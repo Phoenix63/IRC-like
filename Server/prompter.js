@@ -1,26 +1,11 @@
-/*
- *
- * IMPORTS
- */
-
 var colors      = require('colors');
 var readline    = require('readline');
 var util        = require('util');
 
 module.exports = function(app) {
 
-    /*
-     *
-     * CONST
-     */
-
-    // command line before cmd
-    const cmdHead   = colors.grey('$socket ')+colors.green('> ');
-
-
-
-
-    const clear = function() {
+    //clear cmd
+    const clearCmd = function() {
         process.stdout.write("\x1Bc");
     };
 
@@ -34,42 +19,59 @@ module.exports = function(app) {
     };
 
     const completer = function(line) {
-        var completions = [
-            ''
-        ];
+        var completions = ["/w", "/clients", "/kick", "/bc"];
+        var hits = completions.filter(function(c) {
+            return c.indexOf(line) == 0;
+        });
 
-         var hits = completions.filter(function(c) {
-             return c.indexOf(line) == 0;
-         });
-
-         if (hits.length > 0) {
-             return [hits, line];
-         }
-         return [[], line];
+        if (hits.length == 1) {
+            return [hits, line];
+        } else {
+            console.log("Suggest :");
+            var list = "",
+                l = 0,
+                c = "",
+                t = hits.length ? hits : completions;
+            for (var i = 0; i < t.length; i++) {
+                c = t[i].replace(/(\s*)$/g, "")
+                if (list != "") {
+                    list += ", ";
+                }
+                if (((list + c).length + 4 - l) > process.stdout.columns) {
+                    list += "\n";
+                    l = list.length;
+                }
+                list += c;
+            }
+            console.log(list + "\n");
+            return [hits, line];
+        }
     };
     const rl = readline.createInterface({
         input: process.stdin,
         output: process.stdout,
         completer: completer
     });
-    /*
-     *
-     * Events
-     */
+
+
+
+    //Events
+
+    //The 'line' event is emitted whenever the input stream receives an end-of-line input (\n, \r, or \r\n)
     rl.on("line", function(line) {
-
         app.query(line);
-
-        rl.prompt();
+       // rl.prompt();
     });
     rl.on('close', function() {
-        return process.exit(0);
-    });
-    rl.on("SIGINT", function() {
-        rl.clearLine();
-        return process.exit(0);
+        return process.exit(1);
     });
 
+    /* no very useless but interesting
+    rl.on('SIGINT', function() {
+        rl.question('Are you sure you want to exit?(y/no)', function(answer) {
+            return (answer.match(/^o(ui)?$/i) || answer.match(/^y(es)?$/i)) ? process.exit(1) : rl.prompt();
+        });
+    });*/
 
 
     console.log = function() {
@@ -85,12 +87,10 @@ module.exports = function(app) {
         fu("error", arguments);
     };
 
-    /*
-     *
-     * RUN
-     */
-    clear();
-    rl.setPrompt(cmdHead, 2);
+    //Run
+    clearCmd();
+    //change C:\blablabla to $socket>
+    rl.setPrompt(colors.grey('$socket ')+colors.green('> '), 2);
     rl.prompt();
 };
 
