@@ -15,7 +15,7 @@ module.exports = function(app) {
      */
 
     // command line before cmd
-    const cmdHead   = colors.grey('$socket ')+colors.green('> ');
+    app.title = app.title || colors.grey('$socket');
 
 
 
@@ -90,7 +90,7 @@ module.exports = function(app) {
      * RUN
      */
     clear();
-    rl.setPrompt(cmdHead, 2);
+    rl.setPrompt(app.title+colors.green(' > '), 2);
     rl.prompt();
 };
 

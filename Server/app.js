@@ -2,16 +2,13 @@ var prompter    = require('./prompter.js');
 var net         = require('net');
 var shortId     = require('shortid');
 var colors      = require('colors');
+var config      = require('./config.json');
 
 var clients = [];
 
 
 process.on('uncaughtException', function (err) {
-    for(var key in err) {
-        console.log('-----'+key+'-----');
-        console.log(err[key]);
-    }
-    //console.log(err);
+    console.log('\t\t'+colors.red(err));
 });
 
 function findClient(id) {
@@ -90,7 +87,7 @@ server.on('error', function (err) {
     console.log('error:', err);
 });
 
-server.listen(8088, '193.70.84.46');
+server.listen(config.tcp_server.port, config.tcp_server.ip);
 
 var App = (function() {
 
@@ -122,7 +119,7 @@ var App = (function() {
                     i++;
                 }
                 cli.write(ret+'\n');
-                console.log(colors.gren('YOU')+colors.white(' >> ')+ colors.yellow(cli.name)+ colors.white(ret));
+                console.log(colors.green('YOU')+colors.white(' >> ')+ colors.yellow(cli.name)+ ' : '+colors.white(ret));
             } else {
                 console.log(colors.yellow('Can\'t find this client...'));
             }
@@ -135,7 +132,7 @@ var App = (function() {
             }
             clients.forEach(function(c) {
                 c.write(ret+'\n');
-                console.log(colors.gren('YOU')+colors.white(' >> ')+ colors.yellow(c.name)+ colors.white(ret));
+                console.log(colors.green('YOU')+colors.white(' >> ')+ colors.yellow(cli.name)+ ' : '+colors.white(ret));
             });
         } else if (req[0] === 'kick' && req[1]) {
             var cli = findClient(req[1]);

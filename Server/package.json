@@ -11,6 +11,11 @@
   "license": "ISC",
   "dependencies": {
     "colors": "^1.1.2",
-    "shortid": "^2.2.6"
+    "shortid": "^2.2.6",
+    "socket.io": "^1.7.2"
+  },
+  "devDependencies": {
+    "assert": "^1.4.1",
+    "sinon": "^1.17.7"
   }
 }
