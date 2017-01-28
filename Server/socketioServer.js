@@ -36,7 +36,11 @@ function SocketioServer(centralizedServer){
                 message += dataParts[i]+" ";
             }
             centralizedServer.onData(socket,cmd,message.trim());
-        })
+        });
+
+        socket.on("disconnect", function(){
+            centralizedServer.onDisconnect(socket);
+        });
     });
 
 

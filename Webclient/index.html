@@ -10,6 +10,9 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         var socket = io.connect('http://localhost:8087');
+        socket.on("data",function(message){
+            console.log("message from server : "+message);
+        });
         /*
          request example, client side :
          socket.emit("data","/setNickname kingofbonobo");

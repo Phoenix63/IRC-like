@@ -30,7 +30,7 @@ function JavaServer(centralizedServer){
         });
 
         socket.on('end', function (msg) {
-            centralizedServer.onDisconnect(socket)
+            centralizedServer.onDisconnect(socket);
         });
 
     });

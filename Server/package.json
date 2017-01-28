@@ -2,7 +2,7 @@
   "name": "irc-test",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "main": "centralizedServer.js",
   "scripts": {
     "test": "node app.js",
     "start": "node app.js"

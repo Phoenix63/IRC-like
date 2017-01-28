@@ -3,6 +3,7 @@ var prompter = require('./prompter.js');
 var JavaServer = require('./javaServer.js');
 var SocketioServer = require('./socketioServer.js');
 
+
 function CentralizedServer(){
     this.clients = [];
     this.logger = new Logger();
@@ -37,19 +38,18 @@ CentralizedServer.prototype.onConnect = function(socket){
 };
 CentralizedServer.prototype.onDisconnect = function(socket){
     this.logger.socketAction(socket,"is now disconnected to the server");
-    clients.splice(clients.indexOf(socket), 1);
+    this.clients.splice(this.clients.indexOf(socket), 1);
 };
 CentralizedServer.prototype.broadcast = function(data, sender){
     this.clients.forEach(function(client){
         if(client.id===sender.id) return;
         //client.write is create in socket to call socket.emit("data","message")
-        console.log("emission");
         client.write(data);
-        console.log(client.write);
     });
 };
-CentralizedServer.prototype.onCommand = function(cmd, message){
-    switch (cmd){
+CentralizedServer.prototype.onCommand = function(commandLine){
+    var parts = commandLine.split(' ');
+    switch (parts[0]){
         case "/clients":
             var str = "Il y a actuellement "+this.clients.length+" client(s) connecté(s)\n";
             if(this.clients.length>0){
@@ -61,19 +61,18 @@ CentralizedServer.prototype.onCommand = function(cmd, message){
             this.logger.information(str);
             break;
 
-        case "/write":
-
-            break;
 
         default :
-            console.log("Commande non reconnu : "+cmd);
-            this.logger.error("Commande "+cmd+" non reconnu !!!");
+            this.logger.error("Commande "+parts[0]+" non reconnu !!!");
     }
 };
 
 var centralizedServer = new CentralizedServer();
 var javaServer = new JavaServer(centralizedServer);
 var socketioServer = new SocketioServer(centralizedServer);
+
+
+prompter(centralizedServer);
 
 
 

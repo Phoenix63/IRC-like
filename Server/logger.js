@@ -17,5 +17,5 @@ Logger.prototype.error = function(message){
     console.log(colors.red(message));
 };
 Logger.prototype.information = function(message){
-    console.log(colors.orange(message));
+    console.log(colors.yellow(message));
 }

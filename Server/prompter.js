@@ -59,7 +59,7 @@ module.exports = function(app) {
 
     //The 'line' event is emitted whenever the input stream receives an end-of-line input (\n, \r, or \r\n)
     rl.on("line", function(line) {
-        app.query(line);
+        app.onCommand(line);
        // rl.prompt();
     });
     rl.on('close', function() {
