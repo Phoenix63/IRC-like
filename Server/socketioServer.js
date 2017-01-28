@@ -1,7 +1,7 @@
 var http = require('http');
 var fs = require('fs');
 
-module.export = SocketioServer;
+module.exports = SocketioServer;
 
 
 function SocketioServer(centralizedServer){
@@ -16,8 +16,15 @@ function SocketioServer(centralizedServer){
 
     // Quand un client se connecte, on le note dans la console
     io.sockets.on('connection', function (socket) {
+
+        //we create socket.write in socketio, to emit easly since centralizedServer
+        socket.write = function(message){
+            socket.emit("data",message);
+        };
+
         centralizedServer.onConnect(socket);
-        //meme si avec socketio on peut faire socket.on("machintruc"), on en créé qu'un seul : on("data") pour que ce soit pareil que javaServer c plus simple, on gere le reste dans centralized Server
+
+        //meme si avec socketio on peut faire socket.on("machintruc"), on en créé qu'un seul : on("data") pour que ce soit pareil que javaServer.js c plus simple, on gere le reste dans centralized Server
         socket.on('data',function(data){
             //La méthode trim() permet de retirer les blancs en début et fin de chaîne.
             var dataParts = data.toString().trim().split(' ');
@@ -28,7 +35,7 @@ function SocketioServer(centralizedServer){
             for(var i = 1;i<dataParts.length;i++){
                 message += dataParts[i]+" ";
             }
-            centralizedServer.onData(socket,cmd,data);
+            centralizedServer.onData(socket,cmd,message.trim());
         })
     });
 

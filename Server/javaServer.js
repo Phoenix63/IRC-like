@@ -1,5 +1,7 @@
-module.export = JavaServer;
+var net         = require('net');
+var colors      = require('colors');
 
+module.exports = JavaServer;
 
 function JavaServer(centralizedServer){
     var javaServer = net.createServer(function(socket) {
@@ -8,6 +10,12 @@ function JavaServer(centralizedServer){
 
         centralizedServer.onConnect(socket);
 
+        /*
+        /*
+        request example, client side :
+        socket.emit("data","/setNickname kingofbonobo");
+        socket.emit("data","/message hello word");
+         */
         socket.on('data', function (data) {
             //La méthode trim() permet de retirer les blancs en début et fin de chaîne.
             var dataParts = data.toString().trim().split(' ');
@@ -18,26 +26,16 @@ function JavaServer(centralizedServer){
             for(var i = 1;i<dataParts.length;i++){
                 message += dataParts[i]+" ";
             }
-            centralizedServer.onData(socket,cmd,data);
+            centralizedServer.onData(socket,cmd,message.trim());
         });
-
-        function broadcast(message, sender) {
-            clients.forEach(function (client) {
-                // Don't want to send it to sender
-                if (client === sender) return;
-                client.write(message);
-            });
-        }
 
         socket.on('end', function (msg) {
             centralizedServer.onDisconnect(socket)
         });
 
     });
-    javaServer.on('listening', function () {
-        console.log('javaServer listening');
-    });
+
 
     javaServer.listen(8088);
-}
+};
 

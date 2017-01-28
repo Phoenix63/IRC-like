@@ -49,6 +49,7 @@ function findClientByPseudo(pseudo) {
 
 var server = net.createServer(function(socket) {
     // Identify this client
+    socket.name = socket.remoteAddress + ":" + socket.remotePort;
     clients.push(socket);
     socket.write('Welcome' + socket.name + '\n');
     console.log(socket.name+' has just logged in.');

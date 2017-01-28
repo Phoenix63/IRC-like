@@ -1,47 +1,79 @@
-var JavaServer = require('./javaServer.js');
-var SocketioServer = require('./socketioServer');
 var Logger = require('./logger.js');
+var prompter = require('./prompter.js');
+var JavaServer = require('./javaServer.js');
+var SocketioServer = require('./socketioServer.js');
 
-
-
-function Server(){
+function CentralizedServer(){
     this.clients = [];
     this.logger = new Logger();
-    this.emitter = new Emitter();
-
 }
-Server.prototype.broadcast = function(data, sender){
 
-};
+
 //for example /w salut ------------- /w = cmd | salut = data
-Server.prototype.onData = function(socket, cmd, data){
+CentralizedServer.prototype.onData = function(socket, cmd, message){
     switch (cmd){
         case "/message":
-            this.logger.socketAction(socket, "has written -> "+data);
+            this.logger.socketAction(socket, "has written -> "+message);
             break;
-        case "/setNickname":
+
+        case "/nickname":
             //if the value is null we create a random nickname
-            socket.nickname = data;
+            socket.nickname = message;
             if(socket.nickname===null){
                 socket.nickname = 'an unnamed cell';
             }
-            this.logger.socketAction(socket, "has modify his nickname");
+            this.logger.socketAction(socket, "has indicate his nickname");
+            this.broadcast(socket.nickname+" join the chat\n", socket);
             break;
+
         default :
             console.log("Commande non reconnu : "+cmd);
-            this.logger.error("Commande non reconnu !!!")
+            this.logger.error("Commande "+cmd+" non reconnu !!!");
     }
 };
-Server.prototype.onConnect = function(socket){
-    this.logger.socketAction(socket,"is now connected to the server");
+CentralizedServer.prototype.onConnect = function(socket){
     this.clients.push(socket);
+    this.logger.socketAction(socket,"is now connected to the server");
 };
-Server.prototype.onDisconnect = function(socket){
+CentralizedServer.prototype.onDisconnect = function(socket){
     this.logger.socketAction(socket,"is now disconnected to the server");
     clients.splice(clients.indexOf(socket), 1);
 };
+CentralizedServer.prototype.broadcast = function(data, sender){
+    this.clients.forEach(function(client){
+        if(client.id===sender.id) return;
+        //client.write is create in socket to call socket.emit("data","message")
+        console.log("emission");
+        client.write(data);
+        console.log(client.write);
+    });
+};
+CentralizedServer.prototype.onCommand = function(cmd, message){
+    switch (cmd){
+        case "/clients":
+            var str = "Il y a actuellement "+this.clients.length+" client(s) connecté(s)\n";
+            if(this.clients.length>0){
+                this.clients.forEach(function(client){
+                    str += client.nickname+" ";
+                });
+                str += "\n";
+            }
+            this.logger.information(str);
+            break;
 
-var server = new Server();
-var javaServer = new JavaServer(server);
-var socketioServer = new SocketioServer(server);
+        case "/write":
+
+            break;
+
+        default :
+            console.log("Commande non reconnu : "+cmd);
+            this.logger.error("Commande "+cmd+" non reconnu !!!");
+    }
+};
+
+var centralizedServer = new CentralizedServer();
+var javaServer = new JavaServer(centralizedServer);
+var socketioServer = new SocketioServer(centralizedServer);
+
+
 
