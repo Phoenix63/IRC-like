@@ -40,3 +40,4 @@ obj/
 .idea/
 idea/*.xml
 out/
+Server/node_modules

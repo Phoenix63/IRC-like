@@ -1,0 +1,43 @@
+module.export = JavaServer;
+
+
+function JavaServer(centralizedServer){
+    var javaServer = net.createServer(function(socket) {
+        // Identify this client
+        socket.id = socket.remoteAddress + ":" + socket.remotePort;
+
+        centralizedServer.onConnect(socket);
+
+        socket.on('data', function (data) {
+            //La méthode trim() permet de retirer les blancs en début et fin de chaîne.
+            var dataParts = data.toString().trim().split(' ');
+
+            //part 0 correspond to the identifiant of the message, for example : /w /setNicknname, ....
+            var cmd = dataParts[0];
+            var message = "";
+            for(var i = 1;i<dataParts.length;i++){
+                message += dataParts[i]+" ";
+            }
+            centralizedServer.onData(socket,cmd,data);
+        });
+
+        function broadcast(message, sender) {
+            clients.forEach(function (client) {
+                // Don't want to send it to sender
+                if (client === sender) return;
+                client.write(message);
+            });
+        }
+
+        socket.on('end', function (msg) {
+            centralizedServer.onDisconnect(socket)
+        });
+
+    });
+    javaServer.on('listening', function () {
+        console.log('javaServer listening');
+    });
+
+    javaServer.listen(8088);
+}
+
