@@ -14,14 +14,30 @@ var Logger          = require('./modules/Logger');
 var colors          = require('colors');
 
 
+var commandes = {
+    "/message": function(socket, command) {
+        socket.logger._CLIENT_SEND_MESSAGE(command);
+        socket.broadcast(socket.client.id + ' : '+ command);
+    },
+    "/w": function(socket, command) {
+        var idToSend = command.match(/([a-zA-Z0-9]+[ ])/gi)[0].replace(' ', '');
+        try {
+            var client = Client.find(idToSend);
+            client.socket.send('whisper [from] : '+socket.client.id + ' : '+ command.replace(idToSend+' ', ''));
+            socket.send('whisper [to] : '+client.id+' : '+ command.replace(idToSend+' ', ''));
+        }
+        catch (e) {
+            socket.send('Error: can\'t find client '+idToSend);
+        }
 
+    }
+}
 
 socketManager.create(function(socket) {
 
-
-
     var c = new Client.client(socket);
     var logger = new Logger(c);
+    c.socket.logger = logger;
 
     socket.on('connect', function() {
         logger._CLIENT_CONNECTED();
@@ -29,8 +45,12 @@ socketManager.create(function(socket) {
     });
 
     socket.on('message', function(str) {
-        logger._CLIENT_SEND_MESSAGE(str);
-        socket.broadcast(c.id + ' : '+ str);
+        var command = str.match(/(\/([a-z])+[ ])/gi);
+        if(command && command[0] && commandes[command[0].replace(' ', '')]) {
+            commandes[command[0].replace(' ', '')](socket, str.replace(command[0], ''));
+        } else {
+            socket.send('Unknow command '+str);
+        }
     });
 
     socket.on('end', function() {
@@ -40,6 +60,10 @@ socketManager.create(function(socket) {
     socket.on('close', function() {
         logger._CLIENT_DECONNECTED();
         c.delete();
+    });
+
+    socket.on('error on command', function(cmd) {
+        socket.send('Your command "'+cmd+'" is not valide');
     });
 });
 

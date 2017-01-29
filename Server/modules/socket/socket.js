@@ -10,16 +10,27 @@ var Socket = (function() {
         this.id = '__'+shortid.generate();
         this.type = type;
         this.socket = soc;
+        this.client = null;
+        this.logger = null;
         sockets.push(this);
 
         this.onSignal = {};
     }
 
+    Socket.__defineSetter__('client', function cli() {
+        this.client = cli;
+    });
+    Socket.__defineSetter__('logger', function(log) {
+        this.logger = log;
+    });
+
     Socket.prototype.send = function(data) {
         if(this.type === 'tcp')
             this.socket.write(data+'\n');
-        else
+        else {
             this.socket.emit('message', data);
+        }
+
     }
 
     Socket.prototype.broadcast = function(str) {

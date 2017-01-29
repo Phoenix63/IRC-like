@@ -7,6 +7,7 @@ Client = (function () {
     function Client(socket) {
         this.id = shortid.generate();
         this.socket = socket;
+        this.socket.client = this;
         clients.push(this);
     }
 
