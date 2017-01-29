@@ -9,15 +9,15 @@
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        var socket = io.connect('http://localhost:8087');
+        var socket = io.connect('http://localhost:8089');
         socket.on("data",function(message){
-            console.log("message from server : "+message);
+            console.log(message);
         });
         /*
          request example, client side :
-         socket.emit("data","/setNickname kingofbonobo");
+         socket.emit("data","/nickname kingofbonobo");
          socket.emit("data","/message hello word");
-         warning : always use data, we parse /machintruc server side
+         warning : always use emit("data",....);
          */
     </script>
 </body>

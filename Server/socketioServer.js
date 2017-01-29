@@ -1,5 +1,6 @@
 var http = require('http');
 var fs = require('fs');
+var config = require('./config.json');
 
 module.exports = SocketioServer;
 
@@ -40,5 +41,5 @@ function SocketioServer(centralizedServer) {
             centralizedServer.onDisconnect(socket);
         });
     });
-    socketioServer.listen(8087);
+    socketioServer.listen(config.sio_server.port);
 }

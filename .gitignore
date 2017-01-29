@@ -41,3 +41,4 @@ obj/
 idea/*.xml
 out/
 Server/node_modules
+Server/data

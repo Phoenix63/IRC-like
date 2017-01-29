@@ -19,7 +19,7 @@ module.exports = function(app) {
     };
 
     const completer = function(line) {
-        var completions = ["/w", "/clients", "/kick", "/bc"];
+        var completions = ["/broadcast", "/clients"];
         var hits = completions.filter(function(c) {
             return c.indexOf(line) == 0;
         });
