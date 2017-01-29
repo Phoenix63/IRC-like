@@ -1,25 +1,39 @@
-var prompter    = require('./prompter.js');
-var net         = require('net');
-var colors      = require('colors');
-var config      = require('./config.json');
-var socketManager   = require('./modules/socket/socket');
-var Client      = require('./modules/client/client');
+process.env.debug = true;
 
-process.on('uncaughtException', function (err) {
-    console.log('\t\t'+colors.red(err));
-});
+var def             = require('./modules/def');
+var prompter        = require('./prompter.js');
+var net             = require('net');
+var config          = require('./config.json');
+var socketManager   = require('./modules/socket/socket');
+var Client          = require('./modules/client/client');
+var Logger          = require('./modules/Logger');
+var colors          = require('colors');
+
+// true : coupe le serveur sur une erreur
+// false : laisse le serveur tourner sur une erreur
 
 
 
 socketManager.create(function(socket) {
 
+
+
     var c = new Client.client(socket);
-    console.log('new client ('+socket.type+') '+c.id);
-    c.socket.send('Your name is '+c.id);
+    var logger = new Logger(c);
+
+    socket.on('connect', function() {
+        logger._CLIENT_CONNECTED();
+        c.socket.send('Your name is '+c.id);
+    });
 
     socket.on('message', function(str) {
-        console.log(colors.yellow(c.id) + colors.grey(' : ') + colors.white(str));
+        logger._CLIENT_SEND_MESSAGE(str);
         socket.broadcast(c.id + ' : '+ str);
+    });
+
+    socket.on('end', function() {
+        logger._CLIENT_DECONNECTED();
+        c.delete();
     });
 });
 
@@ -53,7 +67,7 @@ var App = (function() {
                     i++;
                 }
                 cli.socket.send(ret+'\n');
-                console.log(colors.green('YOU')+colors.white(' >> ')+ colors.yellow(cli.name)+ ' : '+colors.white(ret));
+                console.log(colors.green('YOU')+colors.white(' >> ')+ colors.yellow(cli.id)+ ' : '+colors.white(ret));
             } else {
                 console.log(colors.yellow('Can\'t find this client...'));
             }
@@ -66,7 +80,7 @@ var App = (function() {
             }
             Client.list().forEach(function(c) {
                 c.socket.send(ret+'\n');
-                console.log(colors.green('YOU')+colors.white(' >> ')+ colors.yellow(cli.name)+ ' : '+colors.white(ret));
+                console.log(colors.green('YOU')+colors.white(' >> ')+ colors.yellow(cli.id)+ ' : '+colors.white(ret));
             });
         }
     };

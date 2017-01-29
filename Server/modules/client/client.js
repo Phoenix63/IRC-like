@@ -11,8 +11,9 @@ Client = (function () {
     }
 
     Client.prototype.delete = function () {
+        this.socket.close();
         clients.splice(clients.indexOf(this), 1);
-        this.destroy();
+        delete this;
     }
 
     return Client;

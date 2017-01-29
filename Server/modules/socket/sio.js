@@ -15,6 +15,7 @@ function createServer(callback) {
 
         socket.on('disconnect', function() {
             socket.manager.emit('end');
+            socket.manager.emit('close');
         });
     });
 }

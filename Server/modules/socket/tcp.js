@@ -7,6 +7,8 @@ function createServer(callback) {
         callback(socket);
         socket.buffer = '';
 
+        socket.manager.emit('connect');
+
         socket.on('data', function (data) {
             var lines = data.toString().split(/\n|\r/),
                 i, line;
@@ -40,10 +42,10 @@ function createServer(callback) {
         });
 
         socket.on('close', function() {
-            socket.emit('end', 'CLOSESOC :: ');
+            socket.manager.emit('close');
         });
-        socket.on('end', function (msg) {
-            socket.manager.emit('end', msg);
+        socket.on('end', function () {
+            socket.manager.emit('end');
         });
 
 

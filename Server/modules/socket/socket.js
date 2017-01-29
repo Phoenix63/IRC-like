@@ -41,6 +41,7 @@ var Socket = (function() {
 
     Socket.prototype.close = function() {
         sockets.splice(sockets.indexOf(this), 1);
+        delete this;
     }
 
     return Socket;
