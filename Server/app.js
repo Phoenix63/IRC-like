@@ -12,7 +12,6 @@ var Client          = require('./modules/client/client');
 var Logger          = require('./modules/Logger');
 var colors          = require('colors');
 var shortid         = require('shortid');
-var mkdirp          = require('mkdirp');
 var image_server    = require('./modules/imageServer/server');
 var config          = require('./config.json');
 
