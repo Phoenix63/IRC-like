@@ -36,7 +36,7 @@ var Socket = (function() {
     Socket.prototype.broadcast = function(str) {
         sockets.forEach((function(soc) {
             if(soc.id !== this.id) {
-                soc.send(str+'\n');
+                soc.send(str);
             }
         }).bind(this));
     }

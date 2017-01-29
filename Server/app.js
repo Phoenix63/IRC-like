@@ -7,11 +7,14 @@ process.env.debug = true;
 var def             = require('./modules/def');
 var prompter        = require('./prompter.js');
 var net             = require('net');
-var config          = require('./config.json');
 var socketManager   = require('./modules/socket/socket');
 var Client          = require('./modules/client/client');
 var Logger          = require('./modules/Logger');
 var colors          = require('colors');
+var shortid         = require('shortid');
+var mkdirp          = require('mkdirp');
+var image_server    = require('./modules/imageServer/server');
+var config          = require('./config.json');
 
 
 var commandes = {
@@ -62,8 +65,15 @@ socketManager.create(function(socket) {
         c.delete();
     });
 
-    socket.on('error on command', function(cmd) {
-        socket.send('Your command "'+cmd+'" is not valide');
+    socket.on('image', function(data) {
+        if(data.type === 'png') {
+            var base64Data = data.image.replace(/^data:image\/png;base64,/, "");
+            var img_path = c.id+"_"+shortid.generate()+".png";
+            require("fs").writeFile("images/"+img_path, base64Data, 'base64', function() {
+                logger._RECEIVE_IMAGE('http://'+config.ip+':'+config.image_server.port+'/img/'+img_path);
+                socket.send('I got your image :)! check http://'+config.ip+':'+config.image_server.port+'/img/'+img_path);
+            });
+        }
     });
 });
 
@@ -96,7 +106,7 @@ var App = (function() {
                     ret += req[i]+' ';
                     i++;
                 }
-                cli.socket.send(ret+'\n');
+                cli.socket.send(ret);
                 console.log(colors.green('YOU')+colors.white(' >> ')+ colors.yellow(cli.id)+ ' : '+colors.white(ret));
             } else {
                 console.log(colors.yellow('Can\'t find this client...'));
@@ -109,7 +119,7 @@ var App = (function() {
                 i++;
             }
             Client.list().forEach(function(c) {
-                c.socket.send(ret+'\n');
+                c.socket.send(ret);
                 console.log(colors.green('YOU')+colors.white(' >> ')+ colors.yellow(c.id)+ ' : '+colors.white(ret));
             });
         }

@@ -10,28 +10,36 @@ function createServer(callback) {
         socket.manager.emit('connect');
 
         socket.on('data', function (data) {
-            var lines = data.toString().split(/\n|\r/),
-                i, line;
+                var lines = data.toString().split(/\n|\r/),
+                    i, line;
 
-            for (i = 0; i < lines.length - 1; i += 1) {
-                line = socket.buffer + lines[i];
-                socket.buffer = '';
-
-                if (line.length <= 510) {
-                    socket.emit('message', line);
-                } else {
-                    console.warn(socket.remoteAddress, socket.name,
-                        'Bufferoverflow');
+                for (i = 0; i < lines.length - 1; i += 1) {
+                    line = socket.buffer + lines[i];
                     socket.buffer = '';
-                }
-            }
+/*
+                    if (line.length <= 510) {
+                        socket.emit('message', line);
+                    } else {
+                        console.warn(socket.remoteAddress, socket.name,
+                            'Bufferoverflow');
+                        socket.buffer = '';
+                    }*/
+                    try {
+                        console.log('image');
+                        var json = JSON.parse(line);
+                        socket.manager.emit('image', json);
+                    }
+                    catch (e) { console.log('message'); socket.emit('message', line); }
 
-            socket.buffer += lines[lines.length - 1];
-            if (socket.buffer.length >= 510) {
-                console.warn(socket.remoteAddress, socket.name, 'Bufferoverflow.');
-                socket.buffer = '';
-            }
-            socket.manager.emit('data', data);
+                }
+/*
+                socket.buffer += lines[lines.length - 1];
+                if (socket.buffer.length >= 510) {
+                    console.warn(socket.remoteAddress, socket.name, 'Bufferoverflow.');
+                    socket.buffer = '';
+                }*/
+                socket.manager.emit('data', data);
+
         });
 
         socket.on('error', function() {
@@ -43,6 +51,7 @@ function createServer(callback) {
                 return;
             }
             socket.manager.emit('message', msg);
+
         });
 
         socket.on('close', function() {
@@ -67,7 +76,7 @@ function createServer(callback) {
         console.log('error:', err);
     });
 
-    server.listen(config.tcp_server.port, config.tcp_server.ip);
+    server.listen(config.tcp_server.port, config.ip);
 }
 
 

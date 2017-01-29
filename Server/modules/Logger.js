@@ -33,6 +33,11 @@ var Logger = (function() {
     Logger.prototype._CLIENT_DECONNECTED= function() {
         console.log(colors.yellow(this.client.id + ' leave the server'));
     }
+    Logger.prototype._RECEIVE_IMAGE = function(path) {
+        if(!path)
+            throwError(this.client, "must have a String");
+        console.log(colors.yellow(this.client.id)+ colors.grey(' : ') + colors.white('Send image '+path));
+    }
 
     return Logger;
 })();
