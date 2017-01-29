@@ -17,7 +17,7 @@ var Socket = (function() {
 
     Socket.prototype.send = function(data) {
         if(this.type === 'tcp')
-            this.socket.write(data);
+            this.socket.write(data+'\n');
         else
             this.socket.emit('message', data);
     }
@@ -25,7 +25,7 @@ var Socket = (function() {
     Socket.prototype.broadcast = function(str) {
         sockets.forEach((function(soc) {
             if(soc.id !== this.id) {
-                soc.send(str);
+                soc.send(str+'\n');
             }
         }).bind(this));
     }

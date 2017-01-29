@@ -13,6 +13,11 @@ function createServer(callback) {
             socket.manager.emit('message', data);
         });
 
+        socket.on('error', function() {
+            socket.manager.emit('end');
+            socket.manager.emit('close');
+        });
+
         socket.on('disconnect', function() {
             socket.manager.emit('end');
             socket.manager.emit('close');

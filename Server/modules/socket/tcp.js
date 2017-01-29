@@ -34,6 +34,10 @@ function createServer(callback) {
             socket.manager.emit('data', data);
         });
 
+        socket.on('error', function() {
+            socket.emit('close');
+        });
+
         socket.on('message', function (msg) {
             if (msg.trim() === '') {
                 return;

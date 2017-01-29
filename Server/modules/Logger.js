@@ -4,7 +4,7 @@ var colors      = require('colors');
 
 function throwError(client, message) {
     if(client && client.socket && client.socket.emit)
-        client.delete();
+        client.socket.emit('end');
     throw "[line "+__lineError + "] ConfMessage : " + __callerName + " "+ message;
 }
 

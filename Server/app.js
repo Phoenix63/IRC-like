@@ -1,3 +1,7 @@
+
+// true : coupe le serveur sur une erreur
+// false : laisse le serveur tourner sur une erreur
+
 process.env.debug = true;
 
 var def             = require('./modules/def');
@@ -9,8 +13,6 @@ var Client          = require('./modules/client/client');
 var Logger          = require('./modules/Logger');
 var colors          = require('colors');
 
-// true : coupe le serveur sur une erreur
-// false : laisse le serveur tourner sur une erreur
 
 
 
@@ -32,6 +34,10 @@ socketManager.create(function(socket) {
     });
 
     socket.on('end', function() {
+        logger._CLIENT_DECONNECTED();
+        c.delete();
+    });
+    socket.on('close', function() {
         logger._CLIENT_DECONNECTED();
         c.delete();
     });
@@ -72,7 +78,7 @@ var App = (function() {
                 console.log(colors.yellow('Can\'t find this client...'));
             }
         } else if (req[0] === 'bc' && req[1]) {
-            var i = 2;
+            var i = 1;
             var ret = '';
             while(req[i]) {
                 ret += req[i]+' ';
@@ -80,7 +86,7 @@ var App = (function() {
             }
             Client.list().forEach(function(c) {
                 c.socket.send(ret+'\n');
-                console.log(colors.green('YOU')+colors.white(' >> ')+ colors.yellow(cli.id)+ ' : '+colors.white(ret));
+                console.log(colors.green('YOU')+colors.white(' >> ')+ colors.yellow(c.id)+ ' : '+colors.white(ret));
             });
         }
     };
