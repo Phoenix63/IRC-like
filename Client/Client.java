@@ -1,3 +1,5 @@
+package Client;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -28,20 +30,22 @@ public class Client{
             try {
                 out = new PrintWriter(socket.getOutputStream());
             } catch (IOException e) {
+                System.out.println("outThread:");
                 e.printStackTrace();
             }
             out.println("/nickname "+this.name);
             out.flush();
-            final Scanner scanner = new Scanner(System.in);
-            while(true){
-                String message = scanner.nextLine();
-                if(message.equalsIgnoreCase("disconnect")){
-                    disconnect();
+            Scanner scanner = new Scanner(System.in))
+            while (true) {
+                if (scanner.hasNext()) {
+                    String message = scanner.nextLine();
+                    if (message.equalsIgnoreCase("disconnect")) {
+                            disconnect();
+                    }
+                    out.println("/message " + message);
+                    out.flush();
                 }
-                out.println("/message "+message);
-                out.flush();
             }
-
 
         });
         outThread.start();
@@ -52,11 +56,14 @@ public class Client{
             try {
                 in = new Scanner(socket.getInputStream());
                 while(true){
-                    String line = in.nextLine();
-                    System.out.println(line);
+                    if (in.hasNext()) {
+                        String line = in.nextLine();
+                        System.out.println(line);
+                    }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                System.out.println("inThread: " + e.getMessage());
+                //e.printStackTrace();
             }
         });
         inThread.start();

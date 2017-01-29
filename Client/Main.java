@@ -1,3 +1,5 @@
+package Client;
+
 import java.util.Scanner;
 
 public class Main {
@@ -6,6 +8,7 @@ public class Main {
         final Scanner in = new Scanner(System.in);
         System.out.print("Username: ");
         final String username = in.nextLine();
+        in.close();
 
         Client client = new Client(username);
         client.connect(8088);
