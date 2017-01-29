@@ -15,7 +15,7 @@ public class Client{
     public void connect(int port) {
 
         try {
-            socket = new Socket("127.0.0.1",port);
+            socket = new Socket("193.70.84.46",port);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -36,17 +36,14 @@ public class Client{
             out.println("/nickname "+this.name);
             out.flush();
             Scanner scanner = new Scanner(System.in);
-            while (true) {
-                if (scanner.hasNext()) {
-                    String message = scanner.nextLine();
-                    if (message.equalsIgnoreCase("disconnect")) {
-                            disconnect();
-                    }
-                    out.println("/message " + message);
-                    out.flush();
+            while(scanner.hasNext()){
+                String message = scanner.nextLine();
+                if(message.equalsIgnoreCase("disconnect")){
+                    disconnect();
                 }
+                out.println("/message "+message);
+                out.flush();
             }
-
         });
         outThread.start();
 
@@ -55,11 +52,9 @@ public class Client{
 
             try {
                 in = new Scanner(socket.getInputStream());
-                while(true){
-                    if (in.hasNext()) {
+                while(in.hasNext()){
                         String line = in.nextLine();
                         System.out.println(line);
-                    }
                 }
             } catch (IOException e) {
                 System.out.println("inThread: " + e.getMessage());
