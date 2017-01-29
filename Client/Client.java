@@ -35,7 +35,7 @@ public class Client{
             }
             out.println("/nickname "+this.name);
             out.flush();
-            Scanner scanner = new Scanner(System.in))
+            Scanner scanner = new Scanner(System.in);
             while (true) {
                 if (scanner.hasNext()) {
                     String message = scanner.nextLine();
