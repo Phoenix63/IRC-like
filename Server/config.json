@@ -8,5 +8,6 @@
   },
   "image_server": {
     "port": "3010"
-  }
+  },
+  "imageSizeLimit": 2097152
 }

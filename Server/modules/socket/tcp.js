@@ -40,16 +40,12 @@ function createServer(callback) {
                 return;
             }
             if(msg.indexOf('/image ')=== 0 || socket.manager.isImageLoading) {
-                console.log('image');
                 socket.manager.isImageLoading = true;
                 socket.manager.emit('image', msg.toString());
-                socket.manager.isImageLoading = false;
-            }
-            if(!socket.manager.isImageLoading) {
-                console.log('command');
+
+            }else{
                 socket.manager.emit('message', msg);
             }
-
 
         });
 
