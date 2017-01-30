@@ -62,5 +62,5 @@ node_modules/
 /test.js
 /test.html
 !/modules/client/client.js
-/test/
+/test/*
 images/*

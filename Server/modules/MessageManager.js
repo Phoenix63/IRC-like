@@ -23,9 +23,6 @@ var commands = {
         catch (e) {
             writeResp(socket, null, "/whisper", "/w "+str, "no client found");
         }
-    },
-    "/image": function(socket, str) {
-        socket.emit('image', str.replace('/image ', ''));
     }
 };
 commands["/w"] = commands["/whisper"];
@@ -41,11 +38,9 @@ var CommandManager = (function() {
         return false;
     };
 
-    CommandManager.prototype.exec = function(str) {
+    CommandManager.prototype.exec = function(str, image) {
         var command = str.match(/(\/([a-z])+[ ])/gi);
         var req = command[0].replace(' ','');
-        if(!CommandManager.check(req))
-            throw "Invalide command";
 
         commands[req](this.socket, str.replace(command, ''));
     };
@@ -60,10 +55,10 @@ var MessageManager = (function() {
         this.socket.commandManager = new CommandManager(socket);
         this.socket.on('message', (function(str) {
             var command = str.match(/(\/([a-z])+[ ])/gi);
-            if(command && command[0] && CommandManager.check(command[0].replace(' ', ''))) {
+            if (command && command[0] && CommandManager.check(command[0].replace(' ', ''))) {
                 this.socket.commandManager.exec(str);
             } else {
-                socket.send('{"err": "Unknow command", "command":"'+str+'"}');
+                socket.send('{"err": "Unknow command", "command":"' + str + '"}');
             }
         }).bind(this));
     }

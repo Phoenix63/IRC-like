@@ -5,27 +5,29 @@ var config      = require('./../../config.json');
 function createServer(callback) {
     var server = net.createServer(function(socket) {
         callback(socket);
+        socket.manager.isImageLoading = false;
         socket.buffer = '';
-
         socket.manager.emit('connect');
 
         socket.on('data', function (data) {
-                var lines = data.toString().split(/\n|\r/),
-                    i, line;
 
-                for (i = 0; i < lines.length - 1; i += 1) {
-                    line = socket.buffer + lines[i];
-                    socket.buffer = '';
 
-                    /*try {
-                        var json = JSON.parse(line);
-                        socket.manager.emit('image', json);
-                    }
-                    catch (e) {socket.emit('message', line); }*/
-                    socket.emit('message', line);
+            socket.manager.emit('data', data);
 
-                }
-                socket.manager.emit('data', data);
+            var lines = data.toString().split(/\n|\r/),
+                i, line;
+
+            for (i = 0; i < lines.length - 1; i += 1) {
+                line = socket.buffer + lines[i];
+                socket.buffer = '';
+
+                socket.emit('message', line);
+                socket.receiving = false;
+            }
+
+            socket.buffer += lines[lines.length - 1];
+
+
 
         });
 
@@ -37,7 +39,17 @@ function createServer(callback) {
             if (msg.trim() === '') {
                 return;
             }
-            socket.manager.emit('message', msg);
+            if(msg.indexOf('/image ')=== 0 || socket.manager.isImageLoading) {
+                console.log('image');
+                socket.manager.isImageLoading = true;
+                socket.manager.emit('image', msg.toString());
+                socket.manager.isImageLoading = false;
+            }
+            if(!socket.manager.isImageLoading) {
+                console.log('command');
+                socket.manager.emit('message', msg);
+            }
+
 
         });
 
