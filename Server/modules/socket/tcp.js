@@ -8,6 +8,11 @@ function createServer(callback) {
         socket.manager.isImageLoading = false;
         socket.buffer = '';
         socket.manager.emit('connect');
+        socket.setTimeout(0);
+
+        socket.on('timeout', function() {
+            socket.manager.emit('close');
+        });
 
         socket.on('data', function (data) {
 
@@ -40,16 +45,12 @@ function createServer(callback) {
                 return;
             }
             if(msg.indexOf('/image ')=== 0 || socket.manager.isImageLoading) {
-                console.log('image');
                 socket.manager.isImageLoading = true;
                 socket.manager.emit('image', msg.toString());
-                socket.manager.isImageLoading = false;
-            }
-            if(!socket.manager.isImageLoading) {
-                console.log('command');
+
+            }else{
                 socket.manager.emit('message', msg);
             }
-
 
         });
 

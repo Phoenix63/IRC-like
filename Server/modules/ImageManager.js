@@ -15,21 +15,38 @@ var ImageManager = (function() {
 
         this.image = '';
 
+        this.receiveTimeout = null;
+
         this.socket.on('image', (function(data) {
+
             this.socket.isImageLoading = true;
             this.image += data.replace('/image', '');
-            console.log('receiving image');
+
+            clearTimeout(this.receiveTimeout);
+            this.receiveTimeout = setTimeout((function() {
+                this.socket.send('{"err": "cannot receive your image", "errfrom": "timeout"}');
+                this.image = '';
+                this.socket.isImageLoading = false;
+                clearTimeout(this.receiveTimeout);
+            }).bind(this), 1000);
 
             if(this.image.indexOf(';END;')>0) {
+                clearTimeout(this.receiveTimeout);
+                var size = 3*(Buffer.byteLength(this.image, 'utf8')/4);
+                if(size > config.imageSizeLimit) {
+                    this.socket.send('{"err": "your image should be under '+config.imageSizeLimit+' bytes", "type":"image"}');
+                    this.image = '';
+                    this.socket.isImageLoading = false;
+                    return;
+                }
                 try {
                     this.image = this.image.replace(';END;','');
                     data = JSON.parse(this.image);
                 } catch(e) {
-                    //this.socket.send('{"err": "invalid image", "image": "'+data+'"}');
-                    this.socket.isImageLoading = false;
+                    this.socket.send('{"err": "invalid image", "type":"image"}');
                     this.image = '';
-                    throw "invalid image received";
-
+                    this.socket.isImageLoading = false;
+                    return;
                 }
                 if(format.indexOf(data.type)>=0) {
                     var base64Data = data.image.replace(/^data:image\/([a-z])+;base64,/, "");
