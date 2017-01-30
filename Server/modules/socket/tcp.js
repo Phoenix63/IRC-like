@@ -8,6 +8,11 @@ function createServer(callback) {
         socket.manager.isImageLoading = false;
         socket.buffer = '';
         socket.manager.emit('connect');
+        socket.setTimeout(0);
+
+        socket.on('timeout', function() {
+            socket.manager.emit('close');
+        });
 
         socket.on('data', function (data) {
 
