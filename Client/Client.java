@@ -15,7 +15,7 @@ public class Client{
     public void connect(int port) {
 
         try {
-            socket = new Socket("193.70.84.46",port);
+            socket = new Socket("127.0.0.1",port);//"193.70.84.46",port);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -41,8 +41,11 @@ public class Client{
                 if(message.equalsIgnoreCase("disconnect")){
                     disconnect();
                 }
-                //TODO: envoyer /message quand ce n'est pas une commande !
-                out.println("/message "+message);
+                if (message.charAt(0) == '/') {
+                    out.println(message);
+                } else {
+                    out.println("/message " + message);
+                }
                 out.flush();
             }
         });
