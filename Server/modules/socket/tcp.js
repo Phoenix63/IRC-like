@@ -16,28 +16,15 @@ function createServer(callback) {
                 for (i = 0; i < lines.length - 1; i += 1) {
                     line = socket.buffer + lines[i];
                     socket.buffer = '';
-/*
-                    if (line.length <= 510) {
-                        socket.emit('message', line);
-                    } else {
-                        console.warn(socket.remoteAddress, socket.name,
-                            'Bufferoverflow');
-                        socket.buffer = '';
-                    }*/
-                    try {
-                        console.log('image');
+
+                    /*try {
                         var json = JSON.parse(line);
                         socket.manager.emit('image', json);
                     }
-                    catch (e) { console.log('message'); socket.emit('message', line); }
+                    catch (e) {socket.emit('message', line); }*/
+                    socket.emit('message', line);
 
                 }
-/*
-                socket.buffer += lines[lines.length - 1];
-                if (socket.buffer.length >= 510) {
-                    console.warn(socket.remoteAddress, socket.name, 'Bufferoverflow.');
-                    socket.buffer = '';
-                }*/
                 socket.manager.emit('data', data);
 
         });

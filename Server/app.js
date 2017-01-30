@@ -4,55 +4,35 @@
 
 process.env.debug = true;
 
+// globals
 var def             = require('./modules/def');
-var prompter        = require('./prompter.js');
 var net             = require('net');
+var colors          = require('colors');
+var shortid         = require('shortid');
+var prompter        = require('./prompter.js');
+var config          = require('./config.json');
+var image_server    = require('./modules/imageServer/server');
+
+// socket
+
 var socketManager   = require('./modules/socket/socket');
 var Client          = require('./modules/client/client');
 var Logger          = require('./modules/Logger');
-var colors          = require('colors');
-var shortid         = require('shortid');
-var image_server    = require('./modules/imageServer/server');
-var config          = require('./config.json');
+var MessageManager  = require('./modules/MessageManager');
+var ImageManager    = require('./modules/ImageManager');
 
-
-var commandes = {
-    "/message": function(socket, command) {
-        socket.logger._CLIENT_SEND_MESSAGE(command);
-        socket.broadcast(socket.client.id + ' : '+ command);
-    },
-    "/w": function(socket, command) {
-        var idToSend = command.match(/([a-zA-Z0-9]+[ ])/gi)[0].replace(' ', '');
-        try {
-            var client = Client.find(idToSend);
-            client.socket.send('whisper [from] : '+socket.client.id + ' : '+ command.replace(idToSend+' ', ''));
-            socket.send('whisper [to] : '+client.id+' : '+ command.replace(idToSend+' ', ''));
-        }
-        catch (e) {
-            socket.send('Error: can\'t find client '+idToSend);
-        }
-
-    }
-}
 
 socketManager.create(function(socket) {
 
     var c = new Client.client(socket);
     var logger = new Logger(c);
     c.socket.logger = logger;
+    c.socket.messageManager = new MessageManager(c.socket);
+    c.socket.imageManager = new ImageManager(c.socket);
 
     socket.on('connect', function() {
         logger._CLIENT_CONNECTED();
-        c.socket.send('Your name is '+c.id);
-    });
-
-    socket.on('message', function(str) {
-        var command = str.match(/(\/([a-z])+[ ])/gi);
-        if(command && command[0] && commandes[command[0].replace(' ', '')]) {
-            commandes[command[0].replace(' ', '')](socket, str.replace(command[0], ''));
-        } else {
-            socket.send('Unknow command '+str);
-        }
+        c.socket.send('{"id":"'+c.id+'", "err":"false"}');
     });
 
     socket.on('end', function() {
@@ -62,17 +42,6 @@ socketManager.create(function(socket) {
     socket.on('close', function() {
         logger._CLIENT_DECONNECTED();
         c.delete();
-    });
-
-    socket.on('image', function(data) {
-        if(data.type === 'png') {
-            var base64Data = data.image.replace(/^data:image\/png;base64,/, "");
-            var img_path = c.id+"_"+shortid.generate()+".png";
-            require("fs").writeFile("images/"+img_path, base64Data, 'base64', function() {
-                logger._RECEIVE_IMAGE('http://'+config.ip+':'+config.image_server.port+'/img/'+img_path);
-                socket.send('I got your image :)! check http://'+config.ip+':'+config.image_server.port+'/img/'+img_path);
-            });
-        }
     });
 });
 

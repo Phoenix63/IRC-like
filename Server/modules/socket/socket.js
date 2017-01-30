@@ -12,6 +12,8 @@ var Socket = (function() {
         this.socket = soc;
         this.client = null;
         this.logger = null;
+        this.messageManager = null;
+        this.imageManager = null;
         sockets.push(this);
 
         this.onSignal = {};
