@@ -54,12 +54,15 @@ var MessageManager = (function() {
         this.socket = socket;
         this.socket.commandManager = new CommandManager(socket);
         this.socket.on('message', (function(str) {
-            var command = str.match(/(\/([a-z])+[ ])/gi);
-            if (command && command[0] && CommandManager.check(command[0].replace(' ', ''))) {
-                this.socket.commandManager.exec(str);
-            } else {
-                socket.send('{"err": "Unknow command", "command":"' + str + '"}');
+            if(!this.socket.isImageLoading) {
+                var command = str.match(/(\/([a-z])+[ ])/gi);
+                if (command && command[0] && CommandManager.check(command[0].replace(' ', ''))) {
+                    this.socket.commandManager.exec(str);
+                } else {
+                    socket.send('{"err": "Unknow command", "command":"' + str + '"}');
+                }
             }
+
         }).bind(this));
     }
 
