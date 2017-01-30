@@ -41,6 +41,7 @@ public class Client{
                 if(message.equalsIgnoreCase("disconnect")){
                     disconnect();
                 }
+                //TODO: envoyer /message quand ce n'est pas une commande !
                 out.println("/message "+message);
                 out.flush();
             }
