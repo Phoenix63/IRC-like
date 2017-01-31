@@ -1,3 +1,5 @@
+"use strict"
+
 var Client = require('./client/client');
 
 var colors      = require('colors');

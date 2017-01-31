@@ -1,11 +1,10 @@
-
+"use strict"
 // true : coupe le serveur sur une erreur
 // false : laisse le serveur tourner sur une erreur
 
 process.env.debug = true;
 
 // globals
-var def             = require('./modules/def');
 var net             = require('net');
 var colors          = require('colors');
 var shortid         = require('shortid');

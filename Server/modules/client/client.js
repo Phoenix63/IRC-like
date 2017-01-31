@@ -1,8 +1,10 @@
+"use strict"
+
 var shortid     = require('shortid');
 
 var clients = [];
 
-Client = (function () {
+const Client = (function () {
 
     function Client(socket) {
         this.id = shortid.generate();

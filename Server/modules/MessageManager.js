@@ -1,3 +1,5 @@
+"use strict"
+
 var Client  = require('./client/client');
 
 function writeResp(socket, to, command, message, err) {

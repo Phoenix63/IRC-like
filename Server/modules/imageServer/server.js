@@ -1,3 +1,5 @@
+"use strict"
+
 var config = require('./../../config.json');
 var express = require('express');
 var path = require('path');

@@ -1,3 +1,5 @@
+"use strict"
+
 var tcp     = require('./tcp');
 var sio     = require('./sio.js');
 var shortid = require('shortid');
@@ -31,7 +33,7 @@ var Socket = (function() {
 
     Socket.prototype.send = function(data) {
         if(this.type === 'tcp')
-            this.socket.write(data+'\n');
+            this.socket.write(data+'\n\r');
         else {
             this.socket.emit('message', data);
         }
