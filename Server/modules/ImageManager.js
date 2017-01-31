@@ -1,9 +1,10 @@
+"use strict"
 
 var shortid = require('shortid');
 var fs      = require('fs');
 var config  = require('./../config.json');
 
-format = [
+const format = [
     'png',
     'jpeg',
     'jpg'

@@ -1,3 +1,5 @@
+"use strict"
+
 var config      = require('./../../config.json');
 var io          = require('socket.io')(config.sio_server.port);
 

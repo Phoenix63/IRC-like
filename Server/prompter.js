@@ -2,6 +2,7 @@
  *
  * IMPORTS
  */
+"use strict"
 
 var colors      = require('colors');
 var readline    = require('readline');

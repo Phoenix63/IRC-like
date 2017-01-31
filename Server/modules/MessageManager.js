@@ -1,3 +1,5 @@
+"use strict"
+
 var Client  = require('./client/client');
 
 function writeResp(socket, to, command, message, err) {
@@ -21,7 +23,7 @@ var commands = {
             writeResp(socket, client.id, "/whisper", str.replace(idToSend+' ', ''), false);
         }
         catch (e) {
-            writeResp(socket, null, "/whisper", "/w "+str, "no client found");
+            writeResp(socket, null, "/whisper", "/w "+str, e);
         }
     }
 };
