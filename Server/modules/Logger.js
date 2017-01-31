@@ -7,7 +7,7 @@ var colors      = require('colors');
 function throwError(client, message) {
     if(client && client.socket && client.socket.emit)
         client.socket.emit('end');
-    throw "[line "+__lineError + "] ConfMessage : " + __callerName + " "+ message;
+    throw "ConfMessage : "+ message;
 }
 
 if(!process.env.debug) {
@@ -20,7 +20,7 @@ var Logger = (function() {
 
     function Logger(client){
         if(!client instanceof Client.client)
-            throwError(client, "must be an instance of Client");
+            throwError(client, "Logger have an instance of Client");
         this.client = client;
     }
 
@@ -29,7 +29,7 @@ var Logger = (function() {
     }
     Logger.prototype._CLIENT_SEND_MESSAGE= function(message) {
         if(!message)
-            throwError(this.client, "must have a String");
+            throwError(this.client, "_CLIENT_SEND_MESSAGE must have a String");
         console.log(colors.yellow(this.client.id) + colors.grey(' : ') + colors.white(message));
     }
     Logger.prototype._CLIENT_DECONNECTED= function() {
@@ -37,7 +37,7 @@ var Logger = (function() {
     }
     Logger.prototype._RECEIVE_IMAGE = function(path) {
         if(!path)
-            throwError(this.client, "must have a String");
+            throwError(this.client, " _RECEIVE_IMAGE must have a String");
         console.log(colors.yellow(this.client.id)+ colors.grey(' : ') + colors.white('Send image '+path));
     }
 

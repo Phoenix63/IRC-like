@@ -65,8 +65,8 @@ var App = (function() {
                 console.log(colors.yellow('no client connected'));
             }
         } else if (req[0] === 'send' && req[1] && req[2]) {
-            var cli = Client.find(req[1]);
-            if(cli) {
+            try {
+                var cli = Client.find(req[1]);
                 var i = 2;
                 ret = '';
                 while(req[i]) {
@@ -75,9 +75,10 @@ var App = (function() {
                 }
                 cli.socket.send(ret);
                 console.log(colors.green('YOU')+colors.white(' >> ')+ colors.yellow(cli.id)+ ' : '+colors.white(ret));
-            } else {
-                console.log(colors.yellow('Can\'t find this client...'));
+            } catch(e) {
+                console.log(colors.yellow(e));
             }
+
         } else if (req[0] === 'bc' && req[1]) {
             var i = 1;
             var ret = '';
