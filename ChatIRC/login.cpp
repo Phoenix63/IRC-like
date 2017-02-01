@@ -1,6 +1,6 @@
 #include "login.h"
 #include "ui_login.h"
-
+#include "mainframe.h"
 Login::Login(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Login)
@@ -11,15 +11,26 @@ Login::Login(QWidget *parent) :
 Login::~Login()
 {
     delete ui;
+    delete main;
 }
+
+void Login::on_pushButton_connect_clicked()
+{
+    //    QString host= ui->lineEdit_host->text();
+    //    int port = ui->lineEdit_port->text().toInt(0,10);
+        Login::doConnect("localhost",1234);
+        main=new MainFrame(this,socket);
+        main->show();
+}
+
 void Login::doConnect(QString host,int port)
 {
     socket = new QTcpSocket(this);
-
     connect(socket, SIGNAL(connected()),this, SLOT(connected()));
     connect(socket, SIGNAL(disconnected()),this, SLOT(disconnected()));
     connect(socket, SIGNAL(bytesWritten(qint64)),this, SLOT(bytesWritten(qint64)));
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
+
 
     qDebug() << "connecting...";
 
@@ -33,16 +44,9 @@ void Login::doConnect(QString host,int port)
     }
 }
 
-void Login::on_pushButton_clicked()
-{
-//    QString host= ui->lineEdit_host->text();
-//    int port = ui->lineEdit_port->text().toInt(0,10);
-    Login::doConnect("localhost",1234);
-}
 void Login::connected()
 {
     qDebug() << "connected...";
-
     // Hey server, tell me about you.
     socket->write("Bonjour\n");
 }
@@ -64,3 +68,5 @@ void Login::readyRead()
     // read the data from the socket
     qDebug() << socket->readAll();
 }
+
+

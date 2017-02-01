@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <QAbstractSocket>
+#include "mainframe.h"
 
 namespace Ui {
 class Login;
@@ -26,9 +27,10 @@ public slots:
     void readyRead();
 
 private slots:
-    void on_pushButton_clicked();
+    void on_pushButton_connect_clicked();
 
 private:
+    MainFrame *main;
     QTcpSocket *socket;
     Ui::Login *ui;
 };

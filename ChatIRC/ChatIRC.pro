@@ -14,14 +14,16 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp \
     login.cpp \
-    listchannel.cpp
+    listchannel.cpp \
+    mainframe.cpp
 
-HEADERS  += mainwindow.h \
+HEADERS  += \
     login.h \
-    listchannel.h
+    listchannel.h \
+    mainframe.h
 
-FORMS    += mainwindow.ui \
+FORMS    += \
     login.ui \
-    listchannel.ui
+    listchannel.ui \
+    mainframe.ui
