@@ -20,12 +20,6 @@ public:
     void doConnect(QString host,int port);
     ~Login();
 
-public slots:
-    void connected();
-    void disconnected();
-    void bytesWritten(qint64 bytes);
-    void readyRead();
-
 private slots:
     void on_pushButton_connect_clicked();
 
