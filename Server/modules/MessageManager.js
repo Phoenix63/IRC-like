@@ -1,9 +1,64 @@
 var err     = require('./ErrorManager');
+var Channel     = require('./channel/Channel');
+var Client      = require('./client/client');
 
 
 var allowedCommand = {
-    'NICK': function(socket, params){
+    'NICK': function(socket, command){
+        socket.client.name = command[1].split(' ')[0];
+    },
+    'JOIN': function(socket, command) {
+        var name = command[1].split(' ')[0];
+        var key = command[1].split(' ')[1] || '';
 
+        var err = true;
+
+        Channel.list().forEach(function(chan) {
+            if(chan.name === name) {
+                err = false;
+                // join
+                chan.addUser(socket.client, key);
+
+            }
+        });
+        if(err) {
+            // create
+            new Channel(socket.client, name, key, 2);
+        }
+    },
+    'PRIVMSG': function(socket, command) {
+        var receivers = command[1].split(' ')[0].split(',');
+        var message = command[1].split(':');
+        if(!message[1]) {
+            err.ERR_NOTEXTTOSEND(socket);
+            return;
+        }
+
+        var clients = {};
+        var channels = {};
+        Channel.list().forEach(function(chan) {
+            channels[chan.name]= chan;
+        });
+        Client.list().forEach(function(cli) {
+            clients[cli.name] = cli;
+        });
+        var error = true;
+        receivers.forEach(function(r) {
+            if(clients[r]) {
+                clients[r].socket.send(':'+ socket.client.name+' PRIVMSG :'+message[1]);
+                error = false;
+            } else if (channels[r]) {
+                if(channels[r].users.indexOf(socket.client)>=0) {
+                    channels[r].broadcast(':'+ socket.client.name+' PRIVMSG :'+message[1]);
+                    error = false;
+                } else {
+                    err.ERR_CANNOTSENDTOCHAN(socket);
+                }
+            }
+        });
+        if(error) {
+            err.ERR_NORECIPIENT(socket);
+        }
     }
 };
 
@@ -13,12 +68,15 @@ var CommandManager = (function() {
         this.socket = socket;
     }
 
-    CommandManager.prototype.exec = function(command, params) {
-        if(allowedCommand[command]) {
-            allowedCommand[command](this.socket, params);
+    CommandManager.prototype.exec = function(command) {
+        if(allowedCommand[command[0]]) {
+            allowedCommand[command[0]](this.socket, command);
+            return;
+        } else {
+            err.ERR_UNKNOWCOMMAND(this.socket);
             return;
         }
-        err.ERR_UNKNOWCOMMAND(this.socket);
+
     };
 
 
@@ -27,11 +85,13 @@ var CommandManager = (function() {
 
 function parseMessage(line) {
 
-    var command = line.match(/[A-Z]+/g);
+    var command = line.match(/[A-Z]+([ ][^[a-zA-Z0-9#&:][a-zA-Z0-9 ]+)?/g);
     if(command) {
         return [command[0], line.replace(new RegExp(command[0]+"[ ]?"), '')];
+    } else {
+        throw "unknow command";
     }
-    throw "unknow command";
+
 }
 
 var MessageManager = (function() {
@@ -40,10 +100,10 @@ var MessageManager = (function() {
         this.socket.commandManager = new CommandManager(socket);
         this.socket.on('message', (function(str) {
             if(!this.socket.isImageLoading) {
-
                 try {
-                    this.socket.commandManager(this.socket, parseMessage(str));
+                    this.socket.commandManager.exec(parseMessage(str));
                 } catch(e) {
+                    console.log(e);
                     err.ERR_UNKNOWCOMMAND(this.socket);
                 }
 

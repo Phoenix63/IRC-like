@@ -20,6 +20,10 @@ var Logger          = require('./modules/Logger');
 var MessageManager  = require('./modules/MessageManager');
 var ImageManager    = require('./modules/ImageManager');
 
+// channels
+
+var Channel         = require('./modules/channel/Channel');
+
 
 socketManager.create(function(socket) {
 
@@ -31,8 +35,18 @@ socketManager.create(function(socket) {
 
     socket.on('connect', function() {
         logger._CLIENT_CONNECTED();
-        c.socket.send('{"id":"'+c.id+'", "err":"false"}');
-        c.name = 'potatoes';
+
+        var channels = Channel.list();
+        var drop = '';
+        channels.forEach(function(chan) {
+            if(chan.flags.indexOf('i')===-1) {
+                drop += chan.name+',';
+            }
+        });
+        if(drop.length>0)
+            drop = drop.slice(0,-1);
+        c.socket.send('['+drop+']');
+        //c.name = 'potatoes';
     });
 
     socket.on('end', function() {
@@ -91,6 +105,19 @@ var App = (function() {
                 c.socket.send(ret);
                 console.log(colors.green('YOU')+colors.white(' >> ')+ colors.yellow(c.name)+ ' : '+colors.white(ret));
             });
+        } else if (req[0] === 'channels') {
+            var list = Channel.list(true);
+            if(list.length > 0) {
+                var ret = '';
+                ret += '-- Channels --\n';
+                for(var i=0; i<list.length; i++) {
+                    ret += i + '\t\t'+ list[i].name + '\t\t' + list[i].users.length+'/'+list[i].maxSize+'\n';
+                }
+
+                console.log(colors.yellow(ret));
+            } else {
+                console.log(colors.yellow('no channel connected'));
+            }
         }
     };
 

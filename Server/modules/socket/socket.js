@@ -32,7 +32,8 @@ var Socket = (function() {
     });
 
     Socket.prototype.send = function(data) {
-        console.log(':: '+this.client.id+' > '+data);
+        this.logger._SEND_TO_CLIENT(data);
+
         if(this.type === 'tcp')
             this.socket.write(data+'\n\r');
         else {
@@ -42,10 +43,8 @@ var Socket = (function() {
     }
 
     Socket.prototype.broadcast = function(str) {
-        sockets.forEach((function(soc) {
-            if(soc.id !== this.id) {
-                soc.send(str);
-            }
+        this.client.channels.forEach((function(chan) {
+            chan.broadcast(str);
         }).bind(this));
     }
 

@@ -12,6 +12,8 @@ const Client = (function () {
         this.nick = null;
         this.socket = socket;
         this.socket.client = this;
+
+        this.channels = [];
         clients.push(this);
     }
 
@@ -33,10 +35,11 @@ const Client = (function () {
                 .replace(/\{/, '[')
                 .replace(/\}/, ']')
                 .replace(/\\/, '\|'))>=0) {
-            err.ERR_NICKCOLLISION(this.socket);
+            err.ERR_NICKNAMEINUSE(this.socket);
             return;
         }
-        if(name === '') {
+        var match = name.match(/[a-zA-Z0-9\[\]\{\}_-é"'ëäïöüâêîôûç`è]+/);
+        if((match && match[0] !== name) || name === '') {
             err.ERR_NONICKNAMEGIVEN(this.socket);
             return;
         }
