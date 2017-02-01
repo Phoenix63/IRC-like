@@ -31,7 +31,9 @@ void MainFrame::on_pushButton_send_clicked()
 
 void MainFrame::readyRead()
 {
-    QString message(socket->readLine(255));
-    message = message.left(message.length() - 1);
-    ui->textBrowser_messageLog->append(message);
+    char toto[255];
+    int t = socket->readLine(toto,255);
+    toto[t-1] = '\0';
+    toto[0] = ' ';
+    ui->textBrowser_messageLog->append(toto);
 }
