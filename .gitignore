@@ -39,4 +39,9 @@ obj/
 *.iml
 .idea/
 idea/*.xml
+<<<<<<< HEAD
 out/
+=======
+out/
+node_modules/
+>>>>>>> 2738062d3117f73e7205b7e991a834e283369b68
