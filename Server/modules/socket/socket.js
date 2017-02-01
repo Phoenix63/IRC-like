@@ -32,6 +32,7 @@ var Socket = (function() {
     });
 
     Socket.prototype.send = function(data) {
+        console.log(':: '+this.client.id+' > '+data);
         if(this.type === 'tcp')
             this.socket.write(data+'\n\r');
         else {
@@ -58,6 +59,7 @@ var Socket = (function() {
     }
 
     Socket.prototype.close = function() {
+        this.socket.destroy();
         sockets.splice(sockets.indexOf(this), 1);
         delete this;
     }

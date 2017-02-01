@@ -23,7 +23,7 @@ var ImageManager    = require('./modules/ImageManager');
 
 socketManager.create(function(socket) {
 
-    var c = new Client.client(socket);
+    var c = new Client(socket);
     var logger = new Logger(c);
     c.socket.logger = logger;
     c.socket.messageManager = new MessageManager(c.socket);
@@ -32,6 +32,7 @@ socketManager.create(function(socket) {
     socket.on('connect', function() {
         logger._CLIENT_CONNECTED();
         c.socket.send('{"id":"'+c.id+'", "err":"false"}');
+        c.name = 'potatoes';
     });
 
     socket.on('end', function() {
@@ -57,7 +58,7 @@ var App = (function() {
                 var ret = '';
                 ret += '-- Client list --\n';
                 for(var i=0; i<Client.list().length; i++) {
-                    ret += i + '\t\t'+Client.list()[i].id+'\t\t'+Client.list()[i].socket.type+'\n';
+                    ret += i + '\t\t'+ Client.list()[i].name+'\t\t'+ Client.list()[i].id+'\t\t'+Client.list()[i].socket.type+'\n';
                 }
 
                 console.log(colors.yellow(ret));
@@ -74,7 +75,7 @@ var App = (function() {
                     i++;
                 }
                 cli.socket.send(ret);
-                console.log(colors.green('YOU')+colors.white(' >> ')+ colors.yellow(cli.id)+ ' : '+colors.white(ret));
+                console.log(colors.green('YOU')+colors.white(' >> ')+ colors.yellow(cli.name)+ ' : '+colors.white(ret));
             } catch(e) {
                 console.log(colors.yellow(e));
             }
@@ -88,7 +89,7 @@ var App = (function() {
             }
             Client.list().forEach(function(c) {
                 c.socket.send(ret);
-                console.log(colors.green('YOU')+colors.white(' >> ')+ colors.yellow(c.id)+ ' : '+colors.white(ret));
+                console.log(colors.green('YOU')+colors.white(' >> ')+ colors.yellow(c.name)+ ' : '+colors.white(ret));
             });
         }
     };
