@@ -17,30 +17,30 @@
    <property name="geometry">
     <rect>
      <x>60</x>
-     <y>80</y>
+     <y>30</y>
      <width>46</width>
      <height>13</height>
     </rect>
    </property>
    <property name="text">
-    <string>UserID :</string>
+    <string>Nickname</string>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit">
+  <widget class="QLineEdit" name="lineEdit_username">
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>70</y>
+     <y>30</y>
      <width>161</width>
      <height>20</height>
     </rect>
    </property>
   </widget>
-  <widget class="QLineEdit" name="lineEdit_2">
+  <widget class="QLineEdit" name="lineEdit_pass">
    <property name="geometry">
     <rect>
      <x>110</x>
-     <y>120</y>
+     <y>80</y>
      <width>161</width>
      <height>20</height>
     </rect>
@@ -49,17 +49,17 @@
   <widget class="QLabel" name="label_2">
    <property name="geometry">
     <rect>
-     <x>40</x>
-     <y>120</y>
+     <x>60</x>
+     <y>80</y>
      <width>61</width>
      <height>20</height>
     </rect>
    </property>
    <property name="text">
-    <string>Password :</string>
+    <string>Password</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton">
+  <widget class="QPushButton" name="pushButton_connect">
    <property name="geometry">
     <rect>
      <x>120</x>
@@ -72,20 +72,7 @@
     <string>Connect</string>
    </property>
   </widget>
-  <widget class="QCheckBox" name="checkBox">
-   <property name="geometry">
-    <rect>
-     <x>130</x>
-     <y>150</y>
-     <width>111</width>
-     <height>20</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Accept Regulation</string>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="pushButton_2">
+  <widget class="QPushButton" name="pushButton_register">
    <property name="geometry">
     <rect>
      <x>210</x>
@@ -98,7 +85,7 @@
     <string>Register</string>
    </property>
   </widget>
-  <widget class="QPushButton" name="pushButton_3">
+  <widget class="QPushButton" name="pushButton_guest">
    <property name="geometry">
     <rect>
      <x>170</x>
@@ -122,6 +109,45 @@
    </property>
    <property name="text">
     <string>No account yet ? Login as</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_host">
+   <property name="geometry">
+    <rect>
+     <x>110</x>
+     <y>130</y>
+     <width>161</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Host</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>70</x>
+     <y>130</y>
+     <width>61</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Server</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="lineEdit_port">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>130</y>
+     <width>51</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Port</string>
    </property>
   </widget>
  </widget>

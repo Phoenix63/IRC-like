@@ -2,6 +2,9 @@
 #define LOGIN_H
 
 #include <QDialog>
+#include <QObject>
+#include <QTcpSocket>
+#include <QAbstractSocket>
 
 namespace Ui {
 class Login;
@@ -13,9 +16,20 @@ class Login : public QDialog
     
 public:
     explicit Login(QWidget *parent = 0);
+    void doConnect(QString host,int port);
     ~Login();
-    
+
+public slots:
+    void connected();
+    void disconnected();
+    void bytesWritten(qint64 bytes);
+    void readyRead();
+
+private slots:
+    void on_pushButton_clicked();
+
 private:
+    QTcpSocket *socket;
     Ui::Login *ui;
 };
 
