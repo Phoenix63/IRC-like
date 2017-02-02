@@ -1,4 +1,4 @@
-var err     = require('./ErrorManager');
+var err     = require('./SignalManager');
 var Channel     = require('./channel/Channel');
 var Client      = require('./client/client');
 
@@ -59,6 +59,46 @@ var allowedCommand = {
         if(error) {
             err.ERR_NORECIPIENT(socket);
         }
+    },
+    'NAMES': function(socket, command) {
+        var channels = command[1].split(' ')[0].split(',');
+        var users = [];
+        Channel.list().forEach(function(chan) {
+            var list = false;
+            if((channels.indexOf(chan.name)>=0 || channels[0] === '')
+                && ((!chan._isSecret && !chan._isPrivate) || chan.users.indexOf(socket.client)>=0)) {
+
+                chan.users.forEach(function(u) {
+                    if(users.indexOf(u)<0) {
+                        users.push(u.name);
+                    }
+                });
+
+            }
+        });
+        err.RPL_NAMREPLY(socket)
+        users.forEach(function(u) {
+            socket.send(u);
+        });
+        err.RPL_ENDOFNAMES(socket);
+    },
+    'LIST': function(socket, command) {
+        var channels = command[1].split(' ')[0].split(',');
+
+        var listChan = [];
+        Channel.list().forEach(function(chan) {
+            if((channels.indexOf(chan.name)>=0 || channels[0] === '')
+                && (!chan._isSecret || chan.users.indexOf(socket.client)>=0)) {
+                listChan.push((chan._isPrivate?'Prv':'')+chan.name);
+            }
+        });
+
+        err.RPL_LIST(socket);
+        err.RPL_LISTSTART(socket);
+        listChan.forEach(function(c) {
+           socket.send(c);
+        });
+        err.RPL_LISTEND(socket);
     }
 };
 

@@ -35,18 +35,6 @@ socketManager.create(function(socket) {
 
     socket.on('connect', function() {
         logger._CLIENT_CONNECTED();
-
-        var channels = Channel.list();
-        var drop = '';
-        channels.forEach(function(chan) {
-            if(chan.flags.indexOf('i')===-1) {
-                drop += chan.name+',';
-            }
-        });
-        if(drop.length>0)
-            drop = drop.slice(0,-1);
-        c.socket.send('['+drop+']');
-        //c.name = 'potatoes';
     });
 
     socket.on('end', function() {

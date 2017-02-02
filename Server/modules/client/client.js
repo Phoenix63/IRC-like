@@ -1,7 +1,7 @@
 "use strict"
 
 var shortid     = require('shortid');
-var err         = require('../ErrorManager');
+var err         = require('../SignalManager');
 
 var clients = [];
 
@@ -18,6 +18,9 @@ const Client = (function () {
     }
 
     Client.prototype.delete = function () {
+        this.channels.forEach(function(c) {
+            c.removeUser(this);
+        });
         this.socket.close();
         clients.splice(clients.indexOf(this), 1);
         delete this;

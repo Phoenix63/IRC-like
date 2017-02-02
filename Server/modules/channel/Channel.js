@@ -1,6 +1,6 @@
 
 var shortid     = require('shortid');
-var err         = require('./../ErrorManager');
+var err         = require('./../SignalManager');
 
 var channels = [];
 
@@ -8,7 +8,7 @@ var Channel = (function() {
 
     function Channel(creator, name, pass, maxSize) {
         if(!typeof maxSize === "number") {
-            err.ERR_INVALIDCHANNELNAME(creator);
+            err.ERR_NOSUCHCHANNEL(creator);
             delete this;
             return;
         }
@@ -17,8 +17,6 @@ var Channel = (function() {
         this.creator = creator;
         this.pass = pass;
         this.maxSize = maxSize;
-
-
 
         this.invisibleUsers = [];
         this.notifiedUsers = [];
@@ -64,8 +62,7 @@ var Channel = (function() {
             }
         });
         if(error) {
-            console.log('error');
-            err.ERR_INVALIDCHANNELNAME(op.socket);
+            err.ERR_NOSUCHCHANNEL(op.socket);
             return;
         }
         this.name = name;
@@ -76,7 +73,7 @@ var Channel = (function() {
             err.ERR_BANNEDFROMCHAN(user.socket);
             return;
         }
-        if(this.flags.indexOf('i')>=0 && this.invitation.indexOf(user) === -1) {
+        if(this._isInvitation && this.invitation.indexOf(user) === -1) {
             err.ERR_INVITEONLYCHAN(user.socket);
             return;
         }
@@ -106,6 +103,11 @@ var Channel = (function() {
         }
         this.broadcast(':'+user.name+' PART '+this.name);
         user.channels.splice(user.channels.indexOf(this),1);
+
+        if(this.users.length <= 0) {
+            channels.splice(channels.indexOf(this), 1);
+            delete this;
+        }
     }
 
     Channel.prototype.broadcast = function(message) {
@@ -113,6 +115,19 @@ var Channel = (function() {
             u.socket.send(message);
         });
     }
+
+
+
+
+    Channel.prototype.__defineGetter__('_isPrivate', function() {
+        return (this.flags.indexOf('p')>=0);
+    });
+    Channel.prototype.__defineGetter__('_isSecret', function() {
+        return (this.flags.indexOf('s')>=0);
+    });
+    Channel.prototype.__defineGetter__('_isInvitation', function() {
+        return (this.flags.indexOf('i')>=0);
+    });
 
     Channel.list = function() {
         return channels;

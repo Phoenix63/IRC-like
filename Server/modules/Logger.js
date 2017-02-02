@@ -44,7 +44,10 @@ var Logger = (function() {
         console.log(colors.yellow(this.client.name) + colors.green(' change is nickname to '+ newName));
     };
     Logger.prototype._SEND_TO_CLIENT = function(message) {
-        console.log(colors.grey('[to] ')+colors.green(this.client.name)+ '> '+message);
+        console.log(colors.grey('[to] ')+colors.green(this.client.name)+ '<< '+message);
+    };
+    Logger.prototype._USER_SEND_CMD = function(cmd) {
+        console.log(colors.grey('[from] ')+colors.green(this.client.name)+ '>> '+message);
     }
     return Logger;
 })();

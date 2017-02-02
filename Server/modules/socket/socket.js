@@ -43,8 +43,8 @@ var Socket = (function() {
     }
 
     Socket.prototype.broadcast = function(str) {
-        this.client.channels.forEach((function(chan) {
-            chan.broadcast(str);
+        sockets.forEach((function(s) {
+            s.send(str);
         }).bind(this));
     }
 
