@@ -39,6 +39,9 @@ Errors = {
     },
     ERR_NORECIPIENT: function(socket) {
         sendErr("ERR_NORECIPIENT", socket);
+    },
+    ERR_NOTONCHANNEL:function(socket) {
+        sendErr("ERR_NOTONCHANNEL", socket);
     }
 };
 

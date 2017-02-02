@@ -18,9 +18,9 @@ const Client = (function () {
     }
 
     Client.prototype.delete = function () {
-        this.channels.forEach(function(c) {
+        this.channels.forEach((function(c) {
             c.removeUser(this);
-        });
+        }).bind(this));
         this.socket.close();
         clients.splice(clients.indexOf(this), 1);
         delete this;

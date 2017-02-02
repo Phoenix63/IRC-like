@@ -93,6 +93,12 @@ var Channel = (function() {
     }
 
     Channel.prototype.removeUser = function(user) {
+
+        if(this.users.indexOf(user)<0) {
+            err.ERR_NOTONCHANNEL(user.socket);
+            return;
+        }
+
         this.users.splice(this.users.indexOf(user), 1);
         this.invisibleUsers.splice(this.invisibleUsers.indexOf(user), 1);
         this.notifiedUsers.splice(this.notifiedUsers.indexOf(user), 1);

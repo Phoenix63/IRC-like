@@ -26,6 +26,14 @@ var allowedCommand = {
             new Channel(socket.client, name, key, 2);
         }
     },
+    'PART': function(socket, command) {
+        var channels = command[1].split(' ')[0].split(',');
+        Channel.list().forEach(function(chan) {
+            if(channels.indexOf(chan) >= 0) {
+                chan.removeUser(socket.client);
+            }
+        });
+    },
     'PRIVMSG': function(socket, command) {
         var receivers = command[1].split(' ')[0].split(',');
         var message = command[1].split(':');
@@ -82,10 +90,11 @@ var allowedCommand = {
 
         socket.send("RPL_LISTSTART");
         Channel.list().forEach(function(chan) {
-            if(!chan._isSecret) {
-                
+            if(((channels[0] !== '' && channels.indexOf(chan)>=0) || channels[0] === '')&& (!chan._isSecret || (chan._isSecret && chan.users.indexOf(socket.client)>=0))) {
+                socket.send("RPL_LIST "+chan.name+(chan._isPrivate?' # ':'')+' :'+(chan.topic || 'No topic set'));
             }
         });
+        socket.send("RPL_LISTEND :End of /LIST");
     },
     'MODE': function(socket, command) {
 
