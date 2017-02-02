@@ -4,7 +4,7 @@ function sendErr(err, socket) {
 }
 
 Errors = {
-    ERR_UNKNOWCOMMAND: function(socket) {
+    ERR_UNKNOWNCOMMAND: function(socket) {
         sendErr("ERR_UNKNOWCOMMAND", socket);
     },
     ERR_NICKNAMEINUSE: function(socket) {

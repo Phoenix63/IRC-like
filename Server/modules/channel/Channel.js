@@ -30,6 +30,7 @@ var Channel = (function() {
         this.operators.push(creator);
         this.users.push(creator);
         this.notifiedUsers.push(creator);
+        creator.channels.push(this);
 
 
         this.name = '';
@@ -93,7 +94,7 @@ var Channel = (function() {
     }
 
     Channel.prototype.removeUser = function(user) {
-
+        console.log('remove user');
         if(this.users.indexOf(user)<0) {
             err.ERR_NOTONCHANNEL(user.socket);
             return;
@@ -105,12 +106,14 @@ var Channel = (function() {
 
         this.operators.splice(this.notifiedUsers.indexOf(user), 1);
         if(user === this.creator) {
+            console.log('remove user creator');
             this.creator = this.operators[0];
         }
         this.broadcast(':'+user.name+' PART '+this.name);
         user.channels.splice(user.channels.indexOf(this),1);
 
         if(this.users.length <= 0) {
+            console.log('delete channel');
             channels.splice(channels.indexOf(this), 1);
             delete this;
         }

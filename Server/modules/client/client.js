@@ -36,7 +36,7 @@ const Client = (function () {
             name = name.slice(1,name.length);
         }
 
-        clients.forEach(function(c) {
+        clients.forEach((function(c) {
             if(c.name === name
                     .replace(/\[/, '{')
                     .replace(/\]/, '}')
@@ -47,7 +47,7 @@ const Client = (function () {
                 err.ERR_NICKNAMEINUSE(this.socket);
                 return;
             }
-        });
+        }).bind(this));
 
         var match = name.match(/[a-zA-Z0-9\[\]\{\}_-é"'ëäïöüâêîôûç`è]+/);
         if((match && match[0] !== name) || name === '') {

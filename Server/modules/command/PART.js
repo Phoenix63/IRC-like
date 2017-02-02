@@ -1,0 +1,12 @@
+
+var Channel     = require('./../channel/Channel');
+var config      = require('./../../config.json');
+
+module.exports = function(socket, command) {
+    var channels = command[1].split(' ')[0].split(',');
+    Channel.list().forEach(function(chan) {
+        if(channels.indexOf(chan) >= 0) {
+            chan.removeUser(socket.client);
+        }
+    });
+}
