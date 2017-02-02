@@ -6,12 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>386</width>
+    <height>362</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Pand'IRC</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true"/>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
@@ -124,7 +127,7 @@
     <bool>false</bool>
    </property>
    <property name="text">
-    <string/>
+    <string>crismos.fr</string>
    </property>
    <property name="placeholderText">
     <string>Host</string>
@@ -153,7 +156,7 @@
     </rect>
    </property>
    <property name="text">
-    <string/>
+    <string>8088</string>
    </property>
    <property name="placeholderText">
     <string>Port</string>

@@ -6,6 +6,7 @@
 
 QT       += core gui
 QT += network
+RC_FILE = myapp.rc
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,3 +28,5 @@ FORMS    += \
     login.ui \
     listchannel.ui \
     mainframe.ui
+
+RESOURCES +=

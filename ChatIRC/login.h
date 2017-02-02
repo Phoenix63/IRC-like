@@ -17,7 +17,7 @@ class Login : public QDialog
     
 public:
     explicit Login(QWidget *parent = 0);
-    void doConnect(QString host,int port);
+    void doConnect(QString host,int port,QString username);
     ~Login();
 
 private slots:
