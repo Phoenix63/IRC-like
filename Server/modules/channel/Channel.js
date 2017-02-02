@@ -110,9 +110,10 @@ var Channel = (function() {
         }
     }
 
-    Channel.prototype.broadcast = function(message) {
+    Channel.prototype.broadcast = function(message, except) {
         this.users.forEach(function(u) {
-            u.socket.send(message);
+            if(u !== except)
+                u.socket.send(message);
         });
     }
 

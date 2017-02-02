@@ -39,21 +39,6 @@ Errors = {
     },
     ERR_NORECIPIENT: function(socket) {
         sendErr("ERR_NORECIPIENT", socket);
-    },
-    RPL_NAMREPLY: function(socket) {
-        sendErr("RPL_NAMREPLY", socket);
-    },
-    RPL_ENDOFNAMES: function(socket) {
-        sendErr("RPL_ENDOFNAMES", socket);
-    },
-    RPL_LIST: function(socket) {
-        sendErr("RPL_LIST", socket);
-    },
-    RPL_LISTSTART: function(socket) {
-        sendErr("RPL_LISTSTART", socket);
-    },
-    RPL_LISTEND: function(socket) {
-        sendErr("RPL_LISTEND", socket);
     }
 };
 

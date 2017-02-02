@@ -31,16 +31,24 @@ const Client = (function () {
     });
 
     Client.prototype.__defineSetter__('name', function(name) {
-        if(clients.indexOf(name
-                .replace(/\[/, '{')
-                .replace(/\]/, '}')
-                .replace(/\|/, '\\')
-                .replace(/\{/, '[')
-                .replace(/\}/, ']')
-                .replace(/\\/, '\|'))>=0) {
-            err.ERR_NICKNAMEINUSE(this.socket);
-            return;
+
+        if(name[0] === ':') {
+            name = name.slice(1,name.length);
         }
+
+        clients.forEach(function(c) {
+            if(c.name === name
+                    .replace(/\[/, '{')
+                    .replace(/\]/, '}')
+                    .replace(/\|/, '\\')
+                    .replace(/\{/, '[')
+                    .replace(/\}/, ']')
+                    .replace(/\\/, '\|')) {
+                err.ERR_NICKNAMEINUSE(this.socket);
+                return;
+            }
+        });
+
         var match = name.match(/[a-zA-Z0-9\[\]\{\}_-é"'ëäïöüâêîôûç`è]+/);
         if((match && match[0] !== name) || name === '') {
             err.ERR_NONICKNAMEGIVEN(this.socket);

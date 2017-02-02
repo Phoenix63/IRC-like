@@ -49,7 +49,7 @@ var allowedCommand = {
                 error = false;
             } else if (channels[r]) {
                 if(channels[r].users.indexOf(socket.client)>=0) {
-                    channels[r].broadcast(':'+ socket.client.name+' PRIVMSG '+ r +' :'+message[1]);
+                    channels[r].broadcast(':'+ socket.client.name+' PRIVMSG '+ r +' :'+message[1], socket.client);
                     error = false;
                 } else {
                     err.ERR_CANNOTSENDTOCHAN(socket);
@@ -62,43 +62,39 @@ var allowedCommand = {
     },
     'NAMES': function(socket, command) {
         var channels = command[1].split(' ')[0].split(',');
-        var users = [];
+
         Channel.list().forEach(function(chan) {
             var list = false;
             if((channels.indexOf(chan.name)>=0 || channels[0] === '')
                 && ((!chan._isSecret && !chan._isPrivate) || chan.users.indexOf(socket.client)>=0)) {
-
+                var userList = '';
                 chan.users.forEach(function(u) {
-                    if(users.indexOf(u)<0) {
-                        users.push(u.name);
-                    }
+                    userList += ' @'+u.name;
                 });
+                socket.send('RPL_NAMREPLY '+chan.name+' :'+userList.slice(1,userList.length));
+                socket.send(chan.name+' :End of /NAMES list');
 
             }
         });
-        err.RPL_NAMREPLY(socket)
-        users.forEach(function(u) {
-            socket.send(u);
-        });
-        err.RPL_ENDOFNAMES(socket);
     },
     'LIST': function(socket, command) {
         var channels = command[1].split(' ')[0].split(',');
 
-        var listChan = [];
+        socket.send("RPL_LISTSTART");
         Channel.list().forEach(function(chan) {
-            if((channels.indexOf(chan.name)>=0 || channels[0] === '')
-                && (!chan._isSecret || chan.users.indexOf(socket.client)>=0)) {
-                listChan.push((chan._isPrivate?'Prv':'')+chan.name);
+            if(!chan._isSecret) {
+                
             }
         });
+    },
+    'MODE': function(socket, command) {
 
-        err.RPL_LIST(socket);
-        err.RPL_LISTSTART(socket);
-        listChan.forEach(function(c) {
-           socket.send(c);
-        });
-        err.RPL_LISTEND(socket);
+    },
+    'PING': function(socket, command) {
+
+    },
+    'CAP': function(socket, command) {
+
     }
 };
 
@@ -141,6 +137,7 @@ var MessageManager = (function() {
         this.socket.on('message', (function(str) {
             if(!this.socket.isImageLoading) {
                 try {
+                    this.socket.logger._CLIENT_SEND_MESSAGE(str);
                     this.socket.commandManager.exec(parseMessage(str));
                 } catch(e) {
                     console.log(e);

@@ -42,9 +42,11 @@ var Socket = (function() {
 
     }
 
-    Socket.prototype.broadcast = function(str) {
+    Socket.prototype.broadcast = function(str, except) {
         sockets.forEach((function(s) {
-            s.send(str);
+            if(except !== s) {
+                s.send(str);
+            }
         }).bind(this));
     }
 
