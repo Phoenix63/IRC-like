@@ -45,11 +45,11 @@ var allowedCommand = {
         var error = true;
         receivers.forEach(function(r) {
             if(clients[r]) {
-                clients[r].socket.send(':'+ socket.client.name+' PRIVMSG '+ clients[r] +' :'+message[1]);
+                clients[r].socket.send(':'+ socket.client.name+' PRIVMSG '+ r +' :'+message[1]);
                 error = false;
             } else if (channels[r]) {
                 if(channels[r].users.indexOf(socket.client)>=0) {
-                    channels[r].broadcast(':'+ socket.client.name+' PRIVMSG '+ channels[r] +' :'+message[1]);
+                    channels[r].broadcast(':'+ socket.client.name+' PRIVMSG '+ r +' :'+message[1]);
                     error = false;
                 } else {
                     err.ERR_CANNOTSENDTOCHAN(socket);
