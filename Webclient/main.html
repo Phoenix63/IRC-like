@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<link rel="stylesheet" href="/CSS/style.css" />
-		<link rel="stylesheet" href="/CSS/footer-distributed.css">
+		<link rel="stylesheet" href="CSS/style.css" />
+		<link rel="stylesheet" href="CSS/footer-distributed.css">
 		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
 		<script src="verifForm1.js"></script>
@@ -12,15 +12,15 @@
 	<body>
 		<div id="page">
 			<header>
-				<center><img id="banniere" src="/IMAGE/banniere.png" alt="" /></center>
+				<center><img id="banniere" src="IMAGE/banniere.png" alt="" /></center>
 			</header>
 			<div id="corps">
 				<div id="imagePandaG">
-					<img src="/IMAGE/image.png" alt="" />
+					<img src="IMAGE/image.png" alt="" />
 				</div>
 				<div class="flexbox-container">
 					<section id="connexionGuest" class="formulaire">
-						<form action="#" method="post">
+						<form action="#" method="post" class="formType">
 							<div class="form">
 								<fieldset>
 									<legend>Invites</legend>
@@ -31,7 +31,7 @@
 						</form>
 					</section>
 					<section ng-app="myForm" ng-controller="form1Ctrl" id="connexion" class="formulaire">
-						<form ng-submit="" novalidate>
+						<form ng-submit="" class="formType">
 							<div class="form">
 								<fieldset>
 									<legend>Connexion</legend>
@@ -43,7 +43,7 @@
 						</form>
 					</section>
 					<section id="inscription" class="formulaire">
-					<form action="#" method="post">
+					<form action="#" method="post" class="formType">
 						<div class="form">
 							<fieldset>
 								<legend>Inscription</legend>
@@ -59,8 +59,8 @@
 					</form>
 					</section>
 				</div>
-				<div id="/IMAGE/imagePandaD">
-					<img src="image.png" alt="" />
+				<div id="imagePandaD">
+					<img src="IMAGE/image.png" alt="" />
 				</div>
 			</div>
 		<footer class="footer-distributed">
