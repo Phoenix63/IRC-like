@@ -1,24 +1,75 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Chat IRC</title>
-</head>
-<body>
-    <h1>Communication avec socket.io !</h1>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<link rel="stylesheet" href="/CSS/style.css" type="text/css" />
+		<link rel="stylesheet" href="/CSS/footer-distributed.css" type="text/css" >
+		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" type="text/css">
 
-    <script src="/socket.io/socket.io.js"></script>
-    <script>
-        var socket = io.connect('http://localhost:8089');
-        socket.on("data",function(message){
-            console.log(message);
-        });
-        /*
-         request example, client side :
-         socket.emit("data","/nickname kingofbonobo");
-         socket.emit("data","/message hello word");
-         warning : always use emit("data",....);
-         */
-    </script>
-</body>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
+
+	</head>
+	<body>
+		<div id="page" ng-app="myChat">
+			<header>
+				<center><img id="banniere" src="/IMAGE/banniere.png" alt="" /></center>
+			</header>
+			<nav>
+			</nav>
+			<div id="box" ng-controller="ChatCtrl">
+				<div id="content" ng-repeat="message in messages">
+				<p>{{message}}</p>
+				</div>
+				<form ng-submit="envoieMessage()">
+					<input id="inputcontent" ng-model="newMessage" placeholder="message"></input>
+					<button type="submit">Envoyer</button>
+				</form>
+			</div>
+			<footer class="footer-distributed">
+
+				<div class="footer-right">
+
+					<a href="#"><i class="fa fa-facebook"></i></a>
+					<a href="#"><i class="fa fa-twitter"></i></a>
+					<a href="#"><i class="fa fa-linkedin"></i></a>
+					<a href="#"><i class="fa fa-github"></i></a>
+
+				</div>
+
+				<div class="footer-left">
+
+					<p class="footer-desc">
+						Chat realise dans le cadre d'un projet scolaire tutore de l'universite Blaise Pascal Clermont-Ferrand 
+					</p>
+
+					<p>M1 Informatique UBP Clermont-Ferrand &copy; 2017</p>
+				</div>
+
+			</footer>
+		</div>
+	</body>
+	<script src="/socket.io/socket.io.js"></script>
+	<script>
+	var app = angular.module("myChat",[]);
+	app.controller("ChatCtrl",function($scope) {
+		var socket = io.connect('http://localhost:8089');
+		if(socket==null){	
+			alert('server down');
+		}
+		$scope.messages = [];
+		$scope.envoieMessage = function() {
+			alert('dedans');
+			socket.emit("data","/message "+ $scope.newMessage);
+			$scope.newMessage = undefined;
+		}
+		
+		socket.on("data",function(msg) {
+			alert("heyyy");
+			$scope.messages.push(msg);
+			alert("heiiiiii");
+		});
+			
+	});
+
+	</script>
 </html>

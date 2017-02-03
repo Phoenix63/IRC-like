@@ -1,0 +1,160 @@
+header('Content-type: test/css');
+
+html {
+	min-height: 100%;
+	background:#A2A1A1;
+}
+
+#page {
+	width: 1280px;
+	margin: auto; 
+	height:100%;
+}
+
+#banniere {
+	width:100%;
+	height:100%;
+}
+
+
+
+footer {
+	position: absolute;
+	bottom: 0;
+}
+
+@media (max-height:800px) {
+	footer { position: static; }
+}
+
+.formulaire {
+	outline: 5px solid #1f2026;
+	outline-offset: 0px;
+}
+
+.flexbox-container {
+	display: inline-block;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	align-content: center;
+}
+.deroulant {
+	font-weight:bold;
+	text-shadow:0px -1px 0px rgba(0,0,0,0.2);
+	margin-left:0;
+}
+
+#imagePandaG {
+	display:inline-block;
+	position:absolute;
+	left:5%;
+	top:50%;
+	
+}
+#imagePandaD {
+	display:inline-block;
+	position:absolute;
+	top:50%;
+	right:5%;
+	
+}
+
+#connexion, #connexionGuest {
+	margin-top:15px;
+}
+
+#inscription {
+	margin-top:15px;
+	margin-bottom:15px;
+}
+
+
+
+#corps {
+	text-align:center;
+	border:1px black groove;
+	vertical-align:middle;
+	background:-webkit-gradient(linear,left top,left bottom,from(#3F0004),to(#000000));
+}
+
+#box {
+	margin:25px;
+	width:1230px;
+	height:800px;
+	border:1px black groove;
+	background:red
+}
+
+#content {
+	position:relative;
+	margin:auto;
+	margin-top:100px;
+	width:500px;
+	height:300px;
+	border:1px black groove;
+	background:black;
+}
+
+#inputcontent {
+	display:block;
+	position:relative;
+	margin:auto;
+	margin-top:10px;
+	width:500px;
+	height:50px;
+	border:1px black groove;
+	border-radius:4px;
+}
+
+#subMessButton {
+	display:block;
+	margin:auto;
+}
+
+
+form {
+    
+	background:-webkit-gradient(linear,left top,left bottom,from(#beced4),to(#e4f0f5));
+}
+legende {
+	
+	font-family:"Trebuchet MS",cursive,sans-serif;
+	color:#464d55;
+}
+
+label {
+	color:black;
+	font-weight:bold;
+	padding-top:6px;
+	text-shadow:0px -1px 0px rgba(0,0,0,0.2);
+
+}
+
+input {
+	display:block;
+	color:#dedede;
+	margin:auto;
+	text-shadow:0px 1px 0px #4d4d4d;
+	background:#4d4d4d;
+	-webkit-border-radius:0px 5px 5px 0px;
+}
+
+input[type="submit"] {
+	width:95px;
+	height:30px;
+	margin-left:295px;
+	font-size:1em;
+	font-weight:bold;
+	border:none;
+	color:#cecece;
+	text-shadow:0px -1px 0px #000;
+	background:#1f2026;
+	background:-webkit-gradient(linear,left top,left bottom,from(#1f2026),to(#15161a));
+	-webkit-border-radius:5px;
+	-webkit-box-shadow:0px 0px 1px #000;
+}
+input[type="submit"]:hover {
+	background:#343640;
+	background:-webkit-gradient(linear,left top,left bottom,from(#343640),to(#15161a));
+}
