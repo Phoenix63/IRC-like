@@ -27,8 +27,8 @@
 						<p>{{message}}</p>
 						</div>
 					</div>
-					<form ng-submit="envoieMessage()">
-						<textarea id="inputcontent" ng-model="newMessage" placeholder="message"></textarea>
+					<form ng-submit="sendMessage()">
+						<input id="inputcontent" ng-model="newMessage" placeholder="message"></input>
 						<button type="submit" id="buttonSend">Envoyer</button>
 					</form>
 				</div>
@@ -70,7 +70,7 @@
 		}
 		
 		$scope.messages = [];
-		$scope.envoieMessage = function() {
+		$scope.sendMessage = function() {
 			socket.emit("data","/message " + $scope.newMessage);
 			$scope.messages.push("user: " + $scope.newMessage);
 			$scope.newMessage = undefined;
