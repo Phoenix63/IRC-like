@@ -1,6 +1,7 @@
 var err     = require('./../SignalManager');
 var Channel     = require('./../channel/Channel');
 var config      = require('./../../config.json');
+var Client      = require('./../client/client');
 
 module.exports = function(socket, command) {
     var receivers = command[1].split(' ')[0].split(',');

@@ -20,21 +20,14 @@ module.exports = function(socket, command) {
                 socket.send(':'+config.ip+' 331 JOIN '+chan.name+' :No topic is set');
             }
 
-            var ret = ':'+config.ip+' 353 JOIN @ '+chan.name;
-            var us = '';
-            chan.users.forEach(function(u) {
-                us += ' @'+u.name;
-            });
-            if(us)
-                socket.send(ret+(us?' :'+us.slice(1,us.length):''));
-            socket.send(':'+config.ip+' 366 JOIN :End of /NAMES list');
+            chan.RPL_NAMREPLY(socket);
 
 
         }
     });
     if(err) {
         // create
-        new Channel(socket.client, name, key, 20);
-        socket.send(':'+config.ip+' 366 JOIN :End of /NAMES list');
+        var chan = new Channel(socket.client, name, key, 20);
+        chan.RPL_NAMREPLY(socket);
     }
 }

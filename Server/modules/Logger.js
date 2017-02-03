@@ -46,8 +46,8 @@ var Logger = (function() {
     Logger.prototype._SEND_TO_CLIENT = function(message) {
         console.log(colors.grey('[to] ')+colors.green(this.client.name)+ '<< '+message);
     };
-    Logger.prototype._USER_SEND_CMD = function(cmd) {
-        console.log(colors.grey('[from] ')+colors.green(this.client.name)+ '>> '+message);
+    Logger.prototype._USER_SEND_CMD = function(message) {
+        console.log(colors.grey('[from] ')+colors.red(this.client.name)+ '>> '+message);
     }
     return Logger;
 })();

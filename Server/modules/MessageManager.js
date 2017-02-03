@@ -10,8 +10,8 @@ var allowedCommand = {
     'PRIVMSG':  require('./command/PRIVMSG'),
     'NAMES':    require('./command/NAMES'),
     'LIST':     require('./command/LIST'),
-    'WHO':      require('./command/WHO'),
-    'QUIT':     require('./command/QUIT')
+    'QUIT':     require('./command/QUIT'),
+    'WHO':      require('./command/WHO')
 };
 
 var CommandManager = (function() {
@@ -52,7 +52,7 @@ var MessageManager = (function() {
         this.socket.commandManager = new CommandManager(socket);
         this.socket.on('message', (function(str) {
             if(!this.socket.isImageLoading) {
-                this.socket.logger._CLIENT_SEND_MESSAGE(str);
+                this.socket.logger._USER_SEND_CMD(str);
                 this.socket.commandManager.exec(parseMessage(str));
             }
         }).bind(this));

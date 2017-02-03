@@ -12,6 +12,8 @@ const Client = (function () {
         this.nick = null;
         this.socket = socket;
         this.socket.client = this;
+        this.away = false;
+        this.ip = socket.socket.remoteAddress;
 
         this.channels = [];
         clients.push(this);
