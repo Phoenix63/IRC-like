@@ -1,4 +1,4 @@
-header('Content-type: test/css');
+
 
 html {
 	min-height: 100%;
@@ -45,6 +45,11 @@ footer {
 	margin-left:0;
 }
 
+.formType {
+    
+	background:-webkit-gradient(linear,left top,left bottom,from(#beced4),to(#e4f0f5));
+}
+
 #imagePandaG {
 	display:inline-block;
 	position:absolute;
@@ -88,12 +93,11 @@ footer {
 
 #content {
 	position:relative;
-	margin:auto;
-	margin-top:100px;
-	width:500px;
-	height:300px;
+	margin-top:10px;
+	width:800px;
+	height:600px;
 	border:1px black groove;
-	background:black;
+	background:grey;
 }
 
 #inputcontent {
@@ -107,16 +111,33 @@ footer {
 	border-radius:4px;
 }
 
-#subMessButton {
+#buttonSend {
 	display:block;
 	margin:auto;
 }
 
-
-form {
-    
-	background:-webkit-gradient(linear,left top,left bottom,from(#beced4),to(#e4f0f5));
+#channelBox {
+	display:inline-block;
+	margin-top:25px;
+	margin-left:10px;
+	width:200px;
+	height:750px;
+	background:grey;
 }
+
+#msgBox {
+	display:inline-block;
+}
+
+#userBox {
+	display:inline-block;
+	margin-top:25px;
+	width:200px;
+	height:750px;
+	background:grey;
+}
+
+
 legende {
 	
 	font-family:"Trebuchet MS",cursive,sans-serif;
