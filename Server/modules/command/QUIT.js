@@ -1,4 +1,6 @@
 
+var config = require('./../../config.json');
+
 module.exports = function(socket, command) {
 
     if(!socket.client.identity) {
@@ -6,5 +8,10 @@ module.exports = function(socket, command) {
         return;
     }
 
+    socket.client.channels.forEach(function(chan) {
+        chan.users.forEach(function(u) {
+            u.socket.send(':'+socket.client.name+'!'+config.ip+' QUIT :Gone');
+        });
+    });
     socket.client.delete();
 }
