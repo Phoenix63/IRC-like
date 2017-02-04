@@ -1,11 +1,13 @@
 
+var config      = require('./../config.json');
+
 function sendErr(err, socket) {
     socket.send(err);
 }
 
 Errors = {
-    ERR_UNKNOWNCOMMAND: function(socket) {
-        sendErr("ERR_UNKNOWCOMMAND", socket);
+    ERR_UNKNOWNCOMMAND: function(command, socket) {
+        sendErr(":"+config.ip+' 421 '+socket.client.name+' '+command+' :Unknown cammand', socket);
     },
     ERR_NICKNAMEINUSE: function(socket) {
         sendErr("ERR_NICKNAMEINUSE", socket);

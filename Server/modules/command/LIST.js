@@ -3,6 +3,12 @@ var Channel     = require('./../channel/Channel');
 var config      = require('./../../config.json');
 
 module.exports = function(socket, command) {
+
+    if(!socket.client.identity) {
+        socket.send(':'+config.ip+' 451 * LIST :You have not registered');
+        return;
+    }
+
     var channels = command[1].split(' ')[0].split(',');
 
     socket.send(":"+config.ip+" 321 Channel :Users Name");

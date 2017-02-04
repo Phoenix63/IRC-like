@@ -173,7 +173,7 @@ var Channel = (function() {
             }
             socket.send(
                 ':'+config.ip+' 352 '+socket.client.name+' '+this.name+' ~'
-                +u.name+' '+u.ip+' '+config.ip+' '+u.name+ ' '
+                +u.identity+' '+u.ip+' '+config.ip+' '+u.name+ ' '
                 +(u.away?'G':'H')
                 + delimiter + ' :0 Guest_'+u.id);
 

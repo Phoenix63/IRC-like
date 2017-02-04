@@ -11,7 +11,8 @@ var allowedCommand = {
     'NAMES':    require('./command/NAMES'),
     'LIST':     require('./command/LIST'),
     'QUIT':     require('./command/QUIT'),
-    'WHO':      require('./command/WHO')
+    'WHO':      require('./command/WHO'),
+    'USER':     require('./command/USER')
 };
 
 var CommandManager = (function() {
@@ -25,7 +26,7 @@ var CommandManager = (function() {
             allowedCommand[command[0]](this.socket, command);
             return;
         } else {
-            err.ERR_UNKNOWNCOMMAND(this.socket);
+            err.ERR_UNKNOWNCOMMAND(command[0], this.socket);
             return;
         }
 

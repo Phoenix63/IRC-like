@@ -4,6 +4,12 @@ var config      = require('./../../config.json');
 var Client      = require('./../client/client');
 
 module.exports = function(socket, command) {
+
+    if(!socket.client.identity) {
+        socket.send(':'+config.ip+' 451 * PRIVMSG :You have not registered');
+        return;
+    }
+
     var receivers = command[1].split(' ')[0].split(',');
     var message = command[1].split(':');
     if(!message[1]) {

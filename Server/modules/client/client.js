@@ -10,6 +10,8 @@ const Client = (function () {
     function Client(socket) {
         this.id = shortid.generate();
         this.nick = null;
+        this.identity = null;
+        this.realname = '';
         this.socket = socket;
         this.socket.client = this;
         this.away = false;
@@ -17,6 +19,13 @@ const Client = (function () {
 
         this.channels = [];
         clients.push(this);
+    }
+
+    Client.prototype.setIdentity = function(pseudo) {
+        if(this.identity)
+            return false;
+        this.identity = pseudo;
+        return true;
     }
 
     Client.prototype.delete = function () {

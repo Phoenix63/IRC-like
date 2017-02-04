@@ -1,6 +1,12 @@
 var Channel = require('./../channel/Channel');
 
 module.exports = function(socket, command) {
+
+    if(!socket.client.identity) {
+        socket.send(':'+config.ip+' 451 * WHO :You have not registered');
+        return;
+    }
+
     var name = command[1].split(' ')[0];
     if(name[0] === '#') {
         Channel.list().forEach(function(chan) {
