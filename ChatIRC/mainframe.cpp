@@ -19,21 +19,25 @@ MainFrame::~MainFrame()
     delete socket;
 }
 
+
 void MainFrame::on_pushButton_send_clicked()
 {
 
-    QString message = ui->lineEdit_message->text();
+    QString message = ui->messageSender->text();
+    ui->messagePrinter->append(message);
     message.append('\n');
     QByteArray ba = message.toLatin1();
     socket->write(ba.data());
-    ui->lineEdit_message->setText("");
+    ui->messageSender->setText("");
 }
 
 void MainFrame::readyRead()
 {
-    char toto[255];
-    int t = socket->readLine(toto,255);
-    toto[t-1] = '\0';
-    toto[0] = ' ';
-    ui->textBrowser_messageLog->append(toto);
+    while(socket->canReadLine()){
+        char toto[255];
+        int t = socket->readLine(toto,255);
+        toto[t-1] = '\0';
+        toto[0] = ' ';
+        ui->messagePrinter->append(toto);
+    }
 }

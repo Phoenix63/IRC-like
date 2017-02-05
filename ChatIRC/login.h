@@ -23,6 +23,8 @@ public:
 private slots:
     void on_pushButton_connect_clicked();
 
+    void on_pushButton_guest_clicked();
+
 private:
     MainFrame *main;
     QTcpSocket *socket;

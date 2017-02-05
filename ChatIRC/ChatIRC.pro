@@ -16,17 +16,14 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
     login.cpp \
-    listchannel.cpp \
     mainframe.cpp
 
 HEADERS  += \
     login.h \
-    listchannel.h \
     mainframe.h
 
 FORMS    += \
     login.ui \
-    listchannel.ui \
     mainframe.ui
 
 RESOURCES +=
