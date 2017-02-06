@@ -7,7 +7,7 @@ function sendErr(err, socket) {
 
 Errors = {
     ERR_UNKNOWNCOMMAND: function(command, socket) {
-        sendErr(":"+config.ip+' 421 '+socket.client.name+' '+command+' :Unknown cammand', socket);
+        sendErr(":"+config.ip+' 421 '+socket.client.name+' '+command+' :Unknown command', socket);
     },
     ERR_NICKNAMEINUSE: function(socket) {
         sendErr("ERR_NICKNAMEINUSE", socket);
