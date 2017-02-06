@@ -24,6 +24,10 @@ const Client = (function () {
     Client.prototype.setIdentity = function(pseudo) {
         if(this.identity)
             return false;
+        clients.forEach(function(c) {
+            if(c.identity === pseudo)
+                return false;
+        });
         this.identity = pseudo;
         return true;
     }
