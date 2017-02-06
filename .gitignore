@@ -39,7 +39,9 @@ obj/
 *.iml
 .idea/
 idea/*.xml
+
 out/
+node_modules/
 
 Server/client.js
 Server/images/*
