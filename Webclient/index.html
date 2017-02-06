@@ -62,17 +62,27 @@
 	</body>
 	<script>
 	(function() {
+		var uniqid = function() {
+				return (new Date().getTime() + Math.floor((Math.random()*10000)+1)).toString(16);
+		};
 		var app = angular.module("myChat",[]);
 		app.controller("ChatCtrl",function($scope) {
+			
 			var socket = io('http://localhost:8089');
-			socket.emit("message","NICK gilo");
+			var uuid = uniqid();
+			var nickname = uuid;
+			socket.emit("message","NICK Guest_"+uuid);
 			
 			$scope.messages = [];
 			
 			$scope.sendMessage = function() {
-				socket.emit("message","USER gilo 0 * : " + $scope.newMessage);
-				$scope.messages.push("gilo: " + $scope.newMessage);
-				alert('c fait');
+				var parseMessage = $scope.newMessage.split(' ');
+				socket.emit("message","USER " + nickname+" 0 * : " + $scope.newMessage);
+				$scope.messages.push(nickname + ": " + $scope.newMessage);
+				if(parseMessage[0]=="NICK") {
+					nickname = parseMessage[1];
+					$scope.messages.push("You have changed your nickname to "+nickname);
+				}
 				$scope.newMessage = undefined;
 			}
 			
