@@ -1,4 +1,22 @@
 {
-  "name": "IRCLike",
-  "version": "0.0.1"
+  "name": "irc-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.js",
+    "start": "node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "express": "^4.14.1",
+    "shortid": "^2.2.6",
+    "socket.io": "^1.7.2"
+  },
+  "devDependencies": {
+    "assert": "^1.4.1",
+    "sinon": "^1.17.7"
+  }
 }
