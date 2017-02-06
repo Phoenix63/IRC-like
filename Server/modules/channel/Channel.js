@@ -70,7 +70,7 @@ var Channel = (function() {
             } else if (this.usersFlags[u.id].flags.indexOf('v')>=0) {
                 delimiter = '+';
             }
-            us += ' '+delimiter+this.usersFlags[u.id].client.rname;
+            us += ' '+delimiter+this.usersFlags[u.id].client.name;
 
         }).bind(this));
 
@@ -175,7 +175,7 @@ var Channel = (function() {
                 ':'+config.ip+' 352 '+socket.client.name+' '+this.name+' ~'
                 +u.identity+' '+u.ip+' '+config.ip+' '+u.name+ ' '
                 +(u.away?'G':'H')
-                + delimiter + ' :0 Guest_'+u.id);
+                + delimiter + ' :0 '+u.rname);
 
 
         }).bind(this));
