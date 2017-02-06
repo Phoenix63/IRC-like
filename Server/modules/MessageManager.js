@@ -54,7 +54,12 @@ var MessageManager = (function() {
         this.socket.on('message', (function(str) {
             if(!this.socket.isImageLoading) {
                 this.socket.logger._USER_SEND_CMD(str);
-                this.socket.commandManager.exec(parseMessage(str));
+                try {
+                    this.socket.commandManager.exec(parseMessage(str));
+                } catch(e) {
+                    err.ERR_UNKNOWNCOMMAND(socket);
+                }
+
             }
         }).bind(this));
     }

@@ -70,7 +70,7 @@ var Channel = (function() {
             } else if (this.usersFlags[u.id].flags.indexOf('v')>=0) {
                 delimiter = '+';
             }
-            us += ' '+delimiter+this.usersFlags[u.id].client.name;
+            us += ' '+delimiter+this.usersFlags[u.id].client.rname;
 
         }).bind(this));
 

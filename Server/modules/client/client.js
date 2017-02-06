@@ -11,7 +11,7 @@ const Client = (function () {
         this.id = shortid.generate();
         this.nick = null;
         this.identity = null;
-        this.realname = '';
+        this.realname = null;
         this.socket = socket;
         this.socket.client = this;
         this.away = false;
@@ -39,6 +39,10 @@ const Client = (function () {
 
     Client.prototype.__defineGetter__('name', function() {
         return this.nick || 'Guest_'+this.id;
+    });
+
+    Client.prototype.__defineGetter__('rname', function() {
+        return this.realname || 'Guest_'+this.id;
     });
 
     Client.prototype.__defineSetter__('name', function(name) {
