@@ -39,9 +39,12 @@ obj/
 *.iml
 .idea/
 idea/*.xml
-<<<<<<< HEAD
+
 out/
 node_modules/
-=======
-out/
->>>>>>> master
+
+Server/client.js
+Server/images/*
+Server/node_modules/
+Server/test.js
+Server/test/
