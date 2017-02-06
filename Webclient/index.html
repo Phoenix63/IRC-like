@@ -5,6 +5,7 @@
 		<link rel="stylesheet" href="CSS/style.css" type="text/css" />
 		<link rel="stylesheet" href="CSS/footer-distributed.css" type="text/css" >
 		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" type="text/css">
+		<script src="https://cdn.socket.io/socket.io-1.0.0.js"></script>
 
 		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
 
@@ -59,37 +60,30 @@
 			</footer>
 		</div>
 	</body>
-	<script src="/socket.io/socket.io.js"></script>
 	<script>
-	
-	var app = angular.module("myChat",[]);
-	app.controller("ChatCtrl",function($scope) {
-		var socket = io.connect('http://localhost:8089');
-		if(socket==null){	
-			alert('server down');
-		}
-		
-		$scope.messages = [];
-		$scope.sendMessage = function() {
-			socket.emit("data","/message " + $scope.newMessage);
-			$scope.messages.push("user: " + $scope.newMessage);
-			$scope.newMessage = undefined;
-		}
-		
-		socket.on("data",function(msg) {
-			$scope.$apply(function(){
-				var msgFinal = "";
-				var parsingMsg = msg.split(' ');
-				if(parsingMsg[0] == "/message") {
-					for(var i = 1; i < parsingMsg.length; i++) {
-						msgFinal = msgFinal + " " + parsingMsg[i];
-					}
-				}
-				$scope.messages.push(msgFinal);
-		  });
+	(function() {
+		var app = angular.module("myChat",[]);
+		app.controller("ChatCtrl",function($scope) {
+			var socket = io('http://localhost:8089');
+			socket.emit("message","NICK gilo");
+			
+			$scope.messages = [];
+			
+			$scope.sendMessage = function() {
+				socket.emit("message","USER gilo 0 * : " + $scope.newMessage);
+				$scope.messages.push("gilo: " + $scope.newMessage);
+				alert('c fait');
+				$scope.newMessage = undefined;
+			}
+			
+			socket.on("message",function(msg) {
+				$scope.$apply(function(){
+					$scope.messages.push(msg);
+			  });
+			});
+			
 		});
-		
-	});
+	})();
 
 	</script>
 </html>
