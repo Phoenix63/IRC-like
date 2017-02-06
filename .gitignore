@@ -40,3 +40,9 @@ obj/
 .idea/
 idea/*.xml
 out/
+
+Server/client.js
+Server/images/*
+Server/node_modules/
+Server/test.js
+Server/test/
