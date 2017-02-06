@@ -17,12 +17,11 @@ class Login : public QDialog
     
 public:
     explicit Login(QWidget *parent = 0);
-    void doConnect(QString host,int port,QString username);
+    bool doConnect(QString host,int port,QString username);
     ~Login();
 
 private slots:
     void on_pushButton_connect_clicked();
-
     void on_pushButton_guest_clicked();
 
 private:

@@ -2,7 +2,7 @@
 #include "ui_mainframe.h"
 #include <QTcpSocket>
 #include <QAbstractSocket>
-
+#include "parseur.h"
 
 MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
     QDialog(parent),
@@ -22,13 +22,13 @@ MainFrame::~MainFrame()
 
 void MainFrame::on_pushButton_send_clicked()
 {
-
     QString message = ui->messageSender->text();
-    ui->messagePrinter->append(message);
-    message.append('\n');
-    QByteArray ba = message.toLatin1();
-    socket->write(ba.data());
-    ui->messageSender->setText("");
+        ui->messagePrinter->append(message);
+        message.append('\n');
+        Parseur::parse(&message);
+        QByteArray ba = message.toLatin1();
+        socket->write(ba.data());
+        ui->messageSender->setText("");
 }
 
 void MainFrame::readyRead()
