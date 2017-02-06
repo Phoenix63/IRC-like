@@ -21,6 +21,13 @@ var Socket = (function() {
 
         sockets.push(this);
 
+        this.timeout = setInterval((function() {
+            if(this.client)
+                this.client.delete();
+            else
+                this.close();
+        }).bind(this), 1000*60*5);
+
         this.onSignal = {};
     }
 

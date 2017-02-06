@@ -1,4 +1,5 @@
 var Channel = require('./../channel/Channel');
+var config  = require('./../../config.json');
 
 module.exports = function(socket, command) {
 

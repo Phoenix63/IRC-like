@@ -138,19 +138,19 @@ var Channel = (function() {
 
 
         if(user === this.creator) {
+            this.creator = null;
             this.users.forEach((function(u) {
-                if(this.usersFlags[u].flags.indexOf('o')>=0) {
+                if(this.usersFlags[u.id].flags.indexOf('o')>=0 && !this.creator) {
                     this.creator = u;
                 }
             }).bind(this));
-            this.creator = this.operators[0];
         }
 
         this.broadcast(':'+user.name+' PART '+this.name);
         user.channels.splice(user.channels.indexOf(this),1);
 
         delete this.usersFlags[user];
-        if(this.users.length <= 0) {
+        if(this.users.length <= 0 || !this.creator) {
             channels.splice(channels.indexOf(this), 1);
             delete this;
         }
