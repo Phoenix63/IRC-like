@@ -12,7 +12,6 @@ module.exports = function(socket, command) {
         var name = cmd[0];
         var realname = cmd[3];
 
-
         socket.client.identity = name;
         if(realname[0] === ':') {
             socket.client.realname = realname.replace(':','');
@@ -21,7 +20,11 @@ module.exports = function(socket, command) {
         }
 
 
+
+
     } catch(e) {
+        socket.client.identity = null;
+        socket.client.realname = null;
         socket.send(':'+config.ip+' 461 USER :Not enough parameters');
     }
 

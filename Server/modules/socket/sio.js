@@ -11,6 +11,10 @@ function createServer(callback) {
         callback(socket);
         socket.manager.emit('connect', socket);
 
+        socket.destroy = function() {
+            socket.disconnect();
+        };
+
         socket.on('message', function(msg) {
             if(msg.indexOf('/image ')=== 0 || socket.manager.isImageLoading) {
                 socket.manager.isImageLoading = true;
