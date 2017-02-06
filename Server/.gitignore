@@ -64,3 +64,4 @@ node_modules/
 !/modules/client/client.js
 /test/*
 images/*
+.gitignore
