@@ -188,7 +188,7 @@ class Channel {
         RPLSender.PART(user, this);
         user.channels.splice(user.channels.indexOf(this),1);
 
-        delete this._usersFlags[user];
+        delete this._usersFlags[user.id];
         if(this.users.length <= 0 || !this.creator) {
             channels.splice(channels.indexOf(this), 1);
             delete this;
