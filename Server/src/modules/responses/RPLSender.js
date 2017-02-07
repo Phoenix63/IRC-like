@@ -26,9 +26,9 @@ class RPLSender {
         let us = '';
         channel.users.forEach((u) => {
             var delimiter = '';
-            if(channel.usersFlags[u.id].flags.indexOf('o')>=0) {
+            if(channel.isOperator(u)) {
                 delimiter = '@';
-            } else if (this.usersFlags[u.id].flags.indexOf('v')>=0) {
+            } else if (channel.isVoice(u)) {
                 delimiter = '+';
             }
             us += ' '+delimiter+channel.usersFlags[u.id].client.name;

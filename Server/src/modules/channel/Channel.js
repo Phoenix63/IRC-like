@@ -26,7 +26,7 @@ class Channel {
         this.maxSize = maxSize;
 
         this.bannedUsers = [];
-        this.usersFlags = {};
+        this._usersFlags = {};
 
         this.invitation = [];
 
@@ -47,8 +47,20 @@ class Channel {
 
     }
 
+    /**
+     *
+     * @returns {string}
+     */
     get name() {
         return this._name;
+    }
+
+    /**
+     *
+     * @returns {*}
+     */
+    get usersFlags() {
+        return this._usersFlags;
     }
 
     /**
@@ -57,8 +69,8 @@ class Channel {
      */
     get users() {
         let list = [];
-        for(let key in this.usersFlags) {
-            list.push(this.usersFlags[key].client);
+        for(let key in this._usersFlags) {
+            list.push(this._usersFlags[key].client);
         }
         return list;
     }
@@ -88,6 +100,28 @@ class Channel {
     }
 
     /**
+     * return true if the clinet is operator
+     * @param {Client} client
+     * @returns {boolean}
+     */
+    isOperator(client) {
+        if(this._usersFlags[client.id] && this._usersFlags[client.id].flags.indexOf('o')>=0)
+            return true;
+        return false;
+    }
+
+    /**
+     * return true if the client is voice
+     * @param {Client} client
+     * @returns {boolean}
+     */
+    isVoice(client) {
+        if(this._usersFlags[client.id] && this._usersFlags[client.id].flags.indexOf('v')>=0)
+            return true;
+        return false;
+    }
+
+    /**
      * add user to the channel
      * @param {Client} user
      * @param {string} key
@@ -112,12 +146,12 @@ class Channel {
         user.channels.push(this);
         if(this.users.length === 0) {
             this.creator = user;
-            this.usersFlags[user.id] = {
+            this._usersFlags[user.id] = {
                 client: user,
                 flags: 'omvw'
             };
         } else {
-            this.usersFlags[user.id] = {
+            this._usersFlags[user.id] = {
                 client: user,
                 flags: ''
             };
@@ -145,7 +179,7 @@ class Channel {
         if(user === this.creator) {
             this.creator = null;
             this.users.forEach((u) => {
-                if(this.usersFlags[u.id].flags.indexOf('o')>=0 && !this.creator) {
+                if(this._usersFlags[u.id].flags.indexOf('o')>=0 && !this.creator) {
                     this.creator = u;
                 }
             });
@@ -154,7 +188,7 @@ class Channel {
         RPLSender.PART(user, this);
         user.channels.splice(user.channels.indexOf(this),1);
 
-        delete this.usersFlags[user];
+        delete this._usersFlags[user];
         if(this.users.length <= 0 || !this.creator) {
             channels.splice(channels.indexOf(this), 1);
             delete this;
@@ -174,9 +208,8 @@ class Channel {
         });
     }
 
-
     /**
-     * get channel list
+     *
      * @returns {Array<Channel>}
      */
     static list() {
