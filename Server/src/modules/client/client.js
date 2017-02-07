@@ -1,61 +1,126 @@
 "use strict"
 
 import shortid from 'shortid';
-import err from './../SignalManager';
+import Socket from './../socket/socket';
+
+import ERRSender from './../responses/ERRSender';
+import RPLSender from './../responses/RPLSender';
+
 
 let clients = [];
 
 class Client {
 
+    /**
+     * constructor
+     * @param {Socket} socket
+     */
     constructor(socket) {
-        this.id = shortid.generate();
-        this.nick = null;
-        this.identity = null;
-        this.realname = null;
-        this.socket = socket;
-        this.socket.client = this;
-        this.away = false;
-        this.ip = socket.socket.remoteAddress;
+        this._id = shortid.generate();
+        this._name = null;
+        this._identity = null;
+        this._realname = null;
+        this._socket = socket;
+        this._socket.client = this;
+        this._away = false;
+        this._ip = socket.socket.remoteAddress;
 
-        this.channels = [];
+        this._channels = [];
         clients.push(this);
     }
 
-    setIdentity(pseudo) {
-        if(this.identity)
-            return false;
-        clients.forEach((c) => {
-            if(c.identity === pseudo)
-                return false;
-        });
-        this.identity = pseudo;
-        return true;
+
+    /**
+     * get user socket or null if its not defined
+     * @returns {null|Socket}
+     */
+    get socket() {
+        return this._socket;
     }
 
-    delete() {
-        this.channels.forEach((function(c) {
-            c.removeUser(this);
-        }).bind(this));
-        this.socket.close();
-        clients.splice(clients.indexOf(this), 1);
-        delete this;
-    };
+    /**
+     * get user id
+     * @returns {string}
+     */
+    get id() {
+        return this._id;
+    }
 
+    /**
+     * get user ip, may be 127.0.0.1 if not defined
+     * @returns {string}
+     */
+    get ip() {
+        return this._ip || '127.0.0.1';
+    }
+
+    /**
+     * get user identity, may be Guest_<id> if not defined
+     * @returns {string}
+     */
+    get identity() {
+        return this._identity || 'Guest_'+this._id;
+    }
+
+    /**
+     * get user name, may be Guest_<id> if not defined
+     * @returns {string}
+     */
     get name() {
-        return this.nick || 'Guest_'+this.id;
+        return this._name || 'Guest_'+this._id;
     }
 
-    // get real name
-    get rname() {
-        return this.realname || 'Guest_'+this.id;
+    /**
+     * get user realname, may be Guest_<id> if not defined
+     * @returns {string}
+     */
+    get realname() {
+        return this._realname || 'Guest_'+this._id;
     }
 
+    /**
+     *
+     * @param {string} val
+     */
+    set realname(val) {
+        this._realname = val;
+    }
+
+    /**
+     * return true if user is registered / else false
+     * @returns {boolean}
+     */
+    get isRegistered() {
+        return (this._realname !== null) && (this._name !== null);
+    }
+
+    /**
+     *
+     * @returns {Array}
+     */
+    get channels() {
+        return this._channels;
+    }
+
+    /**
+     * change identity of user if its valid
+     * @param {string} identity
+     */
+    set identity(identity) {
+        if(!this._identity)
+            this._identity = identity;
+    }
+
+    /**
+     * set the user name
+     * @param {string} name
+     */
     set name(name) {
         if(name[0] === ':') {
             name = name.slice(1,name.length);
         }
 
-        clients.forEach(((c) => {
+        clients.forEach((c) => {
             if(c.name === name
                     .replace(/\[/, '{')
                     .replace(/\]/, '}')
@@ -63,29 +128,56 @@ class Client {
                     .replace(/\{/, '[')
                     .replace(/\}/, ']')
                     .replace(/\\/, '\|')) {
-                err.ERR_NICKNAMEINUSE(this.socket);
+                ERRSender.ERR_NICKNAMEINUSE(this);
                 return null;
             }
-        }).bind(this));
+        });
 
         let match = name.match(/[a-zA-Z0-9\[\]\{\}_-é"'ëäïöüâêîôûç`è]+/);
         if((match && match[0] !== name) || name === '') {
-            err.ERR_NONICKNAMEGIVEN(this.socket);
+            ERRSender.ERR_NONICKNAMEGIVEN(this);
             return;
         }
         this.socket.logger._USER_CHANGE_NICK(name);
         this.socket.broadcast(':'+this.name+' NICK '+name);
-        this.nick = name;
+        this._name = name;
     }
 
+    /*
+    * methods
+     */
+
+    /**
+     * delete the current user
+     */
+    delete() {
+        this._channels.forEach((function(c) {
+            c.removeUser(this);
+        }).bind(this));
+        this.socket.close();
+        clients.splice(clients.indexOf(this), 1);
+        delete this;
+    };
+
+
+    /**
+     * find a client in user list
+     * @param id
+     * @returns {null|Client}
+     */
     static find(id) {
         for(let key in clients) {
             if( key === id || clients[key].name === id || client[key].id === id) {
                 return clients[key];
             }
         }
-        throw "Client "+id+" is not in the list";
+        return null;
     }
+
+    /**
+     * get client list
+     * @returns {Array}
+     */
     static list() {
         return clients;
     }

@@ -1,12 +1,12 @@
 "use strict";
 
 import Channel from './../channel/Channel';
-import config from './../../config.json';
+import ERRSender from './../responses/ERRSender';
 
 module.exports = function(socket, command) {
 
-    if(!socket.client.identity) {
-        socket.send(':'+config.ip+' 451 * PART :You have not registered');
+    if(!socket.client.isRegistered) {
+        ERRSender.ERR_NOTREGISTERED(socket.client, 'PART');
         return;
     }
 

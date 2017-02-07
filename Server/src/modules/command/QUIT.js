@@ -1,18 +1,17 @@
 "use strict";
 
 import config from './../../config.json';
+import ERRSender from './../responses/ERRSender';
 
 module.exports = function(socket, command) {
 
-    if(!socket.client.identity) {
-        socket.send(':'+config.ip+' 451 * QUIT :You have not registered');
+    if(!socket.client.isRegistered) {
+        ERRSender.ERR_NOTREGISTERED(socket.client, 'QUIT');
         return;
     }
 
     socket.client.channels.forEach((chan) => {
-        chan.users.forEach((u) => {
-            u.socket.send(':'+socket.client.name+'!'+config.ip+' QUIT :Gone');
-        });
+        chan.broadcast(':'+socket.client.name+'!'+config.ip+' QUIT :Gone')
     });
     socket.client.delete();
 }

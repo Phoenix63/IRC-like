@@ -1,9 +1,9 @@
-var err     = require('./SignalManager');
-var Channel     = require('./channel/Channel');
-var config      = require('./../config.json');
+"use strict";
+
+import ERRSender from './responses/ERRSender';
 
 
-var allowedCommand = {
+let allowedCommand = {
     'NICK':     require('./command/NICK'),
     'JOIN':     require('./command/JOIN'),
     'PART':     require('./command/PART'),
@@ -15,48 +15,58 @@ var allowedCommand = {
     'USER':     require('./command/USER')
 };
 
+
 class CommandManager {
 
     constructor(socket) {
         this.socket = socket;
     }
 
+    /**
+     * exec a command if it's allowed
+     * @param {Array} command
+     */
     exec(command) {
         if(allowedCommand[command[0]]) {
             allowedCommand[command[0]](this.socket, command);
-            return;
         } else {
-            err.ERR_UNKNOWNCOMMAND(command[0], this.socket);
-            return;
+            ERRSender.ERR_UNKNOWNCOMMAND(this.socket.client, command[0] || 'undefined');
         }
 
     }
 }
 
+/**
+ *
+ * @param {string} line
+ * @returns {[string,*]}
+ */
 function parseMessage(line) {
 
-    var command = line.match(/[A-Z]+([ ][^[a-zA-Z0-9#&:][a-zA-Z0-9 ]+)?/g);
+    let command = line.match(/[A-Z]+([ ][^[a-zA-Z0-9#&:][a-zA-Z0-9 ]+)?/g);
     if(command) {
         return [command[0], line.replace(new RegExp(command[0]+"[ ]?"), '')];
     } else {
-        throw "unknown command";
+        return [line.split(' ')[0], null];
     }
 
 }
 
 class MessageManager {
 
+    /**
+     * read message sended by client
+     * @param {Socket} socket
+     */
     constructor(socket) {
         this.socket = socket;
         this.socket.commandManager = new CommandManager(socket);
-        this.socket.on('message', ((str) => {
+        this.socket.on('message', (str) => {
             this.socket.logger._USER_SEND_CMD(str);
-            try {
-                this.socket.commandManager.exec(parseMessage(str));
-            } catch(e) {
-                err.ERR_UNKNOWNCOMMAND(socket);
-            }
-        }).bind(this));
+
+
+            this.socket.commandManager.exec(parseMessage(str));
+        });
     }
 
 }

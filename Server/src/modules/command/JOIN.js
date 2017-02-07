@@ -1,12 +1,12 @@
 "use strict";
 
 import Channel from './../channel/Channel';
-import config from './../../config.json';
+import ERRSender from './../responses/ERRSender';
 
 module.exports = function(socket, command) {
 
-    if(!socket.client.identity) {
-        socket.send(':'+config.ip+' 451 * JOIN :You have not registered');
+    if(!socket.client.isRegistered) {
+        ERRSender.ERR_NOTREGISTERED(socket.client, 'JOIN');
         return;
     }
 
@@ -20,21 +20,10 @@ module.exports = function(socket, command) {
             err = false;
             // join
             chan.addUser(socket.client, key);
-
-            if(chan.topic) {
-                socket.send(':'+config.ip+' 332 JOIN '+chan.name+' :'+chan.topic);
-            } else {
-                socket.send(':'+config.ip+' 331 JOIN '+chan.name+' :No topic is set');
-            }
-
-            chan.RPL_NAMREPLY(socket);
-
-
         }
     });
     if(err) {
         // create
-        let chan = new Channel(socket.client, name, key, 20);
-        chan.RPL_NAMREPLY(socket);
+        new Channel(socket.client, name, key, 20);
     }
 }

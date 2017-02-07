@@ -1,21 +1,20 @@
 "use strict";
 
 import Channel from './../channel/Channel';
-import config from './../../config.json';
 import Client from './../client/client';
-import err from './../SignalManager';
+import ERRSender from './../responses/ERRSender';
 
 module.exports = function(socket, command) {
 
-    if(!socket.client.identity) {
-        socket.send(':'+config.ip+' 451 * PRIVMSG :You have not registered');
+    if(!socket.client.isRegistered) {
+        ERRSender.ERR_NOTREGISTERED(socket.client, 'PRIVMSG');
         return;
     }
 
     let receivers = command[1].split(' ')[0].split(',');
     let message = command[1].split(':');
     if(!message[1]) {
-        err.ERR_NOTEXTTOSEND(socket);
+        ERRSender.ERR_NOTEXTTOSEND(socket.client);
         return;
     }
 
@@ -37,11 +36,11 @@ module.exports = function(socket, command) {
                 channels[r].broadcast(':'+ socket.client.name+' PRIVMSG '+ r +' :'+message[1], socket.client);
                 error = false;
             } else {
-                err.ERR_CANNOTSENDTOCHAN(socket);
+                ERRSender.ERR_CANNOTSENDTOCHAN(socket.client, r);
             }
         }
     });
     if(error) {
-        err.ERR_NORECIPIENT(socket);
+        ERRSender.ERR_NORECIPIENT(socket.client, 'PRIVMSG');
     }
 }

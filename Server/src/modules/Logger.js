@@ -9,12 +9,6 @@ function throwError(client, message) {
     throw "ConfMessage : "+ message;
 }
 
-if(!process.env.debug) {
-    process.on('uncaughtException', (err) => {
-        console.log('\t\t'+colors.red(err));
-    });
-}
-
 class Logger {
 
     constructor(client){

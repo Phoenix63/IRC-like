@@ -1,9 +1,9 @@
 "use strict";
 
-if(process.argv[2] && process.argv[2] === 'DEV') {
-    process.env.debug = true;
-} else {
-    process.env.debug = false;
+if (!(process.argv[2] && process.argv[2] === 'DEV')) {
+    process.on('uncaughtException', (err) => {
+        console.log('\t\t' + colors.red(err));
+    });
 }
 
 // globals
