@@ -30,18 +30,25 @@ class Channel {
 
         this.invitation = [];
 
-        this.addUser(creator, pass);
 
-        this.name = '';
-        this.setName(creator, name);
 
-        if(this.name === '') {
+        this._name = name;
+
+        if(this._name === '') {
             delete this;
             return;
         }
 
+
+
         channels.push(this);
 
+        this.addUser(creator, pass);
+
+    }
+
+    get name() {
+        return this._name;
     }
 
     /**
@@ -78,33 +85,6 @@ class Channel {
      */
     get isInvitation() {
         return (this.flags.indexOf('i')>=0);
-    }
-
-    /**
-     * set channel name
-     * @param {Client} op
-     * @param {string} name
-     */
-    setName(op, name) {
-
-        if(!this.usersFlags[op.id] || this.usersFlags[op.id].flags<0) {
-            return;
-        }
-
-        if(name[0] !== '#') {
-            name = '#'+name;
-        }
-        let error = false;
-        channels.forEach((chan) => {
-            if(chan.name === name) {
-                error = true;
-            }
-        });
-        if(error) {
-            ERRSender.ERR_NOSUCHCHANNEL(op, this);
-            return;
-        }
-        this.name = name;
     }
 
     /**
