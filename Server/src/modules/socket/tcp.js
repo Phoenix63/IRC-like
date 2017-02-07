@@ -1,13 +1,12 @@
 "use strict"
 
-var net         = require('net');
-var config      = require('./../../config.json');
+import net from 'net';
+import config from './../../config.json';
 
 
 function createServer(callback) {
-    var server = net.createServer(function(socket) {
+    let server = net.createServer(function(socket) {
         callback(socket);
-        socket.manager.isImageLoading = false;
         socket.buffer = '';
         socket.manager.emit('connect');
         socket.setTimeout(0);
@@ -21,7 +20,7 @@ function createServer(callback) {
 
             socket.manager.emit('data', data);
 
-            var lines = data.toString().split(/\n|\r/),
+            let lines = data.toString().split(/\n|\r/),
                 i, line;
 
             for (i = 0; i < lines.length - 1; i += 1) {
@@ -46,13 +45,8 @@ function createServer(callback) {
             if (msg.trim() === '') {
                 return;
             }
-            if(msg.indexOf('/image ')=== 0 || socket.manager.isImageLoading) {
-                socket.manager.isImageLoading = true;
-                socket.manager.emit('image', msg.toString());
+            socket.manager.emit('message', msg);
 
-            }else{
-                socket.manager.emit('message', msg);
-            }
 
         });
 

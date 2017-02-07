@@ -39,5 +39,12 @@ obj/
 *.iml
 .idea/
 idea/*.xml
+
 out/
 node_modules/
+
+Server/client.js
+Server/images/*
+Server/node_modules/
+Server/test.js
+Server/test/

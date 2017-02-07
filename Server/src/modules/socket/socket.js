@@ -15,11 +15,15 @@ var Socket = (function() {
         this.client = null;
         this.logger = null;
         this.messageManager = null;
-        this.imageManager = null;
-
-        this.isImageLoading = false;
 
         sockets.push(this);
+
+        this.timeout = setInterval((function() {
+            if(this.client)
+                this.client.delete();
+            else
+                this.close();
+        }).bind(this), 1000*60*5);
 
         this.onSignal = {};
     }
@@ -32,6 +36,8 @@ var Socket = (function() {
     });
 
     Socket.prototype.send = function(data) {
+        this.logger._SEND_TO_CLIENT(data);
+
         if(this.type === 'tcp')
             this.socket.write(data+'\n\r');
         else {
@@ -40,10 +46,10 @@ var Socket = (function() {
 
     }
 
-    Socket.prototype.broadcast = function(str) {
-        sockets.forEach((function(soc) {
-            if(soc.id !== this.id) {
-                soc.send(str);
+    Socket.prototype.broadcast = function(str, except) {
+        sockets.forEach((function(s) {
+            if(except !== s) {
+                s.send(str);
             }
         }).bind(this));
     }
@@ -58,6 +64,7 @@ var Socket = (function() {
     }
 
     Socket.prototype.close = function() {
+        this.socket.destroy();
         sockets.splice(sockets.indexOf(this), 1);
         delete this;
     }
