@@ -15,9 +15,6 @@ var Socket = (function() {
         this.client = null;
         this.logger = null;
         this.messageManager = null;
-        this.imageManager = null;
-
-        this.isImageLoading = false;
 
         sockets.push(this);
 

@@ -1,12 +1,13 @@
-"use strict"
-// true : coupe le serveur sur une erreur
-// false : laisse le serveur tourner sur une erreur
+"use strict";
 
-process.env.debug = true;
+if(process.argv[2] && process.argv[2] === 'DEV') {
+    process.env.debug = true;
+} else {
+    process.env.debug = false;
+}
 
 // globals
 import colors from 'colors';
-import prompter from './prompter.js';
 
 // socket
 
@@ -26,7 +27,6 @@ socketManager.create((socket) => {
     let logger = new Logger(c);
     c.socket.logger = logger;
     c.socket.messageManager = new MessageManager(c.socket);
-    c.socket.imageManager = new ImageManager(c.socket);
 
     socket.on('connect', () => {
         logger._CLIENT_CONNECTED();
@@ -49,12 +49,12 @@ class App {
     }
 
     query(str) {
-        var req = str.split(' ');
+        let req = str.split(' ');
         if(req[0] === 'clients') {
             if(Client.list().length > 0) {
-                var ret = '';
+                let ret = '';
                 ret += '-- Client list --\n';
-                for(var i=0; i<Client.list().length; i++) {
+                for(let i=0; i<Client.list().length; i++) {
                     ret += i + '\t\t'+ Client.list()[i].name+'\t\t'+ Client.list()[i].id+'\t\t'+Client.list()[i].socket.type+'\n';
                 }
 
@@ -64,8 +64,9 @@ class App {
             }
         } else if (req[0] === 'send' && req[1] && req[2]) {
             try {
-                var cli = Client.find(req[1]);
-                var i = 2;
+                let cli = Client.find(req[1]);
+                let i = 2;
+                let ret;
                 ret = '';
                 while(req[i]) {
                     ret += req[i]+' ';
@@ -78,8 +79,8 @@ class App {
             }
 
         } else if (req[0] === 'bc' && req[1]) {
-            var i = 1;
-            var ret = '';
+            let i = 1;
+            let ret = '';
             while(req[i]) {
                 ret += req[i]+' ';
                 i++;
@@ -89,11 +90,11 @@ class App {
                 console.log(colors.green('YOU')+colors.white(' >> ')+ colors.yellow(c.name)+ ' : '+colors.white(ret));
             });
         } else if (req[0] === 'channels') {
-            var list = Channel.list(true);
+            let list = Channel.list(true);
             if(list.length > 0) {
-                var ret = '';
+                let ret = '';
                 ret += '-- Channels --\n';
-                for(var i=0; i<list.length; i++) {
+                for(let i=0; i<list.length; i++) {
                     ret += i + '\t\t'+ list[i].name + '\t\t' + list[i].users.length+'/'+list[i].maxSize+'\n';
                 }
 
@@ -105,6 +106,4 @@ class App {
     }
 };
 
-var app = new App();
-
-prompter(app);
+let app = new App();

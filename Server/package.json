@@ -4,10 +4,10 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon --exec babel-node ./src/app.js",
+    "dev": "nodemon --exec babel-node ./src/app.js DEV",
     "watch": "babel --watch src --out-dir dist --source-maps inline --copy-files",
     "build": "babel src --out-dir dist --source-maps inline --copy-files",
-    "start": "npm run build && node dist/app.js"
+    "start": "npm run build && node dist/app.js PROD"
   },
   "author": "",
   "license": "ISC",
