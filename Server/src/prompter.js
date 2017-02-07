@@ -1,19 +1,13 @@
-/*
- *
- * IMPORTS
- */
+
 "use strict"
 
-var colors      = require('colors');
-var readline    = require('readline');
-var util        = require('util');
+import colors from 'colors';
+import readline from 'readline';
+import util from 'util';
 
-module.exports = function(app) {
+module.exports = (app) => {
 
-    /*
-     *
-     * CONST
-     */
+
 
     // command line before cmd
     app.title = app.title || colors.grey('$socket');
@@ -21,11 +15,11 @@ module.exports = function(app) {
 
 
 
-    const clear = function() {
+    const clear = () => {
         process.stdout.write("\x1Bc");
     };
 
-    const fu = function (type, args) {
+    const fu = (type, args) => {
         var t = Math.ceil((rl.line.length + 3) / process.stdout.columns);
         var text = util.format.apply(console, args);
         rl.output.write("\n\x1B[" + t + "A\x1B[0J");
@@ -34,12 +28,12 @@ module.exports = function(app) {
         rl._refreshLine();
     };
 
-    const completer = function(line) {
+    const completer = (line) => {
         var completions = [
             ''
         ];
 
-         var hits = completions.filter(function(c) {
+         var hits = completions.filter((c) => {
              return c.indexOf(line) == 0;
          });
 
@@ -53,45 +47,37 @@ module.exports = function(app) {
         output: process.stdout,
         completer: completer
     });
-    /*
-     *
-     * Events
-     */
-    rl.on("line", function(line) {
+
+    rl.on("line", (line) => {
 
         app.query(line);
 
         rl.prompt();
     });
-    rl.on('close', function() {
+    rl.on('close', () => {
         return process.exit(0);
     });
-    rl.on("SIGINT", function() {
+    rl.on("SIGINT", () => {
         rl.clearLine();
         return process.exit(0);
     });
 
 
 
-    console.log = function() {
+    console.log = () => {
         fu("log", arguments);
     };
-    console.warn = function() {
+    console.warn = () => {
         fu("warn", arguments);
     };
-    console.info = function() {
+    console.info = () => {
         fu("info", arguments);
     };
-    console.error = function() {
+    console.error = () => {
         fu("error", arguments);
     };
 
-    /*
-     *
-     * RUN
-     */
     clear();
     rl.setPrompt(app.title+colors.green(' > '), 2);
     rl.prompt();
 };
-

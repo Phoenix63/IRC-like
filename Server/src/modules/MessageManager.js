@@ -15,13 +15,13 @@ var allowedCommand = {
     'USER':     require('./command/USER')
 };
 
-var CommandManager = (function() {
+class CommandManager {
 
-    function CommandManager(socket) {
+    constructor(socket) {
         this.socket = socket;
     }
 
-    CommandManager.prototype.exec = function(command) {
+    exec(command) {
         if(allowedCommand[command[0]]) {
             allowedCommand[command[0]](this.socket, command);
             return;
@@ -30,11 +30,8 @@ var CommandManager = (function() {
             return;
         }
 
-    };
-
-
-    return CommandManager;
-})();
+    }
+}
 
 function parseMessage(line) {
 
@@ -47,25 +44,21 @@ function parseMessage(line) {
 
 }
 
-var MessageManager = (function() {
-    function MessageManager(socket) {
+class MessageManager {
+
+    constructor(socket) {
         this.socket = socket;
         this.socket.commandManager = new CommandManager(socket);
-        this.socket.on('message', (function(str) {
-            if(!this.socket.isImageLoading) {
-                this.socket.logger._USER_SEND_CMD(str);
-                try {
-                    this.socket.commandManager.exec(parseMessage(str));
-                } catch(e) {
-                    err.ERR_UNKNOWNCOMMAND(socket);
-                }
-
+        this.socket.on('message', ((str) => {
+            this.socket.logger._USER_SEND_CMD(str);
+            try {
+                this.socket.commandManager.exec(parseMessage(str));
+            } catch(e) {
+                err.ERR_UNKNOWNCOMMAND(socket);
             }
         }).bind(this));
     }
 
-    return MessageManager;
-
-})();
+}
 
 module.exports = MessageManager;

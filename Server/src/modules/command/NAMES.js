@@ -1,6 +1,7 @@
+"use strict";
 
-var Channel     = require('./../channel/Channel');
-var config      = require('./../../config.json');
+import Channel from './../channel/Channel';
+import config from './../../config.json';
 
 module.exports = function(socket, command) {
 
@@ -9,14 +10,14 @@ module.exports = function(socket, command) {
         return;
     }
 
-    var channels = command[1].split(' ')[0].split(',');
+    let channels = command[1].split(' ')[0].split(',');
 
-    Channel.list().forEach(function(chan) {
+    Channel.list().forEach((chan) => {
         if((channels.indexOf(chan.name)>=0 || channels[0] === '')
             && ((!chan._isSecret && !chan._isPrivate) || chan.users.indexOf(socket.client)>=0)) {
 
-            var ret = ':'+config.ip+' 353 JOIN @ '+chan.name;
-            var us = '';
+            let ret = ':'+config.ip+' 353 JOIN @ '+chan.name;
+            let us = '';
             chan.users.forEach(function(u) {
                 us += ' @'+u.name;
             });

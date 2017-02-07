@@ -5,55 +5,50 @@
 process.env.debug = true;
 
 // globals
-var net             = require('net');
-var colors          = require('colors');
-var shortid         = require('shortid');
-var prompter        = require('./prompter.js');
-var config          = require('./config.json');
-var image_server    = require('./modules/imageServer/server');
+import colors from 'colors';
+import prompter from './prompter.js';
 
 // socket
 
-var socketManager   = require('./modules/socket/socket');
-var Client          = require('./modules/client/client');
-var Logger          = require('./modules/Logger');
-var MessageManager  = require('./modules/MessageManager');
-var ImageManager    = require('./modules/ImageManager');
+import socketManager from './modules/socket/socket';
+import Client from './modules/client/client';
+import Logger from './modules/Logger';
+import MessageManager from './modules/MessageManager';
 
 // channels
 
-var Channel         = require('./modules/channel/Channel');
+import Channel from './modules/channel/Channel';
 
 
-socketManager.create(function(socket) {
+socketManager.create((socket) => {
 
-    var c = new Client(socket);
-    var logger = new Logger(c);
+    let c = new Client(socket);
+    let logger = new Logger(c);
     c.socket.logger = logger;
     c.socket.messageManager = new MessageManager(c.socket);
     c.socket.imageManager = new ImageManager(c.socket);
 
-    socket.on('connect', function() {
+    socket.on('connect', () => {
         logger._CLIENT_CONNECTED();
     });
 
-    socket.on('end', function() {
+    socket.on('end', () => {
         logger._CLIENT_DECONNECTED();
         c.delete();
     });
-    socket.on('close', function() {
+    socket.on('close', () => {
         logger._CLIENT_DECONNECTED();
         c.delete();
     });
 });
 
-var App = (function() {
+class App {
 
-    function App() {
+    constructor() {
 
     }
 
-    App.prototype.query = function(str) {
+    query(str) {
         var req = str.split(' ');
         if(req[0] === 'clients') {
             if(Client.list().length > 0) {
@@ -107,12 +102,8 @@ var App = (function() {
                 console.log(colors.yellow('no channel connected'));
             }
         }
-    };
-
-    return App;
-})();
-
-
+    }
+};
 
 var app = new App();
 

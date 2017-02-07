@@ -1,7 +1,9 @@
-var err     = require('./../SignalManager');
-var Channel     = require('./../channel/Channel');
-var config      = require('./../../config.json');
-var Client      = require('./../client/client');
+"use strict";
+
+import Channel from './../channel/Channel';
+import config from './../../config.json';
+import Client from './../client/client';
+import err from './../SignalManager';
 
 module.exports = function(socket, command) {
 
@@ -10,23 +12,23 @@ module.exports = function(socket, command) {
         return;
     }
 
-    var receivers = command[1].split(' ')[0].split(',');
-    var message = command[1].split(':');
+    let receivers = command[1].split(' ')[0].split(',');
+    let message = command[1].split(':');
     if(!message[1]) {
         err.ERR_NOTEXTTOSEND(socket);
         return;
     }
 
-    var clients = {};
-    var channels = {};
-    Channel.list().forEach(function(chan) {
+    let clients = {};
+    let channels = {};
+    Channel.list().forEach((chan) => {
         channels[chan.name]= chan;
     });
-    Client.list().forEach(function(cli) {
+    Client.list().forEach((cli) => {
         clients[cli.name] = cli;
     });
-    var error = true;
-    receivers.forEach(function(r) {
+    let error = true;
+    receivers.forEach((r) => {
         if(clients[r]) {
             clients[r].socket.send(':'+ socket.client.name+' PRIVMSG '+ r +' :'+message[1]);
             error = false;

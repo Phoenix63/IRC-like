@@ -1,13 +1,14 @@
+"use strict";
 
-var shortid     = require('shortid');
-var err         = require('./../SignalManager');
-var config      = require('./../../config.json');
+import shortid from 'shortid';
+import err from './../SignalManager';
+import config from './../../config.json';
 
-var channels = [];
+let channels = [];
 
-var Channel = (function() {
+class Channel {
 
-    function Channel(creator, name, pass, maxSize) {
+    constructor(creator, name, pass, maxSize) {
         if(!typeof maxSize === "number") {
             err.ERR_NOSUCHCHANNEL(creator);
             delete this;
@@ -46,24 +47,24 @@ var Channel = (function() {
 
     }
 
-    Channel.prototype.__defineGetter__('users', function() {
-        var list = [];
-        for(var key in this.usersFlags) {
+    get users() {
+        let list = [];
+        for(let key in this.usersFlags) {
             list.push(this.usersFlags[key].client);
         }
         return list;
-    });
+    }
 
-    Channel.prototype.RPL_NAMREPLY = function(socket) {
-        var sep = '=';
+    RPL_NAMREPLY(socket) {
+        let sep = '=';
         if(this._isSecret)
             sep = '@';
         if(this._isPrivate)
             sep = '*';
 
-        var ret = ':'+config.ip+' 353 '+ socket.client.name +' '+sep+' '+this.name;
-        var us = '';
-        this.users.forEach((function(u) {
+        let ret = ':'+config.ip+' 353 '+ socket.client.name +' '+sep+' '+this.name;
+        let us = '';
+        this.users.forEach((u) => {
             var delimiter = '';
             if(this.usersFlags[u.id].flags.indexOf('o')>=0) {
                 delimiter = '@';
@@ -72,15 +73,16 @@ var Channel = (function() {
             }
             us += ' '+delimiter+this.usersFlags[u.id].client.name;
 
-        }).bind(this));
+        });
 
-        if(us)
+        if(us) {
             socket.send(ret+(us?' :'+us.slice(1,us.length):''));
+        }
         socket.send(':'+config.ip+' 366 '+ socket.client.name +' :End of /NAMES list');
     }
 
-    Channel.prototype.setName = function(op, name) {
 
+    setName(op, name) {
 
         if(!this.usersFlags[op.id] || this.usersFlags[op.id].flags<0) {
             err.ERR_NOTOPONCHANNEL(op.socket);
@@ -91,7 +93,7 @@ var Channel = (function() {
             name = '#'+name;
         }
         var error = false;
-        channels.forEach(function(chan) {
+        channels.forEach((chan) => {
             if(chan.name === name) {
                 error = true;
             }
@@ -103,7 +105,7 @@ var Channel = (function() {
         this.name = name;
     }
 
-    Channel.prototype.addUser = function(user, key) {
+    addUser(user, key) {
         if(this.bannedUsers.indexOf(user)>=0) {
             err.ERR_BANNEDFROMCHAN(user.socket);
             return;
@@ -129,7 +131,7 @@ var Channel = (function() {
         this.broadcast(':'+user.name+' JOIN '+this.name);
     }
 
-    Channel.prototype.removeUser = function(user) {
+    removeUser(user) {
 
         if(this.users.indexOf(user)<0) {
             err.ERR_NOTONCHANNEL(user.socket);
@@ -139,11 +141,11 @@ var Channel = (function() {
 
         if(user === this.creator) {
             this.creator = null;
-            this.users.forEach((function(u) {
+            this.users.forEach((u) => {
                 if(this.usersFlags[u.id].flags.indexOf('o')>=0 && !this.creator) {
                     this.creator = u;
                 }
-            }).bind(this));
+            });
         }
 
         this.broadcast(':'+user.name+' PART '+this.name);
@@ -156,15 +158,15 @@ var Channel = (function() {
         }
     }
 
-    Channel.prototype.broadcast = function(message, except) {
-        this.users.forEach(function(u) {
+    broadcast(message, except) {
+        this.users.forEach((u) => {
             if(u !== except)
                 u.socket.send(message);
         });
     }
 
-    Channel.prototype.RPL_WHOREPLY = function(socket) {
-        this.users.forEach((function(u) {
+    RPL_WHOREPLY(socket) {
+        this.users.forEach((u) => {
             var delimiter = '';
             if(this.usersFlags[u.id].flags.indexOf('o')>=0) {
                 delimiter = '@';
@@ -178,29 +180,28 @@ var Channel = (function() {
                 + delimiter + ' :0 '+u.rname);
 
 
-        }).bind(this));
+        });
         socket.send(':'+config.ip+' 315 '+socket.client.name+' '+this.name+' :End of /WHO list');
 
     }
 
 
 
-
-    Channel.prototype.__defineGetter__('_isPrivate', function() {
+    get _isPrivate() {
         return (this.flags.indexOf('p')>=0);
-    });
-    Channel.prototype.__defineGetter__('_isSecret', function() {
-        return (this.flags.indexOf('s')>=0);
-    });
-    Channel.prototype.__defineGetter__('_isInvitation', function() {
-        return (this.flags.indexOf('i')>=0);
-    });
+    }
 
-    Channel.list = function() {
+    get _isSecret() {
+        return (this.flags.indexOf('s')>=0);
+    }
+    get _isInviation() {
+        return (this.flags.indexOf('i')>=0);
+    }
+
+    static list() {
         return channels;
     }
 
-    return Channel;
-})();
+}
 
 module.exports = Channel;

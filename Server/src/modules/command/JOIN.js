@@ -1,6 +1,7 @@
+"use strict";
 
-var Channel     = require('./../channel/Channel');
-var config      = require('./../../config.json');
+import Channel from './../channel/Channel';
+import config from './../../config.json';
 
 module.exports = function(socket, command) {
 
@@ -9,12 +10,12 @@ module.exports = function(socket, command) {
         return;
     }
 
-    var name = command[1].split(' ')[0];
-    var key = command[1].split(' ')[1] || '';
+    let name = command[1].split(' ')[0];
+    let key = command[1].split(' ')[1] || '';
 
-    var err = true;
+    let err = true;
 
-    Channel.list().forEach(function(chan) {
+    Channel.list().forEach((chan) => {
         if(chan.name === name) {
             err = false;
             // join
@@ -33,7 +34,7 @@ module.exports = function(socket, command) {
     });
     if(err) {
         // create
-        var chan = new Channel(socket.client, name, key, 20);
+        let chan = new Channel(socket.client, name, key, 20);
         chan.RPL_NAMREPLY(socket);
     }
 }

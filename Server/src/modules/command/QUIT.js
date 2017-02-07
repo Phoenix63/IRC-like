@@ -1,5 +1,6 @@
+"use strict";
 
-var config = require('./../../config.json');
+import config from './../../config.json';
 
 module.exports = function(socket, command) {
 
@@ -8,8 +9,8 @@ module.exports = function(socket, command) {
         return;
     }
 
-    socket.client.channels.forEach(function(chan) {
-        chan.users.forEach(function(u) {
+    socket.client.channels.forEach((chan) => {
+        chan.users.forEach((u) => {
             u.socket.send(':'+socket.client.name+'!'+config.ip+' QUIT :Gone');
         });
     });

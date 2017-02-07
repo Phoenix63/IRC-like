@@ -1,7 +1,9 @@
 "use strict"
 
-var config      = require('./../../config.json');
-var io          = require('socket.io')(config.sio_server.port);
+import config from './../../config.json';
+import sio from 'socket.io';
+
+let io = sio(config.sio_server.port);
 
 var watchers = {};
 

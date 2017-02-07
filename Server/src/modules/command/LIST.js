@@ -1,6 +1,7 @@
+"use strict";
 
-var Channel     = require('./../channel/Channel');
-var config      = require('./../../config.json');
+import Channel from './../channel/Channel';
+import config from './../../config.json';
 
 module.exports = function(socket, command) {
 
@@ -9,10 +10,10 @@ module.exports = function(socket, command) {
         return;
     }
 
-    var channels = command[1].split(' ')[0].split(',');
+    let channels = command[1].split(' ')[0].split(',');
 
     socket.send(":"+config.ip+" 321 Channel :Users Name");
-    Channel.list().forEach(function(chan) {
+    Channel.list().forEach((chan) => {
         if(((channels[0] !== '' && channels.indexOf(chan)>=0) || channels[0] === '')&& (!chan._isSecret || (chan._isSecret && chan.users.indexOf(socket.client)>=0))) {
             socket.send(":"+config.ip+" 322 "+socket.client.name+" "+(chan._isPrivate?'#':'')+chan.name+' '+chan.users.length+' :'+(chan.topic || 'No topic set'));
         }

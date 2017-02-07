@@ -1,7 +1,7 @@
 "use strict"
 
-var net         = require('net');
-var config      = require('./../../config.json');
+import net from 'net';
+import config from './../../config.json';
 
 
 function createServer(callback) {

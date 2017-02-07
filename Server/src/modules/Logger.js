@@ -1,8 +1,7 @@
 "use strict"
 
-var Client = require('./client/client');
-
-var colors      = require('colors');
+import Client from './client/client';
+import colors from 'colors';
 
 function throwError(client, message) {
     if(client && client.socket && client.socket.emit)
@@ -11,46 +10,45 @@ function throwError(client, message) {
 }
 
 if(!process.env.debug) {
-    process.on('uncaughtException', function (err) {
+    process.on('uncaughtException', (err) => {
         console.log('\t\t'+colors.red(err));
     });
 }
 
-var Logger = (function() {
+class Logger {
 
-    function Logger(client){
+    constructor(client){
         if(!client instanceof Client)
             throwError(client, "Logger have an instance of Client");
         this.client = client;
     }
 
-    Logger.prototype._CLIENT_CONNECTED = function() {
+    _CLIENT_CONNECTED() {
         console.log(colors.yellow(this.client.name + ' join the server with '+ this.client.socket.type+' connection'));
     }
-    Logger.prototype._CLIENT_SEND_MESSAGE= function(message) {
+    _CLIENT_SEND_MESSAGE(message) {
         if(!message)
             throwError(this.client, "_CLIENT_SEND_MESSAGE must have a String");
         console.log(colors.yellow(this.client.name) + colors.grey(' : ') + colors.white(message));
     }
-    Logger.prototype._CLIENT_DECONNECTED= function() {
+    _CLIENT_DECONNECTED() {
         console.log(colors.yellow(this.client.name + ' leave the server'));
     }
-    Logger.prototype._RECEIVE_IMAGE = function(path) {
+    _RECEIVE_IMAGE(path) {
         if(!path)
             throwError(this.client, " _RECEIVE_IMAGE must have a String");
         console.log(colors.yellow(this.client.name)+ colors.grey(' : ') + colors.white('Send image '+path));
     };
-    Logger.prototype._USER_CHANGE_NICK = function(newName) {
+    _USER_CHANGE_NICK(newName) {
         console.log(colors.yellow(this.client.name) + colors.green(' change is nickname to '+ newName));
     };
-    Logger.prototype._SEND_TO_CLIENT = function(message) {
+    _SEND_TO_CLIENT(message) {
         console.log(colors.grey('[to] ')+colors.green(this.client.name)+ '<< '+message);
     };
-    Logger.prototype._USER_SEND_CMD = function(message) {
+    _USER_SEND_CMD(message) {
         console.log(colors.grey('[from] ')+colors.red(this.client.name)+ '>> '+message);
     }
-    return Logger;
-})();
+}
 
 module.exports = Logger;
 

@@ -1,5 +1,7 @@
-var Channel = require('./../channel/Channel');
-var config  = require('./../../config.json');
+"use strict";
+
+import Channel from './../channel/Channel';
+import config from './../../config.json';
 
 module.exports = function(socket, command) {
 
@@ -8,7 +10,7 @@ module.exports = function(socket, command) {
         return;
     }
 
-    var name = command[1].split(' ')[0];
+    let name = command[1].split(' ')[0];
     if(name[0] === '#') {
         Channel.list().forEach(function(chan) {
             if(name === chan.name) {

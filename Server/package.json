@@ -5,7 +5,8 @@
   "main": "app.js",
   "scripts": {
     "dev": "nodemon --exec babel-node ./src/app.js",
-    "build": "babel src --out-dir dist",
+    "watch": "babel --watch src --out-dir dist --source-maps inline --copy-files",
+    "build": "babel src --out-dir dist --source-maps inline --copy-files",
     "start": "npm run build && node dist/app.js"
   },
   "author": "",

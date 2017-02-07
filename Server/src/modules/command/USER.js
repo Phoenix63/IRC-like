@@ -1,4 +1,6 @@
-var config      = require('./../../config.json');
+"use strict";
+
+import config from './../../config.json';
 
 module.exports = function(socket, command) {
 
@@ -8,11 +10,11 @@ module.exports = function(socket, command) {
     }
 
     try {
-        var cmd = command[1].split(' ');
-        var name = cmd[0];
-        var realname = cmd[3];
+        let cmd = command[1].split(' ');
+        let name = cmd[0];
+        let realname = cmd[3];
 
-        var valid = socket.client.setIdentity(name);
+        let valid = socket.client.setIdentity(name);
 
         if(realname[0] === ':') {
             socket.client.realname = realname.replace(':','');
@@ -31,7 +33,4 @@ module.exports = function(socket, command) {
         socket.send();
     }
 
-
-
-
-}
+};
