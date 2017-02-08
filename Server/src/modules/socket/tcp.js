@@ -12,7 +12,7 @@ function createServer(callback) {
         socket.setTimeout(0);
 
         socket.on('timeout', () => {
-            socket.manager.emit('close');
+            socket.destroy();
         });
 
         socket.on('data', (data) => {
