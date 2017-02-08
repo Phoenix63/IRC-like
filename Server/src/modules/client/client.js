@@ -99,8 +99,16 @@ class Client {
      * @param {string} identity
      */
     set identity(identity) {
-        if(!this._identity)
+        if(!this._identity) {
+
+            let match = name.match(/[a-zA-Z0-9\[\]\{\}_-é"'ëäïöüâêîôûç`è]+/);
+            if(match && match[0] !== identity && identity === '' || identity.length > 15) {
+                ERRSender.ERR_NEEDMOREPARAMS(this, 'USER');
+                return;
+            }
             this._identity = identity;
+        }
+
     }
 
     /**
@@ -126,7 +134,7 @@ class Client {
         });
 
         let match = name.match(/[a-zA-Z0-9\[\]\{\}_-é"'ëäïöüâêîôûç`è]+/);
-        if((match && match[0] !== name) || name === '') {
+        if((match && match[0] !== name) || name === '' || name.length>15) {
             ERRSender.ERR_NONICKNAMEGIVEN(this);
             return;
         }

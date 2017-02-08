@@ -18,7 +18,7 @@ function createServer(callback) {
         };
 
         socket.on('message', function(msg) {
-            if(!socket.manager.isImageLoading) {
+            if(!(msg.length > 510)) {
                 socket.manager.emit('message', msg);
             }
         });

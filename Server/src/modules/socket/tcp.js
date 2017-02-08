@@ -45,9 +45,9 @@ function createServer(callback) {
             if (msg.trim() === '') {
                 return;
             }
-            socket.manager.emit('message', msg);
-
-
+            if(!(msg.length > 510)) {
+                socket.manager.emit('message', msg);
+            }
         });
 
         socket.on('close', function() {

@@ -30,7 +30,11 @@ class Channel {
 
         this.invitation = [];
 
-
+        if(name.match(/(!^#)|(^G)|,/g) || name.length >= 50) {
+            ERRSender.ERR_NOSUCHCHANNEL(creator, {name:name});
+            delete this;
+            return;
+        }
 
         this._name = name;
 
