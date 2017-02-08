@@ -101,7 +101,7 @@ class Client {
     set identity(identity) {
         if(!this._identity) {
 
-            let match = name.match(/[a-zA-Z0-9\[\]\{\}_-é"'ëäïöüâêîôûç`è]+/);
+            let match = identity.match(/[a-zA-Z0-9\[\]\{\}_-é"'ëäïöüâêîôûç`è]+/);
             if(match && match[0] !== identity && identity === '' || identity.length > 15) {
                 ERRSender.ERR_NEEDMOREPARAMS(this, 'USER');
                 return;
