@@ -10,7 +10,6 @@ function createServer(callback) {
         socket.buffer = '';
         socket.manager.emit('connect');
         socket.setTimeout(0);
-        socket.isClosed = false;
 
         socket.on('timeout', () => {
             socket.manager.emit('close');
@@ -38,7 +37,7 @@ function createServer(callback) {
         });
 
         socket.on('error', () => {
-            socket.emit('close');
+            socket.destroy();
         });
 
         socket.on('message', (msg) => {
@@ -51,13 +50,7 @@ function createServer(callback) {
         });
 
         socket.on('close', () => {
-            if(!socket.isClosed) {
-                socket.manager.emit('close');
-            }
-            socket.isClosed = true;
-        });
-        socket.on('end', () => {
-            socket.emit('close');
+            socket.manager.close();
         });
 
 

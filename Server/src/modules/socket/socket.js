@@ -131,7 +131,12 @@ class Socket {
      * delete socket
      */
     close() {
-        this._socket.destroy();
+        if(this._client) {
+            this._client.delete();
+        }
+        if(this._logger) {
+            this._logger._CLIENT_DISCONNECTED();
+        }
         sockets.splice(sockets.indexOf(this), 1);
         delete this;
     }

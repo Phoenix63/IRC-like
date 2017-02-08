@@ -31,11 +31,6 @@ socketManager.create((socket) => {
     socket.on('connect', () => {
         logger._CLIENT_CONNECTED();
     });
-
-    socket.on('close', () => {
-        logger._CLIENT_DISCONNECTED();
-        c.delete();
-    });
 });
 
 class App {

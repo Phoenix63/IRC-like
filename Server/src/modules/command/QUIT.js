@@ -8,10 +8,5 @@ import ERRSender from './../responses/ERRSender';
  * @param command
  */
 module.exports = function (socket, command) {
-    if (socket.client) {
-        socket.client.delete();
-    } else {
-        socket.close();
-    }
-
+    socket._socket.destroy();
 }

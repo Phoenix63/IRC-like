@@ -157,12 +157,12 @@ class Client {
 
     /**
      * delete the current user
+     *
      */
     delete() {
         this._channels.forEach((c) => {
             c.removeUser(this);
         });
-        this.socket.close();
         clients.splice(clients.indexOf(this), 1);
         delete this;
     };
@@ -181,7 +181,6 @@ class Client {
      */
     addChannel(channel) {
         this._channels.push(channel);
-        console.log(this._channels.length);
     }
 
 
