@@ -9,27 +9,25 @@ var watchers = {};
 
 
 function createServer(callback) {
-    io.on('connection', function(socket) {
+    io.on('connection', (socket) => {
         callback(socket);
         socket.manager.emit('connect', socket);
 
-        socket.destroy = function() {
+        socket.destroy = () => {
             socket.disconnect();
         };
 
-        socket.on('message', function(msg) {
-            if(!(msg.length > 510)) {
+        socket.on('message', (msg) => {
+            if (!(msg.length > 510)) {
                 socket.manager.emit('message', msg);
             }
         });
 
-        socket.on('error', function() {
-            socket.manager.emit('end');
+        socket.on('error', () => {
             socket.manager.emit('close');
         });
 
-        socket.on('disconnect', function() {
-            socket.manager.emit('end');
+        socket.on('disconnect', () => {
             socket.manager.emit('close');
         });
     });

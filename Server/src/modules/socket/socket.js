@@ -13,7 +13,7 @@ class Socket {
      * @param {sio|tcp} soc
      */
     constructor(type, soc) {
-        this._id = '__'+shortid.generate();
+        this._id = '__' + shortid.generate();
         this._type = type;
         this._socket = soc;
         this._client = null;
@@ -86,10 +86,10 @@ class Socket {
      * @param {string} data
      */
     send(data) {
-        if(this._logger)
+        if (this._logger)
             this._logger._SEND_TO_CLIENT(data);
-        if(this.isTcp) {
-            this._socket.write(data+'\n\r');
+        if (this.isTcp) {
+            this._socket.write(data + '\n\r');
         } else {
             this._socket.emit('message', data);
         }
@@ -102,7 +102,7 @@ class Socket {
      */
     broadcast(str, except) {
         sockets.forEach((s) => {
-            if(except !== s) {
+            if (except !== s) {
                 s.send(str);
             }
         });
@@ -123,7 +123,7 @@ class Socket {
      * @param {string} data
      */
     emit(event, data) {
-        if(this._onSignal[event])
+        if (this._onSignal[event])
             this._onSignal[event](data);
     }
 
@@ -139,12 +139,12 @@ class Socket {
 }
 
 function create(callback) {
-    tcp.create(function(socket) {
+    tcp.create(function (socket) {
         let soc = new Socket('tcp', socket);
         socket.manager = soc;
         callback(soc);
     });
-    sio.create(function(socket) {
+    sio.create(function (socket) {
         let soc = new Socket('sio', socket);
         socket.manager = soc;
         callback(soc);

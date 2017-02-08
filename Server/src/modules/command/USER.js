@@ -3,9 +3,9 @@
 import config from './../../config.json';
 import ERRSender from './../responses/ERRSender';
 
-module.exports = function(socket, command) {
+module.exports = function (socket, command) {
 
-    if(socket.client.isRegistered) {
+    if (socket.client.isRegistered) {
         ERRSender.ERR_ALREADYREGISTRED(socket.client);
         return;
     }
@@ -15,7 +15,7 @@ module.exports = function(socket, command) {
     let name = cmd[0];
     let realname = cmd[3];
 
-    if(!name || !realname) {
+    if (!name || !realname) {
         ERRSender.ERR_NEEDMOREPARAMS(socket.client, 'USER');
         return;
     }

@@ -47,6 +47,14 @@ class Client {
     }
 
     /**
+     *
+     * @returns {Array<Channel>}
+     */
+    get channels() {
+        return this._channels;
+    }
+
+    /**
      * get user ip, may be 127.0.0.1 if not defined
      * @returns {string}
      */
@@ -139,7 +147,7 @@ class Client {
             return;
         }
         this.socket.logger._USER_CHANGE_NICK(name);
-        this.socket.broadcast(':'+this.name+' NICK '+name);
+        RPLSender.NICK(this);
         this._name = name;
     }
 

@@ -5,17 +5,18 @@ import config from './../../config.json';
 
 
 function createServer(callback) {
-    let server = net.createServer(function(socket) {
+    let server = net.createServer((socket) => {
         callback(socket);
         socket.buffer = '';
         socket.manager.emit('connect');
         socket.setTimeout(0);
+        socket.isClosed = false;
 
-        socket.on('timeout', function() {
+        socket.on('timeout', () => {
             socket.manager.emit('close');
         });
 
-        socket.on('data', function (data) {
+        socket.on('data', (data) => {
 
 
             socket.manager.emit('data', data);
@@ -34,41 +35,43 @@ function createServer(callback) {
             socket.buffer += lines[lines.length - 1];
 
 
-
         });
 
-        socket.on('error', function() {
+        socket.on('error', () => {
             socket.emit('close');
         });
 
-        socket.on('message', function (msg) {
+        socket.on('message', (msg) => {
             if (msg.trim() === '') {
                 return;
             }
-            if(!(msg.length > 510)) {
+            if (!(msg.length > 510)) {
                 socket.manager.emit('message', msg);
             }
         });
 
-        socket.on('close', function() {
-            socket.manager.emit('close');
+        socket.on('close', () => {
+            if(!socket.isClosed) {
+                socket.manager.emit('close');
+            }
+            socket.isClosed = true;
         });
-        socket.on('end', function () {
-            socket.manager.emit('end');
+        socket.on('end', () => {
+            socket.emit('close');
         });
 
 
     });
 
-    server.on('listening', function () {
+    server.on('listening', () => {
         console.log('Server listening');
     });
 
-    server.on('close', function () {
+    server.on('close', () => {
         console.log('Server is now closed');
     });
 
-    server.on('error', function (err) {
+    server.on('error', (err) => {
         console.log('error:', err);
     });
 

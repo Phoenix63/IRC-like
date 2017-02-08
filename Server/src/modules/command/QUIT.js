@@ -2,12 +2,16 @@
 
 import ERRSender from './../responses/ERRSender';
 
-module.exports = function(socket, command) {
-
-    if(!socket.client.isRegistered) {
-        ERRSender.ERR_NOTREGISTERED(socket.client, 'QUIT');
-        return;
+/**
+ *
+ * @param {Socket} socket
+ * @param command
+ */
+module.exports = function (socket, command) {
+    if (socket.client) {
+        socket.client.delete();
+    } else {
+        socket.close();
     }
 
-    socket.client.delete();
 }

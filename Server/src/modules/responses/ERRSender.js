@@ -1,4 +1,3 @@
-
 "use strict";
 
 import Client from './../client/client';
@@ -12,8 +11,8 @@ let ERRSender = {
      * @param {Client} client
      * @param {Channel|Object} channel
      */
-    ERR_NOSUCHCHANNEL : (client, channel) => {
-        client.socket.send(':'+config.ip+' 403 '+channel.name+' :No such channel');
+    ERR_NOSUCHCHANNEL: (client, channel) => {
+        client.socket.send(':' + config.ip + ' 403 ' + channel.name + ' :No such channel');
     },
 
     /**
@@ -22,8 +21,8 @@ let ERRSender = {
      * @param {Channel.name} channel
      * @static
      */
-    ERR_CANNOTSENDTOCHAN : (client, channel) => {
-        client.socket.send(':'+config.ip+' 404 '+channel+' :Cannot send to channel');
+    ERR_CANNOTSENDTOCHAN: (client, channel) => {
+        client.socket.send(':' + config.ip + ' 404 ' + channel + ' :Cannot send to channel');
     },
 
     /**
@@ -32,8 +31,8 @@ let ERRSender = {
      * @param {string} command
      * @static
      */
-    ERR_NORECIPIENT : (client, command) => {
-        client.socket.send(':'+config.ip +' 411 :No recipient give ('+command+')');
+    ERR_NORECIPIENT: (client, command) => {
+        client.socket.send(':' + config.ip + ' 411 :No recipient give (' + command + ')');
     },
 
     /**
@@ -41,8 +40,8 @@ let ERRSender = {
      * @param {Client} client
      * @static
      */
-    ERR_NOTEXTTOSEND : (client) => {
-        client.socket.send(':'+config.ip+' 412 :No text to send');
+    ERR_NOTEXTTOSEND: (client) => {
+        client.socket.send(':' + config.ip + ' 412 :No text to send');
     },
 
     /**
@@ -51,8 +50,8 @@ let ERRSender = {
      * @param {string} command
      * @static
      */
-    ERR_UNKNOWNCOMMAND : (client, command) => {
-        client.socket.send(':'+config.ip+' 421 '+command+' :Unknown command');
+    ERR_UNKNOWNCOMMAND: (client, command) => {
+        client.socket.send(':' + config.ip + ' 421 ' + command + ' :Unknown command');
     },
 
     /**
@@ -60,8 +59,8 @@ let ERRSender = {
      * @param {Client} client
      * @static
      */
-    ERR_NONICKNAMEGIVEN : (client) => {
-        client.socket.send(':'+config.ip+' 431 :No nickname given');
+    ERR_NONICKNAMEGIVEN: (client) => {
+        client.socket.send(':' + config.ip + ' 431 :No nickname given');
     },
 
     /**
@@ -69,8 +68,8 @@ let ERRSender = {
      * @param {Client} client
      * @static
      */
-    ERR_NICKNAMEINUSE : (client) => {
-        client.socket.send(':'+config.ip+' 433 '+client.name+' :Nickname is already in use');
+    ERR_NICKNAMEINUSE: (client) => {
+        client.socket.send(':' + config.ip + ' 433 ' + client.name + ' :Nickname is already in use');
     },
 
     /**
@@ -79,8 +78,8 @@ let ERRSender = {
      * @param {Channel} channel
      * @static
      */
-    ERR_NOTONCHANNEL : (client, channel) => {
-        client.socket.send(':'+config.ip+' 442 '+channel.name+' :You\'re not on that channel');
+    ERR_NOTONCHANNEL: (client, channel) => {
+        client.socket.send(':' + config.ip + ' 442 ' + channel.name + ' :You\'re not on that channel');
     },
 
     /**
@@ -89,8 +88,8 @@ let ERRSender = {
      * @param {string} command
      * @static
      */
-    ERR_NOTREGISTERED : (client, command) => {
-        client.socket.send(':'+config.ip+' 451 * '+command+' :You have not registered');
+    ERR_NOTREGISTERED: (client, command) => {
+        client.socket.send(':' + config.ip + ' 451 * ' + command + ' :You have not registered');
     },
 
     /**
@@ -99,8 +98,8 @@ let ERRSender = {
      * @param {string} command
      * @static
      */
-    ERR_NEEDMOREPARAMS : (client, command) => {
-        client.socket.send(':'+config.ip+' 461 '+command+' :Not enough parameters')
+    ERR_NEEDMOREPARAMS: (client, command) => {
+        client.socket.send(':' + config.ip + ' 461 ' + command + ' :Not enough parameters')
     },
 
     /**
@@ -108,8 +107,8 @@ let ERRSender = {
      * @param {Client} client
      * @param {Channel} channel
      */
-    ERR_CHANNELISFULL : (client, channel) => {
-        client.socket.send(':'+config.ip+' 471 '+ channel.name+' :Cannot join channel (+l)');
+    ERR_CHANNELISFULL: (client, channel) => {
+        client.socket.send(':' + config.ip + ' 471 ' + channel.name + ' :Cannot join channel (+l)');
     },
 
     /**
@@ -117,8 +116,8 @@ let ERRSender = {
      * @param {Client} client
      * @static
      */
-    ERR_ALREADYREGISTRED : (client) => {
-        client.socket.send(':'+config.ip+' 462 :Unauthorized command (already registered)');
+    ERR_ALREADYREGISTRED: (client) => {
+        client.socket.send(':' + config.ip + ' 462 :Unauthorized command (already registered)');
     },
 
     /**
@@ -126,24 +125,24 @@ let ERRSender = {
      * @param {Client} client
      * @param {Channel} channel
      */
-    ERR_INVITEONLYCHAN : (client, channel) => {
-        client.socket.send(':'+config.ip +' 473 '+channel.name+' :Cannot join channel (+i)');
+    ERR_INVITEONLYCHAN: (client, channel) => {
+        client.socket.send(':' + config.ip + ' 473 ' + channel.name + ' :Cannot join channel (+i)');
     },
     /**
      *
      * @param {Client} client
      * @param {Channel} channel
      */
-    ERR_BANNEDFROMCHAN : (client, channel) => {
-        client.socket.send(':'+config.ip+' 474 '+channel.name+' :Cannot join channel (+b)');
+    ERR_BANNEDFROMCHAN: (client, channel) => {
+        client.socket.send(':' + config.ip + ' 474 ' + channel.name + ' :Cannot join channel (+b)');
     },
     /**
      *
      * @param {Client} client
      * @param {Channel} channel
      */
-    ERR_BADCHANNELKEY : (client, channel) => {
-        client.socket.send(':'+config.ip+' 475 '+channel.name+' :Cannot join channel (+k)');
+    ERR_BADCHANNELKEY: (client, channel) => {
+        client.socket.send(':' + config.ip + ' 475 ' + channel.name + ' :Cannot join channel (+k)');
     }
 
 

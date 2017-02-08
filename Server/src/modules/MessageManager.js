@@ -4,15 +4,15 @@ import ERRSender from './responses/ERRSender';
 
 
 let allowedCommand = {
-    'NICK':     require('./command/NICK'),
-    'JOIN':     require('./command/JOIN'),
-    'PART':     require('./command/PART'),
-    'PRIVMSG':  require('./command/PRIVMSG'),
-    'NAMES':    require('./command/NAMES'),
-    'LIST':     require('./command/LIST'),
-    'QUIT':     require('./command/QUIT'),
-    'WHO':      require('./command/WHO'),
-    'USER':     require('./command/USER')
+    'NICK': require('./command/NICK'),
+    'JOIN': require('./command/JOIN'),
+    'PART': require('./command/PART'),
+    'PRIVMSG': require('./command/PRIVMSG'),
+    'NAMES': require('./command/NAMES'),
+    'LIST': require('./command/LIST'),
+    'QUIT': require('./command/QUIT'),
+    'WHO': require('./command/WHO'),
+    'USER': require('./command/USER')
 };
 
 
@@ -27,7 +27,7 @@ class CommandManager {
      * @param {Array} command
      */
     exec(command) {
-        if(allowedCommand[command[0]]) {
+        if (allowedCommand[command[0]]) {
             allowedCommand[command[0]](this.socket, command);
         } else {
             ERRSender.ERR_UNKNOWNCOMMAND(this.socket.client, command[0] || 'undefined');
@@ -44,8 +44,8 @@ class CommandManager {
 function parseMessage(line) {
 
     let command = line.match(/[A-Z]+([ ][^[a-zA-Z0-9#&:][a-zA-Z0-9 ]+)?/g);
-    if(command) {
-        return [command[0], line.replace(new RegExp(command[0]+"[ ]?"), '')];
+    if (command) {
+        return [command[0], line.replace(new RegExp(command[0] + "[ ]?"), '')];
     } else {
         return [line.split(' ')[0], null];
     }
