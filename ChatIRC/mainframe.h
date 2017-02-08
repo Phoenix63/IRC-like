@@ -4,6 +4,7 @@
 #include <QTcpSocket>
 #include <QAbstractSocket>
 #include <QDialog>
+#include "channel.h"
 
 namespace Ui {
 class MainFrame;
@@ -26,6 +27,7 @@ private slots:
 private:
     Ui::MainFrame *ui;
     QTcpSocket *socket;
+    Channel channel;
 };
 
 #endif // MAINFRAME_H

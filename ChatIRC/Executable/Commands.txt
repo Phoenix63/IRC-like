@@ -1,0 +1,13 @@
+!!! All channels names must start with # !!!
+
+/nick <New nickname>  -- Setup a nickname
+/user <username> 0 * : <real name> -- Auth on server, cant do aynthing before(guest only)
+/join <channel>  -- Join a server
+/names -- Users connected under every channels
+/list  -- List every channels and their topics
+/part <channel> --Leave the channel
+/quit -- Leave the server
+/who <channel> -- List user identity for every client in the channel
+
+
+"channel : message" --Send message to channel

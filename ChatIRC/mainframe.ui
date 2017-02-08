@@ -20,7 +20,7 @@
    <item row="0" column="0">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QListView" name="channelList">
+      <widget class="QListWidget" name="channelList">
        <property name="minimumSize">
         <size>
          <width>150</width>
@@ -32,6 +32,9 @@
          <width>150</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="sortingEnabled">
+        <bool>true</bool>
        </property>
       </widget>
      </item>
@@ -72,7 +75,7 @@
       </layout>
      </item>
      <item>
-      <widget class="QListView" name="userList">
+      <widget class="QListWidget" name="userList">
        <property name="minimumSize">
         <size>
          <width>150</width>
@@ -84,6 +87,9 @@
          <width>150</width>
          <height>16777215</height>
         </size>
+       </property>
+       <property name="sortingEnabled">
+        <bool>true</bool>
        </property>
       </widget>
      </item>

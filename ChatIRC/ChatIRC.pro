@@ -17,12 +17,14 @@ TEMPLATE = app
 SOURCES += main.cpp\
     login.cpp \
     mainframe.cpp \
-    parseur.cpp
+    parseur.cpp \
+    channel.cpp
 
 HEADERS  += \
     login.h \
     mainframe.h \
-    parseur.h
+    parseur.h \
+    channel.h
 
 FORMS    += \
     login.ui \
