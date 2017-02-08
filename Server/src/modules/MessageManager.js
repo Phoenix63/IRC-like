@@ -70,5 +70,4 @@ class MessageManager {
     }
 
 }
-
-module.exports = MessageManager;
+export default MessageManager;

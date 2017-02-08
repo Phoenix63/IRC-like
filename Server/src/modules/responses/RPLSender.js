@@ -4,18 +4,15 @@ import Channel from './../channel/Channel';
 
 import config from './../../config.json';
 
-class RPLSender {
+let RPLSender = {
 
-    constructor() {
-
-    }
     /**
      * reply rpl_namreply to the client
      * @param {Client} client
      * @param {Channel} channel
      * @static
      */
-    static RPL_NAMREPLY(client, channel) {
+    RPL_NAMREPLY: (client, channel) => {
         let sep = '=';
         if(channel.isSecret)
             sep = '@';
@@ -39,7 +36,7 @@ class RPLSender {
             client.socket.send(ret+(us?' :'+us.slice(1,us.length):''));
         }
         client.socket.send(':'+config.ip+' 366 '+ client.name +' :End of /NAMES list');
-    }
+    },
 
     /**
      * reply RPL_WHOREPLY to the client
@@ -47,7 +44,7 @@ class RPLSender {
      * @param {Channel} channel
      * @static
      */
-    static RPL_WHOREPLY(client, channel) {
+    RPL_WHOREPLY: (client, channel) => {
         channel.users.forEach((u) => {
             var delimiter = '';
             if(channel.usersFlags[u.id].flags.indexOf('o')>=0) {
@@ -63,7 +60,7 @@ class RPLSender {
 
         });
         client.socket.send(':'+config.ip+' 315 '+client.name+' '+this.name+' :End of /WHO list');
-    }
+    },
 
     /**
      *
@@ -71,13 +68,13 @@ class RPLSender {
      * @param {Channel} channel
      * @static
      */
-    static RPL_TOPIC(client, channel) {
+    RPL_TOPIC: (client, channel) => {
         if(channel.topic) {
             client.socket.send(':'+config.ip+' 332 JOIN '+channel.name+' :'+channel.topic);
         } else {
             client.socket.send(':'+config.ip+' 331 JOIN '+channel.name+' :No topic is set');
         }
-    }
+    },
 
     /**
      *
@@ -85,9 +82,9 @@ class RPLSender {
      * @param {Channel} channel
      * @static
      */
-    static JOIN(client, channel) {
+    JOIN: (client, channel) => {
         channel.broadcast(':'+client.name+' JOIN '+channel.name);
-    }
+    },
 
     /**
      *
@@ -95,9 +92,9 @@ class RPLSender {
      * @param {Channel} channel
      * @static
      */
-    static PART(client, channel) {
+    PART: (client, channel) => {
         channel.broadcast(':'+client.name+' PART '+channel.name);
-    }
+    },
 
     /**
      *
@@ -105,17 +102,17 @@ class RPLSender {
      * @param {Array<string>} list
      * @constructor
      */
-    static LIST(client, list) {
+    LIST: (client, list) => {
         let channels = list.split(' ')[0].split(',');
 
         client.socket.send(":"+config.ip+" 321 Channel :Users Name");
         Channel.list().forEach((chan) => {
             if(((channels[0] !== '' && channels.indexOf(chan)>=0) || channels[0] === '')&& (!chan.isSecret || (chan.isSecret && chan.users.indexOf(client)>=0))) {
-                socket.send(":"+config.ip+" 322 "+client.name+" "+(chan.isPrivate?'#':'')+chan.name+' '+chan.users.length+' :'+(chan.topic || 'No topic set'));
+                client.socket.send(":"+config.ip+" 322 "+client.name+" "+(chan.isPrivate?'#':'')+chan.name+' '+chan.users.length+' :'+(chan.topic || 'No topic set'));
             }
         });
         client.socket.send(":"+config.ip+" 323 "+client.name+" :End of /LIST");
     }
 }
 
-module.exports = RPLSender;
+export default RPLSender

@@ -1,91 +1,146 @@
 "use strict"
 
-var tcp     = require('./tcp');
-var sio     = require('./sio.js');
-var shortid = require('shortid');
+import tcp from './tcp';
+import sio from './sio';
+import shortid from 'shortid';
 
-var sockets = [];
+let sockets = [];
 
-var Socket = (function() {
-
-    function Socket(type, soc) {
-        this.id = '__'+shortid.generate();
-        this.type = type;
-        this.socket = soc;
-        this.client = null;
-        this.logger = null;
-        this.messageManager = null;
+class Socket {
+    /**
+     *
+     * @param {string} type
+     * @param {sio|tcp} soc
+     */
+    constructor(type, soc) {
+        this._id = '__'+shortid.generate();
+        this._type = type;
+        this._socket = soc;
+        this._client = null;
+        this._logger = null;
+        this._messageManager = null;
 
         sockets.push(this);
 
-        this.timeout = setInterval((function() {
-            if(this.client)
-                this.client.delete();
-            else
-                this.close();
-        }).bind(this), 1000*60*5);
-
-        this.onSignal = {};
+        this._onSignal = {};
     }
 
-    Socket.__defineSetter__('client', function cli() {
-        this.client = cli;
-    });
-    Socket.__defineSetter__('logger', function(log) {
-        this.logger = log;
-    });
+    /**
+     *
+     * @returns {sio|tcp|null}
+     */
+    get socket() {
+        return this._socket;
+    }
 
-    Socket.prototype.send = function(data) {
-        this.logger._SEND_TO_CLIENT(data);
+    /**
+     *
+     * @returns {Client|null}
+     */
+    get client() {
+        return this._client;
+    }
 
-        if(this.type === 'tcp')
-            this.socket.write(data+'\n\r');
-        else {
-            this.socket.emit('message', data);
+    /**
+     *
+     * @returns {Logger|null}
+     */
+    get logger() {
+        return this._logger;
+    }
+
+    /**
+     *
+     * @param {Client|null} cli
+     */
+    set client(cli) {
+        this._client = cli;
+    }
+
+    /**
+     *
+     * @param {Logger|null} log
+     */
+    set logger(log) {
+        this._logger = log;
+    }
+
+    /**
+     *
+     * @returns {boolean}
+     */
+    get isTcp() {
+        return this._type === 'tcp';
+    }
+
+    /**
+     *
+     * @param {string} data
+     */
+    send(data) {
+        if(this._logger)
+            this._logger._SEND_TO_CLIENT(data);
+        if(this.isTcp) {
+            this._socket.write(data+'\n\r');
+        } else {
+            this._socket.emit('message', data);
         }
-
     }
 
-    Socket.prototype.broadcast = function(str, except) {
-        sockets.forEach((function(s) {
+    /**
+     *
+     * @param {string} str
+     * @param {Socket} except
+     */
+    broadcast(str, except) {
+        sockets.forEach((s) => {
             if(except !== s) {
                 s.send(str);
             }
-        }).bind(this));
+        });
     }
 
-    Socket.prototype.on = function(event, callback) {
-        this.onSignal[event] = callback;
+    /**
+     *
+     * @param {string} event
+     * @param {function} callback
+     */
+    on(event, callback) {
+        this._onSignal[event] = callback;
     }
 
-    Socket.prototype.emit = function(event, data) {
-        if(this.onSignal[event])
-            this.onSignal[event](data);
+    /**
+     *
+     * @param {string} event
+     * @param {string} data
+     */
+    emit(event, data) {
+        if(this._onSignal[event])
+            this._onSignal[event](data);
     }
 
-    Socket.prototype.close = function() {
-        this.socket.destroy();
+    /**
+     * delete socket
+     */
+    close() {
+        this._socket.destroy();
         sockets.splice(sockets.indexOf(this), 1);
         delete this;
     }
 
-    return Socket;
-})();
+}
 
 function create(callback) {
     tcp.create(function(socket) {
-        var soc = new Socket('tcp', socket);
+        let soc = new Socket('tcp', socket);
         socket.manager = soc;
         callback(soc);
     });
     sio.create(function(socket) {
-        var soc = new Socket('sio', socket);
+        let soc = new Socket('sio', socket);
         socket.manager = soc;
         callback(soc);
     })
 }
 
-
-module.exports = {
-    create: create
-}
+export default {create: create};

@@ -95,14 +95,6 @@ class Client {
     }
 
     /**
-     *
-     * @returns {Array}
-     */
-    get channels() {
-        return this._channels;
-    }
-
-    /**
      * change identity of user if its valid
      * @param {string} identity
      */
@@ -159,6 +151,23 @@ class Client {
         delete this;
     };
 
+    /**
+     * remove channel from list
+     * @param {Channel} channel
+     */
+    removeChannel(channel) {
+        this._channels.splice(this._channels.indexOf(channel), 1);
+    }
+
+    /**
+     * add channel from list
+     * @param {Channel} channel
+     */
+    addChannel(channel) {
+        this._channels.push(channel);
+        console.log(this._channels.length);
+    }
+
 
     /**
      * find a client in user list
@@ -183,5 +192,4 @@ class Client {
     }
 
 }
-
-module.exports = Client;
+export default Client;

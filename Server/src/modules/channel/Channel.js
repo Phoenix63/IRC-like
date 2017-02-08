@@ -143,7 +143,7 @@ class Channel {
             ERRSender.ERR_CHANNELISFULL(user, this);
             return;
         }
-        user.channels.push(this);
+
         if(this.users.length === 0) {
             this.creator = user;
             this._usersFlags[user.id] = {
@@ -158,7 +158,7 @@ class Channel {
         }
 
 
-        user.channels.push(this);
+        user.addChannel(this);
         RPLSender.JOIN(user, this);
         RPLSender.RPL_TOPIC(user, this);
         RPLSender.RPL_NAMREPLY(user, this);
@@ -169,7 +169,6 @@ class Channel {
      * @param {Client} user
      */
     removeUser(user) {
-
         if(this.users.indexOf(user)<0) {
             ERRSender.ERR_NOTONCHANNEL(user, this);
             return;
@@ -181,12 +180,13 @@ class Channel {
             this.users.forEach((u) => {
                 if(this._usersFlags[u.id].flags.indexOf('o')>=0 && !this.creator) {
                     this.creator = u;
+                    this._usersFlags[u.id].flags = 'omvw';
                 }
             });
         }
 
         RPLSender.PART(user, this);
-        user.channels.splice(user.channels.indexOf(this),1);
+        user.removeChannel(this);
 
         delete this._usersFlags[user.id];
         if(this.users.length <= 0 || !this.creator) {
@@ -218,4 +218,4 @@ class Channel {
 
 }
 
-module.exports = Channel;
+export default Channel;
