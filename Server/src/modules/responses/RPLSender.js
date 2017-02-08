@@ -126,6 +126,15 @@ let RPLSender = {
             });
         }
 
+    },
+    /**
+     *
+     * @param {Socket} socket
+     * @static
+     */
+    HEADER: (socket) => {
+        socket.send(':'+config.ip+' NOTICE AUTH :*** Looking up your hostname...');
+        socket.send(':'+config.ip+' NOTICE AUTH :*** Found your hostname');
     }
 };
 

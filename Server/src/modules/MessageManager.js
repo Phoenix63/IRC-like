@@ -63,8 +63,6 @@ class MessageManager {
         this.socket.commandManager = new CommandManager(socket);
         this.socket.on('message', (str) => {
             this.socket.logger._USER_SEND_CMD(str);
-
-
             this.socket.commandManager.exec(parseMessage(str));
         });
     }

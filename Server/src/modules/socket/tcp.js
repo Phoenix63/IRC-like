@@ -3,6 +3,7 @@
 import net from 'net';
 import config from './../../config.json';
 
+const interval = 60000;
 
 function createServer(callback) {
     let server = net.createServer((socket) => {
@@ -10,10 +11,29 @@ function createServer(callback) {
         socket.buffer = '';
         socket.manager.emit('connect');
         socket.setTimeout(0);
+        socket.life = 1;
 
         socket.on('timeout', () => {
             socket.destroy();
         });
+
+        socket.timeoutKill = null;
+
+        socket.timeoutReset = () => {
+            socket.life = 1;
+            clearInterval(socket.timeoutKill);
+            setInterval(() => {
+                if(socket.life>0) {
+                    socket.write('PING :'+config.ip);
+                    socket.life = 0;
+                } else {
+                    clearInterval(socket.timeoutKill)
+                    socket.destroy();
+                }
+            },interval/2, interval/2);
+        };
+
+        socket.timeoutReset();
 
         socket.on('data', (data) => {
 
@@ -45,6 +65,7 @@ function createServer(callback) {
                 return;
             }
             if (!(msg.length > 510)) {
+                socket.timeoutReset();
                 socket.manager.emit('message', msg);
             }
         });

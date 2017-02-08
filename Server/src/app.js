@@ -15,6 +15,7 @@ import socketManager from './modules/socket/socket';
 import Client from './modules/client/client';
 import Logger from './modules/Logger';
 import MessageManager from './modules/MessageManager';
+import RPLSender from './modules/responses/RPLSender';
 
 // channels
 
@@ -29,6 +30,7 @@ socketManager.create((socket) => {
     c.socket.messageManager = new MessageManager(c.socket);
 
     socket.on('connect', () => {
+        RPLSender.HEADER(socket);
         logger._CLIENT_CONNECTED();
     });
 });

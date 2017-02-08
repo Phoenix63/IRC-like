@@ -47,7 +47,8 @@ class Logger {
 
     _USER_SEND_CMD(message) {
         console.log(colors.grey('[from] ') + colors.red(this.client.name) + '>> ' + message);
-    }
+    };
+
 }
 
 export default Logger;

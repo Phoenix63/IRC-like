@@ -111,7 +111,7 @@ class Client {
             let error = false;
             clients.forEach((c) => {
                 if (c.identity === identity) {
-                    ERRSender.ERR_NEEDMOREPARAMS(this);
+                    ERRSender.ERR_ALREADYREGISTRED(this);
                     error = true;
                 }
             });
