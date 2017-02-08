@@ -52,6 +52,9 @@ function createServer(callback) {
         socket.on('close', () => {
             socket.manager.close();
         });
+        socket.on('end', () => {
+            socket.manager.close();
+        });
 
 
     });
