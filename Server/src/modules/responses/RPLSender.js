@@ -22,7 +22,7 @@ let RPLSender = {
         let ret = ':'+config.ip+' 353 '+ client.name +' '+sep+' '+channel.name;
         let us = '';
         channel.users.forEach((u) => {
-            var delimiter = '';
+            let delimiter = '';
             if(channel.isOperator(u)) {
                 delimiter = '@';
             } else if (channel.isVoice(u)) {
@@ -46,7 +46,7 @@ let RPLSender = {
      */
     RPL_WHOREPLY: (client, channel) => {
         channel.users.forEach((u) => {
-            var delimiter = '';
+            let delimiter = '';
             if(channel.usersFlags[u.id].flags.indexOf('o')>=0) {
                 delimiter = '@';
             } else if (channel.usersFlags[u.id].flags.indexOf('v')>=0) {
@@ -59,7 +59,7 @@ let RPLSender = {
                 + delimiter + ' :0 '+u.realname);
 
         });
-        client.socket.send(':'+config.ip+' 315 '+client.name+' '+this.name+' :End of /WHO list');
+        client.socket.send(':'+config.ip+' 315 '+client.name+' '+channel.name+' :End of /WHO list');
     },
 
     /**
