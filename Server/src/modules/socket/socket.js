@@ -35,6 +35,14 @@ class Socket {
 
     /**
      *
+     * @returns {string}
+     */
+    get type() {
+        return this._type;
+    }
+
+    /**
+     *
      * @returns {Client|null}
      */
     get client() {
