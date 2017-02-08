@@ -10,7 +10,7 @@ let ERRSender = {
     /**
      *
      * @param {Client} client
-     * @param {Channel} channel
+     * @param {Channel|Object} channel
      */
     ERR_NOSUCHCHANNEL : (client, channel) => {
         client.socket.send(':'+config.ip+' 403 '+channel.name+' :No such channel');

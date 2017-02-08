@@ -13,6 +13,11 @@ module.exports = function(socket, command) {
     let name = command[1].split(' ')[0];
     let key = command[1].split(' ')[1] || '';
 
+    if(name[0] !== '#') {
+        ERRSender.ERR_NOSUCHCHANNEL(socket.client, {name: name});
+        return;
+    }
+
     let err = true;
 
     Channel.list().forEach((chan) => {
