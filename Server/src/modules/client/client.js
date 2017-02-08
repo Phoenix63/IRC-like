@@ -67,7 +67,7 @@ class Client {
      * @returns {string}
      */
     get identity() {
-        return this._identity || 'Guest_'+this._id;
+        return this._identity || 'Guest_' + this._id;
     }
 
     /**
@@ -75,7 +75,7 @@ class Client {
      * @returns {string}
      */
     get name() {
-        return this._name || 'Guest_'+this._id;
+        return this._name || 'Guest_' + this._id;
     }
 
     /**
@@ -83,7 +83,7 @@ class Client {
      * @returns {string}
      */
     get realname() {
-        return this._realname || 'Guest_'+this._id;
+        return this._realname || 'Guest_' + this._id;
     }
 
     /**
@@ -107,14 +107,24 @@ class Client {
      * @param {string} identity
      */
     set identity(identity) {
-        if(!this._identity) {
+        if (!this._identity) {
+            let error = false;
+            clients.forEach((c) => {
+                if (c.identity === identity) {
+                    ERRSender.ERR_NEEDMOREPARAMS(this);
+                    error = true;
+                }
+            });
 
-            let match = identity.match(/[a-zA-Z0-9\[\]\{\}_-é"'ëäïöüâêîôûç`è]+/);
-            if(match && match[0] !== identity && identity === '' || identity.length > 15) {
+            let match = identity.match(/[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]+/);
+            if (match && match[0] !== identity && identity === '' || identity.length > 15) {
                 ERRSender.ERR_NEEDMOREPARAMS(this, 'USER');
-                return;
+                error = true;
             }
-            this._identity = identity;
+            if(!error) {
+                this._identity = identity;
+            }
+
         }
 
     }
@@ -124,35 +134,34 @@ class Client {
      * @param {string} name
      */
     set name(name) {
-        if(name[0] === ':') {
-            name = name.slice(1,name.length);
+        if (name[0] === ':') {
+            name = name.slice(1, name.length);
         }
 
+        let error = false;
+
         clients.forEach((c) => {
-            if(c.name === name
-                    .replace(/\[/, '{')
-                    .replace(/\]/, '}')
-                    .replace(/\|/, '\\')
-                    .replace(/\{/, '[')
-                    .replace(/\}/, ']')
-                    .replace(/\\/, '\|')) {
+            if (c.name === name) {
                 ERRSender.ERR_NICKNAMEINUSE(this);
-                return null;
+                error = true;
             }
         });
 
-        let match = name.match(/[a-zA-Z0-9\[\]\{\}_-é"'ëäïöüâêîôûç`è]+/);
-        if((match && match[0] !== name) || name === '' || name.length>15) {
+        let match = name.match(/[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]+/);
+        if ((match && match[0] !== name) || name === '' || name.length > 15) {
             ERRSender.ERR_NONICKNAMEGIVEN(this);
-            return;
+            error = true;
         }
-        this.socket.logger._USER_CHANGE_NICK(name);
-        RPLSender.NICK(this);
-        this._name = name;
+        if(!error) {
+            this.socket.logger._USER_CHANGE_NICK(name);
+            RPLSender.NICK(this);
+            this._name = name;
+        }
+
     }
 
     /*
-    * methods
+     * methods
      */
 
     /**
@@ -190,8 +199,8 @@ class Client {
      * @returns {null|Client}
      */
     static find(id) {
-        for(let key in clients) {
-            if( key === id || clients[key].name === id || client[key].id === id) {
+        for (let key in clients) {
+            if (key === id || clients[key].name === id || client[key].id === id) {
                 return clients[key];
             }
         }
