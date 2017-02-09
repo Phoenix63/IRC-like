@@ -18,7 +18,6 @@ import MessageManager from './modules/MessageManager';
 import RPLSender from './modules/responses/RPLSender';
 
 // channels
-
 import Channel from './modules/channel/Channel';
 
 

@@ -19,9 +19,7 @@ class Socket {
         this._client = null;
         this._logger = null;
         this._messageManager = null;
-
         sockets.push(this);
-
         this._onSignal = {};
     }
 
@@ -131,10 +129,10 @@ class Socket {
      * delete socket
      */
     close() {
-        if(this._client) {
+        if (this._client) {
             this._client.delete();
         }
-        if(this._logger) {
+        if (this._logger) {
             this._logger._CLIENT_DISCONNECTED();
         }
         sockets.splice(sockets.indexOf(this), 1);
