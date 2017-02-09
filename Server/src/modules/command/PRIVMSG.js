@@ -12,11 +12,12 @@ module.exports = function (socket, command) {
     }
 
     let receivers = command[1].split(' ')[0].split(',');
-    let message = command[1].split(':');
-    if (!message[1]) {
+    let message = command[1].replace(receivers+" ","");
+    if (!message || message[0] !== ':' || message.length<2) {
         ERRSender.ERR_NOTEXTTOSEND(socket.client);
         return;
     }
+    message = message.slice(1,message.length);
 
     let clients = {};
     let channels = {};
@@ -29,11 +30,11 @@ module.exports = function (socket, command) {
     let error = true;
     receivers.forEach((r) => {
         if (clients[r]) {
-            clients[r].socket.send(':' + socket.client.name + ' PRIVMSG ' + r + ' :' + message[1]);
+            clients[r].socket.send(':' + socket.client.name + ' PRIVMSG ' + r + ' :' + message);
             error = false;
         } else if (channels[r]) {
             if (channels[r].users.indexOf(socket.client) >= 0) {
-                channels[r].broadcast(':' + socket.client.name + ' PRIVMSG ' + r + ' :' + message[1], socket.client);
+                channels[r].broadcast(':' + socket.client.name + ' PRIVMSG ' + r + ' :' + message, socket.client);
                 error = false;
             } else {
                 ERRSender.ERR_CANNOTSENDTOCHAN(socket.client, r);
