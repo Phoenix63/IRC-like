@@ -20,6 +20,9 @@
 			<div id="box" ng-controller="ChatCtrl">
 				<div id="channelBox">
 					<p>channels</p>
+					<div ng-repeat="channel in channels">
+						<p>{{channel}}</p>
+					</div>
 				</div>
 				<div id="msgBox">
 					<p>Messages</p>
@@ -34,7 +37,10 @@
 					</form>
 				</div>
 				<div id="userBox">
-					<p>Users</p>
+					<p>users</p>
+					<div="user in users">
+						<p>{{user}}</p>
+					</div>
 				</div>
 			</div>
 			<footer class="footer-distributed">
@@ -67,23 +73,69 @@
 		};
 		var app = angular.module("myChat",[]);
 		app.controller("ChatCtrl",function($scope) {
-			
 			var socket = io('http://localhost:8089');
 			var uuid = uniqid();
 			var nickname = uuid;
-			socket.emit("message","NICK Guest_"+uuid);
-			
 			$scope.messages = [];
+			$scope.users = [];
+			$scope.channels = [];
+			currentChannel = "";
 			
 			$scope.sendMessage = function() {
-				var parseMessage = $scope.newMessage.split(' ');
-				socket.emit("message","USER " + nickname+" 0 * : " + $scope.newMessage);
-				$scope.messages.push(nickname + ": " + $scope.newMessage);
-				if(parseMessage[0]=="NICK") {
-					nickname = parseMessage[1];
-					$scope.messages.push("You have changed your nickname to "+nickname);
+				var parseMsg = $scope.newMessage.split(' ');
+				var message = "";
+				switch(parseMsg[0]) {
+					case "/JOIN":
+						socket.emit("message", "JOIN " + parseMsg[1]);
+						$scope.messages.push("You have join channel : " + parseMsg[1]);
+						$scope.channels.push(parseMsg[1]);
+						currentChannel = parseMsg[1];
+						$scope.newMessage = undefined;
+						$scope.$apply();
+						break;
+					case "/NICK":
+						socket.emit("message", "NICK " + parseMsg[1]);
+						$scope.messages.push("You have change your nickname : " + parseMsg[1]);
+						socket.emit("message","USER " + parsingMsg[1] + " 0 * : " + parsingMsg[1]);
+						$scope.newMessage = undefined;
+						$scope.$apply();
+						break;
+					case "/NAMES":
+						//users on every channel
+						socket.emit("message","NAMES");
+						socket.on("message",function(msg) {
+							$scope.$apply(function(){
+								$scope.messages.push(msg);
+							});
+						});
+						$scope.newMessage = undefined;
+						break;
+					case "/LIST":
+						//list every channels with their topic
+						socket.emit("message","LIST");
+						$scope.newMessage = undefined;
+						break;
+					case "/PART":
+						//leave the channel
+						socket.emit("message","PART " + parsingMsg[1]);
+						$scope.newMessage = undefined;
+						break;
+					case "/QUIT":
+						//leave the server
+						socket.emit("message","QUIT");
+						$scope.newMessage = undefined;
+						break;
+					case "/WHO":
+						//users in the channel
+						socket.emit("message","WHO " + parsingMsg[1]);
+						$scope.newMessage = undefined;
+						break;
+					default:
+						socket.emit("message","PRIVMSG " + currentChannel + " : " + $scope.newMessage);
+						$scope.messages.push("Gilo :" + $scope.newMessage);
+						$scope.newMessage = undefined;
+						$scope.$apply();
 				}
-				$scope.newMessage = undefined;
 			}
 			
 			socket.on("message",function(msg) {
@@ -91,7 +143,6 @@
 					$scope.messages.push(msg);
 			  });
 			});
-			
 		});
 	})();
 
