@@ -27,7 +27,8 @@ void MainFrame::on_pushButton_send_clicked()
     QString message = ui->messageSender->text();
         ui->messagePrinter->append(message);
         message.append('\n');
-        Parseur::parse(&message);
+        Parseur::Out parseur;
+        parseur.parse(&message);
         socket->write(message.toLatin1().data());
         ui->messageSender->setText("");
 }
@@ -47,6 +48,10 @@ void MainFrame::readyRead()
             QString cmd = string.right(string.length() - i - 1);
             if (cmd.startsWith("331") || cmd.startsWith("332"))
                 channel.update(cmd);
+            else if(cmd.startsWith("PART")){
+                qDebug() << "you left :" << cmd;
+                channel.leave(cmd);
+            }
             else
                 ui->messagePrinter->append(string);
         }

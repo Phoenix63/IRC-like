@@ -21,17 +21,23 @@ void Channel::append(QString channel, QString text)
     channels[channel].append(text);
 }
 
-void Channel::add(QString newChannel)
+void Channel::join(QString newChannel)
 {
-    channels[newChannel] = QString("test");
+    channels[newChannel] = QString();
 
+}
+
+void Channel::leave(QString channel){
+    QString chan = channel.split(' ').at(1);
+    channels.remove(chan);
+    setQList();
 }
 
 void Channel::update(QString string)
 {
         QString chan = string.split(' ').at(2);
         if (!channels.contains(chan))
-            add(chan);
+            join(chan);
         setQList();
 }
 

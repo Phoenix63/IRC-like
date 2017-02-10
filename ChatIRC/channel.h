@@ -12,12 +12,14 @@ private:
     QListWidget *chanList;
     QString *current;
     QHash<QString, QString> channels;
+
 public:
     Channel();
     void change(QString newChannel);
     QString * text();
     void append(QString channel, QString text);
-    void add(QString newChannel);
+    void join(QString newChannel);
+    void leave(QString channel);
     void update(QString string);
     void setQList();
     void setList(QListWidget *list);

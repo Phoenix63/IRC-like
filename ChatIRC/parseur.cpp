@@ -1,6 +1,7 @@
 #include "parseur.h"
 
-QString * Parseur::parse(QString *string)
+
+QString * Parseur::Out::parse(QString *string)
 {
     if      (string->startsWith("/nick"))  string->replace(QString("/nick"), QString("NICK"));
     else if (string->startsWith("/user"))  string->replace(QString("/user"), QString("USER"));
@@ -8,9 +9,18 @@ QString * Parseur::parse(QString *string)
     else if (string->startsWith("/names")) string->replace(QString("/names"), QString("NAMES"));
     else if (string->startsWith("/part"))  string->replace(QString("/part"), QString("PART"));
     else if (string->startsWith("/list"))  string->replace(QString("/list"), QString("LIST"));
-    else if (string->startsWith("/quit"))  string->replace(QString("/quit"), QString("QUIT"));
+    else if (string->startsWith("/quit")) {
+        emit quit_signal();
+        string->replace(QString("/quit"), QString("QUIT"));
+    }
     else if (string->contains("/who"))     string->replace(QString("/who"), QString("WHO"));
     else                                   string->prepend("PRIVMSG ");
 
     return string;
 }
+
+
+//QString * Parseur::In::parse(QString *string)
+//{
+
+//}
