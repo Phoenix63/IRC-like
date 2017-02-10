@@ -120,7 +120,7 @@ let RPLSender = {
      * @static
      */
     NICK: (oldname, client) => {
-        if(client) {
+        if (client) {
             client.channels.forEach((chan) => {
                 chan.broadcast(':' + oldname + ' NICK ' + client.name, client)
             });
@@ -133,8 +133,8 @@ let RPLSender = {
      * @static
      */
     HEADER: (socket) => {
-        socket.send(':'+config.ip+' NOTICE AUTH :*** Looking up your hostname...');
-        socket.send(':'+config.ip+' NOTICE AUTH :*** Found your hostname');
+        socket.send(':' + config.ip + ' NOTICE AUTH :*** Looking up your hostname...');
+        socket.send(':' + config.ip + ' NOTICE AUTH :*** Found your hostname');
     }
 };
 

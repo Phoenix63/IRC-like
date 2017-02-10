@@ -12,12 +12,12 @@ module.exports = function (socket, command) {
     }
 
     let receivers = command[1].split(' ')[0].split(',');
-    let message = command[1].replace(receivers+" ","");
-    if (!message || message[0] !== ':' || message.length<2) {
+    let message = command[1].replace(receivers + " ", "");
+    if (!message || message[0] !== ':' || message.length < 2) {
         ERRSender.ERR_NOTEXTTOSEND(socket.client);
         return;
     }
-    message = message.slice(1,message.length);
+    message = message.slice(1, message.length);
 
     let clients = {};
     let channels = {};
@@ -44,4 +44,4 @@ module.exports = function (socket, command) {
     if (error) {
         ERRSender.ERR_NORECIPIENT(socket.client, 'PRIVMSG');
     }
-}
+};

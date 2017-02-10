@@ -2,7 +2,6 @@
 
 import shortid from 'shortid';
 import Socket from './../socket/socket';
-
 import ERRSender from './../responses/ERRSender';
 import RPLSender from './../responses/RPLSender';
 
@@ -117,11 +116,11 @@ class Client {
             });
 
             let match = identity.match(/[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]+/);
-            if (!match || (match && match[0] !== identity )|| identity === '' || identity.length > 15) {
+            if (!match || (match && match[0] !== identity ) || identity === '' || identity.length > 15) {
                 ERRSender.ERR_NEEDMOREPARAMS(this, 'USER');
                 error = true;
             }
-            if(!error) {
+            if (!error) {
                 this._identity = identity;
             }
 
@@ -152,7 +151,7 @@ class Client {
             ERRSender.ERR_NONICKNAMEGIVEN(this);
             error = true;
         }
-        if(!error) {
+        if (!error) {
             this.socket.logger._USER_CHANGE_NICK(name);
             RPLSender.NICK(this);
             this._name = name;

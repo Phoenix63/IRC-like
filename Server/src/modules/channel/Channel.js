@@ -30,19 +30,18 @@ class Channel {
 
         this.invitation = [];
 
-        if(name.match(/(!^#)|(^G)|,/g) || name.length >= 50) {
-            ERRSender.ERR_NOSUCHCHANNEL(creator, {name:name});
+        if (name.match(/(!^#)|(^G)|,/g) || name.length >= 50) {
+            ERRSender.ERR_NOSUCHCHANNEL(creator, {name: name});
             delete this;
             return;
         }
 
         this._name = name;
 
-        if(this._name === '') {
+        if (this._name === '') {
             delete this;
             return;
         }
-
 
 
         channels.push(this);
@@ -73,7 +72,7 @@ class Channel {
      */
     get users() {
         let list = [];
-        for(let key in this._usersFlags) {
+        for (let key in this._usersFlags) {
             list.push(this._usersFlags[key].client);
         }
         return list;
@@ -84,7 +83,7 @@ class Channel {
      * @returns {boolean}
      */
     get isPrivate() {
-        return (this.flags.indexOf('p')>=0);
+        return (this.flags.indexOf('p') >= 0);
     }
 
     /**
@@ -92,7 +91,7 @@ class Channel {
      * @returns {boolean}
      */
     get isSecret() {
-        return (this.flags.indexOf('s')>=0);
+        return (this.flags.indexOf('s') >= 0);
     }
 
     /**
@@ -100,7 +99,7 @@ class Channel {
      * @returns {boolean}
      */
     get isInvitation() {
-        return (this.flags.indexOf('i')>=0);
+        return (this.flags.indexOf('i') >= 0);
     }
 
     /**
@@ -109,7 +108,7 @@ class Channel {
      * @returns {boolean}
      */
     isOperator(client) {
-        if(this._usersFlags[client.id] && this._usersFlags[client.id].flags.indexOf('o')>=0)
+        if (this._usersFlags[client.id] && this._usersFlags[client.id].flags.indexOf('o') >= 0)
             return true;
         return false;
     }
@@ -120,7 +119,7 @@ class Channel {
      * @returns {boolean}
      */
     isVoice(client) {
-        if(this._usersFlags[client.id] && this._usersFlags[client.id].flags.indexOf('v')>=0)
+        if (this._usersFlags[client.id] && this._usersFlags[client.id].flags.indexOf('v') >= 0)
             return true;
         return false;
     }
@@ -131,24 +130,24 @@ class Channel {
      * @param {string} key
      */
     addUser(user, key) {
-        if(this.bannedUsers.indexOf(user)>=0) {
+        if (this.bannedUsers.indexOf(user) >= 0) {
             ERRSender.ERR_BANNEDFROMCHAN(user, this);
             return;
         }
-        if(this._isInvitation && this.isInvitation.indexOf(user) === -1) {
+        if (this._isInvitation && this.isInvitation.indexOf(user) === -1) {
             ERRSender.ERR_INVITEONLYCHAN(user, this);
             return;
         }
-        if(key !== this.pass) {
+        if (key !== this.pass) {
             ERRSender.ERR_BADCHANNELKEY(user, this);
             return;
         }
-        if(this.users.length >= this.maxSize) {
+        if (this.users.length >= this.maxSize) {
             ERRSender.ERR_CHANNELISFULL(user, this);
             return;
         }
 
-        if(this.users.length === 0) {
+        if (this.users.length === 0) {
             this.creator = user;
             this._usersFlags[user.id] = {
                 client: user,
@@ -173,16 +172,16 @@ class Channel {
      * @param {Client} user
      */
     removeUser(user) {
-        if(this.users.indexOf(user)<0) {
+        if (this.users.indexOf(user) < 0) {
             ERRSender.ERR_NOTONCHANNEL(user, this);
             return;
         }
 
 
-        if(user === this.creator) {
+        if (user === this.creator) {
             this.creator = null;
             this.users.forEach((u) => {
-                if(this._usersFlags[u.id].flags.indexOf('o')>=0 && !this.creator) {
+                if (this._usersFlags[u.id].flags.indexOf('o') >= 0 && !this.creator) {
                     this.creator = u;
                     this._usersFlags[u.id].flags = 'omvw';
                 }
@@ -193,7 +192,7 @@ class Channel {
         user.removeChannel(this);
 
         delete this._usersFlags[user.id];
-        if(this.users.length <= 0 || !this.creator) {
+        if (this.users.length <= 0 || !this.creator) {
             channels.splice(channels.indexOf(this), 1);
             delete this;
         }
@@ -207,7 +206,7 @@ class Channel {
      */
     broadcast(message, except) {
         this.users.forEach((u) => {
-            if(u !== except)
+            if (u !== except)
                 u.socket.send(message);
         });
     }
