@@ -4,6 +4,7 @@
 #include <QTcpSocket>
 #include <QAbstractSocket>
 #include <QDialog>
+#include <QString>
 #include "channel.h"
 
 namespace Ui {
@@ -23,11 +24,14 @@ public slots:
 
 private slots:
     void on_pushButton_send_clicked();
+    void test();
 
 private:
     Ui::MainFrame *ui;
     QTcpSocket *socket;
     Channel channel;
+    Parseur::Out parseur_out;
+    Parseur::In parseur_in;
 };
 
 #endif // MAINFRAME_H

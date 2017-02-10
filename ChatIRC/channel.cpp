@@ -29,7 +29,8 @@ void Channel::join(QString newChannel)
 
 void Channel::leave(QString channel){
     QString chan = channel.split(' ').at(1);
-    channels.remove(chan);
+    if(channels.contains(chan))
+        channels.remove(chan);
     setQList();
 }
 
@@ -52,4 +53,18 @@ void Channel::setQList()
 void Channel::setList(QListWidget *list)
 {
     chanList = list;
+}
+
+void Channel::setParseurIn(Parseur::In *parseur)
+{
+    parseur_in = parseur;
+    connect(parseur_in, SIGNAL(channel_add_signal(QString)), this, SLOT(update(QString)));
+
+}
+
+void Channel::setParseurOut(Parseur::Out *parseur)
+{
+    parseur_out = parseur;
+    connect(parseur_out, SIGNAL(leave_channel_signal(QString)),this, SLOT(leave(QString)));
+
 }

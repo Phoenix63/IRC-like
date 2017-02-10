@@ -13,12 +13,16 @@ public:
     QString * parse(QString *string);
 signals:
     void quit_signal();
+    void leave_channel_signal(QString channel);
 };
 
-class In {
+class In : public QObject {
+    Q_OBJECT
 private:
 public:
     QString * parse(QString *string);
+signals:
+    void channel_add_signal(QString);
 };
 }
 

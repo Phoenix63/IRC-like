@@ -12,6 +12,8 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
 {
     ui->setupUi(this);
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
+    connect(&parseur_out, SIGNAL(quit_signal()), this, SLOT(test()));
+    channel.setParseurIn(&parseur_in);
     channel.setList(ui->channelList);
 }
 
@@ -27,8 +29,7 @@ void MainFrame::on_pushButton_send_clicked()
     QString message = ui->messageSender->text();
         ui->messagePrinter->append(message);
         message.append('\n');
-        Parseur::Out parseur;
-        parseur.parse(&message);
+        parseur_out.parse(&message);
         socket->write(message.toLatin1().data());
         ui->messageSender->setText("");
 }
@@ -41,18 +42,16 @@ void MainFrame::readyRead()
 
             // Get rid of spaces and \n
             string = string.left(string.length() - 1);
-            string = string.right(string.length() - 1);
-
+            string = string.right(string.length() - 2);
             //Parse the message starting from error code to detect server name
             int i = string.indexOf(' ');
             QString cmd = string.right(string.length() - i - 1);
-            if (cmd.startsWith("331") || cmd.startsWith("332"))
-                channel.update(cmd);
-            else if(cmd.startsWith("PART")){
-                qDebug() << "you left :" << cmd;
-                channel.leave(cmd);
-            }
-            else
-                ui->messagePrinter->append(string);
+            parseur_in.parse(&cmd);
+            ui->messagePrinter->append(string);
         }
+}
+
+void MainFrame::test()
+{
+    qDebug() << "quit";
 }
