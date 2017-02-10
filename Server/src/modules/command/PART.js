@@ -16,4 +16,4 @@ module.exports = function (socket, command) {
             chan.removeUser(socket.client);
         }
     });
-}
+};
