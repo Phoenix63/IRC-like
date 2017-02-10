@@ -11,9 +11,7 @@ QString * Parseur::Out::parse(QString *string)
     else if (string->startsWith("/part"))
     {
         string->replace(QString("/part"), QString("PART"));
-        int i = string->indexOf(' ');
-        QString chan = string->right(string->length() - i - 1);
-        emit leave_channel_signal(chan);
+        emit leave_channel_signal(string->left(string->length() - 1));
     }
     else if (string->startsWith("/list"))  string->replace(QString("/list"), QString("LIST"));
     else if (string->startsWith("/quit"))

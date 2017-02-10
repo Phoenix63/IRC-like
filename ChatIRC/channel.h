@@ -21,14 +21,14 @@ public:
     void change(QString newChannel);
     QString * text();
     void append(QString channel, QString text);
-    void join(QString newChannel);
-    void leave(QString channel);
     void setQList();
     void setList(QListWidget *list);
     void setParseurIn(Parseur::In *parseur);
     void setParseurOut(Parseur::Out *parseur);
+    void join(QString newChannel);
 public slots:
      void update(QString string);
+     void leave(QString channel);
 };
 
 #endif // CHANNEL_H

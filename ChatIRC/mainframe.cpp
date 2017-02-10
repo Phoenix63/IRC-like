@@ -14,6 +14,7 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
     connect(&parseur_out, SIGNAL(quit_signal()), this, SLOT(test()));
     channel.setParseurIn(&parseur_in);
+    channel.setParseurOut(&parseur_out);
     channel.setList(ui->channelList);
 }
 
