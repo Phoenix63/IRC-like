@@ -43,7 +43,7 @@ class CommandManager {
  */
 function parseMessage(line) {
 
-    let command = line.match(/[A-Z]+([ ][^[a-zA-Z0-9#&:][a-zA-Z0-9 ]+)?/g);
+    let command = line.match(/^[A-Z]+([ ][^[a-zA-Z0-9#&:][a-zA-Z0-9 ]+)?/g);
     if (command) {
         return [command[0], line.replace(new RegExp(command[0] + "[ ]?"), '')];
     } else {
