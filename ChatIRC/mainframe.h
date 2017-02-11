@@ -26,12 +26,15 @@ private slots:
     void on_pushButton_send_clicked();
     void test();
 
+    void on_channelList_itemSelectionChanged();
+
 private:
     Ui::MainFrame *ui;
     QTcpSocket *socket;
     Channel channel;
     Parseur::Out parseur_out;
     Parseur::In parseur_in;
+    QString channelName;
 };
 
 #endif // MAINFRAME_H
