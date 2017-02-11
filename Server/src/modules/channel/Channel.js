@@ -7,6 +7,7 @@ import RPLSender from './../responses/RPLSender';
 let channels = [];
 
 class Channel {
+
     /**
      *
      * @param {Client} creator
@@ -153,7 +154,7 @@ class Channel {
      * @param {Client} user
      */
     removeUser(user) {
-        var index = this._users.indexOf(user);
+        let index = this._users.indexOf(user);
         if (index < 0) {
             ERRSender.ERR_NOTONCHANNEL(user, this);
             return;
