@@ -49,6 +49,14 @@ class Logger {
         console.log(colors.grey('[from] ') + colors.red(this.client.name) + '>> ' + message);
     };
 
+    _CLIENT_LOGGED() {
+        console.log(colors.yellow(this.client.name + 'is now logged as '+client.identity));
+    };
+
+    _CLIENT_IS_NOW_ADMIN() {
+        console.log(colors.yellow(this.client.identity+' is now ')+colors.red('ADMIN'));
+    }
+
 }
 
 export default Logger;
