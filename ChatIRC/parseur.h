@@ -13,7 +13,7 @@ class Out : public QObject {
     Q_OBJECT
 private:
 public:
-    QString * parse(QString *string);
+    QString * parse(QString *string, QString channel);
 signals:
     void quit_signal();
     void leave_channel_signal(QString channel);

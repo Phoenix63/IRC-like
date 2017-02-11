@@ -1,4 +1,6 @@
 #include "channel.h"
+#include <QColor>
+
 
 Channel::Channel()
 {
@@ -46,6 +48,7 @@ void Channel::change(QString newChannel)
     if (channels.contains(newChannel)) {
         current = &channels[newChannel];
         currentKey = newChannel;
+        chanList->findItems(newChannel,Qt::MatchExactly)[0]->setForeground(QColor("black"));
     }
    refreshText();
 }
@@ -110,4 +113,6 @@ void Channel::appendChannel(QString string, QString channel, QString send)
     }
     channels[channel].append(send+string);
     refreshText();
+    if(channel.compare("\"Debug\"")!=0 && channel.compare(currentKey)!=0)
+        chanList->findItems(channel,Qt::MatchExactly)[0]->setForeground(QColor("red"));
 }

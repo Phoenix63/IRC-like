@@ -7,7 +7,7 @@
  * Parseur::Out: parse client request
  */
 
-QString * Parseur::Out::parse(QString *string)
+QString * Parseur::Out::parse(QString *string, QString channel)
 {
     emit send_request_signal(*string);
     if      (string->startsWith("/nick"))  string->replace(QString("/nick"), QString("NICK"));
@@ -31,7 +31,8 @@ QString * Parseur::Out::parse(QString *string)
         string->replace(QString("/msg"), QString("PRIVMSG"));
         emit send_whisper_signal(string->split(' ').at(1));
     }
-    else                                   string->prepend("PRIVMSG ");
+    else if (channel != "\"Debug\"")   string->prepend("PRIVMSG " + channel + " :");
+    else                                string->prepend("PRIVMSG ");
 
     return string;
 }

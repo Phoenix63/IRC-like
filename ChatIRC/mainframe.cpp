@@ -32,9 +32,7 @@ void MainFrame::on_pushButton_send_clicked()
     QString message = ui->messageSender->text();
         ui->messagePrinter->append(message);
         message.append('\n');
-        if (channelName!="\"Debug\"")
-            message.prepend(channelName.toLatin1() +" :");
-        parseur_out.parse(&message);
+        parseur_out.parse(&message, channelName);
         socket->write(message.toLatin1().data());
         ui->messageSender->setText("");
 }
