@@ -20,15 +20,14 @@ let RPLSender = {
 
         let ret = ':' + config.ip + ' 353 ' + client.name + ' ' + sep + ' ' + channel.name;
         let us = '';
-        channel.users.forEach((u) => {
+        channel.users.forEach((user) => {
             let delimiter = '';
-            if (channel.isOperator(u)) {
+            if (channel.isOperator(user)) {
                 delimiter = '@';
-            } else if (channel.isVoice(u)) {
+            } else if (channel.isVoice(user)) {
                 delimiter = '+';
             }
-            us += ' ' + delimiter + channel.usersFlags[u.id].client.name;
-
+            us += ' ' + delimiter + user.name;
         });
 
         if (us) {
@@ -137,5 +136,4 @@ let RPLSender = {
         socket.send(':' + config.ip + ' NOTICE AUTH :*** Found your hostname');
     }
 };
-
 export default RPLSender

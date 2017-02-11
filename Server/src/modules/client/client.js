@@ -23,7 +23,13 @@ class Client {
         this._socket.client = this;
         this._away = false;
         this._ip = socket.socket.remoteAddress;
-
+        /**
+         i - marque un utilisateur comme invisible ;
+         s - marque un utilisateur comme recevant les notifications du serveur ;
+         w - l'utilisateur reçoit les WALLOPs ;
+         o - drapeau d'opérateur.
+         */
+        this._flag = "sw";
         this._channels = [];
         clients.push(this);
     }

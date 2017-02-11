@@ -1,53 +1,43 @@
 "use strict";
 
-import shortid from 'shortid';
 import Client from './../client/client';
-
 import ERRSender from './../responses/ERRSender';
 import RPLSender from './../responses/RPLSender';
 
 let channels = [];
 
 class Channel {
-
     /**
      *
      * @param {Client} creator
      * @param {string} name
      * @param {string} pass
-     * @param {number} maxSize
+     * @param {number} size
      * @constructor
      */
-    constructor(creator, name, pass, maxSize) {
+    constructor(creator, name, pass, size) {
+         /**
+         s 		canal secret; le canal est totalement invisible
+         p 		canal privé; le nom du canal est invisible
+         n 		les messages externes ne sont pas autorisés
+         m 		canal modéré, seuls les utilisateurs en mode +v et les opérateurs peuvent envoyer un message
+         i 		canal accessible uniquement sur invitation (commande /invite)
+         t 		sujet du canal uniquement modifiable par les opérateurs du canal
+         */
         this.flags = 'tn';
-        this.id = shortid.generate();
-        this.creator = creator;
         this.pass = pass;
-        this.maxSize = maxSize;
-
+        this.size = size;
         this.bannedUsers = [];
+        this._users = [];
+        /**
+         o 	@ 	nom de l'utilisateur concerné 	Opérateur de canal : peut changer les modes du channel et expulser les autres utilisateurs
+         v 	+ 	nom de l'utilisateur concerné 	verbose ou voiced : autorise l'utilisateur à parler sur un canal modéré (mode +m)
+         */
         this._usersFlags = {};
-
         this.invitation = [];
-
-        if (name.match(/(!^#)|(^G)|,/g) || name.length >= 50) {
-            ERRSender.ERR_NOSUCHCHANNEL(creator, {name: name});
-            delete this;
-            return;
-        }
-
         this._name = name;
-
-        if (this._name === '') {
-            delete this;
-            return;
-        }
-
-
         channels.push(this);
-
         this.addUser(creator, pass);
-
     }
 
     /**
@@ -71,11 +61,7 @@ class Channel {
      * @returns {Array}
      */
     get users() {
-        let list = [];
-        for (let key in this._usersFlags) {
-            list.push(this._usersFlags[key].client);
-        }
-        return list;
+        return this._users;
     }
 
     /**
@@ -142,25 +128,20 @@ class Channel {
             ERRSender.ERR_BADCHANNELKEY(user, this);
             return;
         }
-        if (this.users.length >= this.maxSize) {
+        if (this.users.length >= this.size) {
             ERRSender.ERR_CHANNELISFULL(user, this);
             return;
         }
-
+        this._users.push(user);
         if (this.users.length === 0) {
-            this.creator = user;
-            this._usersFlags[user.id] = {
-                client: user,
-                flags: 'omvw'
-            };
+            this._usersFlags[user.id] = 'ov';
         } else {
-            this._usersFlags[user.id] = {
-                client: user,
-                flags: ''
-            };
+            this._usersFlags[user.id] = '';
         }
-
-
+        if (this.pass.length>0){
+            //if password, private channel
+            this.flags += "p";
+        }
         user.addChannel(this);
         RPLSender.JOIN(user, this);
         RPLSender.RPL_TOPIC(user, this);
@@ -172,31 +153,15 @@ class Channel {
      * @param {Client} user
      */
     removeUser(user) {
-        if (this.users.indexOf(user) < 0) {
+        var index = this._users.indexOf(user);
+        if (index < 0) {
             ERRSender.ERR_NOTONCHANNEL(user, this);
             return;
         }
-
-
-        if (user === this.creator) {
-            this.creator = null;
-            this.users.forEach((u) => {
-                if (this._usersFlags[u.id].flags.indexOf('o') >= 0 && !this.creator) {
-                    this.creator = u;
-                    this._usersFlags[u.id].flags = 'omvw';
-                }
-            });
-        }
-
         RPLSender.PART(user, this);
         user.removeChannel(this);
-
         delete this._usersFlags[user.id];
-        if (this.users.length <= 0 || !this.creator) {
-            channels.splice(channels.indexOf(this), 1);
-            delete this;
-        }
-
+        this._users.splice(index, 1);
     }
 
     /**

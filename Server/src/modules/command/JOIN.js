@@ -4,7 +4,6 @@ import Channel from './../channel/Channel';
 import ERRSender from './../responses/ERRSender';
 
 module.exports = function (socket, command) {
-
     if (!socket.client.isRegistered) {
         ERRSender.ERR_NOTREGISTERED(socket.client, 'JOIN');
         return;
@@ -20,15 +19,20 @@ module.exports = function (socket, command) {
 
     let err = true;
 
-    Channel.list().forEach((chan) => {
-        if (chan.name === name) {
+    Channel.list().forEach((channel) => {
+        if (channel.name === name) {
             err = false;
             // join
-            chan.addUser(socket.client, key);
+            channel.addUser(socket.client, key);
         }
     });
     if (err) {
         // create
+        if (name.match(/(!^#)|(^G)|,/g) || name.length >= 50 || name ==='') {
+            ERRSender.ERR_NOSUCHCHANNEL(creator, {name: name});
+            return;
+        }
         new Channel(socket.client, name, key, 20);
     }
+
 }

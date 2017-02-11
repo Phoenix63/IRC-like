@@ -55,4 +55,4 @@ class CommandManager {
 
     }
 }
-export default CommandManager;
+export default CommandManager
