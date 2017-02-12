@@ -8,7 +8,7 @@ Add redis-server to environment variables.
 Launch redis with the command
     redis-server
 
-Then add dependancies :
+Then add dependencies :
     npm install
 
 How to run this app ?
