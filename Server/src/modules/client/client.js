@@ -144,7 +144,7 @@ class Client {
         });
 
         let match = identity.match(/[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]+/);
-        if (!match || (match && match[0] !== identity ) || identity === '' || identity.length > 15 || identity.indexOf('GUEST_') === 0) {
+        if (!match || (match && match[0] !== identity ) || identity === '' || identity.length > 15 || identity.indexOf('GUEST_') >= 0) {
             ERRSender.ERR_NEEDMOREPARAMS(this, 'USER');
             return false;
         }
