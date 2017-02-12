@@ -46,6 +46,9 @@ class Logger {
     };
 
     _USER_SEND_CMD(message) {
+        if(message.indexOf('PASS ')===0) {
+            message = 'PASS ********';
+        }
         console.log(colors.grey('[from] ') + colors.red(this.client.name) + '>> ' + message);
     };
 
