@@ -105,6 +105,15 @@ let ERRSender = {
     ERR_ALREADYREGISTRED: (client) => {
         client.socket.send(':' + config.ip + ' 462 :Unauthorized command (already registered)');
     },
+
+    /**
+     *
+     * @param {Client} client
+     * @static
+     */
+    ERR_PASSWDMISMATCH: (client) => {
+        client.socket.send(':'+ config.ip + ' 464 '+client.name+ ' :Password incorrect');
+    },
     /**
      *
      * @param {Client} client
@@ -129,5 +138,7 @@ let ERRSender = {
     ERR_BADCHANNELKEY: (client, channel) => {
         client.socket.send(':' + config.ip + ' 475 ' + channel.name + ' :Cannot join channel (+k)');
     }
+
+
 };
 export default ERRSender;

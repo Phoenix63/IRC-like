@@ -121,70 +121,65 @@ class Client {
      * @returns {boolean}
      */
     get isRegistered() {
-        return (this._realname !== null) && (this._name !== null);
+        return (this._realname !== null) && (this._name !== null) && (this._identity !== null);
     }
 
     /**
      * change identity of user if its valid
      * @param {string} identity
      */
-    set identity(identity) {
+    setIdentity(identity) {
         //TODO test this fonctionnality
-        if (!this._identity) {
-            let error = false;
-            clients.forEach((c) => {
-                if (c.identity === identity) {
-                    ERRSender.ERR_ALREADYREGISTRED(this);
-                    error = true;
-                }
-            });
 
-            let match = identity.match(/[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]+/);
-            if (!match || (match && match[0] !== identity ) || identity === '' || identity.length > 15 || identity.indexOf('GUEST_') === 0) {
-                ERRSender.ERR_NEEDMOREPARAMS(this, 'USER');
-                error = true;
-            }
-            // command USER valid
-            if (!error) {
-                let logErr = true;
-                if(this._pass && this._pass !== '') {
-                    client.get(identity, (err, reply) => {
-                        if(reply) {
-                            if(this._pass === reply.toString()) {
-                                logErr = false;
-                            }
-                        } else {
-                            client.set(identity, this._pass, redis.print);
-                            logErr = false;
-                        }
-                        if(!logErr) {
-                            this._socket.logger._CLIENT_LOGGED();
-                            // not guest
-                            client.get("admin", (err, reply) => {
-                                if(!reply) {
-                                    this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                                    this.addFlag('o');
-                                    client.set("admin", identity, redis.print);
-                                } else if (reply === identity) {
-                                    this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                                    this.addFlag('o');
-                                }
-                            });
-                            this._identity = identity;
-                        } else {
-                            this._identity = 'GUEST_'+identity;
-                        }
-                    });
-                } else {
-                    // log as guest
-                    this._identity = 'GUEST_'+identity;
-                }
-
-
-            }
-
+        if(this._identity) {
+            ERRSender.ERR_ALREADYREGISTRED(this);
+            return false;
         }
 
+        clients.forEach((c) => {
+            if((this._pass && c.identity === identity) || (!this._pass && c.identity === 'GUEST_'+identity)) {
+                ERRSender.ERR_ALREADYREGISTRED(this);
+                return false;
+            }
+        });
+
+        let match = identity.match(/[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]+/);
+        if (!match || (match && match[0] !== identity ) || identity === '' || identity.length > 15 || identity.indexOf('GUEST_') === 0) {
+            ERRSender.ERR_NEEDMOREPARAMS(this, 'USER');
+            return false;
+        }
+
+        // command USER valid
+        if(this._pass) {
+            // user should not be a guest
+            client.hgetall("PASS", (err, obj) => {
+                if(obj && obj[identity] && obj[identity] !== this._pass) {
+                    ERRSender.ERR_PASSWDMISMATCH(this);
+                    return false;
+                } else {
+                    if(!obj || !obj[identity]) {
+                        client.hmset("PASS", identity, this._pass);
+                    }
+                    this._identity = identity;
+                    this._socket.logger._CLIENT_LOGGED();
+
+                    client.get("admin", (err, reply) => {
+                        if (!reply) {
+                            this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                            this.addFlag('o');
+                            client.set("admin", identity, redis.print);
+                        } else if (reply === identity) {
+                            this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                            this.addFlag('o');
+                        }
+                    });
+                }
+            });
+        } else {
+            this._identity = 'GUEST_' + identity;
+            this._socket.logger._CLIENT_GUEST();
+        }
+        return true;
     }
 
     /**
