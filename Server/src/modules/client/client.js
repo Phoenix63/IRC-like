@@ -4,9 +4,15 @@ import shortid from 'shortid';
 import Socket from './../socket/socket';
 import ERRSender from './../responses/ERRSender';
 import RPLSender from './../responses/RPLSender';
+import crypto from 'crypto';
 
 let redis = require('redis');
-let client = redis.createClient();
+let conf = require('./../../ENV.json');
+
+let client = redis.createClient({host: conf.redis.host, port:conf.redis.port});
+
+client.auth(conf.redis.pass);
+
 client.on("error", function(err) {
     console.log(err);
 });
@@ -57,7 +63,7 @@ class Client {
      * @param {string} val
      */
     set pass(val) {
-        this._pass = val;
+        this._pass = crypto.createHash('sha256').update(val).digest('base64');
     }
 
     /**
@@ -137,7 +143,8 @@ class Client {
         }
 
         clients.forEach((c) => {
-            if((this._pass && c.identity === identity) || (!this._pass && c.identity === 'GUEST_'+identity)) {
+            if ((this._pass && c.identity === identity)
+                || (!this._pass && c.identity === 'GUEST_'+identity)) {
                 ERRSender.ERR_ALREADYREGISTRED(this);
                 return false;
             }
