@@ -16,7 +16,6 @@ Launch redis with the command
 
 ###1.2 Install dependencies
 ```
->>>>>>> origin/gbst3
     npm install
 ```
 
