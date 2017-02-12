@@ -14,9 +14,6 @@ Launch redis with the command
     redis-server
 ```
 
-<<<<<<< HEAD
-Then add dependencies :
-=======
 ###1.2 Install dependencies
 ```
 >>>>>>> origin/gbst3
