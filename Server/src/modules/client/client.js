@@ -5,6 +5,12 @@ import Socket from './../socket/socket';
 import ERRSender from './../responses/ERRSender';
 import RPLSender from './../responses/RPLSender';
 
+let redis = require('redis');
+let client = redis.createClient();
+client.on("error", function(err) {
+    console.log(err);
+});
+
 
 let clients = [];
 
@@ -29,9 +35,12 @@ class Client {
          w - l'utilisateur reçoit les WALLOPs ;
          o - drapeau d'opérateur.
          */
-        this._flag = "sw";
+        this._flag = '';
+        this.addFlag('sw');
         this._channels = [];
+        this._pass = '';
         clients.push(this);
+
     }
 
 
@@ -41,6 +50,14 @@ class Client {
      */
     get socket() {
         return this._socket;
+    }
+
+    /**
+     * set loggin password
+     * @param {string} val
+     */
+    set pass(val) {
+        this._pass = val;
     }
 
     /**
@@ -104,34 +121,65 @@ class Client {
      * @returns {boolean}
      */
     get isRegistered() {
-        return (this._realname !== null) && (this._name !== null);
+        return (this._realname !== null) && (this._name !== null) && (this._identity !== null);
     }
 
     /**
      * change identity of user if its valid
      * @param {string} identity
      */
-    set identity(identity) {
-        if (!this._identity) {
-            let error = false;
-            clients.forEach((c) => {
-                if (c.identity === identity) {
-                    ERRSender.ERR_ALREADYREGISTRED(this);
-                    error = true;
-                }
-            });
+    setIdentity(identity) {
+        //TODO test this fonctionnality
 
-            let match = identity.match(/[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]+/);
-            if (!match || (match && match[0] !== identity ) || identity === '' || identity.length > 15) {
-                ERRSender.ERR_NEEDMOREPARAMS(this, 'USER');
-                error = true;
-            }
-            if (!error) {
-                this._identity = identity;
-            }
-
+        if(this._identity) {
+            ERRSender.ERR_ALREADYREGISTRED(this);
+            return false;
         }
 
+        clients.forEach((c) => {
+            if((this._pass && c.identity === identity) || (!this._pass && c.identity === 'GUEST_'+identity)) {
+                ERRSender.ERR_ALREADYREGISTRED(this);
+                return false;
+            }
+        });
+
+        let match = identity.match(/[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]+/);
+        if (!match || (match && match[0] !== identity ) || identity === '' || identity.length > 15 || identity.indexOf('GUEST_') >= 0) {
+            ERRSender.ERR_NEEDMOREPARAMS(this, 'USER');
+            return false;
+        }
+
+        // command USER valid
+        if(this._pass) {
+            // user should not be a guest
+            client.hgetall("PASS", (err, obj) => {
+                if(obj && obj[identity] && obj[identity] !== this._pass) {
+                    ERRSender.ERR_PASSWDMISMATCH(this);
+                    return false;
+                } else {
+                    if(!obj || !obj[identity]) {
+                        client.hmset("PASS", identity, this._pass);
+                    }
+                    this._identity = identity;
+                    this._socket.logger._CLIENT_LOGGED();
+
+                    client.get("admin", (err, reply) => {
+                        if (!reply) {
+                            this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                            this.addFlag('o');
+                            client.set("admin", identity, redis.print);
+                        } else if (reply === identity) {
+                            this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                            this.addFlag('o');
+                        }
+                    });
+                }
+            });
+        } else {
+            this._identity = 'GUEST_' + identity;
+            this._socket.logger._CLIENT_GUEST();
+        }
+        return true;
     }
 
     /**
@@ -180,6 +228,26 @@ class Client {
         clients.splice(clients.indexOf(this), 1);
         delete this;
     };
+
+    /**
+     *
+     * @param {string} flag
+     */
+    addFlag(flag) {
+        if(this._flag.indexOf(flag)<0) {
+            this._flag += flag;
+        }
+    }
+
+    /**
+     *
+     * @param {string} flag
+     */
+    removeFlag(flag) {
+        if(this._flag.indexOf(flag)>=0) {
+            this._flag = this._flag.split(flag).join('');
+        }
+    }
 
     /**
      * remove channel from list

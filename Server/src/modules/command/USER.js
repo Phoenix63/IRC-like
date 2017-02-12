@@ -21,7 +21,7 @@ module.exports = function (socket, command) {
     }
 
 
-    socket.client.identity = name;
+    socket.client.setIdentity(name);
     socket.client.realname = realname;
 
 };

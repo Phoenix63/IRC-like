@@ -12,7 +12,8 @@ let allowedCommand = {
     'LIST': require('./command/LIST'),
     'QUIT': require('./command/QUIT'),
     'WHO': require('./command/WHO'),
-    'USER': require('./command/USER')
+    'USER': require('./command/USER'),
+    'PASS': require('./command/PASS')
 };
 
 class CommandManager {
