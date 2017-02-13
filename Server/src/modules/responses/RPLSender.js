@@ -22,9 +22,9 @@ let RPLSender = {
         let us = '';
         channel.users.forEach((user) => {
             let delimiter = '';
-            if (channel.isOperator(user)) {
+            if (channel.isUserOperator(user)) {
                 delimiter = '@';
-            } else if (channel.isVoice(user)) {
+            } else if (channel.isUserVoice(user)) {
                 delimiter = '+';
             }
             us += ' ' + delimiter + user.name;
@@ -45,10 +45,11 @@ let RPLSender = {
     RPL_WHOREPLY: (client, channel) => {
         channel.users.forEach((u) => {
             let delimiter = '';
-            if (channel.usersFlags[u.id].flags.indexOf('o') >= 0) {
-                delimiter = '@';
-            } else if (channel.usersFlags[u.id].flags.indexOf('v') >= 0) {
-                delimiter = '+';
+            if(channel.isUserOperator(u)) {
+                delimiter += '@';
+            }
+            if(channel.isUserVoice(u)) {
+                delimiter += '+';
             }
             client.socket.send(
                 ':' + config.ip + ' 352 ' + client.name + ' ' + channel.name + ' ~'

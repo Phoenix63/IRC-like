@@ -26,7 +26,8 @@ class Channel {
          i 		canal accessible uniquement sur invitation (commande /invite)
          t 		sujet du canal uniquement modifiable par les opérateurs du canal
          */
-        this.flags = 'tn';
+        this._flags = '';
+        this.addChannelFlag(['t', 'n']);
         this.pass = pass;
         this.size = size;
         this.bannedUsers = [];
@@ -71,7 +72,7 @@ class Channel {
      * @returns {boolean}
      */
     get isPrivate() {
-        return (this.flags.indexOf('p') >= 0);
+        return (this._flags.indexOf('p') >= 0);
     }
 
     /**
@@ -79,7 +80,7 @@ class Channel {
      * @returns {boolean}
      */
     get isSecret() {
-        return (this.flags.indexOf('s') >= 0);
+        return (this._flags.indexOf('s') >= 0);
     }
 
     /**
@@ -87,7 +88,30 @@ class Channel {
      * @returns {boolean}
      */
     get isInvitation() {
-        return (this.flags.indexOf('i') >= 0);
+        return (this._flags.indexOf('i') >= 0);
+    }
+
+    /**
+     *
+     * @param {Array} flag
+     */
+    addChannelFlag(flag) {
+        if(flag instanceof Array) {
+            flag.forEach((f) => {
+                this._flags = this._flags.split(f).join('') + f;
+            });
+        } else {
+            throw "flag must be an Array";
+        }
+    }
+    removeChannelFlag(flag) {
+        if(flag instanceof Array) {
+            flag.forEach((f) => {
+                this._flags = this._flags.split(f).join('');
+            });
+        } else {
+            throw "flag must be an Array";
+        }
     }
 
     /**
@@ -95,8 +119,8 @@ class Channel {
      * @param {Client} client
      * @returns {boolean}
      */
-    isOperator(client) {
-        if (this._usersFlags[client.id] && this._usersFlags[client.id].flags.indexOf('o') >= 0)
+    isUserOperator(client) {
+        if (this._usersFlags[client.id] && this._usersFlags[client.id].indexOf('o') >= 0)
             return true;
         return false;
     }
@@ -106,11 +130,45 @@ class Channel {
      * @param {Client} client
      * @returns {boolean}
      */
-    isVoice(client) {
-        if (this._usersFlags[client.id] && this._usersFlags[client.id].flags.indexOf('v') >= 0)
+    isUserVoice(client) {
+        if (this._usersFlags[client.id] && this._usersFlags[client.id].indexOf('v') >= 0)
             return true;
         return false;
     }
+
+    /**
+     *
+     * @param {Client} client
+     */
+    setUserOperator(client) {
+        console.log(this._usersFlags[client.id]);
+        if (this._usersFlags[client.id].indexOf('o')<0) {
+            this._usersFlags[client.id] += 'o';
+            console.log(this._usersFlags[client.id]);
+        }
+    }
+    /**
+     *
+     * @param {Client} client
+     */
+    setUserVoice(client) {
+        console.log(this._usersFlags[client.id]);
+        if (this._usersFlags[client.id].indexOf('v')<0) {
+            this._usersFlags[client.id] += 'v';
+            console.log(this._usersFlags[client.id]);
+        }
+    }
+    /**
+     *
+     * @param {Client} client
+     */
+    removeUserFlag(client, flag) {
+        if(this._usersFlags[client.id]) {
+            this._usersFlags[client.id] = this._usersFlags[client.id].split(flag).join('');
+        }
+    }
+
+
 
     /**
      * add user to the channel
@@ -136,14 +194,15 @@ class Channel {
         }
         if(this._users.indexOf(user) < 0) {
             this._users.push(user);
-            if (this.users.length === 0) {
-                this._usersFlags[user.id] = 'ov';
-            } else {
-                this._usersFlags[user.id] = '';
+            this._usersFlags[user.id] = '';
+
+            if (this._users.length === 1) {
+                this.setUserOperator(user);
+                this.setUserVoice(user);
             }
+
             if (this.pass.length>0){
-                //if password, private channel
-                this.flags += "p";
+                this.addChannelFlag(['p']);
             }
             user.addChannel(this);
             RPLSender.JOIN(user, this);
