@@ -50,7 +50,6 @@ function createServer(callback) {
                 return;
             }
             if (!(msg.length > 510)) {
-                socket.timeoutReset();
                 socket.manager.emit('message', msg);
             }
         });
