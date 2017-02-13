@@ -21,26 +21,27 @@ Login::~Login()
 void Login::on_pushButton_connect_clicked()
 {
     QString username = ui->lineEdit_username->text();
+    QString password = ui->lineEdit_pass->text();
     if(username == NULL){
-        Login::on_pushButton_guest_clicked();
+        on_pushButton_guest_clicked();
     }
-    else{
-        QString host= ui->lineEdit_host->text();
-        int port = ui->lineEdit_port->text().toInt(0,10);
-        if(Login::doConnect(host,port,username)){
-            main=new MainFrame(this,socket);
-            main->setWindowTitle(username +"@"+host+":"+QString::number(port));
-            main->show();
-        }
-        else{
-            QMessageBox::information(this,"Error","Host not found");
-        }
+    else
+    {
+        if (password == NULL)
+            doConnect(username);
+        else
+            doConnect(username,password);
     }
 }
 
 
 void Login::on_pushButton_guest_clicked()
 {
+    doConnect();
+}
+
+
+bool Login::doConnect(){
     QString host= ui->lineEdit_host->text();
     int port = ui->lineEdit_port->text().toInt(0,10);
     socket = new QTcpSocket(this);
@@ -49,34 +50,44 @@ void Login::on_pushButton_guest_clicked()
     {
         qDebug() << "Error: " << socket->errorString();
         QMessageBox::information(this,"Error","Host not found");
+        return false;
     }
     else{
         main=new MainFrame(this,socket);
         main->show();
+        return true;
     }
 }
 
 
-bool Login::doConnect(QString host,int port,QString username)
-{
-    socket = new QTcpSocket(this);
-    socket->connectToHost(host,port);
-    if(!socket->waitForConnected(5000))
+
+bool Login::doConnect(QString username){
+    if(doConnect())
     {
-        qDebug() << "Error: " << socket->errorString();
-        return false;
-    }
-    else
-    {
-        QString nick = username;
-        username.prepend("NICK ");
-        username.append('\n');
-        QByteArray nickname=username.toLatin1();
-        socket->write(nickname.data());
-        nick.prepend("USER "+nick+" 0 * : ");
+        QString host= ui->lineEdit_host->text();
+        int port = ui->lineEdit_port->text().toInt(0,10);
+        main->setWindowTitle(username +"@"+host+":"+QString::number(port));
+        QString nick=username;
+        nick.prepend("NICK ");
         nick.append('\n');
-        QByteArray user =nick.toLatin1();
-        socket->write(user.data());
+        socket->write(nick.toLatin1().data());
+        QString user=username.prepend("USER "+username+" 0 * : ");
+        user.append('\n');
+        socket->write(user.toLatin1().data());
         return true;
     }
+    return false;
+}
+
+
+bool Login::doConnect(QString username,QString password){
+    if(doConnect(username))
+    {
+        password.prepend("PASS ");
+        password.append('\n');
+        QByteArray pass=password.toLatin1();
+        socket->write(pass.data());
+        return true;
+    }
+    return false;
 }

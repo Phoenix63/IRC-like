@@ -23,8 +23,8 @@ SOURCES += main.cpp\
 HEADERS  += \
     login.h \
     mainframe.h \
-    parseur.h \
-    channel.h
+    channel.h \
+    parseur.h
 
 FORMS    += \
     login.ui \

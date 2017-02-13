@@ -4,6 +4,7 @@
 
 /nick <New nickname>  -- Setup a nickname
 /user <username> 0 * : <real name> -- Auth on server, cant do aynthing before(guest only)
+/pass <password> auth to database
 /join <channel>  -- Join a server
 /names -- Users connected under every channels
 /list  -- List every channels and their topics

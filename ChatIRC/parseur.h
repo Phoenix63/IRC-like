@@ -2,37 +2,31 @@
 #define PARSEUR_H
 
 #include <QString>
-#include <QObject>
 
-namespace Parseur {
+#include "channel.h"
 
-/*
- * Parseur::Out: parse server response
- */
-class Out : public QObject {
-    Q_OBJECT
+class Parseur {
 private:
-public:
-    QString * parse(QString *string, QString channel);
-signals:
-    void quit_signal();
-    void leave_channel_signal(QString channel);
-    void send_request_signal(QString string);
-    void send_whisper_signal(QString dest);
-};
+//In private function
 
-/*
- * Parseur::In: parse client request
- */
-class In : public QObject {
-    Q_OBJECT
-private:
+bool in_isChanList(QString string);
+bool in_isNameList(QString string);
+bool in_isJoinNote(QString string);
+bool in_isPartNote(QString string);
+bool in_isPrivMesg(QString string);
+bool in_isWhisMesg(QString string);
+
 public:
-    void parse(QString string);
-signals:
-    void join_channel_signal(QString);
-    void response_signal(QString string, QString channel,QString send);
+    //Initialisation functions
+    void setChannel(Channel *channel);
+
+    //Parsing functions
+    void out(QString *string);
+    void in(QString string);
+
+private:
+    //Pointer to the channel created in mainframe
+    Channel *channel;
 };
-}
 
 #endif // PARSEUR_H

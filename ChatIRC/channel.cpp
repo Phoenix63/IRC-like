@@ -1,66 +1,63 @@
 #include "channel.h"
-#include <QColor>
+#include <QDebug>
 
+/*
+ * Channel: Constructor
+ */
 
 Channel::Channel()
 {
     channels["\"Debug\""] = QString();
     current = &(channels["\"Debug\""]);
     currentKey = QString("\"Debug\"");
+    users["\"Debug\""].append("The godly dev");
+    currentList = &(users["\"Debug\""]);
+    topics["\"Debug\""] = QString("Here we see debug command.");
+    currentTopic = &(topics["\"Debug\""]);
 }
 
 /*
- * Channel: initialisation's function
+ * Channel: Initialisation functions
  */
 
-void Channel::setList(QListWidget *list)
+void Channel::setUi(QListWidget *list, QTextBrowser *text, QListWidget *uList, QLineEdit *tText)
 {
     chanList = list;
+    chanText = text;
+    userList = uList;
+    topicText = tText;
+    refreshChanList();
+    refreshUserList();
+    refreshTopic();
+}
+
+/*
+ * Channel: Channel creation functions
+ */
+
+void Channel::join(QString chan, QString topic)
+{
+    if (!channels.contains(chan)) {
+        channels[chan] = QString();
+        topics[chan] = topic;
+    }
     refreshChanList();
 }
 
-void Channel::setChanText(QTextBrowser *text)
-{
-    chanText = text;
-}
-
-void Channel::setParseurIn(Parseur::In *parseur)
-{
-    parseur_in = parseur;
-    connect(parseur_in, SIGNAL(join_channel_signal(QString)), this, SLOT(join(QString)));
-    connect(parseur_in, SIGNAL(response_signal(QString,QString,QString)), this, SLOT(appendChannel(QString,QString,QString)));
-}
-
-void Channel::setParseurOut(Parseur::Out *parseur)
-{
-    parseur_out = parseur;
-    connect(parseur_out, SIGNAL(leave_channel_signal(QString)),this, SLOT(leave(QString)));
-    connect(parseur_out, SIGNAL(send_request_signal(QString)), this, SLOT(appendCurrent(QString)));
-    connect(parseur_out, SIGNAL(send_whisper_signal(QString)), this, SLOT(joinWhisper(QString)));
+void Channel::joinWhisper(QString dest){
+    if (!channels.contains(dest))
+        channels[dest] = QString();
+    refreshChanList();
 }
 
 /*
- * Channel: State update
- */
-
-void Channel::change(QString newChannel)
-{
-    if (channels.contains(newChannel)) {
-        current = &channels[newChannel];
-        currentKey = newChannel;
-        chanList->findItems(newChannel,Qt::MatchExactly)[0]->setForeground(QColor("black"));
-    }
-   refreshText();
-}
-
-/*
- * Channel: State ui refresh
+ * Channel: UI statues update functions
  */
 
 void Channel::refreshText()
 {
     chanText->clear();
-    chanText->setText(*current);
+    chanText->setText(current->left(current->length()-1));
 }
 
 void Channel::refreshChanList()
@@ -71,33 +68,21 @@ void Channel::refreshChanList()
    }
 }
 
-
 /*
- * Channel: public slot
+ * Channel: Channel quit functions
  */
 
-void Channel::joinWhisper(QString dest){
-    if (!channels.contains(dest))
-        channels[dest] = QString();
+void Channel::leave(QString chan){
+    if(channels.contains(chan)) {
+        channels.remove(chan);
+        change("\"Debug\"");
+    }
     refreshChanList();
 }
 
-void Channel::join(QString string)
-{
-    QString chan = string.split(' ').at(2);
-    if (!channels.contains(chan))
-        channels[chan] = QString();
-    refreshChanList();
-}
-
-void Channel::leave(QString channel){
-    QString chan = channel.split(' ').at(1);
-        if(channels.contains(chan)) {
-            channels.remove(chan);
-            change("\"Debug\"");
-        }
-        refreshChanList();
-}
+/*
+ * Channel: Text adding functions
+ */
 
 void Channel::appendCurrent(QString string)
 {
@@ -107,12 +92,72 @@ void Channel::appendCurrent(QString string)
 
 void Channel::appendChannel(QString string, QString channel, QString send)
 {
-    if(!channels.contains(channel)){
+    if(!channels.contains(channel)) {
         channels[channel] = QString();
         refreshChanList();
     }
-    channels[channel].append(send+string);
-    refreshText();
+    channels[channel].append(send + string);
+    if (channel == currentKey)
+        chanText->append(send + string.left(string.length()-1));
     if(channel.compare("\"Debug\"")!=0 && channel.compare(currentKey)!=0)
         chanList->findItems(channel,Qt::MatchExactly)[0]->setForeground(QColor("red"));
+}
+
+/*
+ * Channel: Current channel change function
+ */
+
+void Channel::change(QString newChannel)
+{
+    if (channels.contains(newChannel)) {
+        current = &channels[newChannel];
+        currentList = &users[newChannel];
+        currentTopic = &topics[newChannel];
+        currentKey = newChannel;
+        chanList->findItems(newChannel,Qt::MatchExactly)[0]->setForeground(QColor("black"));
+    }
+   refreshText();
+   refreshUserList();
+   refreshTopic();
+}
+
+/*
+ * Chanenl: Current channel name getter
+ */
+
+QString Channel::channelName()
+{
+    return currentKey;
+}
+
+
+void Channel::addUser(QString user, QString channel)
+{
+    if (user[0] == '@')
+        user = user.right(user.length() - 1);
+    if (!users[channel].contains(user))
+        users[channel].append(user);
+    refreshUserList();
+
+}
+
+void Channel::delUser(QString user, QString channel)
+{
+    users[channel].removeAll(user);
+    refreshUserList();
+}
+
+void Channel::refreshUserList()
+{
+    userList->clear();
+    for (int i = 0; i < currentList->size(); i++) {
+         userList->addItem(currentList->at(i));
+    }
+}
+
+
+void Channel::refreshTopic()
+{
+    topicText->clear();
+    topicText->setText(*currentTopic);
 }

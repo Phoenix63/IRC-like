@@ -1,24 +1,25 @@
 #include "mainframe.h"
 #include "ui_mainframe.h"
-#include <QTcpSocket>
-#include <QAbstractSocket>
-#include "parseur.h"
-#include "channel.h"
+
+
+/*
+ * Mainframe: constructor
+ */
 
 MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
     QDialog(parent),
     ui(new Ui::MainFrame),
-    socket(socket),
-    channelName("\"Debug\"")
+    socket(socket)
 {
     ui->setupUi(this);
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
-    connect(&parseur_out, SIGNAL(quit_signal()), this, SLOT(test()));
-    channel.setParseurIn(&parseur_in);
-    channel.setParseurOut(&parseur_out);
-    channel.setList(ui->channelList);
-    channel.setChanText(ui->messagePrinter);
+    channel.setUi(ui->channelList, ui->messagePrinter,ui->userList,ui->topicDisplay);
+    parseur.setChannel(&channel);
 }
+
+/*
+ * MainFrame: destructor
+ */
 
 MainFrame::~MainFrame()
 {
@@ -26,33 +27,34 @@ MainFrame::~MainFrame()
     delete socket;
 }
 
-
-void MainFrame::on_pushButton_send_clicked()
-{
-    QString message = ui->messageSender->text();
-        ui->messagePrinter->append(message);
-        message.append('\n');
-        parseur_out.parse(&message, channelName);
-        socket->write(message.toLatin1().data());
-        ui->messageSender->setText("");
-}
-
+/*
+ * MainFrame: socket slots
+ */
 
 void MainFrame::readyRead()
 {
     while(socket->canReadLine()){
             QString string = QString(socket->readLine());
-            parseur_in.parse(string);
+            parseur.in(string);
         }
 }
 
-void MainFrame::test()
+/*
+ * mainFrame: UI slots
+ */
+
+void MainFrame::on_pushButton_send_clicked()
 {
-    qDebug() << "quit";
+    QString message = ui->messageSender->text();
+    ui->messagePrinter->append(message);
+    message.append('\n');
+    parseur.out(&message);
+    socket->write(message.toLatin1().data());
+    ui->messageSender->setText("");
 }
 
 void MainFrame::on_channelList_itemSelectionChanged()
 {
     channel.change(ui->channelList->currentItem()->text());
-    channelName = ui->channelList->currentItem()->text();
 }
+

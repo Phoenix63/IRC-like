@@ -3,66 +3,67 @@
 
 #include <QString>
 #include <QHash>
-#include <QTcpSocket>
 #include <QListWidget>
 #include <QTextBrowser>
-#include "parseur.h"
+#include <QLineEdit>
+#include <QColor>
+#include <QList>
 
-class Channel : public QObject {
-    Q_OBJECT
-private:
-/*
- * Channel: widget pointer for easyer draw handling
- */
-    QListWidget *chanList;
-    QTextBrowser *chanText;
-
-/*
- * Channel: Current pointer and key to bypass hash search
- */
-    QString currentKey;
-    QString *current;
-
-/*
- * Channel: hash map wich contain channel list and their content
- * the key is the channel name
- */
-    QHash<QString, QString> channels;
-
-/*
- * Channel: parser pointer to handle parsing signal
- */
-    Parseur::In *parseur_in;
-    Parseur::Out *parseur_out;
-
+class Channel {
 public:
+    // Constructor
     Channel();
 
-/*
- * Channel: initialisation's function
- */
-    void setList(QListWidget *list);
-    void setChanText(QTextBrowser *text);
-    void setParseurIn(Parseur::In *parseur);
-    void setParseurOut(Parseur::Out *parseur);
+    // Initialisation functions
+    void setUi(QListWidget *list, QTextBrowser *text, QListWidget *uList, QLineEdit *tText);
 
-/*
- * Channel: State update
- */
-    void change(QString newChannel);
+    // Channel creation functions
+    void join(QString chan, QString topic);
+    void joinWhisper(QString dest);
 
-/*
- * Channel: State ui refresh
- */
+    // UI statues update functions
     void refreshText();
     void refreshChanList();
 
-public slots:
-    void joinWhisper(QString dest);
-    void join(QString string);
+    // Channel quit functions
     void leave(QString channel);
-    void appendCurrent(QString string);
+
+    // Text adding function
     void appendChannel(QString string, QString channel, QString send);
+    void appendCurrent(QString string);
+
+    // Current channel change function
+    void change(QString newChannel);
+
+    // Current channel name getter
+    QString channelName();
+
+    // User functions
+    void addUser(QString user, QString channel);
+    void delUser(QString user, QString channel);
+    void refreshUserList();
+
+    void refreshTopic();
+
+private:
+    // Qhash wich contain message: key = channel name, content = message list
+    QHash<QString, QString> channels;
+    QHash<QString, QList<QString>> users;
+    QHash<QString, QString> topics;
+
+    // UI for interface update
+    QListWidget *chanList;
+    QTextBrowser *chanText;
+    QListWidget *userList;
+    QLineEdit *topicText;
+
+    // Current channel name
+    QString currentKey;
+
+    // Pointer on current channel content for les Hash map loop
+    QString *current;
+    QList<QString> *currentList;
+    QString *currentTopic;
 };
 
 #endif // CHANNEL_H
