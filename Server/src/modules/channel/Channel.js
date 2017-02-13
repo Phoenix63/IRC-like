@@ -6,6 +6,7 @@ import RPLSender from './../responses/RPLSender';
 
 let channels = [];
 
+
 class Channel {
 
     /**
@@ -133,20 +134,22 @@ class Channel {
             ERRSender.ERR_CHANNELISFULL(user, this);
             return;
         }
-        this._users.push(user);
-        if (this.users.length === 0) {
-            this._usersFlags[user.id] = 'ov';
-        } else {
-            this._usersFlags[user.id] = '';
+        if(this._users.indexOf(user) < 0) {
+            this._users.push(user);
+            if (this.users.length === 0) {
+                this._usersFlags[user.id] = 'ov';
+            } else {
+                this._usersFlags[user.id] = '';
+            }
+            if (this.pass.length>0){
+                //if password, private channel
+                this.flags += "p";
+            }
+            user.addChannel(this);
+            RPLSender.JOIN(user, this);
+            RPLSender.RPL_TOPIC(user, this);
+            RPLSender.RPL_NAMREPLY(user, this);
         }
-        if (this.pass.length>0){
-            //if password, private channel
-            this.flags += "p";
-        }
-        user.addChannel(this);
-        RPLSender.JOIN(user, this);
-        RPLSender.RPL_TOPIC(user, this);
-        RPLSender.RPL_NAMREPLY(user, this);
     }
 
     /**

@@ -127,68 +127,73 @@ class Client {
      * change identity of user if its valid
      * @param {string} identity
      */
-    setIdentity(identity) {
-        //TODO test this fonctionnality
+    setIdentity(identity, realname) {
+
+        let error = false;
 
         if(this._identity) {
             ERRSender.ERR_ALREADYREGISTRED(this);
-            return false;
+            error = true;
         }
 
         clients.forEach((c) => {
             if ((this._pass && c.identity === identity)
                 || (!this._pass && c.identity === 'GUEST_'+identity)) {
                 ERRSender.ERR_ALREADYREGISTRED(this);
-                return false;
+                error = true;
             }
         });
 
         let match = identity.match(/[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]+/);
         if (!match || (match && match[0] !== identity ) || identity === '' || identity.length > 15 || identity.indexOf('GUEST_') >= 0) {
             ERRSender.ERR_NEEDMOREPARAMS(this, 'USER');
-            return false;
+            error = true;
         }
 
-        // command USER valid
-        if(this._pass) {
-            // user should not be a guest
-            redisClient.getPass(identity, (err, pass) => {
-                if(!err && pass != this._pass) {
-                    ERRSender.ERR_PASSWDMISMATCH(this);
-                    return false;
-                }  else {
-                    if(err) {
-                        redisClient.setPass(identity, this._pass);
-                    }
-
-                    this._identity = identity;
-                    this._socket.logger._CLIENT_LOGGED();
-
-                    RPLSender.RPL_MOTDSTART(this.socket);
-                    RPLSender.RPL_MOTD(this.socket);
-                    RPLSender.RPL_ENDOFMOTD(this.socket);
-
-                    redisClient.getAdmin((reply) => {
-                        if (!reply) {
-                            this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                            this.addFlag('o');
-                            redisClient.setAdmin(this);
-                        } else if (reply === identity) {
-                            this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                            this.addFlag('o');
+        if(!error) {
+            // command USER valid
+            if(this._pass) {
+                // user should not be a guest
+                redisClient.getPass(identity, (err, pass) => {
+                    if(!err && pass != this._pass) {
+                        ERRSender.ERR_PASSWDMISMATCH(this);
+                    }  else {
+                        if(err) {
+                            redisClient.setPass(identity, this._pass);
                         }
-                    });
 
-                }
-            });
-        } else {
-            this._identity = 'GUEST_' + identity;
-            this._socket.logger._CLIENT_GUEST();
-            RPLSender.RPL_MOTDSTART(this.socket);
-            RPLSender.RPL_MOTD(this.socket);
-            RPLSender.RPL_ENDOFMOTD(this.socket);
+                        this._identity = identity;
+                        this._realname = realname;
+                        this._socket.logger._CLIENT_LOGGED();
+
+                        RPLSender.RPL_MOTDSTART(this.socket);
+                        RPLSender.RPL_MOTD(this.socket);
+                        RPLSender.RPL_ENDOFMOTD(this.socket);
+
+                        redisClient.getAdmin((reply) => {
+                            if (!reply) {
+                                this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                                this.addFlag('o');
+                                redisClient.setAdmin(this);
+                            } else if (reply === identity) {
+                                this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                                this.addFlag('o');
+                            }
+                        });
+
+                    }
+                });
+            } else {
+                this._identity = 'GUEST_' + identity;
+                this._realname = realname;
+
+                this._socket.logger._CLIENT_GUEST();
+                RPLSender.RPL_MOTDSTART(this.socket);
+                RPLSender.RPL_MOTD(this.socket);
+                RPLSender.RPL_ENDOFMOTD(this.socket);
+            }
         }
-        return true;
+
     }
 
     /**
