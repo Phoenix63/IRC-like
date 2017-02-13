@@ -15,13 +15,12 @@
 			<header>
 				<center><img id="banniere" src="IMAGE/banniere.png" alt="" /></center>
 			</header>
-			<nav>
-			</nav>
+			
 			<div id="box" ng-controller="ChatCtrl">
 				<div id="channelBox">
 					<p>channels</p>
 					<div ng-repeat="channel in channels">
-						<p>{{channel}}</p>
+						<button>{{channel}}</button>
 					</div>
 				</div>
 				<div id="msgBox">
@@ -67,81 +66,204 @@
 		</div>
 	</body>
 	<script>
-	(function() {
-		var uniqid = function() {
+	var User = (function() {
+		function User(userName, realName, channels) {
+			var uniqid = function() {
 				return (new Date().getTime() + Math.floor((Math.random()*10000)+1)).toString(16);
-		};
+			};	
+			this.userN = userName || ("Guest_" + uniqid());
+			this.realName = realName || "Guest";
+			this.chan = channels || [];
+		}
+		User.prototype.addChannel = function(ch) {
+			this.chan.push(ch);
+		}
+		User.prototype.setNick = function(newNick) {
+			this.userN = newNick;
+		}
+		User.prototype.removeChannel = function(c) {
+			var index = this.chan.indexOf(c);
+			this.chan.splice(index,1);
+		}
+		return User;
+	})();
+
+	
+	var Channel = (function() {
+		function Channel(chanName, admin, listUser) {
+			this.chan = chanName;
+			this.admi = admin;
+			this.listU = listUser || [admin];
+		}
+		Channel.prototype.setAdmin = function(newAdmin) {
+			this.admi = newAdmin;
+		}
+		Channel.prototype.addUser = function(newUser) {
+			this.listU.push(newUser);
+		}
+		Channel.prototype.removeUser = function(u) {
+			var index = this.listU.indexOf(u);
+			this.listU.splice(index,1);
+		}
+		return Channel;
+	})();
+	
+	
+	(function() {
+	
 		var app = angular.module("myChat",[]);
 		app.controller("ChatCtrl",function($scope) {
 			var socket = io('http://localhost:8089');
-			var uuid = uniqid();
-			var nickname = uuid;
+			var user = new User();
+			var nick = user.userN;
+			var realN = user.realName;
 			$scope.messages = [];
 			$scope.users = [];
 			$scope.channels = [];
 			currentChannel = "";
 			
 			$scope.sendMessage = function() {
-				var parseMsg = $scope.newMessage.split(' ');
-				var message = "";
-				switch(parseMsg[0]) {
-					case "/JOIN":
-						socket.emit("message", "JOIN " + parseMsg[1]);
-						$scope.messages.push("You have join channel : " + parseMsg[1]);
-						$scope.channels.push(parseMsg[1]);
-						currentChannel = parseMsg[1];
-						$scope.newMessage = undefined;
-						$scope.$apply();
-						break;
-					case "/NICK":
-						socket.emit("message", "NICK " + parseMsg[1]);
-						$scope.messages.push("You have change your nickname : " + parseMsg[1]);
-						socket.emit("message","USER " + parsingMsg[1] + " 0 * : " + parsingMsg[1]);
-						$scope.newMessage = undefined;
-						$scope.$apply();
-						break;
-					case "/NAMES":
-						//users on every channel
-						socket.emit("message","NAMES");
-						socket.on("message",function(msg) {
-							$scope.$apply(function(){
-								$scope.messages.push(msg);
-							});
-						});
-						$scope.newMessage = undefined;
-						break;
-					case "/LIST":
-						//list every channels with their topic
-						socket.emit("message","LIST");
-						$scope.newMessage = undefined;
-						break;
-					case "/PART":
-						//leave the channel
-						socket.emit("message","PART " + parsingMsg[1]);
-						$scope.newMessage = undefined;
-						break;
-					case "/QUIT":
-						//leave the server
-						socket.emit("message","QUIT");
-						$scope.newMessage = undefined;
-						break;
-					case "/WHO":
-						//users in the channel
-						socket.emit("message","WHO " + parsingMsg[1]);
-						$scope.newMessage = undefined;
-						break;
-					default:
-						socket.emit("message","PRIVMSG " + currentChannel + " : " + $scope.newMessage);
-						$scope.messages.push("Gilo :" + $scope.newMessage);
-						$scope.newMessage = undefined;
-						$scope.$apply();
+			
+				var cmd = $scope.newMessage.match(/^\/[a-z]+/g);
+				if(cmd!=null) {
+					var string = $scope.newMessage.split(cmd)[1];
+					switch(cmd[0]) {
+						case "/join":
+							socket.emit("message", "JOIN" + string);
+							$scope.messages.push("You have join channel : " + string);
+							$scope.channels.push(string);
+							currentChannel = string;
+							$scope.newMessage = undefined;
+							$scope.$apply();
+							break;
+						case "/nick":
+							socket.emit("message", "NICK" + string);
+							socket.emit("message","USER" + string + " 0 * :" + string);
+							$scope.newMessage = undefined;
+							break;
+						case "/names":
+							//users on every channel
+							socket.emit("message","NAMES");
+							$scope.newMessage = undefined;
+							break;
+						case "/list":
+							//list every channels with their topic
+							socket.emit("message","LIST");
+							$scope.newMessage = undefined;
+							break;
+						case "/part":
+							//leave the channel
+							socket.emit("message","PART" +string);
+							$scope.newMessage = undefined;
+							break;
+						case "/quit":
+							//leave the server
+							socket.emit("message","QUIT");
+							$scope.newMessage = undefined;
+							break;
+						case "/who":
+							//users in the channel
+							socket.emit("message","WHO" + string);
+							$scope.newMessage = undefined;
+							break;
+						case "/msg":
+							//messages
+							socket.emit("message","PRIVMSG" + currentChannel + " : " + $scope.newMessage);
+							$scope.messages.push(nick + ": " + $scope.newMessage);
+							$scope.newMessage = undefined;
+							$scope.$apply();
+							break;
+						default:
+							break;
+					}
 				}
 			}
 			
 			socket.on("message",function(msg) {
-				$scope.$apply(function(){
-					$scope.messages.push(msg);
-			  });
+					//error message && response message
+					if(msg.match(/^[:][a-zA-Z0-9]+[ ]PRIVMSG[ ][#]?[a-zA-Z0-9]+[ ][:][ ][a-zA-Z0-9 ]+$/)) {
+						var nck = msg.match(/^:[a-zA-Z0-9]+/g)[0];
+						nck.replace(":","");
+						var command = msg.match(/^[:][a-zA-Z0-9]+[ ]PRIVMSG[ ][#]?[a-zA-Z0-9]+[ ][:][ ]/g);
+						var m = msg.split(command)[1];
+						$scope.messages.push(nck + " : " + m);
+						$scope.$apply();
+					}
+					else if(msg.includes("331")===true) {
+						$scope.messages.push("You have join the channel");
+						$scope.$apply();
+					}
+					else if((msg.includes("NOTICE AUTH")===true)&&(msg.includes("Looking up")===true)) {
+						$scope.messages.push("You have join the server");
+						$scope.$apply();
+					}
+					else if(msg.includes("431")===true) {
+						$scope.messages.push("No nickname given");
+						$scope.$apply();
+					}
+					else if(msg.includes("433")===true) {
+						$scope.messages.push("Nickname already use");
+						$scope.$apply();
+					}
+					else if(msg.includes("403")===true) {
+						$scope.messages.push("No such channel");
+						$scope.$apply();
+					}
+					else if(msg.includes("404")===true) {
+						$scope.messages.push("Cannot send to channel");
+						$scope.$apply();
+					}
+					else if(msg.includes("411")===true) {
+						$scope.messages.push("No recipient give");
+						$scope.$apply();
+					}
+					else if(msg.includes("412")===true) {
+						$scope.messages.push("No text to send");
+						$scope.$apply();
+					}
+					else if(msg.includes("421")===true) {
+						$scope.messages.push("Unknown command");
+						$scope.$apply();
+					}
+					else if(msg.includes("451")===true) {
+						$scope.messages.push("You have not registered");
+						$scope.$apply();
+					}
+					else if(msg.includes("442")===true) {
+						$scope.messages.push("You are not on that channel");
+						$scope.$apply();
+					}
+					else if(msg.includes("461")===true) {
+						$scope.messages.push("Not enough parameters");
+						$scope.$apply();
+					}
+					else if(msg.includes("471")===true) {
+						$scope.messages.push("Channel is full");
+						$scope.$apply();
+					}
+					else if(msg.includes("462")===true) {
+						$scope.messages.push("Already registered");
+						$scope.$apply();
+					}
+					else if(msg.includes("473")===true) {
+						$scope.messages.push("Connot join the invitation");
+						$scope.$apply();
+					}
+					else if(msg.includes("474")===true) {
+						$scope.messages.push("You're banned from this channel");
+						$scope.$apply();
+					}
+					else if(msg.includes("475")===true) {
+						$scope.messages.push("You're banned from this channel");
+						$scope.$apply();
+					}
+					// response
+					else if(msg.includes("475")===true) {
+						$scope.messages.push("You're banned from this channel");
+						$scope.$apply();
+					}
+					
+					
 			});
 		});
 	})();

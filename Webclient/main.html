@@ -4,13 +4,11 @@
 		<link rel="stylesheet" href="CSS/style.css" />
 		<link rel="stylesheet" href="CSS/footer-distributed.css">
 		<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css">
-		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
-		<script src="verifForm1.js"></script>
-		<script src="verifForm2.js"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.5.6/angular.min.js"></script>
 
 	</head>
 	<body>
-		<div id="page">
+		<div id="page" ng-app="myForm">
 			<header>
 				<center><img id="banniere" src="IMAGE/banniere.png" alt="" /></center>
 			</header>
@@ -20,7 +18,7 @@
 				</div>
 				<div class="flexbox-container">
 					<section id="connexionGuest" class="formulaire">
-						<form action="#" method="post" class="formType">
+						<form action="index.html" method="post" class="formType">
 							<div class="form">
 								<fieldset>
 									<legend>Invites</legend>
@@ -30,31 +28,33 @@
 							</div>
 						</form>
 					</section>
-					<section ng-app="myForm" ng-controller="form1Ctrl" id="connexion" class="formulaire">
-						<form ng-submit="" class="formType">
+					<section ng-controller="form1Ctrl" id="connexion" class="formulaire">
+						<form ng-submit="index.html" class="formType">
 							<div class="form">
 								<fieldset>
 									<legend>Connexion</legend>
-									<p><label for="pseudo">Pseudo</label><input type="text" ng-model="user.name" ng-pattern="test1" required/></p>
-									<p><label for="mdp">mot de passe</label><input type="password" required ng-pattern="mdp"/></p>
+									<p><label for="pseudo">Pseudo</label><input type="text" ng-model="nickname"/></p>
+									<p><label for="pwd">mot de passe</label><input type="password" ng-model="pwd"/></p>
+									<p><label for="channel">Server</label><input type="text" ng-model="server"/></p>
+									<p><label for="port">Port</label><input type="text" ng-model="port"/></p>
 								</fieldset>
-								<input type="submit" name="submit" value="Connexion" />
+								<input value="Connexion"/>
 							</div>
 						</form>
 					</section>
 					<section id="inscription" class="formulaire">
-					<form action="#" method="post" class="formType">
+					<form action="#" method="post" class="formType" name="myInscript">
 						<div class="form">
 							<fieldset>
 								<legend>Inscription</legend>
-								<p><label for="nom">Nom</label><input type="text"/></p>
-								<p><label for="prenom">Prenom</label><input type="text"/></p>
-								<p><label for="pseudo">Pseudo</label><input type="text"/></p>
-								<p><label for="mail">mail</label><input type="mail"/></p>
-								<p><label for="mdp">mot de passe</label><input type="password"/></p>
+								<p><label for="name">Nom</label><input type="text" ng-model="name"/></p>
+								<p><label for="firstname">Prenom</label><input type="text" ng-model="firstname"/></p>
+								<p><label for="pseudo">Pseudo</label><input type="text" ng-model="pseudo"/></p>
+								<p><label for="mdp">mot de passe</label><input type="password" ng-model="mdp"/></p>
 								<p><label for="mdpConf">confirmation mdp</label><input type="password"/></p>
+								<p><label for="channel1">channel</label><input type="text" ng-model="chn"/></p>
 							</fieldset>
-							<input type="submit" name="submit" value="Soumettre" />
+							<input type="submit" name="submit" value="Soumettre"/>
 						</div>
 					</form>
 					</section>
@@ -85,5 +85,9 @@
 
 		</footer>
 		</div>
+
 	</body>
+	<script>
+
+	</script>
 </html>
