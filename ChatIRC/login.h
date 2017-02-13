@@ -17,19 +17,31 @@ class Login : public QDialog
     
 public:
     explicit Login(QWidget *parent = 0);
-    bool doConnect();
-    bool doConnect(QString username);
-    bool doConnect(QString username,QString password);
+
+    //Connection to server
+    void doConnect();
+    void sendInfos();
+
+    //Connection to channels
+    void joinChannels(QListWidget *list);
+    QList<QString>* convertChannelList(QListWidget *list);
     ~Login();
+
 
 private slots:
     void on_pushButton_connect_clicked();
     void on_pushButton_guest_clicked();
 
+    //Channels to join at login
+    void on_pushButton_addChannel_clicked();
+    void on_channelList_itemClicked(QListWidgetItem *item);
+    void on_pushButton_deleteChannel_clicked();
+
 private:
     MainFrame *main;
     QTcpSocket *socket;
     Ui::Login *ui;
+    QList<QString>* channelsToJoin;
 };
 
 #endif // LOGIN_H

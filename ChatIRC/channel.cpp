@@ -122,13 +122,17 @@ void Channel::change(QString newChannel)
 }
 
 /*
- * Chanenl: Current channel name getter
+ * Channel: Current channel name getter
  */
 
 QString Channel::channelName()
 {
     return currentKey;
 }
+
+/*
+ * User list functions
+ */
 
 
 void Channel::addUser(QString user, QString channel)

@@ -22,15 +22,18 @@ void Login::on_pushButton_connect_clicked()
 {
     QString username = ui->lineEdit_username->text();
     QString password = ui->lineEdit_pass->text();
-    if(username == NULL){
-        on_pushButton_guest_clicked();
-    }
-    else
+    doConnect();
+    if(username != NULL)
     {
-        if (password == NULL)
-            doConnect(username);
-        else
-            doConnect(username,password);
+        if(password != NULL)
+        {
+            password.prepend("PASS ");
+            password.append('\n');
+            socket->write(password.toLatin1().data());
+            socket->waitForConnected(3000);
+        }
+        sendInfos();
+        joinChannels(ui->channelList);
     }
 }
 
@@ -41,7 +44,11 @@ void Login::on_pushButton_guest_clicked()
 }
 
 
-bool Login::doConnect(){
+/*
+ * Establish connection with server
+ */
+void Login::doConnect()
+{
     QString host= ui->lineEdit_host->text();
     int port = ui->lineEdit_port->text().toInt(0,10);
     socket = new QTcpSocket(this);
@@ -50,44 +57,69 @@ bool Login::doConnect(){
     {
         qDebug() << "Error: " << socket->errorString();
         QMessageBox::information(this,"Error","Host not found");
-        return false;
     }
     else{
         main=new MainFrame(this,socket);
         main->show();
-        return true;
     }
+}
+
+/*
+ * Send informations about identity
+ */
+void Login::sendInfos()
+{
+    QString host= ui->lineEdit_host->text();
+    int port = ui->lineEdit_port->text().toInt(0,10);
+    QString username=ui->lineEdit_username->text();
+    main->setWindowTitle(username +"@"+host+":"+QString::number(port));
+    QString nick=username;
+    nick.prepend("NICK ");
+    nick.append('\n');
+    socket->write(nick.toLatin1().data());
+    QString user=username.prepend("USER "+username+" 0 * : ");
+    user.append('\n');
+    socket->write(user.toLatin1().data());
+}
+
+
+/*
+ * List of channels to join interactions
+ */
+void Login::on_pushButton_addChannel_clicked()
+{
+    ui->channelList->addItem("#general");
+}
+
+void Login::on_pushButton_deleteChannel_clicked()
+{
+    ui->channelList->takeItem(ui->channelList->currentRow());
+}
+
+void Login::on_channelList_itemClicked(QListWidgetItem *item)
+{
+    item->setFlags(item->flags() | Qt::ItemIsEditable);
+    ui->channelList->editItem(item);
 }
 
 
 
-bool Login::doConnect(QString username){
-    if(doConnect())
-    {
-        QString host= ui->lineEdit_host->text();
-        int port = ui->lineEdit_port->text().toInt(0,10);
-        main->setWindowTitle(username +"@"+host+":"+QString::number(port));
-        QString nick=username;
-        nick.prepend("NICK ");
-        nick.append('\n');
-        socket->write(nick.toLatin1().data());
-        QString user=username.prepend("USER "+username+" 0 * : ");
-        user.append('\n');
-        socket->write(user.toLatin1().data());
-        return true;
-    }
-    return false;
+QList<QString>* Login::convertChannelList(QListWidget *channels){
+    QList<QString> *channelsToJoin=new QList<QString>;
+    for(int i = 0; i < channels->count(); i++)
+        channelsToJoin->append(channels->item(i)->text());
+    return channelsToJoin;
 }
 
 
-bool Login::doConnect(QString username,QString password){
-    if(doConnect(username))
+void Login::joinChannels(QListWidget *channels)
+{
+    QList<QString>* channelsToJoin=convertChannelList(channels);
+    for(int i = 0; i < channelsToJoin->size() ; i++)
     {
-        password.prepend("PASS ");
-        password.append('\n');
-        QByteArray pass=password.toLatin1();
-        socket->write(pass.data());
-        return true;
+        QString chan = channelsToJoin->at(i);
+        chan.append('\n');
+        chan.prepend("JOIN ");
+        socket->write(chan.toLatin1().data());
     }
-    return false;
 }

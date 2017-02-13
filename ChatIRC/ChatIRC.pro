@@ -18,13 +18,15 @@ SOURCES += main.cpp\
     login.cpp \
     mainframe.cpp \
     parseur.cpp \
-    channel.cpp
+    channel.cpp \
+    msglist.cpp
 
 HEADERS  += \
     login.h \
     mainframe.h \
     channel.h \
-    parseur.h
+    parseur.h \
+    msglist.h
 
 FORMS    += \
     login.ui \

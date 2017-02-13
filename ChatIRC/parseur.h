@@ -2,6 +2,7 @@
 #define PARSEUR_H
 
 #include <QString>
+#include <QTcpSocket>
 
 #include "channel.h"
 
@@ -15,18 +16,20 @@ bool in_isJoinNote(QString string);
 bool in_isPartNote(QString string);
 bool in_isPrivMesg(QString string);
 bool in_isWhisMesg(QString string);
+bool in_isPing(QString string);
 
 public:
     //Initialisation functions
     void setChannel(Channel *channel);
 
     //Parsing functions
-    void out(QString *string);
+    bool out(QString *string);
     void in(QString string);
 
 private:
     //Pointer to the channel created in mainframe
     Channel *channel;
+    QTcpSocket *socket;
 };
 
 #endif // PARSEUR_H

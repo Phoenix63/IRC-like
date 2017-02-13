@@ -17,7 +17,7 @@ void Parseur::setChannel(Channel *chan)
  * Parse::Out: Parse client request
  */
 
-void Parseur::out(QString *string)
+bool Parseur::out(QString *string)
 {
     channel->appendCurrent(*string);
     if      (string->startsWith("/nick"))  string->replace(QString("/nick"), QString("NICK"));
@@ -42,6 +42,7 @@ void Parseur::out(QString *string)
     else if (string->startsWith("/quit"))
     {
         string->replace(QString("/quit"), QString("QUIT"));
+        return false;
     }
     else if (string->startsWith("/who"))     string->replace(QString("/who"), QString("WHO"));
     else if (string->startsWith("/msg"))
@@ -50,7 +51,8 @@ void Parseur::out(QString *string)
         channel->joinWhisper(string->split(' ').at(1));
     }
     else if (channel->channelName() != "\"Debug\"")   string->prepend("PRIVMSG " + channel->channelName() + " :");
-    else                                string->prepend("PRIVMSG ");
+    else                                              string->prepend("PRIVMSG ");
+    return true;
 }
 
 /*
@@ -70,6 +72,7 @@ void Parseur::in(QString string)
     if (!in_isPartNote(string))
     if (!in_isPrivMesg(string))
     if (!in_isWhisMesg(string))
+    if (!in_isPing(string))
     channel->appendChannel(string+'\n', "\"Debug\"","");
 }
 
@@ -142,4 +145,17 @@ bool Parseur::in_isWhisMesg(QString string)
         return false;
     }
     return true;
+}
+
+bool Parseur::in_isPing(QString string)
+{
+    if(string.contains(QRegularExpression("^PING\\s:.+$")))
+    {
+        int j = string.indexOf(QRegularExpression(":.+$"));
+        QString pong = string.right(string.length()-j)+'\n';
+        pong.prepend("PONG ");
+        socket->write(pong.toLatin1().data());
+            return false;
+    }
+            return true;
 }
