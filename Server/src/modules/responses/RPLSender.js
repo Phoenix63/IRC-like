@@ -1,6 +1,6 @@
 import Client from './../client/client';
 import Channel from './../channel/Channel';
-
+import Client from './../client/client';
 import config from './../../config.json';
 
 let RPLSender = {
@@ -117,17 +117,30 @@ let RPLSender = {
      *
      * @param {string} oldname
      * @param {string} newname
-     * @param {Client} client
+     * @param {Client} renamedClient
      * @static
      */
-    NICK: (oldname, newname, client) => {
-        if (client) {
-            client.channels.forEach((chan) => {
-                chan.broadcast(':' + oldname + ' NICK ' + newname, client)
+    NICK: (oldname, newname, renamedClient) => {
+        var clientsTmp = [];
+        clientsTmp.push(renamedClient);
+        function areCommonChannel(client1, client2){
+            client1.channels.forEach((channelsClient1) =>{
+               client2.channels.forEach((channelsClient2)=>{
+                   if(channelsClient1==channelsClient2){
+                       return true;
+                   }
+               });
             });
+            return false;
         }
-        client.socket.send(':'+oldname+' NICK '+newname);
-
+        Client.list().forEach((client) => {
+            if(areCommonChannel(client,renamedClient) && clientsTmp.indexOf(client) != -1 && client != renamedClient){
+                clientsTmp.push(client)
+            }
+        });
+        clientsTmp.forEach((client) => {
+            client.socket.send(':' + oldname + ' NICK ' + newname, renamedClient);
+        });
     },
     /**
      *
