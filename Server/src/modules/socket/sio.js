@@ -5,6 +5,7 @@ let io = sio(config.sio_server.port);
 
 function createServer(callback) {
     io.on('connection', (socket) => {
+        socket.remoteAddress = socket.request.connection.remoteAddress;
         callback(socket);
         socket.manager.emit('connect', socket);
 

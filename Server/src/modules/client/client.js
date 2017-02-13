@@ -6,16 +6,8 @@ import ERRSender from './../responses/ERRSender';
 import RPLSender from './../responses/RPLSender';
 import crypto from 'crypto';
 
-let redis = require('redis');
-let conf = require('./../../ENV.json');
-
-let client = redis.createClient({host: conf.redis.host, port:conf.redis.port});
-
-client.auth(conf.redis.pass);
-
-client.on("error", function(err) {
-    console.log(err);
-});
+import Redis from '../data/RedisInterface';
+let redisClient = Redis.instance;
 
 
 let clients = [];
@@ -160,14 +152,15 @@ class Client {
         // command USER valid
         if(this._pass) {
             // user should not be a guest
-            client.hgetall("PASS", (err, obj) => {
-                if(obj && obj[identity] && obj[identity] !== this._pass) {
+            redisClient.getPass(identity, (err, pass) => {
+                if(!err && pass != this._pass) {
                     ERRSender.ERR_PASSWDMISMATCH(this);
                     return false;
-                } else {
-                    if(!obj || !obj[identity]) {
-                        client.hmset("PASS", identity, this._pass);
+                }  else {
+                    if(err) {
+                        redisClient.setPass(identity, this._pass);
                     }
+
                     this._identity = identity;
                     this._socket.logger._CLIENT_LOGGED();
 
@@ -175,16 +168,17 @@ class Client {
                     RPLSender.RPL_MOTD(this.socket);
                     RPLSender.RPL_ENDOFMOTD(this.socket);
 
-                    client.get("admin", (err, reply) => {
+                    redisClient.getAdmin((reply) => {
                         if (!reply) {
                             this._socket.logger._CLIENT_IS_NOW_ADMIN();
                             this.addFlag('o');
-                            client.set("admin", identity, redis.print);
+                            redisClient.setAdmin(this);
                         } else if (reply === identity) {
                             this._socket.logger._CLIENT_IS_NOW_ADMIN();
                             this.addFlag('o');
                         }
                     });
+
                 }
             });
         } else {
