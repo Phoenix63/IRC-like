@@ -119,11 +119,12 @@ let RPLSender = {
      * @static
      */
     NICK: (oldname, client) => {
-        if (client) {
+        /*if (client) {
             client.channels.forEach((chan) => {
                 chan.broadcast(':' + oldname + ' NICK ' + client.name, client)
             });
-        }
+        }*/
+        client.socket.send(':'+oldname+' NICK '+client.name);
 
     },
     /**
@@ -132,8 +133,19 @@ let RPLSender = {
      * @static
      */
     HEADER: (socket) => {
-        socket.send(':' + config.ip + ' NOTICE AUTH :*** Looking up your hostname...');
-        socket.send(':' + config.ip + ' NOTICE AUTH :*** Found your hostname');
+        socket.send(':' + config.ip + ' NOTICE AUTH :*** YOU ARE CONNECTED');
+    },
+
+    RPL_MOTDSTART: (socket) => {
+        socket.send(':'+config.ip+' 375 :- '+config.ip+' Message of the day - ');
+    },
+
+    RPL_MOTD: (socket) => {
+        socket.send(':'+config.ip+' 372 :- Welcome '+socket.client.identity);
+    },
+
+    RPL_ENDOFMOTD: (socket) => {
+        socket.send(':'+config.ip+' 376 :End of /MOTD command');
     }
 };
 export default RPLSender

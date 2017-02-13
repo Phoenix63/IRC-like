@@ -104,6 +104,7 @@ class Client {
      */
     get name() {
         return this._name || 'Guest_' + this._id;
+
     }
 
     /**
@@ -170,6 +171,10 @@ class Client {
                     this._identity = identity;
                     this._socket.logger._CLIENT_LOGGED();
 
+                    RPLSender.RPL_MOTDSTART(this.socket);
+                    RPLSender.RPL_MOTD(this.socket);
+                    RPLSender.RPL_ENDOFMOTD(this.socket);
+
                     client.get("admin", (err, reply) => {
                         if (!reply) {
                             this._socket.logger._CLIENT_IS_NOW_ADMIN();
@@ -185,6 +190,9 @@ class Client {
         } else {
             this._identity = 'GUEST_' + identity;
             this._socket.logger._CLIENT_GUEST();
+            RPLSender.RPL_MOTDSTART(this.socket);
+            RPLSender.RPL_MOTD(this.socket);
+            RPLSender.RPL_ENDOFMOTD(this.socket);
         }
         return true;
     }
@@ -214,8 +222,8 @@ class Client {
         }
         if (!error) {
             this.socket.logger._USER_CHANGE_NICK(name);
-            RPLSender.NICK(this);
             this._name = name;
+            RPLSender.NICK(name, this);
         }
 
     }
