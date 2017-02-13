@@ -221,8 +221,8 @@ class Client {
         }
         if (!error) {
             this.socket.logger._USER_CHANGE_NICK(name);
+            RPLSender.NICK(this.name, name, this);
             this._name = name;
-            RPLSender.NICK(name, this);
         }
 
     }

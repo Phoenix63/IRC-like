@@ -2,8 +2,9 @@
 
 import net from 'net';
 import config from './../../config.json';
+import shortid from 'shortid';
 
-const interval = 30000;
+const interval = 60000;
 
 function createServer(callback) {
     let server = net.createServer((socket) => {
@@ -16,12 +17,23 @@ function createServer(callback) {
             socket.destroy();
         });
 
-        setInterval(() => {
-            socket.write('PING :' + config.ip + '\n');
-        }, interval/2);
+        socket.life = 1;
+        socket.resetTimeout = function() {
+            clearTimeout(socket.interval);
+            if(socket.life <= 0) {
+                socket.destroy();
+            }
+            socket.life--;
+            socket.interval = setTimeout(() => {
+                socket.manager.send('PING :'+shortid.generate());
+            }, interval/2);
+        };
+
+        socket.resetTimeout();
 
         socket.on('data', (data) => {
-
+            socket.life = 1;
+            socket.resetTimeout();
 
             socket.manager.emit('data', data);
 

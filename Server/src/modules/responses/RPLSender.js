@@ -116,16 +116,17 @@ let RPLSender = {
     /**
      *
      * @param {string} oldname
+     * @param {string} newname
      * @param {Client} client
      * @static
      */
-    NICK: (oldname, client) => {
+    NICK: (oldname, newname, client) => {
         if (client) {
             client.channels.forEach((chan) => {
-                chan.broadcast(':' + oldname + ' NICK ' + client.name, client)
+                chan.broadcast(':' + oldname + ' NICK ' + newname, client)
             });
         }
-        client.socket.send(':'+oldname+' NICK '+client.name);
+        client.socket.send(':'+oldname+' NICK '+newname);
 
     },
     /**
