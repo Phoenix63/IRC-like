@@ -48,7 +48,7 @@ let RPLSender = {
             if(channel.isUserOperator(u)) {
                 delimiter += '@';
             }
-            if(channel.isUserVoice(u)) {
+            else if(channel.isUserVoice(u)) {
                 delimiter += '+';
             }
             client.socket.send(

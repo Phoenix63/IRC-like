@@ -69,7 +69,7 @@ class Redis {
      * @param {function(err, reply)} callback
      */
     getPass(identity, callback=function(err, reply){}) {
-        this._client.hgetall("PASS", (err, obj) => {
+        this._client.hgetall("PASS",(err, obj) => {
             if(obj && obj[identity]) {
                 callback(null, obj[identity]);
             } else {
