@@ -19,11 +19,11 @@ function createServer(callback) {
         socket.timeoutKill = null;
 
         socket.timeoutReset = () => {
-            if(interval>0) {
+            if (interval > 0) {
                 clearTimeout(socket.timeoutKill);
                 socket.timeoutKill = setTimeout(() => {
-                    socket.write('PING :'+config.ip+'\n');
-                },interval/2);
+                    socket.write('PING :' + config.ip + '\n');
+                }, interval / 2);
             }
         };
 

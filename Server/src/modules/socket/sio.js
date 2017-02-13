@@ -1,15 +1,11 @@
-"use strict"
-
+"use strict";
 import config from './../../config.json';
 import sio from 'socket.io';
-
 let io = sio(config.sio_server.port);
-
-var watchers = {};
-
 
 function createServer(callback) {
     io.on('connection', (socket) => {
+        socket.remoteAddress = socket.request.connection.remoteAddress;
         callback(socket);
         socket.manager.emit('connect', socket);
 
@@ -35,4 +31,4 @@ function createServer(callback) {
 
 module.exports = {
     create: createServer
-}
+};

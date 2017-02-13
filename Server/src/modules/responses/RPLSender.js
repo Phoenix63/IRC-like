@@ -20,15 +20,14 @@ let RPLSender = {
 
         let ret = ':' + config.ip + ' 353 ' + client.name + ' ' + sep + ' ' + channel.name;
         let us = '';
-        channel.users.forEach((u) => {
+        channel.users.forEach((user) => {
             let delimiter = '';
-            if (channel.isOperator(u)) {
+            if (channel.isUserOperator(user)) {
                 delimiter = '@';
-            } else if (channel.isVoice(u)) {
+            } else if (channel.isUserVoice(user)) {
                 delimiter = '+';
             }
-            us += ' ' + delimiter + channel.usersFlags[u.id].client.name;
-
+            us += ' ' + delimiter + user.name;
         });
 
         if (us) {
@@ -46,10 +45,11 @@ let RPLSender = {
     RPL_WHOREPLY: (client, channel) => {
         channel.users.forEach((u) => {
             let delimiter = '';
-            if (channel.usersFlags[u.id].flags.indexOf('o') >= 0) {
-                delimiter = '@';
-            } else if (channel.usersFlags[u.id].flags.indexOf('v') >= 0) {
-                delimiter = '+';
+            if(channel.isUserOperator(u)) {
+                delimiter += '@';
+            }
+            else if(channel.isUserVoice(u)) {
+                delimiter += '+';
             }
             client.socket.send(
                 ':' + config.ip + ' 352 ' + client.name + ' ' + channel.name + ' ~'
@@ -120,11 +120,12 @@ let RPLSender = {
      * @static
      */
     NICK: (oldname, client) => {
-        if(client) {
+        if (client) {
             client.channels.forEach((chan) => {
                 chan.broadcast(':' + oldname + ' NICK ' + client.name, client)
             });
         }
+        client.socket.send(':'+oldname+' NICK '+client.name);
 
     },
     /**
@@ -133,9 +134,19 @@ let RPLSender = {
      * @static
      */
     HEADER: (socket) => {
-        socket.send(':'+config.ip+' NOTICE AUTH :*** Looking up your hostname...');
-        socket.send(':'+config.ip+' NOTICE AUTH :*** Found your hostname');
+        socket.send(':' + config.ip + ' NOTICE AUTH :*** YOU ARE CONNECTED');
+    },
+
+    RPL_MOTDSTART: (socket) => {
+        socket.send(':'+config.ip+' 375 :- '+config.ip+' Message of the day - ');
+    },
+
+    RPL_MOTD: (socket) => {
+        socket.send(':'+config.ip+' 372 :- Welcome '+socket.client.identity);
+    },
+
+    RPL_ENDOFMOTD: (socket) => {
+        socket.send(':'+config.ip+' 376 :End of /MOTD command');
     }
 };
-
 export default RPLSender

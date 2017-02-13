@@ -9,4 +9,4 @@ import ERRSender from './../responses/ERRSender';
  */
 module.exports = function (socket, command) {
     socket._socket.destroy();
-}
+};

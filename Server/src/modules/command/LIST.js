@@ -10,8 +10,5 @@ module.exports = function (socket, command) {
         ERRSender.ERR_NOTREGISTERED(socket.client, 'LIST');
         return;
     }
-
     RPLSender.LIST(socket.client, command[1]);
-
-
-}
+};

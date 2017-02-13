@@ -38,7 +38,7 @@ class Logger {
     };
 
     _USER_CHANGE_NICK(newName) {
-        console.log(colors.yellow(this.client.name) + colors.green(' change is nickname to ' + newName));
+        console.log(colors.yellow(this.client.name) + colors.green(' change his nickname to ' + newName));
     };
 
     _SEND_TO_CLIENT(message) {
@@ -46,8 +46,23 @@ class Logger {
     };
 
     _USER_SEND_CMD(message) {
+        if(message.indexOf('PASS ')===0) {
+            message = 'PASS ********';
+        }
         console.log(colors.grey('[from] ') + colors.red(this.client.name) + '>> ' + message);
     };
+
+    _CLIENT_LOGGED() {
+        console.log(colors.yellow(this.client.name + ' is now logged as '+this.client.identity));
+    };
+
+    _CLIENT_GUEST() {
+        console.log(colors.yellow(this.client.name + ' is a guest: '+this.client.identity));
+    }
+
+    _CLIENT_IS_NOW_ADMIN() {
+        console.log(colors.yellow(this.client.identity+' is now ')+colors.red('ADMIN'));
+    }
 
 }
 

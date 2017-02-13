@@ -3,3 +3,4 @@
 /test/
 test.js
 .idea
+/src/ENV.json
