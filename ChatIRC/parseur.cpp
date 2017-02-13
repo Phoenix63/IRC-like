@@ -17,6 +17,10 @@ void Parseur::setChannel(Channel *chan)
  * Parse::Out: Parse client request
  */
 
+void Parseur::setSocket(QTcpSocket *sock){
+    socket = sock;
+}
+
 bool Parseur::out(QString *string)
 {
     channel->appendCurrent(*string);
@@ -33,10 +37,8 @@ bool Parseur::out(QString *string)
                 channel->leave(channel->channelName());
             }
             else
-            {
-                qDebug() << *string << " , "<< string->split(' ').at(1);
                 channel->leave(string->split(' ').at(1).left(string->split(' ').at(1).length()-1));
-            }
+
         }
     else if (string->startsWith("/list"))  string->replace(QString("/list"), QString("LIST"));
     else if (string->startsWith("/quit"))
@@ -64,7 +66,6 @@ void Parseur::in(QString string)
     // Get rid of spaces and \n
     string = string.left(string.length() - 1);
     string = string.right(string.length() - 2);
-
     //Parse the message starting from error code to detect server name
     if (!in_isChanList(string))
     if (!in_isNameList(string))
@@ -72,8 +73,8 @@ void Parseur::in(QString string)
     if (!in_isPartNote(string))
     if (!in_isPrivMesg(string))
     if (!in_isWhisMesg(string))
-    if (!in_isPing(string))
-    channel->appendChannel(string+'\n', "\"Debug\"","");
+    if (in_isPing(string))
+        channel->appendChannel(string+'\n', "\"Debug\"","");
 }
 
 bool Parseur::in_isChanList(QString string)
@@ -149,13 +150,13 @@ bool Parseur::in_isWhisMesg(QString string)
 
 bool Parseur::in_isPing(QString string)
 {
-    if(string.contains(QRegularExpression("^PING\\s:.+$")))
+    if(string.contains(QRegularExpression("^.+\\sPING\\s:.+$")))
     {
         int j = string.indexOf(QRegularExpression(":.+$"));
         QString pong = string.right(string.length()-j)+'\n';
         pong.prepend("PONG ");
         socket->write(pong.toLatin1().data());
-            return false;
+        return false;
     }
-            return true;
+    return true;
 }

@@ -21,6 +21,7 @@ bool in_isPing(QString string);
 public:
     //Initialisation functions
     void setChannel(Channel *channel);
+    void setSocket(QTcpSocket *socket);
 
     //Parsing functions
     bool out(QString *string);

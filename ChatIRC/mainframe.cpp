@@ -15,6 +15,7 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
     channel.setUi(ui->channelList, ui->messagePrinter,ui->userList,ui->topicDisplay);
     parseur.setChannel(&channel);
+    parseur.setSocket(socket);
     msgList.setMsgSender(ui->messageSender);
     ui->messageSender->installEventFilter(this);
 }
