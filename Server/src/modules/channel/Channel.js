@@ -141,10 +141,8 @@ class Channel {
      * @param {Client} client
      */
     setUserOperator(client) {
-        console.log(this._usersFlags[client.id]);
         if (this._usersFlags[client.id].indexOf('o')<0) {
             this._usersFlags[client.id] += 'o';
-            console.log(this._usersFlags[client.id]);
         }
     }
     /**
@@ -152,10 +150,8 @@ class Channel {
      * @param {Client} client
      */
     setUserVoice(client) {
-        console.log(this._usersFlags[client.id]);
         if (this._usersFlags[client.id].indexOf('v')<0) {
             this._usersFlags[client.id] += 'v';
-            console.log(this._usersFlags[client.id]);
         }
     }
     /**
