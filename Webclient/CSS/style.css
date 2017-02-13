@@ -6,6 +6,8 @@ html {
 }
 
 #page {
+	display:block;
+	position:relative;
 	width: 1280px;
 	margin: auto; 
 	height:100%;
@@ -14,17 +16,6 @@ html {
 #banniere {
 	width:100%;
 	height:100%;
-}
-
-
-
-footer {
-	position: absolute;
-	bottom: 0;
-}
-
-@media (max-height:800px) {
-	footer { position: static; }
 }
 
 .formulaire {
@@ -84,6 +75,7 @@ footer {
 }
 
 #box {
+	position:relative;
 	margin:25px;
 	width:1230px;
 	height:800px;
@@ -105,6 +97,7 @@ footer {
 	position:relative;
 	margin:auto;
 	margin-top:10px;
+	overflow:scroll;
 	width:500px;
 	height:50px;
 	border:1px black groove;
@@ -118,19 +111,36 @@ footer {
 
 #channelBox {
 	display:inline-block;
+	position:absolute;
+	left:10px;
 	margin-top:25px;
-	margin-left:10px;
 	width:200px;
 	height:750px;
 	background:grey;
 }
 
+#masque {
+	display:block;
+	position:fixed;
+	top:0;
+	right:0;
+	bottom:0;
+	left:0;
+	background-color: rgba(0, 0, 0, 0.5);
+	z-index=1000;
+}
+
 #msgBox {
 	display:inline-block;
+	position:absolute;
+	left:215px;
+	
 }
 
 #userBox {
 	display:inline-block;
+	position:absolute;
+	right:10px;
 	margin-top:25px;
 	width:200px;
 	height:750px;
