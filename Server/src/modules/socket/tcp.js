@@ -3,7 +3,7 @@
 import net from 'net';
 import config from './../../config.json';
 
-const interval = 0;
+const interval = 30000;
 
 function createServer(callback) {
     let server = net.createServer((socket) => {
@@ -16,18 +16,9 @@ function createServer(callback) {
             socket.destroy();
         });
 
-        socket.timeoutKill = null;
-
-        socket.timeoutReset = () => {
-            if (interval > 0) {
-                clearTimeout(socket.timeoutKill);
-                socket.timeoutKill = setTimeout(() => {
-                    socket.write('PING :' + config.ip + '\n');
-                }, interval / 2);
-            }
-        };
-
-        socket.timeoutReset();
+        setInterval(() => {
+            socket.write('PING :' + config.ip + '\n');
+        }, interval/2);
 
         socket.on('data', (data) => {
 
