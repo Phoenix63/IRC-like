@@ -25,7 +25,7 @@ function createServer(callback) {
             }
             socket.life--;
             socket.interval = setTimeout(() => {
-                socket.manager.send('PING :'+shortid.generate());
+                socket.manager.send(':'+config.ip+' PING :'+shortid.generate());
             }, interval/2);
         };
 

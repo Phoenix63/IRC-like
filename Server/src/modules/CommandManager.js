@@ -13,7 +13,8 @@ let allowedCommand = {
     'QUIT': require('./command/QUIT'),
     'WHO': require('./command/WHO'),
     'USER': require('./command/USER'),
-    'PASS': require('./command/PASS')
+    'PASS': require('./command/PASS'),
+    'PONG': function(){}
 };
 
 class CommandManager {
