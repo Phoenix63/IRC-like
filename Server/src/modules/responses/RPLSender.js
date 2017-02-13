@@ -1,4 +1,3 @@
-import Client from './../client/client';
 import Channel from './../channel/Channel';
 import Client from './../client/client';
 import config from './../../config.json';
