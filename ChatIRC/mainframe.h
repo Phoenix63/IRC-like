@@ -2,7 +2,7 @@
 #define MAINFRAME_H
 
 #include <QTcpSocket>
-#include <QDialog>
+#include <QMainWindow>
 #include <QString>
 
 #include "channel.h"
@@ -13,7 +13,7 @@ namespace Ui {
 class MainFrame;
 }
 
-class MainFrame : public QDialog
+class MainFrame : public QMainWindow
 {
     Q_OBJECT
 

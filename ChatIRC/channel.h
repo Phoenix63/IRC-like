@@ -44,7 +44,7 @@ public:
     void refreshUserList();
 
     void refreshTopic();
-
+    void changeNick(QString nick, QString newNick);
 private:
     // Qhash wich contain message: key = channel name, content = message list
     QHash<QString, QString> channels;

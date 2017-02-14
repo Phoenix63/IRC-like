@@ -16,6 +16,7 @@ bool in_isJoinNote(QString string);
 bool in_isPartNote(QString string);
 bool in_isPrivMesg(QString string);
 bool in_isWhisMesg(QString string);
+bool in_isNickEdit(QString string);
 bool in_isPing(QString string);
 
 public:

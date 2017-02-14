@@ -7,7 +7,7 @@
  */
 
 MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
-    QDialog(parent),
+    QMainWindow(parent),
     ui(new Ui::MainFrame),
     socket(socket)
 {
@@ -86,6 +86,6 @@ bool MainFrame::eventFilter(QObject *obj, QEvent *event)
         }
     } else {
         // pass the event on to the parent class
-        return QDialog::eventFilter(obj, event);
+        return QMainWindow::eventFilter(obj, event);
     }
 }

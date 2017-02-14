@@ -22,18 +22,20 @@ void Login::on_pushButton_connect_clicked()
 {
     QString username = ui->lineEdit_username->text();
     QString password = ui->lineEdit_pass->text();
-    doConnect();
-    if(username != NULL)
+    if(doConnect())
     {
-        if(password != NULL)
+        if(username != NULL)
         {
-            password.prepend("PASS ");
-            password.append('\n');
-            socket->write(password.toLatin1().data());
-            socket->waitForConnected(3000);
+            if(password != NULL)
+            {
+                password.prepend("PASS ");
+                password.append('\n');
+                socket->write(password.toLatin1().data());
+            }
+            sendInfos();
+            while (!socket->waitForReadyRead());
+            joinChannels(ui->channelList);
         }
-        sendInfos();
-        joinChannels(ui->channelList);
     }
 }
 
@@ -47,7 +49,7 @@ void Login::on_pushButton_guest_clicked()
 /*
  * Establish connection with server
  */
-void Login::doConnect()
+bool Login::doConnect()
 {
     QString host= ui->lineEdit_host->text();
     int port = ui->lineEdit_port->text().toInt(0,10);
@@ -57,10 +59,13 @@ void Login::doConnect()
     {
         qDebug() << "Error: " << socket->errorString();
         QMessageBox::information(this,"Error","Host not found");
+        return false;
     }
     else{
         main=new MainFrame(this,socket);
         main->show();
+        main->setWindowTitle("Guest@"+host+":"+QString::number(port));
+        return true;
     }
 }
 

@@ -28,7 +28,7 @@ bool Parseur::out(QString *string)
     else if (string->startsWith("/user"))  string->replace(QString("/user"), QString("USER"));
     else if (string->startsWith("/join"))  string->replace(QString("/join"), QString("JOIN"));
     else if (string->startsWith("/names")) string->replace(QString("/names"), QString("NAMES"));
-    else if (string->startsWith("/pass")) string->replace(QString("/pass"), QString("PASS"));
+    else if (string->startsWith("/pass"))  string->replace(QString("/pass"), QString("PASS"));
     else if (string->startsWith("/part"))
         {
             string->replace(QString("/part"), QString("PART"));
@@ -73,6 +73,7 @@ void Parseur::in(QString string)
     if (!in_isPartNote(string))
     if (!in_isPrivMesg(string))
     if (!in_isWhisMesg(string))
+    if (!in_isNickEdit(string))
     if (in_isPing(string))
         channel->appendChannel(string+'\n', "\"Debug\"","");
 }
@@ -142,6 +143,17 @@ bool Parseur::in_isWhisMesg(QString string)
     {
         int j = string.indexOf(QRegularExpression(":.+$"));
         channel->appendChannel(string.right(string.length()-j)+'\n', string.split(' ').at(0),string.split(' ').at(0));
+    } else {
+        return false;
+    }
+    return true;
+}
+
+bool Parseur::in_isNickEdit(QString string)
+{
+    if (string.contains(QRegularExpression("^.+\\sNICK\\s.+$"))) {
+        channel->changeNick(string.split(' ')[0], string.split(' ')[2]);
+        channel->appendChannel(string+'\n', "\"Debug\"","");
     } else {
         return false;
     }

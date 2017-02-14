@@ -165,3 +165,18 @@ void Channel::refreshTopic()
     topicText->clear();
     topicText->setText(*currentTopic);
 }
+
+
+void Channel::changeNick(QString nick, QString newNick)
+{
+    for (auto i = 0; i < users.keys().size(); i++) {
+         if (users[users.keys().at(i)].contains(nick))
+             users[users.keys().at(i)].replace(users[users.keys().at(i)].indexOf(nick), newNick);
+    }
+    if (channels.keys().contains(nick)) {
+        channels[newNick] = channels[nick];
+        channels.remove(nick);
+    }
+    refreshUserList();
+    refreshChanList();
+}

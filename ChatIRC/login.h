@@ -19,7 +19,7 @@ public:
     explicit Login(QWidget *parent = 0);
 
     //Connection to server
-    void doConnect();
+    bool doConnect();
     void sendInfos();
 
     //Connection to channels
