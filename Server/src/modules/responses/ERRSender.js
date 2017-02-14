@@ -78,7 +78,7 @@ let ERRSender = {
      * @static
      */
     ERR_NOTREGISTERED: (client, command) => {
-        client.socket.send(':' + config.ip + ' 451 * ' + command + ' :You have not registered');
+        client.socket.send(':' + config.ip + ' 451 ' + command + ' :You have not registered');
     },
     /**
      *
