@@ -10,20 +10,13 @@
 
 #messages {
     position: absolute;
-    top:0;
+    top:100px;
     left: 200px;
     right:200px;
     bottom:50px;
     background-color: #25608b;
 }
-#sendMessage {
-    position: absolute;
-    bottom: 0;
-    right: 200px;
-    left: 200px;
-    height:50px;
-    background-color: #718b3e;
-}
+
 #users {
     position: absolute;
     top: 0;
@@ -33,33 +26,45 @@
     background-color: #8b564b;
     text-align: center;
 }
-
-/*
-#content {
-    position:relative;
-    margin-top:10px;
-    width:800px;
-    height:600px;
-    border:1px black groove;
-    background:grey;
+#topic {
+    position: absolute;
+    top:0;
+    right:200px;
+    left:200px;
+    height:100px;
+    background-color: chocolate;
 }
-
-#inputcontent {
-    display:block;
-    position:relative;
-    margin:auto;
-    margin-top:10px;
-    overflow:scroll;
-    width:500px;
+#divSendMessage {
+     position: absolute;
+     bottom: 0;
+     right: 300px;
+     left: 200px;
+     height:50px;
+     background-color: #3e348b;
+ }
+#divSubmit {
+    position: absolute;
+    bottom: 0;
+    right: 200px;
+    width: 100px;
     height:50px;
-    border:1px black groove;
-    border-radius:4px;
+    background-color: #718b3e;
 }
 
-#buttonSend {
-    display:block;
-    margin:auto;
-}*/
+
+#inputSendMessage {
+    position: absolute;
+    bottom:0;
+    height:44px;
+    width:100%;
+}
+
+#submitSendMessage {
+    position: absolute;
+    bottom:0;
+    height:50px;
+    width:100%;
+}
 
 
 
