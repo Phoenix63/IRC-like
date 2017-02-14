@@ -1,12 +1,34 @@
 <% include layout-head.ejs %>
-<div id="box" ng-controller="ircCtrl">
-    <div id="channelBox">
-        <p>channels</p>
-        <div ng-repeat="channel in channels">
-            <button>{{channel}}</button>
+<div ng-controller="ircCtrl">
+
+        <div id="channels">
+            <p>liste channels</p>
+            <!--
+            <div ng-repeat="channel in channels">
+                <button>{{channel}}</button>
+            </div>
+            -->
         </div>
-    </div>
-    <div id="msgBox">
+
+            <div id="messages">
+                <p>messages du cahnnel</p>
+            </div>
+            <div id="sendMessage">
+                <p>send message</p>
+            </div>
+
+        <div id="users">
+            <p>liste users</p>
+            <!--
+            <div ng-repeat="user in users">
+                <p>{{user}}</p>
+            </div>
+            -->
+        </div>
+
+
+    <!--
+    <div id="divSendMsg">
         <p>Messages</p>
         <div id="content">
             <div ng-repeat="message in messages">
@@ -18,11 +40,8 @@
             <button type="submit" id="buttonSend">Envoyer</button>
         </form>
     </div>
-    <div id="userBox">
-        <p>users</p>
-        <div ng-repeat="user in users">
-            <p>{{user}}</p>
-        </div>
-    </div>
+    -->
+
 </div>
-<% include layout-foot.ejs %>
+</body>
+</html>
