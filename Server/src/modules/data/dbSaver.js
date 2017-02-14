@@ -1,4 +1,6 @@
 
+import Caller from './Caller';
+
 let MongoClient = require('mongodb').MongoClient;
 let config = require('./../../ENV.json');
 
@@ -6,28 +8,6 @@ import Redis from './RedisInterface';
 let redis = Redis.instance;
 
 var url = 'mongodb://'+config.mongo.user+':'+config.mongo.pass+'@'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db+config.mongo.method;
-
-
-class Caller {
-    constructor(callback) {
-        this._callback = callback;
-        this._saved = 0;
-        this._toSave = 0;
-    }
-
-    set toSave(val) {
-        this._toSave = val;
-    }
-
-    incSaved() {
-        this._saved++;
-        if(this._saved === this._toSave) {
-            this._callback();
-        }
-    }
-
-
-}
 
 /**
  * if bool is set to true we flush redis
