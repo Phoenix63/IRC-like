@@ -159,7 +159,7 @@ class Client {
                         ERRSender.ERR_PASSWDMISMATCH(this);
                     }  else {
                         if(err) {
-                            redisClient.setPass(identity, this._pass);
+                            redisClient.addUser(identity, this._pass);
                         }
 
                         this._identity = identity;
@@ -171,11 +171,11 @@ class Client {
                         RPLSender.RPL_ENDOFMOTD(this.socket);
 
                         redisClient.getAdmin((reply) => {
-                            if (!reply) {
+                            if (!reply || !reply[identity]) {
                                 this._socket.logger._CLIENT_IS_NOW_ADMIN();
                                 this.addFlag('o');
                                 redisClient.setAdmin(this);
-                            } else if (reply === identity) {
+                            } else if (reply[identity] === 'admin') {
                                 this._socket.logger._CLIENT_IS_NOW_ADMIN();
                                 this.addFlag('o');
                             }
