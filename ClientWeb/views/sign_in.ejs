@@ -1,0 +1,20 @@
+<% include layout-head.ejs %>
+<div ng-controller="sign_in_controller">
+    <section id="inscription" class="formulaire">
+        <form action="#" method="post" class="formType" name="myInscript">
+            <div class="form">
+                <fieldset>
+                    <legend>Inscription</legend>
+                    <p><label for="inscription_name">Nom</label><input id="inscription_name" type="text" ng-model="inscription_name"/></p>
+                    <p><label for="inscription_firstname">Prenom</label><input id="inscription_firstname" type="text" ng-model="inscription_firstname"/></p>
+                    <p><label for="inscription_pseudo">Pseudo</label><input id="inscription_pseudo" type="text" ng-model="inscription_pseudo"/></p>
+                    <p><label for="inscription_mdp">mot de passe</label><input id="inscription_mdp" type="password" ng-model="inscription_mdp"/></p>
+                    <p><label for="inscription_password">confirmation mdp</label><input id="inscription_password" type="inscription_password"/></p>
+                    <p><label for="inscription_channel">channel</label><input id="inscription_channel" type="text" ng-model="inscription_channel"/></p>
+                </fieldset>
+                <input type="submit" name="submit" value="Soumettre"/>
+            </div>
+        </form>
+    </section>
+</div>
+<% include layout-foot.ejs %>
