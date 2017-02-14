@@ -51,3 +51,4 @@ Server/test/
 
 out/
 node_modules/
+!/ClientWeb/bin/
