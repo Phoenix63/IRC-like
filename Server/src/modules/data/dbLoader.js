@@ -6,6 +6,7 @@ import Redis from './RedisInterface';
 let redis = Redis.instance;
 
 import Caller from './Caller';
+import Channel from './../channel/Channel';
 
 var url = 'mongodb://'+config.mongo.user+':'+config.mongo.pass+'@'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db+config.mongo.method;
 
@@ -29,11 +30,23 @@ module.exports = function(callback) {
             let admin = db.collection('admin');
             admin.find().toArray((err, ads) => {
 
-                caller.toSave = ads.length + us.length;
+
 
                 ads.forEach((tuple) => {
                     redis.setAdmin({identity: tuple.name});
                     caller.incSaved();
+                });
+
+                let channels = db.collection('channels');
+                channels.find().toArray((err, cs) => {
+                    caller.toSave = ads.length + us.length + cs.length;
+
+                    cs.forEach((channel) => {
+                        let obj = JSON.parse(channel.data);
+                        let chan = new Channel({identity: obj.creator}, obj.name, obj.pass, parseInt(obj.size));
+                        chan.setUserFlags(obj.userflags);
+                        caller.incSaved();
+                    });
                 });
             });
         });

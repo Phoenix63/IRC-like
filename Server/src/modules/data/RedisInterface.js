@@ -92,6 +92,38 @@ class Redis {
              callback(obj);
         });
     }
+
+    /**
+     *
+     * @param {Channel} channel
+     */
+    upsertChannel(channel) {
+        this._client.hmset(
+            "channels",
+            channel.name,
+            JSON.stringify({
+                name: channel.name,
+                creator: channel.creator,
+                flags: channel.flags,
+                userflags: channel._usersFlags,
+                pass: channel.pass,
+                size: channel.size
+            }));
+    }
+
+    getChannels(callback) {
+        this._client.hgetall("channels", (err, obj) => {
+            callback(obj);
+        });
+    }
+
+    /**
+     *
+     * @param {Channel} channel
+     */
+    deleteChannel(channel) {
+        this._client.hdel("channels", channel.name);
+    }
 }
 
 export default Redis;

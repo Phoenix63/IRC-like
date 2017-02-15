@@ -9,5 +9,6 @@
   "image_server": {
     "port": "3010"
   },
-  "imageSizeLimit": 2097152
+  "imageSizeLimit": 2097152,
+  "timeout": 0
 }

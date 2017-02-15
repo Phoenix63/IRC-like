@@ -7,7 +7,7 @@ import config from './../../config.json';
 
 let sockets = [];
 
-const interval = 4000;
+const interval = config.timeout;
 
 class Socket {
     /**
@@ -26,14 +26,17 @@ class Socket {
         this._onSignal = {};
 
         this._life = 1;
-        this._interval = setInterval(() => {
-            if(this._life <= 0) {
-                this._socket.destroy();
-            }  else {
-                this._life--;
-                this.send(':'+config.ip+' PING :'+shortid.generate());
-            }
-        }, interval/2);
+        if(interval>0) {
+            this._interval = setInterval(() => {
+                if(this._life <= 0) {
+                    this._socket.destroy();
+                }  else {
+                    this._life--;
+                    this.send(':'+config.ip+' PING :'+shortid.generate());
+                }
+            }, interval/2);
+        }
+
     }
 
     /**

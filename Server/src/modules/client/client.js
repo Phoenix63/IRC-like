@@ -37,6 +37,7 @@ class Client {
         this.addFlag('sw');
         this._channels = [];
         this._pass = '';
+        this._registeredWithPass = false;
         clients.push(this);
 
     }
@@ -164,6 +165,7 @@ class Client {
                         if(err) {
                             redisClient.addUser(identity, this._pass);
                         }
+                        this._registeredWithPass = true;
 
                         this._identity = identity;
                         this._realname = realname;
@@ -174,10 +176,11 @@ class Client {
                         RPLSender.RPL_ENDOFMOTD(this.socket);
 
                         redisClient.getAdmin((reply) => {
-                            if (!reply || !reply[identity]) {
+                            if (!reply) {
                                 this._socket.logger._CLIENT_IS_NOW_ADMIN();
                                 this.addFlag('o');
                                 redisClient.setAdmin(this);
+
                             } else if (reply[identity] === 'admin') {
                                 this._socket.logger._CLIENT_IS_NOW_ADMIN();
                                 this.addFlag('o');
@@ -264,6 +267,10 @@ class Client {
         if(this._flag.indexOf(flag)>=0) {
             this._flag = this._flag.split(flag).join('');
         }
+    }
+
+    isUser() {
+        return this._registeredWithPass;
     }
 
     /**
