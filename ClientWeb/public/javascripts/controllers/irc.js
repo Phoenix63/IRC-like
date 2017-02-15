@@ -54,18 +54,18 @@ myApp.controller("ircCtrl",function($scope) {
                     socket.emit("message","PRIVMSG" + currentChannel + " : " + $scope.newMessage);
                     $scope.messages.push(nick + ": " + $scope.newMessage);
                     $scope.newMessage = undefined;
-                    $scope.$apply();
                     break;
                 default:
-                    alert("noob");
+					$scope.newMessage = undefined;
+                    $scope.messages.push("not a command");
             }
         }
         else {
             socket.emit("message","PRIVMSG " + currentChannel + " : " + $scope.newMessage);
             $scope.messages.push(nick + ": " + $scope.newMessage);
             $scope.newMessage = undefined;
-            $scope.$apply();
         }
+		$scope.$apply();
     }
 
     socket.on("message",function(msg) {
@@ -73,7 +73,6 @@ myApp.controller("ircCtrl",function($scope) {
             var msgPriv = in_isMsg(msg);
             var tt = msgPriv[0] + " : " + msgPriv[2];
             $scope.messages.push(tt);
-            $scope.$apply();
         }
         else if(msg.match(/^:[a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]NICK[ ][a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+$/)) {
             var msgToPush = in_isNickname(msg);
@@ -81,7 +80,6 @@ myApp.controller("ircCtrl",function($scope) {
             nick = msgToPush[1];
             $scope.users[$scope.users.indexOf(oldname)] = nick;
             $scope.messages.push(msgToPush[0] + " has changes his nick to " + msgToPush[1]);
-            $scope.$apply();
         }
         else if(msg.match(/^:[a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]JOIN[ ][#][a-zA-Z0-9]+$/)) {
             var chann = in_isChannel(msg);
@@ -94,7 +92,6 @@ myApp.controller("ircCtrl",function($scope) {
             }
             currentChannel = chann[1];
             $scope.messages.push("You have join the channel " + currentChannel);
-            $scope.$apply();
 
         }
         else if(msg.includes("353")===true) {
@@ -103,79 +100,62 @@ myApp.controller("ircCtrl",function($scope) {
             for (var i=0; i<l.length; i++) {
                 if($scope.users.includes(l[i])===false) {
                     $scope.users.push(l[i]);
-                    $scope.$apply();
                 }
             }
         }
         else if((msg.includes("372")===true)) {
             $scope.messages.push("Welcome " + realN);
-            $scope.$apply();
         }
         else if(msg.includes("431")===true) {
             $scope.messages.push("No nickname given");
-            $scope.$apply();
         }
         else if(msg.includes("433")===true) {
             $scope.messages.push("Nickname already use");
-            $scope.$apply();
         }
         else if(msg.includes("403")===true) {
             $scope.messages.push("No such channel");
-            $scope.$apply();
         }
         else if(msg.includes("404")===true) {
             $scope.messages.push("Cannot send to channel");
-            $scope.$apply();
         }
         else if(msg.includes("411")===true) {
             $scope.messages.push("No recipient give");
-            $scope.$apply();
         }
         else if(msg.includes("412")===true) {
             $scope.messages.push("No text to send");
-            $scope.$apply();
         }
         else if(msg.includes("421")===true) {
             $scope.messages.push("Unknown command");
-            $scope.$apply();
         }
         else if(msg.includes("451")===true) {
             $scope.messages.push("You have not registered");
-            $scope.$apply();
         }
         else if(msg.includes("442")===true) {
             $scope.messages.push("You are not on that channel");
-            $scope.$apply();
         }
         else if(msg.includes("461")===true) {
             $scope.messages.push("Not enough parameters");
-            $scope.$apply();
         }
         else if(msg.includes("471")===true) {
             $scope.messages.push("Channel is full");
-            $scope.$apply();
         }
         else if(msg.includes("462")===true) {
             $scope.messages.push("Already registered");
-            $scope.$apply();
         }
         else if(msg.includes("473")===true) {
             $scope.messages.push("Connot join the invitation");
-            $scope.$apply();
         }
         else if(msg.includes("474")===true) {
             $scope.messages.push("You're banned from this channel");
-            $scope.$apply();
         }
         else if(msg.includes("475")===true) {
             $scope.messages.push("You're banned from this channel");
-            $scope.$apply();
         }
         // response
         else if(msg.includes("475")===true) {
             $scope.messages.push("You're banned from this channel");
-            $scope.$apply();
         }
+		$scope.$apply();
     });
 
 
