@@ -112,6 +112,9 @@ class Client {
      * @param {string} val
      */
     set realname(val) {
+        if(val[0] === ':') {
+            val = val.slice(1, val.length);
+        }
         this._realname = val;
     }
 

@@ -131,16 +131,42 @@ let RPLSender = {
         socket.send(':' + config.ip + ' NOTICE AUTH :*** YOU ARE CONNECTED');
     },
 
+    /**
+     *
+     * @param {Socket} socket
+     * @static
+     */
     RPL_MOTDSTART: (socket) => {
         socket.send(':'+config.ip+' 375 :- '+config.ip+' Message of the day - ');
     },
 
+    /**
+     *
+     * @param {Socket} socket
+     * @static
+     */
     RPL_MOTD: (socket) => {
         socket.send(':'+config.ip+' 372 :- Welcome '+socket.client.identity);
     },
 
+    /**
+     *
+     * @param {Socket} socket
+     * @static
+     */
+
     RPL_ENDOFMOTD: (socket) => {
         socket.send(':'+config.ip+' 376 :End of /MOTD command');
+    },
+
+    /**
+     *
+     * @param {Client} client
+     * @param {Client} user
+     * @static
+     */
+    RPL_WHOISUSER: (client, user) => {
+        client.socket.send(':'+config.ip+' 311 '+user.name+ ' ' + user.identity + ' ' + config.ip + ' * :'+user.realname);
     }
 };
 export default RPLSender
