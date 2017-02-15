@@ -41,6 +41,7 @@ import RPLSender from './modules/responses/RPLSender';
 import dbLoader from './modules/data/dbLoader';
 
 dbLoader(() => {
+    console.log('Database loaded');
     socketManager.create((socket) => {
         let client = new Client(socket);
         let logger = new Logger(client);
