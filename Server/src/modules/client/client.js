@@ -267,6 +267,14 @@ class Client {
     }
 
     /**
+     *
+     * @returns {boolean}
+     */
+    isAdmin() {
+        return this._flag.indexOf('o')>=0;
+    }
+
+    /**
      * remove channel from list
      * @param {Channel} channel
      */

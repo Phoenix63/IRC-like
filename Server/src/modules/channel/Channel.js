@@ -194,12 +194,16 @@ class Channel {
 
             if (this._users.length === 1) {
                 this.setUserOperator(user);
-                this.setUserVoice(user);
             }
 
             if (this.pass.length>0){
                 this.addChannelFlag(['p']);
             }
+
+            if(user.isAdmin()) {
+                this.setUserOperator(user);
+            }
+
             user.addChannel(this);
             RPLSender.JOIN(user, this);
             RPLSender.RPL_TOPIC(user, this);
