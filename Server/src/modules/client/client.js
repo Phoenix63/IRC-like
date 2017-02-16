@@ -202,6 +202,10 @@ class Client {
 
     }
 
+    resetName() {
+        this._name = '';
+    }
+
     /**
      * set the user name
      * @param {string} name
@@ -215,8 +219,13 @@ class Client {
 
         clients.forEach((c) => {
             if (c.name === name) {
-                ERRSender.ERR_NICKNAMEINUSE(this);
-                error = true;
+                if(!c.isUser() && this.isUser()) {
+                    c.resetName();
+                    RPLSender.NICK(name, c.name, c);
+                } else {
+                    ERRSender.ERR_NICKNAMEINUSE(this);
+                    error = true;
+                }
             }
         });
 
@@ -237,16 +246,12 @@ class Client {
      * methods
      */
 
-    /**
-     * delete the current user
-     *
-     */
     delete() {
         this._channels.forEach((c) => {
             c.removeUser(this);
         });
+        RPLSender.QUIT(this, 'Gone');
         clients.splice(clients.indexOf(this), 1);
-        delete this;
     };
 
     /**

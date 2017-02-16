@@ -10,10 +10,17 @@ module.exports = function (socket, command) {
         return;
     }
 
+    let message = command[1].split(' ')[1];
+    if(message && message[0] === ':') {
+        message = message.slice(1, message.length);
+    } else {
+        message = 'Gone';
+    }
+
     let channels = command[1].split(' ')[0].split(',');
     Channel.list().forEach((chan) => {
         if (channels.indexOf(chan.name) >= 0) {
-            chan.removeUser(socket.client);
+            chan.removeUser(socket.client, message);
         }
     });
 };

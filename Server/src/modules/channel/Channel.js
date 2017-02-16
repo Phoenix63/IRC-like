@@ -291,7 +291,7 @@ class Channel {
             user.addChannel(this);
 
             RPLSender.JOIN(user, this);
-            RPLSender.RPL_TOPIC(user, this);
+            RPLSender.RPL_TOPIC('JOIN', user, this);
             RPLSender.RPL_NAMREPLY(user, this);
         }
     }
@@ -299,17 +299,19 @@ class Channel {
     /**
      * remove user from this channel
      * @param {Client} user
+     * @param {string} message
      */
-    removeUser(user) {
+    removeUser(user, message='Gone') {
         let index = this._users.indexOf(user);
         if (index < 0) {
             ERRSender.ERR_NOTONCHANNEL(user, this);
             return;
         }
-        RPLSender.PART(user, this);
+        RPLSender.PART(user, this, message);
         user.removeChannel(this);
-        if(this._temporary) {
-            this._users.splice(index, 1);
+        this._users.splice(index, 1);
+        if(this._temporary && this._users.length <= 0) {
+            channels.splice(this, 1);
         }
     }
 
