@@ -305,14 +305,16 @@ class Channel {
         let index = this._users.indexOf(user);
         if (index < 0) {
             ERRSender.ERR_NOTONCHANNEL(user, this);
-            return;
+        } else {
+            this._users.splice(index, 1);
+            RPLSender.PART(user, this, message);
+            user.removeChannel(this);
+
+            if(this._temporary && this._users.length <= 0) {
+                channels.splice(channels.indexOf(this), 1);
+            }
         }
-        RPLSender.PART(user, this, message);
-        user.removeChannel(this);
-        this._users.splice(index, 1);
-        if(this._temporary && this._users.length <= 0) {
-            channels.splice(this, 1);
-        }
+
     }
 
     /**
