@@ -17,9 +17,10 @@ class Channel {
      * @param {string} name
      * @param {string} pass
      * @param {number} size
+     * @param {string} topic
      * @constructor
      */
-    constructor(creator, name, pass, size) {
+    constructor(creator, name, pass, size, topic='') {
          /**
          s 		canal secret; le canal est totalement invisible
          p 		canal privé; le nom du canal est invisible
@@ -44,6 +45,7 @@ class Channel {
         this._invitation = [];
         this._name = name;
         this._temporary = true;
+        this._topic = topic;
 
 
         // not loaded from db
@@ -74,6 +76,14 @@ class Channel {
      */
     get name() {
         return this._name;
+    }
+
+    get topic() {
+        if(this._topic !== '') {
+            return this._topic;
+        } else {
+            return null;
+        }
     }
 
     /**

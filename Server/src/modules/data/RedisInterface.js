@@ -107,7 +107,8 @@ class Redis {
                 flags: channel.flags,
                 userflags: channel._usersFlags,
                 pass: channel.pass,
-                size: channel.size
+                size: channel.size,
+                topic: (channel.topic||'')
             }));
     }
 

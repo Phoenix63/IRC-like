@@ -43,7 +43,7 @@ module.exports = function(callback) {
 
                     cs.forEach((channel) => {
                         let obj = JSON.parse(channel.data);
-                        let chan = new Channel({identity: obj.creator}, obj.name, obj.pass, parseInt(obj.size));
+                        let chan = new Channel({identity: obj.creator}, obj.name, obj.pass, parseInt(obj.size), (obj.topic||''));
                         chan.setUserFlags(obj.userflags);
                         caller.incSaved();
                     });
