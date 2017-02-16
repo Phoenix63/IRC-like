@@ -62,15 +62,16 @@ let RPLSender = {
 
     /**
      *
+     * @param {string} command
      * @param {Client} client
      * @param {Channel} channel
      * @static
      */
-    RPL_TOPIC: (client, channel) => {
+    RPL_TOPIC: (command, client, channel) => {
         if (channel.topic) {
-            client.socket.send(':' + config.ip + ' 332 JOIN ' + channel.name + ' :' + channel.topic);
+            client.socket.send(':' + config.ip + ' 332 '+command+' ' + channel.name + ' :' + channel.topic);
         } else {
-            client.socket.send(':' + config.ip + ' 331 JOIN ' + channel.name + ' :No topic is set');
+            client.socket.send(':' + config.ip + ' 331 '+command+' ' + channel.name + ' :No topic is set');
         }
     },
 
@@ -88,10 +89,11 @@ let RPLSender = {
      *
      * @param {Client} client
      * @param {Channel} channel
+     * @param {string} message
      * @static
      */
-    PART: (client, channel) => {
-        channel.broadcast(':' + client.name + ' PART ' + channel.name);
+    PART: (client, channel, message='Gone') => {
+        channel.broadcast(':' + client.name + ' PART ' + channel.name + ' :'+message);
     },
 
     /**
@@ -167,6 +169,16 @@ let RPLSender = {
      */
     RPL_WHOISUSER: (client, user) => {
         client.socket.send(':'+config.ip+' 311 '+user.name+ ' ' + user.identity + ' ' + config.ip + ' * :'+user.realname);
+    },
+
+    /**
+     *
+     * @param {Client} client
+     * @param {string} message
+     * @static
+     */
+    QUIT: (client, message='Gone') => {
+        client.socket.broadcast(':'+client.name+' QUIT :'+message);
     }
 };
 export default RPLSender

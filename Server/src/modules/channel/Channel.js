@@ -3,6 +3,8 @@
 import Client from './../client/client';
 import ERRSender from './../responses/ERRSender';
 import RPLSender from './../responses/RPLSender';
+import Redis from './../data/RedisInterface';
+let redis = Redis.instance;
 
 let channels = [];
 
@@ -27,20 +29,43 @@ class Channel {
          t 		sujet du canal uniquement modifiable par les opérateurs du canal
          */
         this._flags = '';
-        this.addChannelFlag(['t', 'n']);
-        this.pass = pass;
-        this.size = size;
-        this.bannedUsers = [];
+
+        this._pass = pass || '';
+        this._size = size;
+        this._bannedUsers = [];
         this._users = [];
+
+        this._creator = creator.identity;
         /**
          o 	@ 	nom de l'utilisateur concerné 	Opérateur de canal : peut changer les modes du channel et expulser les autres utilisateurs
          v 	+ 	nom de l'utilisateur concerné 	verbose ou voiced : autorise l'utilisateur à parler sur un canal modéré (mode +m)
          */
         this._usersFlags = {};
-        this.invitation = [];
+        this._invitation = [];
         this._name = name;
+        this._temporary = true;
+
+
+        // not loaded from db
+        if(creator instanceof Client) {
+
+            if(creator.isAdmin()) {
+                this.setPersistent(true);
+            }
+
+            this.addUser(creator, pass);
+        } else {
+            this.setPersistent(true);
+        }
+
+        this.addChannelFlag(['t', 'n']);
         channels.push(this);
-        this.addUser(creator, pass);
+    }
+
+    _change() {
+        if(!this._temporary) {
+            redis.upsertChannel(this);
+        }
     }
 
     /**
@@ -49,14 +74,6 @@ class Channel {
      */
     get name() {
         return this._name;
-    }
-
-    /**
-     *
-     * @returns {*}
-     */
-    get usersFlags() {
-        return this._usersFlags;
     }
 
     /**
@@ -93,6 +110,60 @@ class Channel {
 
     /**
      *
+     * @returns {string}
+     */
+    get pass() {
+        return this._pass;
+    }
+
+    /**
+     *
+     * @returns {number}
+     */
+    get size() {
+        return this._size;
+    }
+
+    /**
+     *
+     * @returns {boolean}
+     */
+    get isFull() {
+        return this._users.length >= this._size;
+    }
+
+    /**
+     *
+     * @returns {Client}
+     */
+    get creator() {
+        return this._creator;
+    }
+
+    /**
+     * set channel persistent or not
+     * @param {Boolean} bool
+     */
+    setPersistent(bool) {
+        this._temporary = !bool;
+        if(bool) {
+            redis.upsertChannel(this);
+        } else {
+            redis.deleteChannel(this);
+        }
+    }
+
+    /**
+     * this method is only called when bdd is loading
+     * @param {JSON} flags
+     */
+    setUserFlags(flags) {
+        this._usersFlags = flags;
+        this._change();
+    }
+
+    /**
+     *
      * @param {Array} flag
      */
     addChannelFlag(flag) {
@@ -100,6 +171,7 @@ class Channel {
             flag.forEach((f) => {
                 this._flags = this._flags.split(f).join('') + f;
             });
+            this._change();
         } else {
             throw "flag must be an Array";
         }
@@ -109,6 +181,7 @@ class Channel {
             flag.forEach((f) => {
                 this._flags = this._flags.split(f).join('');
             });
+            this._change();
         } else {
             throw "flag must be an Array";
         }
@@ -120,8 +193,11 @@ class Channel {
      * @returns {boolean}
      */
     isUserOperator(client) {
-        if (this._usersFlags[client.id] && this._usersFlags[client.id].indexOf('o') >= 0)
+        if (this._usersFlags[client.identity] && this._usersFlags[client.identity] && this._usersFlags[client.identity].indexOf('o') >= 0) {
             return true;
+        } else if(this._temporary && client.identity === this._creator) {
+            return true;
+        }
         return false;
     }
 
@@ -131,7 +207,7 @@ class Channel {
      * @returns {boolean}
      */
     isUserVoice(client) {
-        if (this._usersFlags[client.id] && this._usersFlags[client.id].indexOf('v') >= 0)
+        if (this._usersFlags[client.identity] && this._usersFlags[client.identity] && this._usersFlags[client.identity].indexOf('v') >= 0)
             return true;
         return false;
     }
@@ -141,8 +217,9 @@ class Channel {
      * @param {Client} client
      */
     setUserOperator(client) {
-        if (this._usersFlags[client.id].indexOf('o')<0) {
-            this._usersFlags[client.id] += 'o';
+        if (typeof this._usersFlags[client.identity] === 'string' && this._usersFlags[client.identity].indexOf('o')<0 && client.isUser()) {
+            this._usersFlags[client.identity] += 'o';
+            this._change();
         }
     }
     /**
@@ -150,8 +227,9 @@ class Channel {
      * @param {Client} client
      */
     setUserVoice(client) {
-        if (this._usersFlags[client.id].indexOf('v')<0) {
-            this._usersFlags[client.id] += 'v';
+        if (typeof this._usersFlags[client.identity] === 'string' && this._usersFlags[client.identity].indexOf('v')<0 && client.isUser()) {
+            this._usersFlags[client.identity] += 'v';
+            this._change();
         }
     }
     /**
@@ -159,8 +237,9 @@ class Channel {
      * @param {Client} client
      */
     removeUserFlag(client, flag) {
-        if(this._usersFlags[client.id]) {
-            this._usersFlags[client.id] = this._usersFlags[client.id].split(flag).join('');
+        if(typeof this._usersFlags[client.identity] === 'string') {
+            this._usersFlags[client.identity] = this._usersFlags[client.id].split(flag).join('');
+            this._change();
         }
     }
 
@@ -171,16 +250,16 @@ class Channel {
      * @param {Client} user
      * @param {string} key
      */
-    addUser(user, key) {
-        if (this.bannedUsers.indexOf(user) >= 0) {
+    addUser(user, key='') {
+        if (this._bannedUsers.indexOf(user) >= 0) {
             ERRSender.ERR_BANNEDFROMCHAN(user, this);
             return;
         }
-        if (this._isInvitation && this.isInvitation.indexOf(user) === -1) {
+        if (this.isInvitation && this.isInvitation.indexOf(user) === -1) {
             ERRSender.ERR_INVITEONLYCHAN(user, this);
             return;
         }
-        if (key !== this.pass) {
+        if (key !== this._pass) {
             ERRSender.ERR_BADCHANNELKEY(user, this);
             return;
         }
@@ -190,19 +269,29 @@ class Channel {
         }
         if(this._users.indexOf(user) < 0) {
             this._users.push(user);
-            this._usersFlags[user.id] = '';
+            if(user.isUser()) {
 
-            if (this._users.length === 1) {
-                this.setUserOperator(user);
-                this.setUserVoice(user);
-            }
+                if(!this._usersFlags[user.identity]) {
+                    this._usersFlags[user.identity] = '';
+                }
 
-            if (this.pass.length>0){
-                this.addChannelFlag(['p']);
+                if (this._users.length === 1 && this._temporary) {
+                    this.setUserOperator(user);
+                }
+
+                if (this._pass.length>0){
+                    this.addChannelFlag(['p']);
+                }
+
+                if(user.isAdmin() || user.identity === this._creator) {
+                    this.setUserOperator(user);
+                }
             }
+            this._change();
             user.addChannel(this);
+
             RPLSender.JOIN(user, this);
-            RPLSender.RPL_TOPIC(user, this);
+            RPLSender.RPL_TOPIC('JOIN', user, this);
             RPLSender.RPL_NAMREPLY(user, this);
         }
     }
@@ -210,17 +299,20 @@ class Channel {
     /**
      * remove user from this channel
      * @param {Client} user
+     * @param {string} message
      */
-    removeUser(user) {
+    removeUser(user, message='Gone') {
         let index = this._users.indexOf(user);
         if (index < 0) {
             ERRSender.ERR_NOTONCHANNEL(user, this);
             return;
         }
-        RPLSender.PART(user, this);
+        RPLSender.PART(user, this, message);
         user.removeChannel(this);
-        delete this._usersFlags[user.id];
         this._users.splice(index, 1);
+        if(this._temporary && this._users.length <= 0) {
+            channels.splice(this, 1);
+        }
     }
 
     /**

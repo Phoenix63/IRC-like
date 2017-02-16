@@ -5,7 +5,10 @@ process.title = 'server';
 import dbSaver from './modules/data/dbSaver';
 
 let quiting = false;
-function quitHandle() {
+function quitHandle(e) {
+    if(e) {
+        console.log(e);
+    }
     if(!quiting) {
         quiting = true;
         console.log('saving database...');

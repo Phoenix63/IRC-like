@@ -37,6 +37,7 @@ class Client {
         this.addFlag('sw');
         this._channels = [];
         this._pass = '';
+        this._registeredWithPass = false;
         clients.push(this);
 
     }
@@ -164,6 +165,7 @@ class Client {
                         if(err) {
                             redisClient.addUser(identity, this._pass);
                         }
+                        this._registeredWithPass = true;
 
                         this._identity = identity;
                         this._realname = realname;
@@ -174,10 +176,11 @@ class Client {
                         RPLSender.RPL_ENDOFMOTD(this.socket);
 
                         redisClient.getAdmin((reply) => {
-                            if (!reply || !reply[identity]) {
+                            if (!reply) {
                                 this._socket.logger._CLIENT_IS_NOW_ADMIN();
                                 this.addFlag('o');
                                 redisClient.setAdmin(this);
+
                             } else if (reply[identity] === 'admin') {
                                 this._socket.logger._CLIENT_IS_NOW_ADMIN();
                                 this.addFlag('o');
@@ -199,6 +202,10 @@ class Client {
 
     }
 
+    resetName() {
+        this._name = '';
+    }
+
     /**
      * set the user name
      * @param {string} name
@@ -212,8 +219,13 @@ class Client {
 
         clients.forEach((c) => {
             if (c.name === name) {
-                ERRSender.ERR_NICKNAMEINUSE(this);
-                error = true;
+                if(!c.isUser() && this.isUser()) {
+                    c.resetName();
+                    RPLSender.NICK(name, c.name, c);
+                } else {
+                    ERRSender.ERR_NICKNAMEINUSE(this);
+                    error = true;
+                }
             }
         });
 
@@ -234,16 +246,12 @@ class Client {
      * methods
      */
 
-    /**
-     * delete the current user
-     *
-     */
     delete() {
         this._channels.forEach((c) => {
             c.removeUser(this);
         });
+        RPLSender.QUIT(this, 'Gone');
         clients.splice(clients.indexOf(this), 1);
-        delete this;
     };
 
     /**
@@ -264,6 +272,18 @@ class Client {
         if(this._flag.indexOf(flag)>=0) {
             this._flag = this._flag.split(flag).join('');
         }
+    }
+
+    isUser() {
+        return this._registeredWithPass;
+    }
+
+    /**
+     *
+     * @returns {boolean}
+     */
+    isAdmin() {
+        return this._flag.indexOf('o')>=0;
     }
 
     /**

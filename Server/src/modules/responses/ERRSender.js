@@ -137,6 +137,16 @@ let ERRSender = {
      */
     ERR_BADCHANNELKEY: (client, channel) => {
         client.socket.send(':' + config.ip + ' 475 ' + channel.name + ' :Cannot join channel (+k)');
+    },
+
+    /**
+     *
+     * @param {Client} client
+     * @param {Channel} channel
+     * @constructor
+     */
+    ERR_CHANOPRIVSNEEDED: (client, channel) => {
+        client.socket.send(':'+config.ip+' 482 '+channel.name+' :You\'re not channel operator');
     }
 
 

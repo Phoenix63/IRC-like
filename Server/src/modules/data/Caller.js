@@ -6,6 +6,10 @@ class Caller {
     }
 
     set toSave(val) {
+        if(val <= 0) {
+            this._callback();
+            delete this;
+        }
         this._toSave = val;
     }
 
