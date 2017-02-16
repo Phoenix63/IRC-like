@@ -69,7 +69,7 @@ myApp.controller("ircCtrl",function($scope) {
     }
 
     socket.on("message",function(msg) {
-        if(msg.match(/^[:][a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]PRIVMSG[ ][#]?[a-zA-Z0-9]+[ ][:][ ][a-zA-Z0-9 ]+$/)) {
+        if(msg.match(/^[:][a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]PRIVMSG[ ][#]?[\w#&é"'\(è_çà@€^$*\-*/+]+[ ][:][ ][a-zA-Z0-9 \W]+$/)) {
             var msgPriv = in_isMsg(msg);
             var tt = msgPriv[0] + " : " + msgPriv[2];
             $scope.messages.push(tt);
@@ -85,15 +85,17 @@ myApp.controller("ircCtrl",function($scope) {
             var chann = in_isChannel(msg);
             if($scope.channels.includes(chann[1])===false) {
                 $scope.channels.push(chann[1]);
-                //channelList.push(new Channel(chann,));
             }
             if($scope.users.includes(chann[0])===false) {
                 $scope.users.push(chann[0]);
             }
             currentChannel = chann[1];
-            $scope.messages.push("You have join the channel " + currentChannel);
+            $scope.messages.push(msg);
 
         }
+		else if(msg.includes("PING")===true) {
+			socket.emit("message","PONG");
+		}
         else if(msg.includes("353")===true) {
             var l = in_isNames(msg);
             $scope.$apply();
@@ -103,6 +105,10 @@ myApp.controller("ircCtrl",function($scope) {
                 }
             }
         }
+		else if(msg.includes("352")===true) {
+			$scope.messages.push(msg);
+		}
+		
         else if((msg.includes("372")===true)) {
             $scope.messages.push("Welcome " + realN);
         }
