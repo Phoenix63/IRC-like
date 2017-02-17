@@ -82,7 +82,7 @@ void Login::sendInfos()
     nick.prepend("NICK ");
     nick.append('\n');
     socket->write(nick.toLatin1().data());
-    QString user=username.prepend("USER "+username+" 0 * : ");
+    QString user=username.prepend("USER "+username+" 0 * :");
     user.append('\n');
     socket->write(user.toLatin1().data());
 }

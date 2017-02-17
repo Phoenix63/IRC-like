@@ -21,39 +21,25 @@ void Parseur::setSocket(QTcpSocket *sock){
     socket = sock;
 }
 
-bool Parseur::out(QString *string)
+bool Parseur::out(QString string)
 {
-    channel->appendCurrent(*string);
-    if      (string->startsWith("/nick"))  string->replace(QString("/nick"), QString("NICK"));
-    else if (string->startsWith("/user"))  string->replace(QString("/user"), QString("USER"));
-    else if (string->startsWith("/join"))  string->replace(QString("/join"), QString("JOIN"));
-    else if (string->startsWith("/names")) string->replace(QString("/names"), QString("NAMES"));
-    else if (string->startsWith("/pass"))  string->replace(QString("/pass"), QString("PASS"));
-    else if (string->startsWith("/part"))
-        {
-            string->replace(QString("/part"), QString("PART"));
-            if(string->contains(QRegularExpression("^PART\\s*$"))){
-                *string="PART "+channel->channelName()+'\n';
-                channel->leave(channel->channelName());
-            }
-            else
-                channel->leave(string->split(' ').at(1).left(string->split(' ').at(1).length()-1));
-
-        }
-    else if (string->startsWith("/list"))  string->replace(QString("/list"), QString("LIST"));
-    else if (string->startsWith("/quit"))
-    {
-        string->replace(QString("/quit"), QString("QUIT"));
+    string.append('\n');
+    channel->appendCurrent(string);
+    if (out_isQuitMsg(string))
         return false;
-    }
-    else if (string->startsWith("/who"))     string->replace(QString("/who"), QString("WHO"));
-    else if (string->startsWith("/msg"))
-    {
-        string->replace(QString("/msg"), QString("PRIVMSG"));
-        channel->joinWhisper(string->split(' ').at(1));
-    }
-    else if (channel->channelName() != "\"Debug\"")   string->prepend("PRIVMSG " + channel->channelName() + " :");
-    else                                              string->prepend("PRIVMSG ");
+    if (!out_isNickMsg(string))
+    if (!out_isUserMsg(string))
+    if (!out_isJoinMsg(string))
+    if (!out_isNamesMsg(string))
+    if (!out_isPassMsg(string))
+    if (!out_isPartMsg(string))
+    if (!out_isListMsg(string))
+    if (!out_isWhoMsg(string))
+    if (!out_isWhoisMsg(string))
+    if (!out_isMsgMsg(string))
+    if (!out_isDebugMsg(string))
+    if (!out_isPrivMsg(string))
+        return false;
     return true;
 }
 
@@ -74,9 +60,142 @@ void Parseur::in(QString string)
     if (!in_isPrivMesg(string))
     if (!in_isWhisMesg(string))
     if (!in_isNickEdit(string))
-    if (in_isPing(string))
+    if (!in_isPing(string))
         channel->appendChannel(string+'\n', "\"Debug\"","");
 }
+
+/*
+ * Parseur: Out private function's
+ */
+
+bool Parseur::out_isNickMsg(QString string)
+{
+    if (!string.startsWith("/nick"))
+        return false;
+    string.replace(QString("/nick"), QString("NICK"));
+    socket->write(string.toLatin1().data());
+    return true;
+}
+
+bool Parseur::out_isUserMsg(QString string)
+{
+    if (!string.startsWith("/user"))
+        return false;
+    string.replace(QString("/user"), QString("USER"));
+    socket->write(string.toLatin1().data());
+    return true;
+}
+
+bool Parseur::out_isJoinMsg(QString string)
+{
+    if (!string.startsWith("/join"))
+        return false;
+    string.replace(QString("/join"), QString("JOIN"));
+    socket->write(string.toLatin1().data());
+    return true;
+}
+
+bool Parseur::out_isNamesMsg(QString string)
+{
+    if(!string.startsWith("/names"))
+        return false;
+    string.replace(QString("/names"), QString("NAMES"));
+    socket->write(string.toLatin1().data());
+    return true;
+}
+
+bool Parseur::out_isPassMsg(QString string)
+{
+    if (!string.startsWith("/pass"))
+        return false;
+    string.replace(QString("/pass"), QString("PASS"));
+    socket->write(string.toLatin1().data());
+    return true;
+}
+
+bool Parseur::out_isPartMsg(QString string)
+{
+    if (!string.startsWith("/part"))
+        return false;
+    string.replace(QString("/part"), QString("PART"));
+    if (string.contains(QRegularExpression("^PART\\s*$"))) {
+        string="PART "+channel->channelName()+'\n';
+        channel->leave(channel->channelName());
+    } else {
+        channel->leave(string.split(' ').at(1).left(string.split(' ').at(1).length()-1));
+    }
+    socket->write(string.toLatin1().data());
+    return true;
+}
+
+bool Parseur::out_isListMsg(QString string)
+{
+    if (!string.startsWith("/list"))
+        return false;
+    string.replace(QString("/list"), QString("LIST"));
+    socket->write(string.toLatin1().data());
+    return true;
+}
+
+bool Parseur::out_isWhoMsg(QString string)
+{
+    if(!string.startsWith("/who ") && !string.startsWith("/who\n"))
+        return false;
+    string.replace(QString("/who"), QString("WHO"));
+    if (channel->channelName() != "\"Debug\"")
+        string = QString("WHO "+ (channel->channelName()) +'\n');
+    qDebug() << string;
+    socket->write(string.toLatin1().data());
+    return true;
+}
+
+bool Parseur::out_isWhoisMsg(QString string)
+{
+    if (!string.startsWith("/whois"))
+        return false;
+    string.replace(QString("/whois"), QString("WHOIS"));
+    socket->write(string.toLatin1().data());
+    return true;
+}
+
+bool Parseur::out_isMsgMsg(QString string)
+{
+    if (!string.startsWith("/msg"))
+        return false;
+    string.replace(QString("/msg"), QString("PRIVMSG"));
+    channel->joinWhisper(string.split(' ').at(1));
+    socket->write(string.toLatin1().data());
+    return true;
+}
+
+bool Parseur::out_isDebugMsg(QString string)
+{
+    if (channel->channelName() == "\"Debug\"")
+        return false;
+    string.prepend("PRIVMSG " + channel->channelName() + " :");
+    socket->write(string.toLatin1().data());
+    return true;
+}
+
+bool Parseur::out_isPrivMsg(QString string)
+{
+    string.prepend("PRIVMSG ");
+    socket->write(string.toLatin1().data());
+        return true;
+}
+
+bool Parseur::out_isQuitMsg(QString string)
+{
+    if (!string.startsWith("/quit"))
+            return false;
+    string.replace(QString("/quit"), QString("QUIT"));
+    socket->write(string.toLatin1().data());
+    return true;
+}
+
+/*
+ * Parseur: In private function's
+ */
 
 bool Parseur::in_isChanList(QString string)
 {
@@ -105,70 +224,57 @@ bool Parseur::in_isNameList(QString string)
 
 bool Parseur::in_isJoinNote(QString string)
 {
-    if (string.contains(QRegularExpression("^.+\\sJOIN\\s#.+$"))) {
-        channel->appendChannel(string+'\n', "\"Debug\"","");
-        channel->addUser(string.split(' ')[0], string.split(' ')[2]);
-    } else {
+    if (!string.contains(IRC::RPL::JOIN))
         return false;
-    }
+    channel->appendChannel(string+'\n', "\"Debug\"","");
+    channel->addUser(string.split(' ')[0], string.split(' ')[2]);
     return true;
 }
 
 bool Parseur::in_isPartNote(QString string)
 {
-    if (string.contains(QRegularExpression("^.+\\sPART\\s#.+$"))) {
-        channel->appendChannel(string+'\n', "\"Debug\"","");
-        channel->delUser(string.split(' ')[0], string.split(' ')[2]);
-    } else {
-        return false;
-    }
+    if (!string.contains(IRC::RPL::PART))
+            return false;
+    channel->appendChannel(string+'\n', "\"Debug\"","");
+    channel->delUser(string.split(' ')[0], string.split(' ')[2]);
     return true;
 }
 
 bool Parseur::in_isPrivMesg(QString string)
 {
-    if (string.contains(QRegularExpression("^.+\\sPRIVMSG\\s#.+\\s:.+$")))
-    {
-        int j = string.indexOf(QRegularExpression(":.+$"));
-        channel->appendChannel(string.right(string.length()-j)+'\n', string.split(' ').at(2),string.split(' ').at(0));
-    } else {
+    if (!string.contains(IRC::RPL::PRIVMSG))
         return false;
-    }
+    int j = string.indexOf(QRegularExpression(":.+$"));
+    channel->appendChannel(string.right(string.length()-j)+'\n', string.split(' ').at(2),string.split(' ').at(0));
     return true;
 }
 
 bool Parseur::in_isWhisMesg(QString string)
 {
-    if (string.contains(QRegularExpression("^.+\\sPRIVMSG\\s.+\\s:.+$")))
-    {
-        int j = string.indexOf(QRegularExpression(":.+$"));
-        channel->appendChannel(string.right(string.length()-j)+'\n', string.split(' ').at(0),string.split(' ').at(0));
-    } else {
+    if (!string.contains(IRC::RPL::WHISPER))
         return false;
-    }
+    int j = string.indexOf(QRegularExpression(":.+$"));
+    channel->appendChannel(string.right(string.length()-j)+'\n', string.split(' ').at(0),string.split(' ').at(0));
     return true;
 }
 
 bool Parseur::in_isNickEdit(QString string)
 {
-    if (string.contains(QRegularExpression("^.+\\sNICK\\s.+$"))) {
-        channel->changeNick(string.split(' ')[0], string.split(' ')[2]);
-        channel->appendChannel(string+'\n', "\"Debug\"","");
-    } else {
+    if (!string.contains(IRC::RPL::NICK))
         return false;
-    }
+    qDebug() << "nick";
+    channel->changeNick(string.split(' ')[0], string.split(' ')[2]);
+    channel->appendChannel(string+'\n', "\"Debug\"","");
     return true;
 }
 
 bool Parseur::in_isPing(QString string)
 {
-    if(string.contains(QRegularExpression("^.+\\sPING\\s:.+$")))
-    {
-        int j = string.indexOf(QRegularExpression(":.+$"));
-        QString pong = string.right(string.length()-j)+'\n';
-        pong.prepend("PONG ");
-        socket->write(pong.toLatin1().data());
+    if(!string.contains(IRC::RPL::PING))
         return false;
-    }
+    int j = string.indexOf(QRegularExpression(":.+$"));
+    QString pong = string.right(string.length()-j)+'\n';
+    pong.prepend("PONG ");
+    socket->write(pong.toLatin1().data());
     return true;
 }

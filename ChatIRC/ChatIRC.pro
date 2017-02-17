@@ -19,14 +19,20 @@ SOURCES += main.cpp\
     mainframe.cpp \
     parseur.cpp \
     channel.cpp \
-    msglist.cpp
+    msglist.cpp \
+    channelcontent.cpp \
+    parseuremoji.cpp
 
 HEADERS  += \
     login.h \
     mainframe.h \
     channel.h \
     parseur.h \
-    msglist.h
+    msglist.h \
+    err_response.h \
+    rpl_response.h \
+    channelcontent.h \
+    parseuremoji.h
 
 FORMS    += \
     login.ui \

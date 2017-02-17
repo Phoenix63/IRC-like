@@ -4,6 +4,7 @@
 #include <QTcpSocket>
 #include <QMainWindow>
 #include <QString>
+#include <QScrollBar>
 
 #include "channel.h"
 #include "parseur.h"
@@ -28,12 +29,16 @@ protected:
 public slots:
     //Socket slots
     void readyRead();
+    void closeEvent (QCloseEvent *event);
 
     //UI slots
     void on_pushButton_send_clicked();
+    void moveScrollBarToBottom(int min, int max);
 
 private slots:
     void on_channelList_itemSelectionChanged();
+
+    void on_messageSender_returnPressed();
 
 private:
     Ui::MainFrame *ui;

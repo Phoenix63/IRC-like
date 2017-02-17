@@ -13,11 +13,13 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
 {
     ui->setupUi(this);
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
-    channel.setUi(ui->channelList, ui->messagePrinter,ui->userList,ui->topicDisplay);
+    channel.setUi(ui->channelList, ui->chatBox,ui->userList,ui->topicDisplay);
     parseur.setChannel(&channel);
     parseur.setSocket(socket);
     msgList.setMsgSender(ui->messageSender);
     ui->messageSender->installEventFilter(this);
+    ui->scrollArea->setStyleSheet("background-color: white");
+    connect(ui->scrollArea->verticalScrollBar(), SIGNAL(rangeChanged(int,int)), this, SLOT(moveScrollBarToBottom(int, int)));
 }
 
 /*
@@ -37,9 +39,15 @@ MainFrame::~MainFrame()
 void MainFrame::readyRead()
 {
     while(socket->canReadLine()){
-            QString string = QString(socket->readLine());
-            parseur.in(string);
-        }
+        QString string = QString(socket->readLine());
+        parseur.in(string);
+    }
+}
+
+void MainFrame::moveScrollBarToBottom(int min, int max)
+{
+    Q_UNUSED(min);
+    ui->scrollArea->verticalScrollBar()->setValue(max);
 }
 
 /*
@@ -49,14 +57,19 @@ void MainFrame::readyRead()
 void MainFrame::on_pushButton_send_clicked()
 {
     QString message = ui->messageSender->text();
-    ui->messagePrinter->append(message);
+    //ui->messagePrinter->append(message);
     msgList.addMsg(message);
-    message.append('\n');
-    if(!parseur.out(&message))
+    if(!parseur.out(message))
         this->close();
     msgList.scrollReset();
-    socket->write(message.toLatin1().data());
+    //socket->write(message.toLatin1().data());
     ui->messageSender->setText("");
+}
+
+void MainFrame::closeEvent (QCloseEvent *event)
+{
+    if(parseur.out("/quit"))
+        event->accept();
 }
 
 void MainFrame::on_channelList_itemSelectionChanged()
@@ -88,4 +101,11 @@ bool MainFrame::eventFilter(QObject *obj, QEvent *event)
         // pass the event on to the parent class
         return QMainWindow::eventFilter(obj, event);
     }
+    return false;
 }
+
+void MainFrame::on_messageSender_returnPressed()
+{
+    on_pushButton_send_clicked();
+}
+

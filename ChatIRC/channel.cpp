@@ -7,20 +7,17 @@
 
 Channel::Channel()
 {
-    channels["\"Debug\""] = QString();
-    current = &(channels["\"Debug\""]);
-    currentKey = QString("\"Debug\"");
-    users["\"Debug\""].append("The godly dev");
-    currentList = &(users["\"Debug\""]);
-    topics["\"Debug\""] = QString("Here we see debug command.");
-    currentTopic = &(topics["\"Debug\""]);
+    currentChannel = QString("\"Debug\"");
+    channels[currentChannel] = ChannelContent();
+    channels[currentChannel].addUser("The godly dev");
+    channels[currentChannel].setTopic("Here we see debug command.");
 }
 
 /*
  * Channel: Initialisation functions
  */
 
-void Channel::setUi(QListWidget *list, QTextBrowser *text, QListWidget *uList, QLineEdit *tText)
+void Channel::setUi(QListWidget *list, QVBoxLayout *text, QListWidget *uList, QLineEdit *tText)
 {
     chanList = list;
     chanText = text;
@@ -38,15 +35,15 @@ void Channel::setUi(QListWidget *list, QTextBrowser *text, QListWidget *uList, Q
 void Channel::join(QString chan, QString topic)
 {
     if (!channels.contains(chan)) {
-        channels[chan] = QString();
-        topics[chan] = topic;
+        channels[chan] = ChannelContent();
+        channels[chan].setTopic(topic);
     }
     refreshChanList();
 }
 
 void Channel::joinWhisper(QString dest){
     if (!channels.contains(dest))
-        channels[dest] = QString();
+        channels[dest] = ChannelContent();
     refreshChanList();
 }
 
@@ -56,15 +53,18 @@ void Channel::joinWhisper(QString dest){
 
 void Channel::refreshText()
 {
-    chanText->clear();
-    chanText->setText(current->left(current->length()-1));
+    clean();
+    QList<QString> text = channels[currentChannel].getChatContent();
+    for (auto i:text ){
+        chanText->addLayout(parseur.parse(i));
+    }
 }
 
 void Channel::refreshChanList()
 {
    chanList->clear();
-   for (int i = 0; i < channels.keys().size(); i++) {
-        chanList->addItem(channels.keys().at(i));
+   for (auto i:channels.keys()) {
+        chanList->addItem(i);
    }
 }
 
@@ -76,8 +76,8 @@ void Channel::leave(QString chan){
     if(channels.contains(chan)) {
         channels.remove(chan);
         change("\"Debug\"");
+        refreshChanList();
     }
-    refreshChanList();
 }
 
 /*
@@ -86,20 +86,16 @@ void Channel::leave(QString chan){
 
 void Channel::appendCurrent(QString string)
 {
-    current->append(string);
-    refreshText();
+    channels[currentChannel].appendChat(string);
+    chanText->addLayout(parseur.parse(string.left(string.length() - 1)));
 }
 
 void Channel::appendChannel(QString string, QString channel, QString send)
 {
-    if(!channels.contains(channel)) {
-        channels[channel] = QString();
-        refreshChanList();
-    }
-    channels[channel].append(send + string);
-    if (channel == currentKey)
-        chanText->append(send + string.left(string.length()-1));
-    if(channel.compare("\"Debug\"")!=0 && channel.compare(currentKey)!=0)
+    channels[channel].appendChat(send + string);
+    if (channel == currentChannel)
+        chanText->addLayout(parseur.parse(send + string.left(string.length()-1)));
+    if(channel != "\"Debug\"" && channel != currentChannel)
         chanList->findItems(channel,Qt::MatchExactly)[0]->setForeground(QColor("red"));
 }
 
@@ -110,10 +106,7 @@ void Channel::appendChannel(QString string, QString channel, QString send)
 void Channel::change(QString newChannel)
 {
     if (channels.contains(newChannel)) {
-        current = &channels[newChannel];
-        currentList = &users[newChannel];
-        currentTopic = &topics[newChannel];
-        currentKey = newChannel;
+        currentChannel = newChannel;
         chanList->findItems(newChannel,Qt::MatchExactly)[0]->setForeground(QColor("black"));
     }
    refreshText();
@@ -127,7 +120,7 @@ void Channel::change(QString newChannel)
 
 QString Channel::channelName()
 {
-    return currentKey;
+    return currentChannel;
 }
 
 /*
@@ -139,23 +132,23 @@ void Channel::addUser(QString user, QString channel)
 {
     if (user[0] == '@')
         user = user.right(user.length() - 1);
-    if (!users[channel].contains(user))
-        users[channel].append(user);
+    channels[channel].addUser(user);
     refreshUserList();
-
 }
 
 void Channel::delUser(QString user, QString channel)
 {
-    users[channel].removeAll(user);
-    refreshUserList();
+    channels[channel].removeUser(user);
+    if (channel == currentChannel)
+        refreshUserList();
 }
 
 void Channel::refreshUserList()
 {
     userList->clear();
-    for (int i = 0; i < currentList->size(); i++) {
-         userList->addItem(currentList->at(i));
+    QList<QString> users = channels[currentChannel].getUsers();
+    for (auto i:users) {
+         userList->addItem(i);
     }
 }
 
@@ -163,15 +156,14 @@ void Channel::refreshUserList()
 void Channel::refreshTopic()
 {
     topicText->clear();
-    topicText->setText(*currentTopic);
+    topicText->setText(channels[currentChannel].getTopic());
 }
 
 
 void Channel::changeNick(QString nick, QString newNick)
 {
-    for (auto i = 0; i < users.keys().size(); i++) {
-         if (users[users.keys().at(i)].contains(nick))
-             users[users.keys().at(i)].replace(users[users.keys().at(i)].indexOf(nick), newNick);
+    for (auto i:channels.keys()) {
+        channels[i].replaceUser(nick, newNick);
     }
     if (channels.keys().contains(nick)) {
         channels[newNick] = channels[nick];
@@ -179,4 +171,27 @@ void Channel::changeNick(QString nick, QString newNick)
     }
     refreshUserList();
     refreshChanList();
+}
+
+void Channel::clearLayout(QLayout *layout)
+{
+    QLayoutItem *item;
+    while((item = layout->takeAt(0))) {
+        if (item->layout()) {
+            clearLayout(item->layout());
+            delete item->layout();
+        }
+        if (item->widget()) {
+            delete item->widget();
+        }
+        delete item;
+    }
+}
+
+void Channel::clean()
+{
+    QLayoutItem *item;
+    while ((item = chanText->takeAt(0))) {
+        clearLayout(item->layout());
+    }
 }
