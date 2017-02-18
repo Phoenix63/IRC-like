@@ -175,17 +175,23 @@ class Client {
                         RPLSender.RPL_MOTD(this.socket);
                         RPLSender.RPL_ENDOFMOTD(this.socket);
 
-                        redisClient.getAdmin((reply) => {
-                            if (!reply) {
-                                this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                                this.addFlag('o');
-                                redisClient.setAdmin(this);
+                        if(process.argv[2] === 'TEST') {
+                            this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                            this.addFlag('o');
+                        } else {
+                            redisClient.getAdmin((reply) => {
+                                if (!reply) {
+                                    this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                                    this.addFlag('o');
+                                    redisClient.setAdmin(this);
 
-                            } else if (reply[identity] === 'admin') {
-                                this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                                this.addFlag('o');
-                            }
-                        });
+                                } else if (reply[identity] === 'admin') {
+                                    this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                                    this.addFlag('o');
+                                }
+                            });
+                        }
+
 
                     }
                 });
@@ -207,16 +213,18 @@ class Client {
      * @param {string} name
      */
     set name(name) {
+        let error = false;
         if(name === null) {
             this.socket.logger._USER_CHANGE_NICK('Guest_'+this._id);
             RPLSender.NICK(this.name, 'Guest_'+this._id, this);
             this._name = null;
+            error = true;
         } else {
             if (name[0] === ':') {
                 name = name.slice(1, name.length);
             }
 
-            let error = false;
+
 
             clients.forEach((c) => {
                 if (c.name === name) {

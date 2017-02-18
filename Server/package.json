@@ -8,6 +8,7 @@
     "watch": "babel --watch src --out-dir dist --source-maps inline --copy-files",
     "build": "babel src --out-dir dist --source-maps inline --copy-files",
     "start": "npm run build && node dist/app.js PROD",
+    "stest": "npm run build && node dist/app.js TEST",
     "test": "mocha"
   },
   "author": "",
