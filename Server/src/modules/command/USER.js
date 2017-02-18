@@ -19,7 +19,6 @@ module.exports = function (socket, command) {
     } else {
         realname = realname.slice(1,realname.length);
     }
-    console.log(realname);
 
     if (!name || !realname) {
         ERRSender.ERR_NEEDMOREPARAMS(socket.client, 'USER');

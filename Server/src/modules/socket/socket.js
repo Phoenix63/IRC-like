@@ -116,7 +116,7 @@ class Socket {
      */
     broadcast(str, except) {
         sockets.forEach((s) => {
-            if (except !== s) {
+            if (!except || except !== s) {
                 s.send(str);
             }
         });
