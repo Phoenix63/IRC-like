@@ -60,7 +60,7 @@ class Channel {
             this.setPersistent(true);
         }
 
-        this.addChannelFlag(['t', 'n']);
+        this._addChannelFlag('tn');
         channels.push(this);
     }
 
@@ -77,6 +77,8 @@ class Channel {
     get name() {
         return this._name;
     }
+
+
 
     get topic() {
         if(this._topic !== '') {
@@ -117,6 +119,8 @@ class Channel {
     get isInvitation() {
         return (this._flags.indexOf('i') >= 0);
     }
+
+
 
     /**
      *
@@ -167,35 +171,64 @@ class Channel {
      * this method is only called when bdd is loading
      * @param {JSON} flags
      */
-    setUserFlags(flags) {
-        this._usersFlags = flags;
-        this._change();
+
+    _addClientFlag(client, flags) {
+        let arrayFlags = flags.split('');
+        arrayFlags.forEach((flag) => {
+            if (this._usersFlags[client.identity].indexOf(flag) === -1) {
+                this._usersFlags[client.identity] += flag;
+                this._change();
+            }
+        });
+    }
+    _removeClientFlag(client, flags) {
+        let arrayFlags = flags.split('');
+        arrayFlags.forEach((flag) => {
+            this._usersFlags[client.identity] = this._usersFlags[client.identity].replace(flag, '');
+            this._change();
+        });
     }
 
     /**
      *
-     * @param {Array} flag
+     * @param {String} flags
      */
-    addChannelFlag(flag) {
-        if(flag instanceof Array) {
-            flag.forEach((f) => {
-                this._flags = this._flags.split(f).join('') + f;
-            });
+    _addChannelFlag(flags) {
+        let arrayFlags = flags.split('');
+        arrayFlags.forEach((flag) => {
+            if(this._flags.indexOf(flag)===-1){
+                this._flags += flag;
+                this._change();
+            }
+        });
+    }
+    /**
+     *
+     * @param {String} flags
+     */
+    _removeChannelFlag(flags) {
+        let arrayFlags = flags.split('');
+        arrayFlags.forEach((flag) => {
+            this._flags = this._flags.replace(flag,'');
             this._change();
-        } else {
-            throw "flag must be an Array";
+        });
+    }
+
+    changeClientFlag(operator, flag, client) {
+        if(operator==='+') {
+            this._addClientFlag(client, flag);
+        }else {
+            this._removeClientFlag(client, flag);
         }
     }
-    removeChannelFlag(flag) {
-        if(flag instanceof Array) {
-            flag.forEach((f) => {
-                this._flags = this._flags.split(f).join('');
-            });
-            this._change();
-        } else {
-            throw "flag must be an Array";
+    changeChannelFlag(operator, flag) {
+        if(operator==='+') {
+            this._addChannelFlag(flag);
+        }else {
+            this._removeChannelFlag(flag);
         }
     }
+
 
     /**
      * return true if the clinet is operator
@@ -203,7 +236,7 @@ class Channel {
      * @returns {boolean}
      */
     isUserOperator(client) {
-        if (this._usersFlags[client.identity] && this._usersFlags[client.identity] && this._usersFlags[client.identity].indexOf('o') >= 0) {
+        if (this._usersFlags[client.identity] && this._usersFlags[client.identity].indexOf('o') >= 0) {
             return true;
         } else if(this._temporary && client.identity === this._creator) {
             return true;
@@ -217,7 +250,7 @@ class Channel {
      * @returns {boolean}
      */
     isUserVoice(client) {
-        if (this._usersFlags[client.identity] && this._usersFlags[client.identity] && this._usersFlags[client.identity].indexOf('v') >= 0)
+        if (this._usersFlags[client.identity] && this._usersFlags[client.identity].indexOf('v') >= 0)
             return true;
         return false;
     }
@@ -290,7 +323,7 @@ class Channel {
                 }
 
                 if (this._pass.length>0){
-                    this.addChannelFlag(['p']);
+                    this._addChannelFlag('p');
                 }
 
                 if(user.isAdmin() || user.identity === this._creator) {
@@ -326,6 +359,12 @@ class Channel {
         }
 
     }
+    setSize(size) {
+        this._size = size;
+    }
+    setPass(pass) {
+        this._pass = pass;
+    }
 
     /**
      * Broadcast message to this channel, if except is defined this client don't receive the message
@@ -343,6 +382,15 @@ class Channel {
      *
      * @returns {Array<Channel>}
      */
+    static getChannelByName(name){
+        Channel.list().forEach(function (channel) {
+            if(channel.name === name){
+                return channel;
+            }
+            return null;
+        })
+    }
+
     static list() {
         return channels;
     }
