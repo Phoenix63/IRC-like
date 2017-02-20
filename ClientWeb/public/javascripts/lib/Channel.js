@@ -1,9 +1,9 @@
 	var Channel = (function() {
-		function Channel(chanName, admin, listUser, messages) {
+		function Channel(chanName) {
 			this.chan = chanName;
-			this.admi = admin;
-			this.listU = listUser || [admin];
-			this.messages = messages || [];
+			this.admi = undefined;
+			this.listU = [];
+			this.messages = [];
 		}
 		Channel.prototype.setAdmin = function(newAdmin) {
 			this.admi = newAdmin;
