@@ -124,7 +124,7 @@ class Client {
      * @returns {boolean}
      */
     get isRegistered() {
-        return (this._realname !== null) && (this._name !== null) && (this._identity !== null);
+        return this._identity !== null;
     }
 
     /**
@@ -175,17 +175,23 @@ class Client {
                         RPLSender.RPL_MOTD(this.socket);
                         RPLSender.RPL_ENDOFMOTD(this.socket);
 
-                        redisClient.getAdmin((reply) => {
-                            if (!reply) {
-                                this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                                this.addFlag('o');
-                                redisClient.setAdmin(this);
+                        if(process.argv[2] === 'TEST') {
+                            this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                            this.addFlag('o');
+                        } else {
+                            redisClient.getAdmin((reply) => {
+                                if (!reply) {
+                                    this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                                    this.addFlag('o');
+                                    redisClient.setAdmin(this);
 
-                            } else if (reply[identity] === 'admin') {
-                                this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                                this.addFlag('o');
-                            }
-                        });
+                                } else if (reply[identity] === 'admin') {
+                                    this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                                    this.addFlag('o');
+                                }
+                            });
+                        }
+
 
                     }
                 });
@@ -202,43 +208,47 @@ class Client {
 
     }
 
-    resetName() {
-        this._name = '';
-    }
-
     /**
      * set the user name
      * @param {string} name
      */
     set name(name) {
-        if (name[0] === ':') {
-            name = name.slice(1, name.length);
-        }
-
         let error = false;
-
-        clients.forEach((c) => {
-            if (c.name === name) {
-                if(!c.isUser() && this.isUser()) {
-                    c.resetName();
-                    RPLSender.NICK(name, c.name, c);
-                } else {
-                    ERRSender.ERR_NICKNAMEINUSE(this);
-                    error = true;
-                }
-            }
-        });
-
-        let match = name.match(/[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]+/);
-        if (!match || (match && match[0] !== name) || name === '' || name.length > 15) {
-            ERRSender.ERR_NONICKNAMEGIVEN(this);
+        if(name === null) {
+            this.socket.logger._USER_CHANGE_NICK('Guest_'+this._id);
+            RPLSender.NICK(this.name, 'Guest_'+this._id, this);
+            this._name = null;
             error = true;
+        } else {
+            if (name[0] === ':') {
+                name = name.slice(1, name.length);
+            }
+
+
+
+            clients.forEach((c) => {
+                if (c.name === name) {
+                    if(!c.isUser() && this.isUser()) {
+                        c.name = null;
+                    } else {
+                        ERRSender.ERR_NICKNAMEINUSE(this);
+                        error = true;
+                    }
+                }
+            });
+
+            let match = name.match(/[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]+/);
+            if (!match || (match && match[0] !== name) || name === '' || name.length > 15) {
+                ERRSender.ERR_NONICKNAMEGIVEN(this);
+                error = true;
+            }
+            if (!error) {
+                this.socket.logger._USER_CHANGE_NICK(name);
+                RPLSender.NICK(this.name, name, this);
+                this._name = name;
+            }
         }
-        if (!error) {
-            this.socket.logger._USER_CHANGE_NICK(name);
-            RPLSender.NICK(this.name, name, this);
-            this._name = name;
-        }
+
 
     }
 

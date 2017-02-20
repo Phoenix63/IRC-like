@@ -23,7 +23,7 @@ process.on('exit', quitHandle);
 
 process.on('SIGINT', quitHandle);
 
-if (!(process.argv[2] && process.argv[2] === 'DEV')) {
+if (!(process.argv[2] && (process.argv[2] === 'DEV' || process.argv[2] === 'TEST'))) {
     process.on('uncaughtException', (err) => {
         console.log('\t\t' + colors.red(err));
     });

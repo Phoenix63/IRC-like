@@ -93,7 +93,8 @@ let RPLSender = {
      * @static
      */
     PART: (client, channel, message='Gone') => {
-        channel.broadcast(':' + client.name + ' PART ' + channel.name + ' :'+message);
+        channel.broadcast(':' + client.name + ' PART ' + channel.name + ' :'+message, client);
+        client.socket.send(':' + client.name + ' PART ' + channel.name + ' :'+message);
     },
 
     /**
@@ -122,7 +123,8 @@ let RPLSender = {
      * @static
      */
     NICK: (oldname, newname, client) => {
-        client.socket.broadcast(':' + oldname + ' NICK ' + newname);
+        client.socket.broadcast(':' + oldname + ' NICK ' + newname, client);
+        client.socket.send(':' + oldname + ' NICK ' + newname);
     },
     /**
      *

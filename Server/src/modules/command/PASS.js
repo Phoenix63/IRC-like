@@ -1,5 +1,7 @@
 "use strict";
 
+import ERRSender from './../responses/ERRSender';
+
 module.exports = function (socket, command) {
 
     if (socket.client.isRegistered) {
