@@ -32,6 +32,10 @@ module.exports = function (socket, command) {
                 ERRSender.ERR_UNKNOWNCOMMAND(socket.client, command[0]);
                 return;
             }
+            if(!channel.isUserOperator(client)){
+
+                return;
+            }
             //give/take channel operator privileges;
             if(flags.indexOf('o') > -1){
                 channel.changeClientFlag(operator,'o',client);
@@ -70,11 +74,7 @@ module.exports = function (socket, command) {
             //no messages to channel from clients on the outside;
             channel.changeChannelFlag(operator,'n')
         }
-        console.log(nameChannel);
-        console.log(operator);
-        console.log(flags);
-        console.log(limit);
-        console.log(arg5);
+
     }
 
 };

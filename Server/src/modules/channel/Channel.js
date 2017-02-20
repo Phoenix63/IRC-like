@@ -177,16 +177,17 @@ class Channel {
         arrayFlags.forEach((flag) => {
             if (this._usersFlags[client.identity].indexOf(flag) === -1) {
                 this._usersFlags[client.identity] += flag;
-                this._change();
+
             }
         });
+        this._change();
     }
     _removeClientFlag(client, flags) {
         let arrayFlags = flags.split('');
         arrayFlags.forEach((flag) => {
             this._usersFlags[client.identity] = this._usersFlags[client.identity].replace(flag, '');
-            this._change();
         });
+        this._change();
     }
 
     /**
@@ -198,9 +199,10 @@ class Channel {
         arrayFlags.forEach((flag) => {
             if(this._flags.indexOf(flag)===-1){
                 this._flags += flag;
-                this._change();
+
             }
         });
+        this._change();
     }
     /**
      *
@@ -210,8 +212,8 @@ class Channel {
         let arrayFlags = flags.split('');
         arrayFlags.forEach((flag) => {
             this._flags = this._flags.replace(flag,'');
-            this._change();
         });
+        this._change();
     }
 
     changeClientFlag(operator, flag, client) {
@@ -284,6 +286,10 @@ class Channel {
             this._usersFlags[client.identity] = this._usersFlags[client.id].split(flag).join('');
             this._change();
         }
+    }
+    setUserFlags(flags) {
+        this._usersFlags = flags;
+        this._change();
     }
 
 
