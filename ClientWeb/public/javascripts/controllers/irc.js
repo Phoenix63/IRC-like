@@ -3,7 +3,7 @@ myApp.controller("ircCtrl",function($scope) {
     var user = new User();
     var nick = user.userN;
     var realN = user.realName;
-    socket.emit("message","USER Giloo63 0 * : " + realN);
+    socket.emit("message","USER Gilo53 0 * : " + realN);
 	$scope.currentChannel = new Channel("accueil");
     $scope.channels = [];
 	
@@ -85,8 +85,15 @@ myApp.controller("ircCtrl",function($scope) {
             var msgToPush = in_isNickname(msg);
             var oldname = msgToPush[0];
             nick = msgToPush[1];
-			$scope.currentChannel.listU[$scope.currentChannel.listU.indexOf(oldname)] = nick;
-            $scope.currentChannel.messages.push(oldname + " has changed his nick to" + nick);
+			if($scope.currentChannel.chan === "accueil") {
+				$scope.currentChannel.messages.push(oldname + " has changed his nick to " + nick);
+			}
+			for(var i = 0; i<$scope.channels.length; i++) {
+				if($scope.channels[i].listU.includes(oldname) === true) {
+					$scope.channels[i].listU[$scope.channels[i].listU.indexOf(oldname)] = nick;
+					$scope.channels[i].messages.push(oldname + " has changed his nick to " + nick);
+				}
+			}
         }
         else if(msg.match(/^:[a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]JOIN[ ][#][\w#&é"'\(è_çà@€^$*\-*\/+]+$/)) {
 			var bool = false;
@@ -119,7 +126,7 @@ myApp.controller("ircCtrl",function($scope) {
 			if($scope.currentChannel.listU.includes(chann[0]) === false) {
 				$scope.currentChannel.addUser(chann[0]);
 			}
-            $scope.currentChannel.messages.push(msg);
+            $scope.currentChannel.messages.push(chann[0] + " has joined the channel");
         }
 		else if(msg.includes("PING")===true) {
 			socket.emit("message", "PONG");
@@ -127,14 +134,12 @@ myApp.controller("ircCtrl",function($scope) {
 		else if(msg.includes("353")===true) {
 			var us = in_isNames(msg);
 			var mNames = "";
-			alert($scope.currentChannel.chan);
 			for(var i=0; i<us.length; i++) {
 				if(($scope.currentChannel.listU.includes(us[i]))===false) {
 					$scope.currentChannel.listU.push(us[i]);
 				}
 				mNames = us[i] + ", " + mNames;
 			}
-			alert("hihi");
 			mNames = mNames + " is on the channel " + currentChannel.chan;
 			
 			$scope.currentChannel.messages.push(mNames);

@@ -1,27 +1,29 @@
 
 	function in_isMsg(msg) {
 		var msSplit = msg.split(' ');
-		var sender = msSplit[0].replace(":","");
+		msSplit[0] = msSplit[0].replace(":","");
 		var channel = msSplit[2];
 		var mess = "";
 		for(var i = 4; i<msSplit.length; i++) {
 			mess = mess + " " + msSplit[i];
 		}
-		var msgBox = [sender, channel, mess];
+		var msgBox = [msSplit[0], channel, mess];
 		return msgBox;
 	}
 	function in_isNickname(msg) {
 		var msSplit = msg.split(' ');
-		var oldU = msSplit[0].replace(":","");
+		msSplit[0] = msSplit[0].replace(":","");
 		var newU = msSplit[2];
-		var lChangN = [oldU, newU];
+		var lChangN = [msSplit[0], newU];
 		return lChangN;
 	}
 	
 	function in_isNames(msg) {
 		var msSplit = msg.split(' ');
 		var listUsers = [];
-		for(var i = 5; i<msSplit.length; i++) {
+		msSplit[5] = msSplit[5].replace(":@","");
+		listUsers.push(msSplit[5]);
+		for(var i = 6; i<msSplit.length; i++) {
 			listUsers.push(msSplit[i]);
 		}
 		return listUsers;
@@ -29,8 +31,8 @@
 	
 	function in_isChannel(msg) {
 		var msSplit = msg.split(' ');
-		var nUser = msSplit[0].replace(":","");
+		msSplit[0] = msSplit[0].replace(":","");
 		var channel = msSplit[2];
-		var lChan = [nUser, channel];
+		var lChan = [msSplit[0], channel];
 		return lChan;
 	}
