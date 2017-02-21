@@ -92,6 +92,7 @@ void Channel::appendCurrent(QString string)
 
 void Channel::appendChannel(QString string, QString channel, QString send)
 {
+    qDebug() << string << channel << send;
     channels[channel].appendChat(send + string);
     if (channel == currentChannel)
         chanText->addLayout(parseur.parse(send + string.left(string.length()-1)));

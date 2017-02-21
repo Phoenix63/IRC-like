@@ -1,7 +1,7 @@
 #include "parseuremoji.h"
 
 ParseurEmoji::ParseurEmoji():
-    smile("img/smile.jpg")
+    smile("img/smile.png")
 {
     smile = smile.scaled(15, 15, Qt::KeepAspectRatio,Qt::SmoothTransformation);
 }
@@ -9,21 +9,25 @@ ParseurEmoji::ParseurEmoji():
 QHBoxLayout * ParseurEmoji::parse(QString string)
 {
     QHBoxLayout *message = new QHBoxLayout;
-    QString msg;
-    for (auto i:string.split(' ')) {
-        if (i == ":smile:") {
-            if (msg != "")
-                message->addWidget(new QLabel(msg));
-            msg = "";
+    auto count = string.count(QRegularExpression(":\\S+:"));
+    auto index = 0;
+    for (auto i = 0; i < count; i++ ) {
+        index = string.indexOf(QRegularExpression(":\\S+:"), index);
+        QString tmp = string.right(string.length() - index);
+        if (tmp.startsWith(":smile:")) {
+            tmp = string.left(index);
+            message->addWidget(new QLabel(string.left(index)));
+            index += 7;
+            string = string.right(string.length() - index);
             QLabel *label = new QLabel;
             label->setPixmap(smile);
             message->addWidget(label);
+            index = 0;
         } else {
-            msg.append(" " + i);
+            index++;
         }
     }
-    if (msg != "")
-        message->addWidget(new QLabel(msg));
+    message->addWidget(new QLabel(string));
     message->addStretch(0);
     return message;
 }

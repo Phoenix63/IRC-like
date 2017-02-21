@@ -90,7 +90,8 @@ bool Parseur::out_isJoinMsg(QString string)
 {
     if (!string.startsWith("/join"))
         return false;
-    string.replace(QString("/join"), QString("JOIN"));
+    string=string.right(string.length()-5);
+    string.prepend("JOIN");
     socket->write(string.toLatin1().data());
     return true;
 }
@@ -99,7 +100,8 @@ bool Parseur::out_isNamesMsg(QString string)
 {
     if(!string.startsWith("/names"))
         return false;
-    string.replace(QString("/names"), QString("NAMES"));
+    string=string.right(string.length()-6);
+    string.prepend("NAMES");
     socket->write(string.toLatin1().data());
     return true;
 }
@@ -108,7 +110,8 @@ bool Parseur::out_isPassMsg(QString string)
 {
     if (!string.startsWith("/pass"))
         return false;
-    string.replace(QString("/pass"), QString("PASS"));
+    string=string.right(string.length()-5);
+    string.prepend("PASS");
     socket->write(string.toLatin1().data());
     return true;
 }
@@ -117,7 +120,8 @@ bool Parseur::out_isPartMsg(QString string)
 {
     if (!string.startsWith("/part"))
         return false;
-    string.replace(QString("/part"), QString("PART"));
+    string=string.right(string.length()-5);
+    string.prepend("PART");
     if (string.contains(QRegularExpression("^PART\\s*$"))) {
         string="PART "+channel->channelName()+'\n';
         channel->leave(channel->channelName());
@@ -139,12 +143,12 @@ bool Parseur::out_isListMsg(QString string)
 
 bool Parseur::out_isWhoMsg(QString string)
 {
-    if(!string.startsWith("/who ") && !string.startsWith("/who\n"))
+    if(!string.startsWith("/who "))
         return false;
-    string.replace(QString("/who"), QString("WHO"));
+    string=string.right(string.length()-4);
+    string.prepend("WHO");
     if (channel->channelName() != "\"Debug\"")
         string = QString("WHO "+ (channel->channelName()) +'\n');
-    qDebug() << string;
     socket->write(string.toLatin1().data());
     return true;
 }
@@ -153,7 +157,8 @@ bool Parseur::out_isWhoisMsg(QString string)
 {
     if (!string.startsWith("/whois"))
         return false;
-    string.replace(QString("/whois"), QString("WHOIS"));
+    string=string.right(string.length()-5);
+    string.prepend("WHOIS");
     socket->write(string.toLatin1().data());
     return true;
 }
@@ -245,7 +250,10 @@ bool Parseur::in_isPrivMesg(QString string)
     if (!string.contains(IRC::RPL::PRIVMSG))
         return false;
     int j = string.indexOf(QRegularExpression(":.+$"));
-    channel->appendChannel(string.right(string.length()-j)+'\n', string.split(' ').at(2),string.split(' ').at(0));
+    QString sender = string.split(' ').at(0);
+    qDebug() << "message from :" << sender;
+    channel->joinWhisper(sender);
+    channel->appendChannel(string.right(string.length()-j)+'\n', string.split(' ').at(2),sender);
     return true;
 }
 
@@ -253,6 +261,7 @@ bool Parseur::in_isWhisMesg(QString string)
 {
     if (!string.contains(IRC::RPL::WHISPER))
         return false;
+    qDebug() << "test";
     int j = string.indexOf(QRegularExpression(":.+$"));
     channel->appendChannel(string.right(string.length()-j)+'\n', string.split(' ').at(0),string.split(' ').at(0));
     return true;
