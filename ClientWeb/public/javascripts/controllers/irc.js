@@ -1,9 +1,9 @@
 myApp.controller("ircCtrl",function($scope) {
 
     var user = new User();
-    var nick = user.userN;
+    var nick = user.nick;
     var realN = user.realName;
-    socket.emit("message","USER Gilo53 0 * : " + realN);
+    socket.emit("message","USER Gilo73 0 * : " + realN);
 	$scope.currentChannel = new Channel("accueil");
     $scope.channels = [];
 	
@@ -126,8 +126,32 @@ myApp.controller("ircCtrl",function($scope) {
 			if($scope.currentChannel.listU.includes(chann[0]) === false) {
 				$scope.currentChannel.addUser(chann[0]);
 			}
-            $scope.currentChannel.messages.push(chann[0] + " has joined the channel");
+            $scope.currentChannel.messages.push(chann[0] + " has joined the channel " + chann[1]);
         }
+		else if(msg.match(/^:[a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]PART[ ][#][\w#&é"'\(è_çà@€^$*\-*\/+]+$/)) {
+			var chann = in_isChannel(msg);
+			if($scope.channels.length === 1) {
+				$scope.channels.splice(0,1);
+				$scope.currentChannel = new Channel("accueil");
+				$scope.currentChannel.messages.push("You leave the channel " + chann[1]);
+			}
+			else {
+				for(var i = 0; i<$scope.channels.length; i++) {
+					if($scope.channels[i].chan === chann[1]) {
+						if($scope.currentChannel === $scope.channels[i]) {
+							$scope.channels.splice(i,1);
+							$scope.currentChannel = $scope.channels[$scope.channels.length-1];
+							$scope.currentChannel.messages.push("You leave the channel " + chann[1] + " and you join the channel " + $scope.channels[$scope.channels.length-1].chan);
+						}
+						else {
+							$scope.channels.splice(i,1);
+							$scope.currentChannel.messages.push("You leave the channel " + chann[1]);
+						}
+					}
+				}
+			}
+			
+		}
 		else if(msg.includes("PING")===true) {
 			socket.emit("message", "PONG");
 		}
