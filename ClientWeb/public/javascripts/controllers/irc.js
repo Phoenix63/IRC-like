@@ -4,7 +4,8 @@ myApp.controller("ircCtrl",function($scope) {
     var realN = user.realName;
 	var boolNames = undefined;
 	var boolNoNames = false;
-    socket.emit("message","USER Gilo243 0 * : " + realN);
+	var boolNoList = true;
+    socket.emit("message","USER Gilo313 0 * : " + realN);
 	$scope.currentChannel = new Channel("@accueil");
     $scope.channels = [];
 	
@@ -350,18 +351,27 @@ myApp.controller("ircCtrl",function($scope) {
 			}
 			
 		}
+		else if(msg.includes("331") === true) {
+			var topic = in_isTopic(msg);
+			$scope.topic = topic[0] + " :" + topic[1];
+		}
 		else if(msg.includes("366")===true) {
 			if(boolNoNames !== true) {
 				$scope.currentChannel.messages.push("There are no users in channels");
 			}
 			boolNoNames = false;
 		}
-		/*else if(msg.includes("315")===true) {
-			if(boolNoList !== true) {
-				$scope.currentChannel.messages.push("There are no users in this channels");
-			}
+		else if(msg.includes("322")===true) {
 			boolNoList = false;
-		}*/
+			var list = in_isList(msg);
+			$scope.currentChannel.messages.push("Channel : " + list[0] + " with " + list[1] + " user(s) - Topic ->" + list[2]);
+		}
+		else if(msg.includes("323")===true) {
+			if(boolNoList !== false) {
+				$scope.currentChannel.messages.push("There are not channels");
+			}
+			boolNoList = true;
+		}
 		else if(msg.includes("352")===true) {
 			$scope.currentChannel.messages.push(msg);
 		}
