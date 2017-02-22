@@ -2,6 +2,7 @@
 		function Channel(chanName) {
 			this.chan = chanName;
 			this.admi = undefined;
+			this.status = 0;
 			this.listU = [];
 			this.messages = [];
 		}

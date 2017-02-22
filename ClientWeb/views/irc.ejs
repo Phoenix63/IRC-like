@@ -3,9 +3,9 @@
     <div id="channels">
         <h3>Channels list</h3>
         <div ng-repeat="channel in channels">
-            <button>{{channel.chan}}</button>
+            <button ng-click="joinChannel(channel)" >{{channel.chan}}</button>
         </div>
-    </div>
+    </div>div
 
     <div id="messages">
         <h3>Channel messages</h3>
