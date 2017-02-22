@@ -21,12 +21,13 @@
 	function in_isNames(msg) {
 		var msSplit = msg.split(' ');
 		var listUsers = [];
+		var chann = msSplit[4];
 		msSplit[5] = msSplit[5].replace(":@","");
 		listUsers.push(msSplit[5]);
 		for(var i = 6; i<msSplit.length; i++) {
 			listUsers.push(msSplit[i]);
 		}
-		return listUsers;
+		return [chann, listUsers];
 	}
 	
 	function in_isChannel(msg) {

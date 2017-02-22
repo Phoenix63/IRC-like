@@ -2,7 +2,9 @@ myApp.controller("ircCtrl",function($scope) {
     var user = new User();
     var nick = user.nick;
     var realN = user.realName;
-    socket.emit("message","USER Gilo123 0 * : " + realN);
+	var boolNames = undefined;
+	var boolNoNames = false;
+    socket.emit("message","USER Gilo243 0 * : " + realN);
 	$scope.currentChannel = new Channel("@accueil");
     $scope.channels = [];
 	
@@ -149,6 +151,7 @@ myApp.controller("ircCtrl",function($scope) {
 				case "/names":
 					//users on every channel
                     socket.emit("message","NAMES");
+					boolNames = true;
                     $scope.newMessage = undefined;
 					break;
 				case "/list":
@@ -187,6 +190,7 @@ myApp.controller("ircCtrl",function($scope) {
     }
 
     socket.on("message",function(msg) {
+		
         if(msg.match(/^[:][a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]PRIVMSG[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?,%£*\-*\/+]+[ ][:][ ][a-zA-Z0-9 \W]+$/)) {
             var msgChan = in_isMsg(msg);
             var tt = msgChan[0] + " : " + msgChan[2];
@@ -246,6 +250,7 @@ myApp.controller("ircCtrl",function($scope) {
         }
         else if(msg.match(/^:[a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]JOIN[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?,%£*\-*\/+]+$/)) {
 			var bool = false;
+			boolNames = false;
             var chann = in_isChannel(msg);
 			var chanToAdd = new Channel(chann[1]);
 			// update
@@ -318,23 +323,45 @@ myApp.controller("ircCtrl",function($scope) {
 		}
 		else if(msg.match(/^:[a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]QUIT[ ][:][Gone]$/)) {
 			//quit
+			alert("dans quit");
 		}
 		else if(msg.includes("PING")===true) {
 			socket.emit("message", "PONG");
 		}
 		else if(msg.includes("353")===true) {
-			var us = in_isNames(msg);
+			boolNoNames = true;
+			var isNames = in_isNames(msg);
+			var us = isNames[1];
 			var mNames = "";
-			for(var i=0; i<us.length; i++) {
-				if(($scope.currentChannel.listU.includes(us[i]))===false) {
-					$scope.currentChannel.listU.push(us[i]);
-				}
+			for(var i = 0; i<us.length; i++) {
 				mNames = us[i] + ", " + mNames;
 			}
-			mNames = mNames + " is on the channel " + $scope.currentChannel.chan;
+			if(boolNames === false) {
+				for(var i = 0;i<us.length; i++) {
+					if(($scope.currentChannel.listU.includes(us[i]))===false) {
+						$scope.currentChannel.listU.push(us[i]);
+					}
+				}	
+			}
+			else if(boolNames === true){
+				var channelName = isNames[0];
+				mNames = "User(s) in the channel " + channelName + " : " + mNames;
+				$scope.currentChannel.messages.push(mNames);
+			}
 			
-			$scope.currentChannel.messages.push(mNames);
 		}
+		else if(msg.includes("366")===true) {
+			if(boolNoNames !== true) {
+				$scope.currentChannel.messages.push("There are no users in channels");
+			}
+			boolNoNames = false;
+		}
+		/*else if(msg.includes("315")===true) {
+			if(boolNoList !== true) {
+				$scope.currentChannel.messages.push("There are no users in this channels");
+			}
+			boolNoList = false;
+		}*/
 		else if(msg.includes("352")===true) {
 			$scope.currentChannel.messages.push(msg);
 		}
