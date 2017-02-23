@@ -3,7 +3,7 @@
     <div id="channels">
         <h3>Channels list</h3>
         <div ng-repeat="channel in channels">
-            <button ng-click="joinChannel(channel)" >{{channel.chan}}</button>
+            <button ng-click="joinChannel(channel)" ng-class="channel.notif == 1 ? 'notif-messageOn' : 'notif-messageOff'">{{channel.chan}}</button>
         </div>
     </div>div
 
