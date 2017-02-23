@@ -5,6 +5,7 @@ myApp.controller("ircCtrl",function($scope) {
 	var boolNames = undefined;
 	var boolNoNames = false;
 	var boolNoList = true;
+	var boolNoWho = true;
     socket.emit("message","USER Gilo313 0 * : " + realN);
 	$scope.currentChannel = new Channel("@accueil");
     $scope.channels = [];
@@ -284,7 +285,7 @@ myApp.controller("ircCtrl",function($scope) {
 				$scope.currentChannel.addUser(chann[0]);
 			}
         }
-		else if(msg.match(/^:[a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]PART[ ][#][\w#&é"'\(è_çà@€^$*\-*\/+]+$/)) {
+		else if(msg.match(/^:[a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]PART[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?,%£*\-*\/+]+$/)) {
 			var chann = in_isChannel(msg);
 			if(nick === chann[0]) {
 				if($scope.channels.length === 1) {
@@ -329,7 +330,7 @@ myApp.controller("ircCtrl",function($scope) {
 		else if(msg.includes("PING")===true) {
 			socket.emit("message", "PONG");
 		}
-		else if(msg.includes("353")===true) {
+		else if(msg.match(/^:[0-9.]+[ ][3][5][3][ ][a-zA-Z]+[ ][=][ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?,%£*\-*\/+]+[ ][:][@][a-zA-Z0-9 ]+$/)) {
 			boolNoNames = true;
 			var isNames = in_isNames(msg);
 			var us = isNames[1];
@@ -351,33 +352,33 @@ myApp.controller("ircCtrl",function($scope) {
 			}
 			
 		}
-		else if(msg.includes("331") === true) {
+		else if(msg.match(/^:[0-9.]+[ ][3][3][1][ ][a-zA-Z]+[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?,%£*\-*\/+]+[ ][:][a-zA-Z0-9 ,?;.\/!§ù%*µ$£^=+)@àç_è\-('"é&²]+$/)) {
 			var topic = in_isTopic(msg);
 			$scope.topic = topic[0] + " :" + topic[1];
 		}
-		else if(msg.includes("366")===true) {
+		else if(msg.match(/^:[0-9.]+[ ][3][6][6][ ][a-z]+[ ][:][a-zA-Z0-9 \/]+$/)) {
 			if(boolNoNames !== true) {
 				$scope.currentChannel.messages.push("There are no users in channels");
 			}
 			boolNoNames = false;
 		}
-		else if(msg.includes("322")===true) {
+		else if(msg.match(/^:[0-9.]+[ ][3][2][2][ ][a-z]+[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?,%£*\-*\/+]+[ ][0-9]+[ ][:][\w\W ]+$/)) {
 			boolNoList = false;
 			var list = in_isList(msg);
 			$scope.currentChannel.messages.push("Channel : " + list[0] + " with " + list[1] + " user(s) - Topic ->" + list[2]);
 		}
-		else if(msg.includes("323")===true) {
+		else if(msg.match(/^:[0-9.]+[ ][3][2][3][ ][a-z]+[ ][:][a-zA-Z0-9 \/]+$/)) {
 			if(boolNoList !== false) {
 				$scope.currentChannel.messages.push("There are not channels");
 			}
 			boolNoList = true;
 		}
+		else if(msg.match(/^:[0-9.]+[ ][3][7][2][ ][:][-][ ][a-zA-Z0-9_\-é"'ëäïöüâêîôûç `è]+$/)) { 
+            $scope.currentChannel.messages.push("Welcome " + realN);
+        }
 		else if(msg.includes("352")===true) {
 			$scope.currentChannel.messages.push(msg);
 		}
-        else if((msg.includes("372")===true)) {
-            $scope.currentChannel.messages.push("Welcome " + realN);
-        }
         else if(msg.includes("431")===true) {
             $scope.currentChannel.messages.push("No nickname given");
         }

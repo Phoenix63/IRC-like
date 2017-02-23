@@ -59,3 +59,4 @@
 		}
 		return [channel, numberOfUser, topic];
 	}
+	
