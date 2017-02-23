@@ -8,6 +8,9 @@
 			this.messages = [];
 			this.status = 1;
 		}
+		Whisper.prototype.setChan = function(chann) {
+			this.chan = chann;
+		}
 		Whisper.prototype.removeUser = function(u) {
 			var index = this.listU.indexOf(u);
 			this.listU.splice(index,1);
