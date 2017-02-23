@@ -4,6 +4,7 @@
 			this.chan = chanName;
 			this.listU = [];
 			this.notif = 0;
+			this.topic = "";
 			this.messages = [];
 			this.status = 1;
 		}
@@ -16,6 +17,9 @@
 		}
 		Whisper.prototype.setNotifOff = function() {
 			this.notif = 0;
+		}
+		Whisper.prototype.setTopic = function(top) {
+			this.topic = top;
 		}
 		return Whisper;
 	})();

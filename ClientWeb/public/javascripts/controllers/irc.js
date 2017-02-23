@@ -6,15 +6,15 @@ myApp.controller("ircCtrl",function($scope) {
 	var boolNoNames = false;
 	var boolNoList = true;
 	var boolNoWho = true;
-    socket.emit("message","USER Gilo1 0 * : " + realN);
+    socket.emit("message","USER Gipm 0 * : " + realN);
 	$scope.currentChannel = new Channel("@accueil");
     $scope.channels = [];
-	
+	$scope.topicChannel = "PANDIRC"
 	
 	$scope.joinChannel = function(ch) {
 		ch.setNotifOff();
 		$scope.currentChannel = ch;
-		
+		$scope.topicChannel = $scope.currentChannel.topic;
 	}
 	
     $scope.sendMessage = function() {
@@ -31,6 +31,7 @@ myApp.controller("ircCtrl",function($scope) {
 							if(string === $scope.channels[i].chan) {
 								$scope.channels[i].setNotifOff();
 								$scope.currentChannel = $scope.channels[i];
+								$scope.topicChannel = $scope.currentChannel.topic;
 							}
 						}
 					}
@@ -381,7 +382,9 @@ myApp.controller("ircCtrl",function($scope) {
 		}
 		else if(msg.match(/^:[0-9.]+[ ][3][3][1][ ][a-zA-Z]+[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?,%£*\-*\/+]+[ ][:][a-zA-Z0-9 ,?;.\/!§ù%*µ$£^=+)@àç_è\-('"é&²]+$/)) {
 			var topic = in_isTopic(msg);
-			$scope.topic = topic[0] + " :" + topic[1];
+			
+			$scope.currentChannel.setTopic(topic[0] + " :" + topic[1]);
+			$scope.topicChannel = $scope.currentChannel.topic;
 		}
 		else if(msg.match(/^:[0-9.]+[ ][3][6][6][ ][a-z]+[ ][:][a-zA-Z0-9 \/]+$/)) {
 			if(boolNoNames !== true) {
