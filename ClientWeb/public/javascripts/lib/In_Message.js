@@ -3,8 +3,9 @@
 		var msSplit = msg.split(' ');
 		msSplit[0] = msSplit[0].replace(":","");
 		var channel = msSplit[2];
+		msSplit[3] = msSplit[3].replace(":","");
 		var mess = "";
-		for(var i = 4; i<msSplit.length; i++) {
+		for(var i = 3; i<msSplit.length; i++) {
 			mess = mess + " " + msSplit[i];
 		}
 		var msgBox = [msSplit[0], channel, mess];
@@ -22,9 +23,11 @@
 		var msSplit = msg.split(' ');
 		var listUsers = [];
 		var chann = msSplit[4];
-		msSplit[5] = msSplit[5].replace(":@","");
+		msSplit[5] = msSplit[5].replace(":","");
+		msSplit[5] = msSplit[5].replace("@","");
 		listUsers.push(msSplit[5]);
 		for(var i = 6; i<msSplit.length; i++) {
+			msSplit[i].replace("@","");
 			listUsers.push(msSplit[i]);
 		}
 		return [chann, listUsers];

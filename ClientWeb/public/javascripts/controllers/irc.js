@@ -3,11 +3,8 @@ myApp.controller("ircCtrl",function($scope) {
     var nick = user.nick;
     var realN = user.realName;
 	var boolNames = undefined;
-	var boolNoNames = false;
-	var boolNoList = true;
-	var boolNoWho = true;
 	var countNick = 0;
-    socket.emit("message","USER J88 0 * : " + realN);
+    socket.emit("message","USER Gil23 0 * : " + realN);
 	$scope.currentChannel = new Channel("@accueil");
     $scope.channels = [];
 	$scope.topicChannel = "PANDIRC";
@@ -19,187 +16,224 @@ myApp.controller("ircCtrl",function($scope) {
 	}
 	
     $scope.sendMessage = function() {
-        var cmd = $scope.newMessage.match(/^\/[a-z]+[ ][\w#&é"@'(\-è_çà)=$*ù^!?.\/]+/g);
-		var cmd1 = $scope.newMessage.match(/^\/[a-z]+$/);
-        if(cmd!=null) {
-			var command = $scope.newMessage.split(' ');
-            var string = command[1];
-            switch(command[0]) {
-                case "/join":
-                    socket.emit("message", "JOIN " + string);
+        var cmdJoin = $scope.newMessage.match(/^\/[a-z]+[ ][\w#&é"'\(è_çà@€^$:!ù;¨?%£*\-*\/+]+$/);
+		var cmdPart = $scope.newMessage.match(/^\/[a-z]+[ ][\w#&é"'\(è_çà@€^$:!ù;¨?%£*\-*\/+, ]+$/);
+		var cmdUser = $scope.newMessage.match(/^\/[a-z]+[ ][\w_\-é"'ëäïöüâêîôûç`è]+$/);
+		var cmdMess = $scope.newMessage.match(/^\/[a-z]+[ ][\w_\-é"'ëäïöüâêîôûç`è]+[ ][\w\W ]+$/);
+		var cmdNoParam = $scope.newMessage.match(/^\/[a-z]+$/);
+		if($scope.newMessage.match(/^\/[a-z]+/g)) {
+			if(cmdJoin != null) {
+				var command = (/^(\/[a-z]+)[ ]([\w#&é"'\è_çà@€^$:!ù;¨?%£*\-*\/+]+)$/).exec($scope.newMessage);
+				var commandParamJoin = command[2];
+				var commandJoin = command[1];
+				if(commandJoin === "/join") {
+					socket.emit("message", "JOIN " + commandParamJoin);
 					if($scope.currentChannel.chan !== "@accueil") {
 						for(var i = 0;i<$scope.channels.length; i++) {
-							if(string === $scope.channels[i].chan) {
+							if(commandParamJoin === $scope.channels[i].chan) {
 								$scope.channels[i].setNotifOff();
 								$scope.currentChannel = $scope.channels[i];
 								$scope.topicChannel = $scope.currentChannel.topic;
 							}
 						}
 					}
-                    break;
-                case "/nick":
-                    socket.emit("message", "NICK " + string);
-                    break;
-                case "/part":
-                    //leave the channel
+				}
+			}
+			if(cmdPart != null) {
+				var command = (/^(\/[a-z]+)[ ]([\w#&é"'\è_çà@€^$:!ù;¨?%£*\-*\/+ ]+)$/).exec($scope.newMessage);
+				var commandPart = command[1];
+				var commandParamPart = command[2];
+				var boolNoPart = false;
+				if(commandPart === "/part") {
+					var multiChannel = commandParamPart.split(' ');
+					if(multiChannel[multiChannel.length-1][0] === ":") {
+						boolNoPart = true;
+						var messToPart = multiChannel[multiChannel.length-1];
+						for(var i = 0; i<$scope.channels.length; i++) {
+							if(multiChannel.includes($scope.channels[i].chan) === true) {
+								socket.emit("PRIVMSG " + $scope.channels[i].chan + " : " + messToPart);
+							}
+						}
+					}
 					if($scope.currentChannel.status === 0) {
-						socket.emit("message","PART " + string);
+						if(boolNoPart === false) {
+							for(var i = 0; i<multiChannel.length; i++) {
+								socket.emit("message","PART " + multiChannel[i]);
+							}
+						}
+						else {
+							for(var i = 0; i<multiChannel.length-1; i++) {
+								socket.emit("message","PART " + multiChannel[i]);
+							}
+						}	
 					}
 					else {
-						if($scope.channels.length !== 1) {
-							if($scope.currentChannel.chan !==string) {
-								for(var i = 0; i<$scope.channels.length; i++) {
-									if($scope.channels[i].chan === string) {
-										$scope.channels.splice(i,1);
-									}
-								}
-							}
-							else {
-								for(var i = 0; i<$scope.channels.length; i++) {
-									if($scope.channels[i].chan === string) {
-										$scope.channels.splice(i,1);
-										$scope.currentChannel = $scope.channels[$scope.channels.length-1];
-									}
-								}
-							}
+						var boolCurrentChan = false;
+						if(multiChannel.includes($scope.currentChannel.chan) === true) {
+							boolCurrentChan = true;
 						}
-						else {
-							$scope.channels.splice(0,1);
-							$scope.currentChannel = new Channel("@accueil");
+						for(var i = 0; i<$scope.channels.length; i++) {
+							if(multiChannel.includes($scope.channels[i].chan) === true) {
+								$scope.channels.splice(i,1);
+							}
 						}
 						
-					}
-                    break;
-                case "/who":
-                    //users in the current channel
-					socket.emit("message","WHO " + string);
-                    break;
-				case "/whois":
-					var boolWhoIs = false
-					if($scope.channels.length !== 0) {
-						for(var i = 0; i<$scope.channels.length; i++) {
-							if($scope.channels[i].listU.includes(string) === true) {
-								boolWhoIs = true;
-							}
-						}
-						if(boolWhoIs === true) {
-							socket.emit("message","WHOIS " + string);
-						}
-						else {
-							$scope.currentChannel.messages.push("You should have a channel in common");
-						}
-					}
-					break;
-                case "/msg":
-                    //messages
-					if(command[2] === undefined) {
-						$scope.currentChannel.messages.push("You should write a message");
-					}
-					else {
-						var booleUnkownNick = false;
-						var booleUsedWhisp = false;
-						for(var i = 0; i<$scope.channels.length; i++) {
-							if($scope.channels[i].listU.includes(string) === true) {
-								booleUnkownNick = true;
-							}
-							if($scope.channels[i].chan === string) {
-								booleUsedWhisp = true;
-								var counter = i;
-							}
-						}
-						// update
-						if(booleUnkownNick === true) {
-							if($scope.currentChannel.chan !== "@accueil") {
-								for(var i = 0; i<$scope.channels.length; i++) {
-									if($scope.channels[i].chan === $scope.currentChannel.chan) {
-										$scope.channels[i] = $scope.currentChannel;
-									}
-								}
-							}
-							if(booleUsedWhisp === true) {
-								$scope.channels[counter].setNotifOff();
-								$scope.currentChannel = $scope.channels[counter];
-								
-								
+						if(boolCurrentChan === true) {
+							if($scope.channels.length !== 0) {
+								$scope.currentChannel = $scope.channels[$scope.channels.length-1];
 							}
 							else {
-								$scope.currentChannel = new Whisper(string);
-								$scope.currentChannel.messages.push("You talk with " + string);
-								$scope.currentChannel.listU.push(string);
-								$scope.currentChannel.listU.push(nick);
-								$scope.channels.push($scope.currentChannel);
-							}
-							var messToSend = out_isMsg($scope.newMessage);
-							socket.emit("message","PRIVMSG " + string + " :" + messToSend);
-							$scope.currentChannel.messages.push(nick + " : " + messToSend);
-						}
-						else {
-							$scope.currentChannel.messages.push("unknown nickname");
-						}
-						
-					}
-                    break;
-                default:
-                    $scope.currentChannel.messages.push("not a command");
-            }
-			$scope.newMessage = undefined;
-        }
-		else if(cmd1!=null) {
-			switch(cmd1[0]) {
-				case "/part":
-					if($scope.currentChannel.chan !== "@accueil") {
-						if($scope.currentChannel.status === 0) {
-							socket.emit("message","PART " + $scope.currentChannel.chan);
-						}
-						else {
-							if($scope.channels.length === 1) {
-								$scope.channels.splice(0,1);
 								$scope.currentChannel = new Channel("@accueil");
 							}
-							else {
-								for(var i = 0; i<$scope.channels.length; i++) {
-									if($scope.channels[i].chan === $scope.currentChannel.chan) {
-										$scope.channels.splice(i,1);
-										$scope.currentChannel = $scope.channels[$scope.channels.length-1];
-									}
-								}
-							}		
 						}
 					}
-					break;
-				case "/names":
-					//users on every channel
-                    socket.emit("message","NAMES");
-					boolNames = true;
-					break;
-				case "/list":
-					//list every channels with their topic
-                    socket.emit("message","LIST");
-					break;
-				case "/who":
-					if($scope.currentChannel.chan !== "@accueil") {
-						socket.emit("message","WHO " + $scope.currentChannel.chan);
+				}
+			}
+			if(cmdUser != null) {
+				var command = (/^(\/[a-z]+)[ ]([\w_\-é"'ëäïöüâêîôûç`è]+)$/).exec($scope.newMessage);
+				var commandUser = command[1];
+				var paramUser = command[2];
+				switch(commandUser) {
+					case "/nick":
+						socket.emit("message", "NICK " + paramUser);
+						break;
+					case "/who":
+						//users in the current channel
+						socket.emit("message","WHO " + paramUser);
+						break;
+					case "/whois":
+						var boolWhoIs = false
+						if($scope.channels.length !== 0) {
+							for(var i = 0; i<$scope.channels.length; i++) {
+								if($scope.channels[i].listU.includes(paramUser) === true) {
+									boolWhoIs = true;
+								}
+							}
+							if(boolWhoIs === true) {
+								socket.emit("message","WHOIS " + paramUser);
+							}
+							else {
+								$scope.currentChannel.messages.push("You should have a channel in common");
+							}
+						}
+						break;
+					default:
+				}
+			}
+			if(cmdMess != null) {
+				var command = (/^(\/[a-z]+)[ ]([\w_\-é"'ëäïöüâêîôûç`è]+)[ ]([\w\W ]+)$/).exec($scope.newMessage);
+				var commandMess = command[1];
+				var paramUser = command[2];
+				var paramMess = command[3];
+				if(commandMess === "/msg") {
+					var booleUnkownNick = false;
+					var booleUsedWhisp = false;
+					for(var i = 0; i<$scope.channels.length; i++) {
+						if($scope.channels[i].listU.includes(paramUser) === true) {
+							booleUnkownNick = true;
+						}
+						if($scope.channels[i].chan === paramUser) {
+							booleUsedWhisp = true;
+							var counter = i;
+						}
+					}
+					// update
+					if(booleUnkownNick === true) {
+						if($scope.currentChannel.chan !== "@accueil") {
+							for(var i = 0; i<$scope.channels.length; i++) {
+								if($scope.channels[i].chan === $scope.currentChannel.chan) {
+									$scope.channels[i] = $scope.currentChannel;
+								}
+							}
+						}
+						if(booleUsedWhisp === true) {
+							$scope.channels[counter].setNotifOff();
+							$scope.currentChannel = $scope.channels[counter];
+						}
+						else {
+							$scope.currentChannel = new Whisper(paramUser);
+							$scope.currentChannel.messages.push("You talk with " + paramUser);
+							$scope.currentChannel.listU.push(paramUser);
+							$scope.currentChannel.listU.push(nick);
+							$scope.channels.push($scope.currentChannel);
+						}
+						socket.emit("message","PRIVMSG " + paramUser + " :" + paramMess);
+						$scope.currentChannel.messages.push(nick + " : " + paramMess);
 					}
 					else {
-						$scope.currentChannel.messages.push("You have to join a channel");
+						$scope.currentChannel.messages.push("unknown nickname");
 					}
-					break;
-				case "/quit":
-					//leave the server
-                    socket.emit("message","QUIT");
-					break;
-				default:
+				}
+						
+				
 			}
+			if(cmdNoParam != null) {
+				var command = (/^(\/[a-z]+)$/).exec($scope.newMessage);
+				var cmd = command[1];
+				switch(cmd) {
+					case "/part":
+						if($scope.currentChannel.chan !== "@accueil") {
+							if($scope.currentChannel.status === 0) {
+								socket.emit("message","PART " + $scope.currentChannel.chan);
+							}
+							else {
+								if($scope.channels.length === 1) {
+									$scope.channels.splice(0,1);
+									$scope.currentChannel = new Channel("@accueil");
+								}
+								else {
+									for(var i = 0; i<$scope.channels.length; i++) {
+										if($scope.channels[i].chan === $scope.currentChannel.chan) {
+											$scope.channels.splice(i,1);
+											$scope.currentChannel = $scope.channels[$scope.channels.length-1];
+										}
+									}
+								}		
+							}
+						}
+						break;
+					case "/names":
+						//users on every channel
+						socket.emit("message","NAMES");
+						boolNames = true;
+						break;
+					case "/list":
+						//list every channels with their topic
+						socket.emit("message","LIST");
+						break;
+					case "/who":
+						if($scope.currentChannel.chan !== "@accueil") {
+							socket.emit("message","WHO " + $scope.currentChannel.chan);
+						}
+						else {
+							$scope.currentChannel.messages.push("You have to join a channel");
+						}
+						break;
+					case "/whois":
+						if($scope.currentChannel.status === 1) {
+							socket.emit("message","WHOIS " + $scope.currentChannel.chan);
+						}
+						else {
+							$scope.currentChannel.messages.push("You should put a user after your command");
+						}
+					case "/quit":
+						//leave the server
+						socket.emit("message","QUIT");
+						break;
+					default:
+				}
+			}
+			
 			$scope.newMessage = undefined;
 			
 		}
-        else if($scope.currentChannel.chan !== "@accueil"){
+		else if($scope.currentChannel.chan !== "@accueil"){
             socket.emit("message","PRIVMSG " + $scope.currentChannel.chan + " : " + $scope.newMessage);
             $scope.currentChannel.messages.push(nick + ": " + $scope.newMessage);
-            $scope.newMessage = undefined;
+			$scope.newMessage = undefined;
         }
 		else {
-			$scope.currentChannel.messages.push("You should join a channel");
+			$scope.currentChannel.messages.push("Command invalid");
 			$scope.newMessage = undefined;
 		}
 		$scope.$apply();
@@ -207,7 +241,7 @@ myApp.controller("ircCtrl",function($scope) {
 
     socket.on("message",function(msg) {
 		
-        if(msg.match(/^[:][a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]PRIVMSG[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?,%£*\-*\/+]+[ ][:][ ][a-zA-Z0-9 \W]+$/)) {
+        if(msg.match(/^[:][a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]PRIVMSG[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?%£*\-*\/+]+[ ][:][ ][a-zA-Z0-9 \W]+$/)) {
             var msgChan = in_isMsg(msg);
             var tt = msgChan[0] + " : " + msgChan[2];
 			if($scope.currentChannel.chan !== msgChan[1]) {
@@ -223,11 +257,10 @@ myApp.controller("ircCtrl",function($scope) {
 			}
 			
         }
-		else if(msg.match(/^[:][a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]PRIVMSG[ ][a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ][:][ ][a-zA-Z0-9 \W]+$/)) {
+		else if(msg.match(/^[:][a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]PRIVMSG[ ][a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ][:][a-zA-Z0-9 \W]+$/)) {
 			var bool = false;
 			var msgPriv = in_isMsg(msg);
 			var WhispToAdd = new Whisper(msgPriv[0]);
-			
 			
 			// update
 			if($scope.currentChannel.chan !== "@accueil") {
@@ -313,7 +346,7 @@ myApp.controller("ircCtrl",function($scope) {
 			}
            
         }
-        else if(msg.match(/^:[a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]JOIN[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?,%£*\-*\/+]+$/)) {
+        else if(msg.match(/^:[a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]JOIN[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?%£*\-*\/+]+$/)) {
 			var bool = false;
 			boolNames = false;
             var chann = in_isChannel(msg);
@@ -355,13 +388,12 @@ myApp.controller("ircCtrl",function($scope) {
 			}
 			
         }
-		else if(msg.match(/^:[a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]PART[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?,%£*\-*\/+]+[ ][:][\w\W ]+$/)) {
+		else if(msg.match(/^:[a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]PART[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?%£*\-*\/+]+[ ][:][\w\W ]+$/)) {
 			var chann = in_isChannel(msg);
 			if(nick === chann[0]) {
 				if($scope.channels.length === 1) {
 					$scope.channels.splice(0,1);
 					$scope.currentChannel = new Channel("@accueil");
-					$scope.currentChannel.messages.push("You leave the channel " + chann[1]);
 				}
 				else {
 					for(var i = 0; i<$scope.channels.length; i++) {
@@ -373,7 +405,6 @@ myApp.controller("ircCtrl",function($scope) {
 							}
 							else {
 								$scope.channels.splice(i,1);
-								$scope.currentChannel.messages.push("You leave the channel " + chann[1]);
 							}
 						}
 					}
@@ -401,8 +432,7 @@ myApp.controller("ircCtrl",function($scope) {
 		else if(msg.includes("PING")===true) {
 			socket.emit("message", "PONG");
 		}
-		else if(msg.match(/^:[0-9.]+[ ][3][5][3][ ][a-zA-Z]+[ ][=][ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?,%£*\-*\/+]+[ ][:][@][a-zA-Z0-9 ]+$/)) {
-			boolNoNames = true;
+		else if(msg.match(/^:[0-9.]+[ ][3][5][3][ ][a-zA-Z]+[ ][=][ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?%£*\-*\/+]+[ ][:][@][a-zA-Z0-9 ]+$/)) {
 			var isNames = in_isNames(msg);
 			var us = isNames[1];
 			var mNames = "";
@@ -424,28 +454,15 @@ myApp.controller("ircCtrl",function($scope) {
 			boolNames = true;
 			
 		}
-		else if(msg.match(/^:[0-9.]+[ ][3][3][1][ ][a-zA-Z]+[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?,%£*\-*\/+]+[ ][:][a-zA-Z0-9 ,?;.\/!§ù%*µ$£^=+)@àç_è\-('"é&²]+$/)) {
+		else if(msg.match(/^:[0-9.]+[ ][3][3][1][ ][a-zA-Z]+[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?%£*\-*\/+]+[ ][:][a-zA-Z0-9 ,?;.\/!§ù%*µ$£^=+)@àç_è\-('"é&²]+$/)) {
 			var topic = in_isTopic(msg);
 			
 			$scope.currentChannel.setTopic(topic[0] + " :" + topic[1]);
 			$scope.topicChannel = $scope.currentChannel.topic;
 		}
-		else if(msg.match(/^:[0-9.]+[ ][3][6][6][ ][a-z]+[ ][:][a-zA-Z0-9 \/]+$/)) {
-			if(boolNoNames !== true) {
-				$scope.currentChannel.messages.push("There are no users in channels");
-			}
-			boolNoNames = false;
-		}
-		else if(msg.match(/^:[0-9.]+[ ][3][2][2][ ][a-z]+[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?,%£*\-*\/+]+[ ][0-9]+[ ][:][\w\W ]+$/)) {
-			boolNoList = false;
+		else if(msg.match(/^:[0-9.]+[ ][3][2][2][ ][a-z]+[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?%£*\-*\/+]+[ ][0-9]+[ ][:][\w\W ]+$/)) {
 			var list = in_isList(msg);
 			$scope.currentChannel.messages.push("Channel : " + list[0] + " with " + list[1] + " user(s) - Topic ->" + list[2]);
-		}
-		else if(msg.match(/^:[0-9.]+[ ][3][2][3][ ][a-z]+[ ][:][a-zA-Z0-9 \/]+$/)) {
-			if(boolNoList !== false) {
-				$scope.currentChannel.messages.push("There are not channels");
-			}
-			boolNoList = true;
 		}
 		else if(msg.match(/^:[0-9.]+[ ][3][7][2][ ][:][-][ ][a-zA-Z0-9_\-é"'ëäïöüâêîôûç `è]+$/)) { 
             $scope.currentChannel.messages.push("Welcome " + realN);
