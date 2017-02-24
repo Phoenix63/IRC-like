@@ -48,3 +48,7 @@ Server/images/*
 Server/node_modules/
 Server/test.js
 Server/test/
+
+out/
+node_modules/
+!/ClientWeb/bin/
