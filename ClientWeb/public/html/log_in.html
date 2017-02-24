@@ -1,0 +1,23 @@
+
+<header>
+    <img id="banniere" src="/images/banniere.png" alt="" />
+</header>
+<div ng-controller="log_in_controller">
+    <section id="connexionGuest" class="formulaire">
+        <button ng-click="loadChat()">Se connecter</button>
+    </section>
+    <section id="connexion" class="formulaire">
+        <form ng-submit="index.html" class="formType">
+            <p>
+                <fieldset>
+                    <legend>Connexion</legend>
+                    <p><label for="connexion_pseudo">Pseudo</label><input id="connexion_pseudo" type="text" ng-model="nickname"/></p>
+                    <p><label for="connexion_password">mot de passe</label><input id="connexion_password" type="password" ng-model="password"/></p>
+                    <p><label for="connexion_server">Server</label><input id="connexion_server" type="text" ng-model="server"/></p>
+                    <p><label for="connexion_port">Port</label><input id="connexion_port" type="text" ng-model="port"/></p>
+            </fieldset>
+            <input value="Connexion"/>
+            </p>
+        </form>
+    </section>
+</div>

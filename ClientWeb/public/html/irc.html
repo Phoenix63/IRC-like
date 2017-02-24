@@ -1,0 +1,36 @@
+
+<div ng-controller="ircCtrl">
+    <div id="channels">
+        <h3>Channels list</h3>
+        <div ng-repeat="channel in channels">
+            <button ng-click="joinChannel(channel)" ng-class="channel.notif == 1 ? 'notif-messageOn' : 'notif-messageOff'">{{channel.chan}}</button>
+        </div>
+    </div>div
+
+    <div id="messages">
+        <h3>Channel messages</h3>
+        <div ng-repeat="message in currentChannel.messages track by $index">
+            <p>{{message}}</p>
+        </div>
+    </div>
+
+    <div id="users">
+        <h3>Users list</h3>
+        <div ng-repeat="user in currentChannel.listU">
+            <p>{{user}}</p>
+        </div>
+    </div>
+    <div id="topic">
+        <h1>{{topicChannel}}</h1>
+    </div>
+
+        <form ng-submit="sendMessage()">
+            <div id="divSendMessage">
+                <input id="inputSendMessage" ng-model="newMessage" placeholder="message"></input>
+            </div>
+            <div id="divSubmit">
+                <button type="submit" id="submitSendMessage">Envoyer</button>
+            </div>
+        </form>
+
+</div>
