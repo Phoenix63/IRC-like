@@ -11,6 +11,12 @@ myApp.controller("ircCtrl",function($scope) {
 	
 	$scope.joinChannel = function(ch) {
 		ch.setNotifOff();
+		//update
+		for(var i = 0; i<$scope.channels.length; i++) {
+			if($scope.channels[i].chan === $scope.currentChannel.chan) {
+				$scope.channels[i] = $scope.currentChannel;
+			}
+		}
 		$scope.currentChannel = ch;
 		$scope.topicChannel = $scope.currentChannel.topic;
 	}
@@ -24,9 +30,12 @@ myApp.controller("ircCtrl",function($scope) {
 							$scope.channels.splice(i,1);
 							if($scope.channels.length === 0) {
 								$scope.currentChannel = new Channel("@accueil");
+								$scope.topicChannel = "PANDIRC";
+								
 							}
 							else {
 								$scope.currentChannel = $scope.channels[$scope.channels.length-1];
+								$scope.topicChannel = $scope.currentChannel.topic;
 							}
 						}
 						else {
@@ -46,6 +55,37 @@ myApp.controller("ircCtrl",function($scope) {
 		}],
 		['DeMute', function ($itemScope) {
 			ch.setNotifOff();
+		}]
+	];
+	
+	$scope.menuOptionsUser = function(userL) [
+		["Message", function ($itemScope) {
+			
+			var boolUser = false;
+			//update
+			for(var i = 0; i<$scope.channels.length; i++) {
+				if($scope.channels[i].chan === $scope.currentChannel.chan) {
+					$scope.channels[i] = $scope.currentChannel;
+				}
+			}
+			for(var i = 0; i<$scope.channels.length; i++) {
+				if($scope.channels[i].chan === userL) {
+					boolUser = true;
+					
+				}
+			}
+			if(boolUser === true) {
+				$scope.currentChannel = $scope.channels[i].chan;
+			}
+			else {
+				$scope.currentChannel = new Whisper(userL);
+				$scope.currentChannel.setTopic(userL);
+				$scope.topicChannel = $scope.currentChannel.topic;
+				$scope.currentChannel.listU.push(nick);
+				$scope.currentChannel.listU.push(userL);
+				$scope.channels.push($scope.currentChannel);
+				$scope.currentChannel.messages.push("You talk with " + userL);
+			}
 		}]
 	];
 	
@@ -116,9 +156,11 @@ myApp.controller("ircCtrl",function($scope) {
 						if(boolCurrentChan === true) {
 							if($scope.channels.length !== 0) {
 								$scope.currentChannel = $scope.channels[$scope.channels.length-1];
+								$scope.topicChannel = $scope.currentChannel.topic;
 							}
 							else {
 								$scope.currentChannel = new Channel("@accueil");
+								$scope.topicChannel = "PANDIRC";
 							}
 						}
 					}
@@ -187,6 +229,8 @@ myApp.controller("ircCtrl",function($scope) {
 						}
 						else {
 							$scope.currentChannel = new Whisper(paramUser);
+							$scope.currentChannel.setTopic(paramUser);
+							$scope.topicChannel = $scope.currentChannel.topic;
 							$scope.currentChannel.messages.push("You talk with " + paramUser);
 							$scope.currentChannel.listU.push(paramUser);
 							$scope.currentChannel.listU.push(nick);
@@ -215,12 +259,14 @@ myApp.controller("ircCtrl",function($scope) {
 								if($scope.channels.length === 1) {
 									$scope.channels.splice(0,1);
 									$scope.currentChannel = new Channel("@accueil");
+									$scope.topicChannel = "PANDIRC";
 								}
 								else {
 									for(var i = 0; i<$scope.channels.length; i++) {
 										if($scope.channels[i].chan === $scope.currentChannel.chan) {
 											$scope.channels.splice(i,1);
 											$scope.currentChannel = $scope.channels[$scope.channels.length-1];
+											$scope.topicChannel = $scope.currentChannel.topic;
 										}
 									}
 								}		
@@ -315,6 +361,8 @@ myApp.controller("ircCtrl",function($scope) {
 				}
 			}
 			if(bool === false) {
+				WhispToAdd.messages.push(msgPriv[0] + " talks to you");
+				WhispToAdd.setTopic(msgPriv[0]);
 				WhispToAdd.messages.push(msgPriv[0] + " : " + msgPriv[2]);
 				WhispToAdd.listU.push(msgPriv[1]);
 				WhispToAdd.listU.push(msgPriv[0]);
@@ -435,6 +483,7 @@ myApp.controller("ircCtrl",function($scope) {
 				if($scope.channels.length === 1) {
 					$scope.channels.splice(0,1);
 					$scope.currentChannel = new Channel("@accueil");
+					$scope.topicChannel = "PANDIRC";
 				}
 				else {
 					for(var i = 0; i<$scope.channels.length; i++) {
@@ -443,6 +492,7 @@ myApp.controller("ircCtrl",function($scope) {
 								$scope.channels.splice(i,1);
 								$scope.currentChannel = $scope.channels[$scope.channels.length-1];
 								$scope.currentChannel.messages.push("You leave the channel " + chann[1] + " and you join the channel " + $scope.channels[$scope.channels.length-1].chan);
+								$scope.topicChannel = $scope.currentChannel.topic;
 							}
 							else {
 								$scope.channels.splice(i,1);

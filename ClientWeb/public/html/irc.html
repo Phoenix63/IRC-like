@@ -17,7 +17,7 @@
     <div id="users">
         <h3>Users list</h3>
         <div ng-repeat="user in currentChannel.listU">
-            <p>{{user}}</p>
+            <button ng-context-menu="menuOptionsUser(user)">{{user}}</button>
         </div>
     </div>
     <div id="topic">
