@@ -52,3 +52,4 @@ Server/test/
 out/
 node_modules/
 !/ClientWeb/bin/
+ClientWeb/public/javascripts/controllers/contextMenu.js

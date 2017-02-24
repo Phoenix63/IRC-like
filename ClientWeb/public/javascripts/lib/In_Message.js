@@ -27,7 +27,7 @@
 		msSplit[5] = msSplit[5].replace("@","");
 		listUsers.push(msSplit[5]);
 		for(var i = 6; i<msSplit.length; i++) {
-			msSplit[i].replace("@","");
+			msSplit[i] = msSplit[i].replace("@","");
 			listUsers.push(msSplit[i]);
 		}
 		return [chann, listUsers];
