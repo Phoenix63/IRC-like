@@ -9,6 +9,9 @@
 }
 
 #messages {
+	overflow-y: auto;
+	overflow-x: hidden;
+	word-wrap:break-word;
     position: absolute;
     top:100px;
     left: 200px;

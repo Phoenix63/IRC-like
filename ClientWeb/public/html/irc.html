@@ -7,7 +7,7 @@
         </div>
     </div>div
 
-    <div id="messages">
+    <div id="messages" scroll-bottom="currentChannel.messages">
         <h3>Channel messages</h3>
         <div ng-repeat="message in currentChannel.messages track by $index">
             <p>{{message}}</p>
