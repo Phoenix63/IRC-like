@@ -138,7 +138,6 @@ let ERRSender = {
     ERR_BADCHANNELKEY: (client, channel) => {
         client.socket.send(':' + config.ip + ' 475 ' + channel.name + ' :Cannot join channel (+k)');
     },
-
     /**
      *
      * @param {Client} client
@@ -147,6 +146,42 @@ let ERRSender = {
      */
     ERR_CHANOPRIVSNEEDED: (client, channel) => {
         client.socket.send(':'+config.ip+' 482 '+channel.name+' :You\'re not channel operator');
+    },
+    /**
+     *
+     * @param client
+     * @param channel
+     * @constructor
+     */
+    ERR_USERNOTINCHANNEL: (client, channel) => {
+        client.socket.send(':'+config.ip+' 441 '+channel.name+' :They aren\'t on that channel');
+    },
+    /**
+     *
+     * @param client
+     * @param channel
+     * @constructor
+     */
+    ERR_USERSDONTMATCH: (client, channel) => {
+        client.socket.send(':'+config.ip+' 502 '+channel.name+' :Cant change mode for other users');
+    },
+    /**
+     *
+     * @param client
+     * @param channel
+     * @constructor
+     */
+    ERR_UMODEUNKNOWNFLAG: (client, channel) => {
+        client.socket.send(':'+config.ip+' 501 '+channel.name+' :Unknown MODE flag');
+    },
+    /**
+     *
+     * @param client
+     * @param channel
+     * @constructor
+     */
+    ERR_KEYSET: (client, channel) => {
+        client.socket.send(':'+config.ip+' 467 '+channel.name+' :Channel key already set');
     }
 
 

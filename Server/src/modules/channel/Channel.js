@@ -97,6 +97,20 @@ class Channel {
     }
 
     /**
+     *
+     * @param id|nickname|client
+     * @returns {null|Client}
+     */
+    getUser(id) {
+        for (let key in this._users) {
+            if (key === id || this._users[key].name === id || this._users[key].id === id) {
+                return this._users[key];
+            }
+        }
+        return null;
+    }
+
+    /**
      * get status private for the channel, true = private / false = public
      * @returns {boolean}
      */
@@ -267,26 +281,7 @@ class Channel {
             this._change();
         }
     }
-    /**
-     *
-     * @param {Client} client
-     */
-    setUserVoice(client) {
-        if (typeof this._usersFlags[client.identity] === 'string' && this._usersFlags[client.identity].indexOf('v')<0 && client.isUser()) {
-            this._usersFlags[client.identity] += 'v';
-            this._change();
-        }
-    }
-    /**
-     *
-     * @param {Client} client
-     */
-    removeUserFlag(client, flag) {
-        if(typeof this._usersFlags[client.identity] === 'string') {
-            this._usersFlags[client.identity] = this._usersFlags[client.id].split(flag).join('');
-            this._change();
-        }
-    }
+
     setUserFlags(flags) {
         this._usersFlags = flags;
         this._change();
@@ -388,13 +383,13 @@ class Channel {
      *
      * @returns {Array<Channel>}
      */
-    static getChannelByName(name){
-        Channel.list().forEach(function (channel) {
-            if(channel.name === name){
-                return channel;
+    static getChannelByName(nameChannel){
+        for(let i = 0; i< Channel.list().length;i++){
+            if(Channel.list()[i].name===nameChannel){
+                return Channel.list()[i];
             }
-            return null;
-        })
+        }
+        return null;
     }
 
     static list() {

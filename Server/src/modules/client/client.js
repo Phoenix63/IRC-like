@@ -318,7 +318,7 @@ class Client {
      * @param id
      * @returns {null|Client}
      */
-    static find(id) {
+    static getClient(id) {
         for (let key in clients) {
             if (key === id || clients[key].name === id || client[key].id === id) {
                 return clients[key];
