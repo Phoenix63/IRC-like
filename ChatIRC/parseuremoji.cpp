@@ -1,9 +1,15 @@
 #include "parseuremoji.h"
 
-ParseurEmoji::ParseurEmoji():
-    smile("img/smile.png")
+ParseurEmoji::ParseurEmoji()
 {
-    smile = smile.scaled(15, 15, Qt::KeepAspectRatio,Qt::SmoothTransformation);
+    QDir emojis("img/");
+    QStringList emojisList = emojis.entryList();
+    for(auto i:emojisList)
+    {
+        QPixmap j("img/"+i);
+        i=i.left(i.length()-4);
+        emotes[":"+i+":"] = j.scaled(15, 15, Qt::KeepAspectRatio,Qt::SmoothTransformation);
+    }
 }
 
 QHBoxLayout * ParseurEmoji::parse(QString string)
@@ -11,21 +17,28 @@ QHBoxLayout * ParseurEmoji::parse(QString string)
     QHBoxLayout *message = new QHBoxLayout;
     auto count = string.count(QRegularExpression(":\\S+:"));
     auto index = 0;
-    for (auto i = 0; i < count; i++ ) {
+    for (auto i = 0; i < count; i++ )
+    {
+        bool modified = false;
         index = string.indexOf(QRegularExpression(":\\S+:"), index);
         QString tmp = string.right(string.length() - index);
-        if (tmp.startsWith(":smile:")) {
-            tmp = string.left(index);
-            message->addWidget(new QLabel(string.left(index)));
-            index += 7;
-            string = string.right(string.length() - index);
-            QLabel *label = new QLabel;
-            label->setPixmap(smile);
-            message->addWidget(label);
-            index = 0;
-        } else {
-            index++;
+        for(auto  i :emotes.keys())
+        {
+            if (tmp.startsWith(i))
+            {
+                tmp = string.left(index);
+                message->addWidget(new QLabel(string.left(index)));
+                index += i.length();
+                string = string.right(string.length() - index);
+                QLabel *label = new QLabel;
+                label->setPixmap(emotes[i]);
+                message->addWidget(label);
+                index = 0;
+                modified=true;
+                break;
+            }
         }
+        if(!modified) index++;
     }
     message->addWidget(new QLabel(string));
     message->addStretch(0);

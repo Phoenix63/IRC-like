@@ -8,6 +8,8 @@
 #include <QSpacerItem>
 #include <QRegularExpression>
 #include <QDebug>
+#include <QHash>
+#include <QDir>
 
 class ParseurEmoji
 {
@@ -19,7 +21,9 @@ public:
 
 private:
     // soon a hash map for easy config from file
+    QHash<QString,QPixmap> emotes;
     QPixmap smile;
+    QPixmap pandab;
 };
 
 #endif // PARSEUREMOJI_H

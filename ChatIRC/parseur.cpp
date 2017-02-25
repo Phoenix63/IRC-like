@@ -251,7 +251,6 @@ bool Parseur::in_isPrivMesg(QString string)
         return false;
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString sender = string.split(' ').at(0);
-    qDebug() << "message from :" << sender;
     channel->joinWhisper(sender);
     channel->appendChannel(string.right(string.length()-j)+'\n', string.split(' ').at(2),sender);
     return true;
@@ -261,7 +260,6 @@ bool Parseur::in_isWhisMesg(QString string)
 {
     if (!string.contains(IRC::RPL::WHISPER))
         return false;
-    qDebug() << "test";
     int j = string.indexOf(QRegularExpression(":.+$"));
     channel->appendChannel(string.right(string.length()-j)+'\n', string.split(' ').at(0),string.split(' ').at(0));
     return true;
@@ -271,7 +269,6 @@ bool Parseur::in_isNickEdit(QString string)
 {
     if (!string.contains(IRC::RPL::NICK))
         return false;
-    qDebug() << "nick";
     channel->changeNick(string.split(' ')[0], string.split(' ')[2]);
     channel->appendChannel(string+'\n', "\"Debug\"","");
     return true;
