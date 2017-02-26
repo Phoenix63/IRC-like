@@ -21,7 +21,7 @@ public:
     Channel();
 
     // Initialisation functions
-    void setUi(QListWidget *list, QVBoxLayout *text, QListWidget *uList, QLineEdit *tText);
+    void setUi(QListWidget *list, QVBoxLayout *text, QListWidget *uList, QLineEdit *tText, QLineEdit *mText);
 
     // Channel creation functions
     void join(QString chan, QString topic);
@@ -64,6 +64,7 @@ private:
     QVBoxLayout *chanText;
     QListWidget *userList;
     QLineEdit *topicText;
+    QLineEdit *messageText;
     ParseurEmoji parseur;
 
     // Current channel name

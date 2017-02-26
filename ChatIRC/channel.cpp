@@ -17,12 +17,13 @@ Channel::Channel()
  * Channel: Initialisation functions
  */
 
-void Channel::setUi(QListWidget *list, QVBoxLayout *text, QListWidget *uList, QLineEdit *tText)
+void Channel::setUi(QListWidget *list, QVBoxLayout *text, QListWidget *uList, QLineEdit *tText, QLineEdit *mText)
 {
     chanList = list;
     chanText = text;
     userList = uList;
     topicText = tText;
+    messageText = mText;
     refreshChanList();
     refreshUserList();
     refreshTopic();
@@ -113,6 +114,7 @@ void Channel::change(QString newChannel)
    refreshText();
    refreshUserList();
    refreshTopic();
+   messageText->setPlaceholderText("Message "+channelName());
 }
 
 /*

@@ -10,10 +10,16 @@
 #include <QPoint>
 #include <QHash>
 #include <QList>
+#include <QStringList>
+#include <QFileDialog>
+#include <QStandardPaths>
+
 
 #include "channel.h"
 #include "parseur.h"
 #include "msglist.h"
+
+
 
 namespace Ui {
 class MainFrame;
@@ -44,6 +50,7 @@ private slots:
     void on_channelList_itemSelectionChanged();
     void on_messageSender_returnPressed();
     void on_pushButton_send_customContextMenuRequested(const QPoint &pos);
+    void on_pushButton_upload_clicked();
 
 private:
     Ui::MainFrame *ui;

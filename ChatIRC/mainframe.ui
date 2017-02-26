@@ -57,7 +57,7 @@
            <x>0</x>
            <y>0</y>
            <width>673</width>
-           <height>464</height>
+           <height>461</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -99,7 +99,7 @@
          <string notr="true">background-color: rgba(255,255,255);</string>
         </property>
         <property name="frameShape">
-         <enum>QFrame::Box</enum>
+         <enum>QFrame::StyledPanel</enum>
         </property>
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <property name="spacing">
@@ -111,6 +111,16 @@
          <property name="bottomMargin">
           <number>5</number>
          </property>
+         <item>
+          <widget class="QPushButton" name="pushButton_upload">
+           <property name="text">
+            <string/>
+           </property>
+           <property name="flat">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
          <item>
           <widget class="QLineEdit" name="messageSender">
            <property name="minimumSize">

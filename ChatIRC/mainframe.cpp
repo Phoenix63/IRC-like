@@ -13,7 +13,7 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
 {
     ui->setupUi(this);
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
-    channel.setUi(ui->channelList, ui->chatBox,ui->userList,ui->topicDisplay);
+    channel.setUi(ui->channelList, ui->chatBox,ui->userList,ui->topicDisplay,ui->messageSender);
     parseur.setChannel(&channel);
     parseur.setSocket(socket);
     msgList.setMsgSender(ui->messageSender);
@@ -21,6 +21,7 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
     ui->scrollArea->setStyleSheet("background-color: white");
     connect(ui->scrollArea->verticalScrollBar(), SIGNAL(rangeChanged(int,int)), this, SLOT(moveScrollBarToBottom(int, int)));
     ui->pushButton_emojis->setIcon(QPixmap("img/smile.png"));
+    ui->pushButton_upload->setIcon(QPixmap("img/upload.png"));
     ui->pushButton_emojis->setContextMenuPolicy(Qt::CustomContextMenu);
     emoji = channel.getHashMap();
 }
@@ -59,9 +60,11 @@ void MainFrame::moveScrollBarToBottom(int min, int max)
 void MainFrame::on_pushButton_emojis_clicked()
 {
     QMenu contextMenu(tr("Context menu"), this);
-
     QList<QAction* > listAction;
-    for (auto i:emoji->keys()) {
+    QStringList emojis = emoji->keys();
+    emojis.sort(Qt::CaseInsensitive);
+    for (auto i:emojis)
+    {
         listAction.append(new QAction(i, this));
         listAction.last()->setIcon(QPixmap(emoji->value(i)));
     }
@@ -120,6 +123,7 @@ void MainFrame::on_messageSender_returnPressed()
         this->close();
     msgList.scrollReset();
     ui->messageSender->setText("");
+    ui->messageSender->setPlaceholderText("Message "+channel.channelName());
 }
 
 void MainFrame::on_pushButton_send_customContextMenuRequested(const QPoint &pos)
@@ -129,4 +133,10 @@ void MainFrame::on_pushButton_send_customContextMenuRequested(const QPoint &pos)
        QAction action1("Remove Data Point", this);
        contextMenu.addAction(&action1);
        contextMenu.exec(ui->pushButton_emojis->mapToGlobal(pos));
+}
+
+void MainFrame::on_pushButton_upload_clicked()
+{
+    QStringList homePath = QStandardPaths::standardLocations(QStandardPaths::HomeLocation);
+    QStringList files = QFileDialog::getOpenFileNames(this,"Select one or more files to open", homePath.first());
 }
