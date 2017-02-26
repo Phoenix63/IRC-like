@@ -10,7 +10,7 @@ ParseurEmoji::ParseurEmoji()
             continue;
         QPixmap j("img/"+i);
         i=i.left(i.length()-4);
-        emotes[":"+i+":"] = j.scaled(15, 15, Qt::KeepAspectRatio,Qt::SmoothTransformation);
+        emotes[":"+i+":"] = j.scaledToHeight(20,Qt::SmoothTransformation);
     }
 }
 
