@@ -15,12 +15,18 @@ ParseurEmoji::ParseurEmoji()
     }
 }
 
-QHBoxLayout * ParseurEmoji::parse(QString string)
+QHBoxLayout * ParseurEmoji::parse(QString heure, QString pseudo, QString string)
 {
     QHBoxLayout *message = new QHBoxLayout;
     message->setSpacing(2);
     auto count = string.count(QRegularExpression(":\\S+:"));
     auto index = 0;
+    QLabel *LHeure = new QLabel(heure);
+    LHeure->setStyleSheet("color: rgb(115, 115, 115);");
+    message->addWidget(LHeure);
+    QLabel *lPseudo= new QLabel(pseudo);
+    lPseudo->setStyleSheet("color: rgb(0, 170, 0);");
+    message->addWidget(lPseudo);
     for (auto i = 0; i < count; i++ )
     {
         bool modified = false;

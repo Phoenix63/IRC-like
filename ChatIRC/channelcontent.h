@@ -13,16 +13,16 @@ public:
     void addUser(QString newUser);
     void removeUser(QString userName);
     void replaceUser(QString oldNick, QString newNick);
-    void appendChat(QString message);
+    void appendChat(QString heure,QString pseudo,QString message);
 
     QString getTopic();
     QList<QString> getUsers();
-    QList<QString> getChatContent();
+    QList<QList<QString>> getChatContent();
 
 private:
     QString topic;
     QList<QString> users;
-    QList<QString> chatContent; // To change when convert text browser to scrollarea + label
+    QList<QList<QString>> chatContent; // To change when convert text browser to scrollarea + label
 };
 
 #endif // CHANNELCONTENT_H

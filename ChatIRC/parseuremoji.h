@@ -17,7 +17,7 @@ class ParseurEmoji
 public:
     ParseurEmoji();
 
-    QHBoxLayout *parse(QString string);
+    QHBoxLayout *parse(QString heure,QString pseudo,QString string);
     QHash<QString, QPixmap> * getHashMap();
 
 private:

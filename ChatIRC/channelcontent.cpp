@@ -27,9 +27,11 @@ void ChannelContent::replaceUser(QString oldNick, QString newNick)
         users[users.indexOf(oldNick)].replace(oldNick, newNick);
 }
 
-void ChannelContent::appendChat(QString message)
+void ChannelContent::appendChat(QString heure, QString pseudo,QString message)
 {
-    chatContent.append(message.left(message.length() - 1));
+    QList<QString> list;
+    list << heure << pseudo << message.left(message.length()-1);
+    chatContent.append(list);
 }
 
 QString ChannelContent::getTopic()
@@ -42,7 +44,7 @@ QList<QString> ChannelContent::getUsers()
     return users;
 }
 
-QList<QString> ChannelContent::getChatContent()
+QList<QList<QString>> ChannelContent::getChatContent()
 {
     return chatContent;
 }

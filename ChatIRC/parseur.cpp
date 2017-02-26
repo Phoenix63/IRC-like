@@ -170,13 +170,13 @@ bool Parseur::out_isMsgMsg(QString string)
     channel->change(string.split(' ').at(1));
     socket->write(string.toLatin1().data());
     int j = string.indexOf(QRegularExpression(":.+$"));
-    channel->appendCurrent("You : "+string.right(string.length()-j-1)+'\n');
+    channel->appendCurrent(string.right(string.length()-j-1)+'\n');
     return true;
 }
 
 bool Parseur::out_isPrivMsg(QString string)
 {
-    channel->appendCurrent('[' + QTime::currentTime().toString() + "]    " +  "You : " + string);
+    channel->appendCurrent(string);
     string.prepend("PRIVMSG "+ channel->channelName() + " :");
     socket->write(string.toLatin1().data());
         return true;

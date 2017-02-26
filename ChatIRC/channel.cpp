@@ -55,9 +55,9 @@ void Channel::joinWhisper(QString dest){
 void Channel::refreshText()
 {
     clean();
-    QList<QString> text = channels[currentChannel].getChatContent();
+    QList<QList<QString>> text = channels[currentChannel].getChatContent();
     for (auto i:text ){
-        chanText->addLayout(parseur.parse(i));
+        chanText->addLayout(parseur.parse(i[0], i[1], i[2]));
     }
 }
 
@@ -87,16 +87,18 @@ void Channel::leave(QString chan){
 
 void Channel::appendCurrent(QString string)
 {
-    channels[currentChannel].appendChat(string);
-    chanText->addLayout(parseur.parse(string.left(string.length() - 1)));
+    QString time = '['+QTime::currentTime().toString()+']';
+    channels[currentChannel].appendChat(time+"    ","You"," : "+string);
+    chanText->addLayout(parseur.parse(time+"    ","You"," : "+string.left(string.length() - 1)));
 }
 
 void Channel::appendChannel(QString string, QString channel, QString send)
 {
     qDebug() << string;
-    channels[channel].appendChat('[' + QTime::currentTime().toString() + "]    " + send + " : " +string);
+    QString time = '['+QTime::currentTime().toString()+']';
+    channels[channel].appendChat(time+"    ", send," : " +string);
     if (channel == currentChannel)
-        chanText->addLayout(parseur.parse('[' + QTime::currentTime().toString() + "]    " + send + " : " +string.left(string.length()-1)));
+        chanText->addLayout(parseur.parse(time , send ," : " +string.left(string.length()-1)));
     if(channel != "\"Debug\"" && channel != currentChannel)
         chanList->findItems(channel,Qt::MatchExactly)[0]->setForeground(QColor("red"));
 }
