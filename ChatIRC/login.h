@@ -5,6 +5,7 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <QAbstractSocket>
+#include <QFile>
 #include "mainframe.h"
 
 namespace Ui {
@@ -25,6 +26,8 @@ public:
     //Connection to channels
     void joinChannels(QListWidget *list);
     QList<QString>* convertChannelList(QListWidget *list);
+    void loadConfig();
+
     ~Login();
 
 

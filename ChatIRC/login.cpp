@@ -9,6 +9,7 @@ Login::Login(QWidget *parent) :
     ui(new Ui::Login)
 {
     ui->setupUi(this);
+    loadConfig();
 }
 
 Login::~Login()
@@ -33,7 +34,7 @@ void Login::on_pushButton_connect_clicked()
                 socket->write(password.toLatin1().data());
             }
             sendInfos();
-            while (!socket->waitForReadyRead());
+            while (!socket->waitForReadyRead(-1));
             joinChannels(ui->channelList);
         }
     }
@@ -127,4 +128,29 @@ void Login::joinChannels(QListWidget *channels)
         chan.prepend("JOIN ");
         socket->write(chan.toLatin1().data());
     }
+}
+
+void Login::loadConfig()
+{
+    QFile config("config.cfg");
+    if (config.exists()) {
+        config.open(QIODevice::ReadOnly);
+        QString buf(config.readLine());
+        if (buf.length() > 0) {
+            ui->lineEdit_username->setText(buf.left(buf.length()-1));
+        }
+        buf = config.readLine();
+        if (buf.length() > 0) {
+            ui->lineEdit_pass->setText(buf.left(buf.length()-1));
+        }
+        buf = config.readLine();
+        if (buf.length() > 0) {
+            ui->lineEdit_host->setText(buf.left(buf.length()-1));
+        }
+        buf = config.readLine();
+        if (buf.length() > 0) {
+            ui->lineEdit_port->setText(buf);
+        }
+    }
+
 }
