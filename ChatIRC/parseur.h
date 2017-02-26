@@ -11,9 +11,11 @@
 
 class Parseur {
 public:
+
     // Initialisation functions
     void setChannel(Channel *channel);
     void setSocket(QTcpSocket *socket);
+    void setNickname(QString *nickname);
 
     // Parsing functions
     bool out(QString string);
@@ -48,6 +50,7 @@ private:
     // Pointer to the channel and socket created in mainframe
     Channel *channel;
     QTcpSocket *socket;
+    QString *nickname;
 };
 
 #endif // PARSEUR_H

@@ -20,7 +20,6 @@
 #include "msglist.h"
 
 
-
 namespace Ui {
 class MainFrame;
 }
@@ -31,9 +30,9 @@ class MainFrame : public QMainWindow
 
 public:
     //Constructor and Destructor
-    explicit MainFrame(QWidget *parent = 0,QTcpSocket *socket=NULL);
+    explicit MainFrame(QWidget *parent = 0,QTcpSocket *socket=NULL,QString nick=NULL);
     ~MainFrame();
-
+    void setNickname(QString nick);
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
 
@@ -52,6 +51,8 @@ private slots:
     void on_pushButton_send_customContextMenuRequested(const QPoint &pos);
     void on_pushButton_upload_clicked();
 
+    void on_actionConnect_changed();
+
 private:
     Ui::MainFrame *ui;
 
@@ -59,6 +60,7 @@ private:
     QTcpSocket *socket;
 
     //Parser and channel for message handling
+    QString nickname;
     Parseur parseur;
     Channel channel;
     MsgList msgList;

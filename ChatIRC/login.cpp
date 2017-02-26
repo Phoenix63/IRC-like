@@ -79,6 +79,7 @@ void Login::sendInfos()
     int port = ui->lineEdit_port->text().toInt(0,10);
     QString username=ui->lineEdit_username->text();
     main->setWindowTitle(username +"@"+host+":"+QString::number(port));
+    main->setNickname(username);
     QString nick=username;
     nick.prepend("NICK ");
     nick.append('\n');

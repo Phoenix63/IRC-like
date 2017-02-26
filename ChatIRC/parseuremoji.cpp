@@ -8,25 +8,26 @@ ParseurEmoji::ParseurEmoji()
     {
         if (i== "." || i=="..")
             continue;
-        qDebug() << i;
         QPixmap j("img/emojis/"+i);
         i=i.left(i.length()-4);
         emotes[":"+i+":"] = j.scaledToHeight(20,Qt::SmoothTransformation);
     }
 }
 
-QHBoxLayout * ParseurEmoji::parse(QString heure, QString pseudo, QString string)
+QList<QHBoxLayout *> ParseurEmoji::parse(QString heure, QString pseudo, QString string)
 {
+    QHBoxLayout *pseudoBox = new QHBoxLayout;
     QHBoxLayout *message = new QHBoxLayout;
+    pseudoBox->setSpacing(2);
     message->setSpacing(2);
     auto count = string.count(QRegularExpression(":\\S+:"));
     auto index = 0;
     QLabel *LHeure = new QLabel(heure);
     LHeure->setStyleSheet("color: rgb(115, 115, 115);");
-    message->addWidget(LHeure);
+    pseudoBox->addWidget(LHeure);
     QLabel *lPseudo= new QLabel(pseudo);
-    lPseudo->setStyleSheet("color: rgb(0, 170, 0);");
-    message->addWidget(lPseudo);
+    lPseudo->setStyleSheet("color: rgb(0, 150, 250);");
+    pseudoBox->addWidget(lPseudo);
     for (auto i = 0; i < count; i++ )
     {
         bool modified = false;
@@ -56,10 +57,14 @@ QHBoxLayout * ParseurEmoji::parse(QString heure, QString pseudo, QString string)
     textLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
     message->addWidget(textLabel);
     message->addStretch(0);
-    return message;
+    pseudoBox->setAlignment(Qt::AlignLeft);
+    QList<QHBoxLayout *> ret;
+    ret << pseudoBox << message;
+    return ret;
 }
 
 QHash<QString, QPixmap> * ParseurEmoji::getHashMap()
 {
     return &emotes;
 }
+

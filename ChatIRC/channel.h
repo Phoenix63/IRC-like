@@ -21,7 +21,7 @@ public:
     Channel();
 
     // Initialisation functions
-    void setUi(QListWidget *list, QVBoxLayout *text, QListWidget *uList, QLineEdit *tText, QLineEdit *mText);
+    void setUi(QListWidget *list, QVBoxLayout *text, QListWidget *uList, QLineEdit *tText, QLineEdit *mText, QVBoxLayout *nText);
 
     // Channel creation functions
     void join(QString chan, QString topic);
@@ -62,6 +62,7 @@ private:
     // UI for interface update
     QListWidget *chanList;
     QVBoxLayout *chanText;
+    QVBoxLayout *nickText;
     QListWidget *userList;
     QLineEdit *topicText;
     QLineEdit *messageText;

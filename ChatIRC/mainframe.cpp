@@ -6,16 +6,18 @@
  * Mainframe: constructor
  */
 
-MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
+MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket,QString nick) :
     QMainWindow(parent),
     ui(new Ui::MainFrame),
-    socket(socket)
+    socket(socket),
+    nickname(nick)
 {
     ui->setupUi(this);
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
-    channel.setUi(ui->channelList, ui->chatBox,ui->userList,ui->topicDisplay,ui->messageSender);
+    channel.setUi(ui->channelList, ui->chatBox,ui->userList,ui->topicDisplay,ui->messageSender, ui->nickBox);
     parseur.setChannel(&channel);
     parseur.setSocket(socket);
+    parseur.setNickname(&nick);
     msgList.setMsgSender(ui->messageSender);
     ui->messageSender->installEventFilter(this);
     ui->scrollArea->setStyleSheet("background-color: white");
@@ -34,6 +36,13 @@ MainFrame::~MainFrame()
 {
     delete ui;
     delete socket;
+}
+
+
+void MainFrame::setNickname(QString nick)
+{
+    nickname = nick;
+    parseur.setNickname(&nickname);
 }
 
 /*
@@ -139,4 +148,10 @@ void MainFrame::on_pushButton_upload_clicked()
 {
     QStringList homePath = QStandardPaths::standardLocations(QStandardPaths::HomeLocation);
     QStringList files = QFileDialog::getOpenFileNames(this,"Select one or more files to open", homePath.first());
+}
+
+
+void MainFrame::on_actionConnect_changed()
+{
+
 }

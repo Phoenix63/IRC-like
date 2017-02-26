@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1007</width>
-    <height>570</height>
+    <width>899</width>
+    <height>583</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -56,18 +56,28 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>673</width>
-           <height>461</height>
+           <width>565</width>
+           <height>474</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
-           <layout class="QVBoxLayout" name="chatBox"/>
+           <layout class="QHBoxLayout" name="horizontalLayout">
+            <item>
+             <layout class="QVBoxLayout" name="nickBox"/>
+            </item>
+            <item>
+             <layout class="QVBoxLayout" name="chatBox"/>
+            </item>
+           </layout>
           </item>
           <item>
            <spacer name="verticalSpacer">
             <property name="orientation">
              <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeType">
+             <enum>QSizePolicy::Expanding</enum>
             </property>
             <property name="sizeHint" stdset="0">
              <size>
@@ -193,7 +203,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1007</width>
+     <width>899</width>
      <height>21</height>
     </rect>
    </property>
@@ -201,6 +211,7 @@
     <property name="title">
      <string>Fichier</string>
     </property>
+    <addaction name="actionConnect"/>
    </widget>
    <widget class="QMenu" name="menuEdition">
     <property name="title">
@@ -225,6 +236,11 @@
   <action name="actioninp">
    <property name="text">
     <string>inp</string>
+   </property>
+  </action>
+  <action name="actionConnect">
+   <property name="text">
+    <string>Connect</string>
    </property>
   </action>
  </widget>

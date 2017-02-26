@@ -17,8 +17,14 @@ void Parseur::setChannel(Channel *chan)
  * Parse::Out: Parse client request
  */
 
-void Parseur::setSocket(QTcpSocket *sock){
+void Parseur::setSocket(QTcpSocket *sock)
+{
     socket = sock;
+}
+
+void Parseur::setNickname(QString *nick)
+{
+    nickname = nick;
 }
 
 bool Parseur::out(QString string)
@@ -225,7 +231,9 @@ bool Parseur::in_isJoinNote(QString string)
     if (!string.contains(IRC::RPL::JOIN))
         return false;
     channel->appendChannel(string+'\n', "\"Debug\"","");
-    channel->addUser(string.split(' ')[0], string.split(' ')[2]);
+    QString user=string.split(' ')[0];
+    if(user.compare(*nickname))
+        channel->addUser(user, string.split(' ')[2]);
     return true;
 }
 
