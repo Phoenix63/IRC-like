@@ -50,7 +50,7 @@ class Channel {
 
         // not loaded from db
         if(creator instanceof Client) {
-
+            //isUser ??????
             if(creator.isAdmin()) {
                 this.setPersistent(true);
             }
@@ -181,25 +181,38 @@ class Channel {
         }
     }
 
-    /**
-     * this method is only called when bdd is loading
-     * @param {JSON} flags
-     */
 
+    /**
+     *
+     * @param client
+     * @param flags
+     * @private
+     */
     _addClientFlag(client, flags) {
         let arrayFlags = flags.split('');
         arrayFlags.forEach((flag) => {
             if (this._usersFlags[client.identity].indexOf(flag) === -1) {
                 this._usersFlags[client.identity] += flag;
-
+                RPLSender.RPL_CHANNELMODEIS(this,this._name+' +'+flag+' '+client.name);
             }
         });
         this._change();
     }
+
+    /**
+     *
+     * @param client
+     * @param flags
+     * @private
+     */
     _removeClientFlag(client, flags) {
         let arrayFlags = flags.split('');
         arrayFlags.forEach((flag) => {
+            let tmp = this._usersFlags[client.identity].length;
             this._usersFlags[client.identity] = this._usersFlags[client.identity].replace(flag, '');
+            if(tmp-1 === this._usersFlags[client.identity].length){
+                RPLSender.RPL_CHANNELMODEIS(this,this._name+' -'+flag+' '+client.name);
+            }
         });
         this._change();
     }
@@ -213,7 +226,7 @@ class Channel {
         arrayFlags.forEach((flag) => {
             if(this._flags.indexOf(flag)===-1){
                 this._flags += flag;
-
+                RPLSender.RPL_CHANNELMODEIS(this,this._name+' +'+flag);
             }
         });
         this._change();
@@ -225,11 +238,21 @@ class Channel {
     _removeChannelFlag(flags) {
         let arrayFlags = flags.split('');
         arrayFlags.forEach((flag) => {
+            let tmp = this._flags.length;
             this._flags = this._flags.replace(flag,'');
+            if(tmp-1 === this._flags.length){
+                RPLSender.RPL_CHANNELMODEIS(this,this._name+' -'+flag);
+            }
         });
         this._change();
     }
 
+    /**
+     *
+     * @param operator
+     * @param flag
+     * @param client
+     */
     changeClientFlag(operator, flag, client) {
         if(operator==='+') {
             this._addClientFlag(client, flag);
@@ -237,6 +260,12 @@ class Channel {
             this._removeClientFlag(client, flag);
         }
     }
+
+    /**
+     *
+     * @param operator
+     * @param flag
+     */
     changeChannelFlag(operator, flag) {
         if(operator==='+') {
             this._addChannelFlag(flag);
@@ -271,16 +300,6 @@ class Channel {
         return false;
     }
 
-    /**
-     *
-     * @param {Client} client
-     */
-    setUserOperator(client) {
-        if (typeof this._usersFlags[client.identity] === 'string' && this._usersFlags[client.identity].indexOf('o')<0 && client.isUser()) {
-            this._usersFlags[client.identity] += 'o';
-            this._change();
-        }
-    }
 
     setUserFlags(flags) {
         this._usersFlags = flags;
@@ -313,27 +332,31 @@ class Channel {
         }
         if(this._users.indexOf(user) < 0) {
             this._users.push(user);
-            if(user.isUser()) {
+            //if(user.isUser()) {
 
                 if(!this._usersFlags[user.identity]) {
                     this._usersFlags[user.identity] = '';
                 }
 
                 if (this._users.length === 1 && this._temporary) {
-                    this.setUserOperator(user);
+                    console.log("yep1");
+                    this._addClientFlag(user,'o')
                 }
 
                 if (this._pass.length>0){
                     this._addChannelFlag('p');
                 }
 
-                if(user.isAdmin() || user.identity === this._creator) {
-                    this.setUserOperator(user);
+                if(user.isAdmin() || user.isSuperAdmin() || user.identity === this._creator) {
+                    console.log("yep2");
+                    console.log("=>"+user.isAdmin() );
+                    console.log("=>"+user.isSuperAdmin());
+                    console.log("=>"+(user.identity === this._creator));
+                    this._addClientFlag(user,'o')
                 }
-            }
+            //}
             this._change();
             user.addChannel(this);
-
             RPLSender.JOIN(user, this);
             RPLSender.RPL_TOPIC('JOIN', user, this);
             RPLSender.RPL_NAMREPLY(user, this);

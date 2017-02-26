@@ -181,6 +181,12 @@ let RPLSender = {
      */
     QUIT: (client, message='Gone') => {
         client.socket.broadcast(':'+client.name+' QUIT :'+message);
+    },
+    RPL_CHANNELMODEIS: (chan, cmd)=> {
+        chan.broadcast(':'+config.ip+' 324 '+cmd);
+    },
+    RPL_UMODEIS: (client, cmd)=> {
+        client.socket.send(':'+config.ip+' 221 '+cmd);
     }
 };
 export default RPLSender

@@ -13,7 +13,7 @@ module.exports = function (socket, command) {
     let key = command[1].split(' ')[1] || '';
 
     if(!name.match(/\W/g) || name.match(/\W/g).join('') !== '#' || name[0] !== '#' || name.length <= 1) {
-        ERRSender.ERR_NOSUCHCHANNEL(socket.client, {name: name});
+        ERRSender.ERR_NOSUCHCHANNEL(socket.client, name);
         return;
     }
 
