@@ -20,7 +20,9 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
     ui->messageSender->installEventFilter(this);
     ui->scrollArea->setStyleSheet("background-color: white");
     connect(ui->scrollArea->verticalScrollBar(), SIGNAL(rangeChanged(int,int)), this, SLOT(moveScrollBarToBottom(int, int)));
-    ui->pushButton_send->setIcon(QPixmap("img/smile.png"));
+    ui->pushButton_emojis->setIcon(QPixmap("img/smile.png"));
+    ui->pushButton_emojis->setContextMenuPolicy(Qt::CustomContextMenu);
+    emoji = channel.getHashMap();
 }
 
 /*
@@ -54,6 +56,22 @@ void MainFrame::moveScrollBarToBottom(int min, int max)
 /*
  * mainFrame: UI slots
  */
+void MainFrame::on_pushButton_emojis_clicked()
+{
+    QMenu contextMenu(tr("Context menu"), this);
+
+    QList<QAction* > listAction;
+    for (auto i:emoji->keys()) {
+        listAction.append(new QAction(i, this));
+        listAction.last()->setIcon(QPixmap(emoji->value(i)));
+    }
+    contextMenu.addActions(listAction);
+    contextMenu.setStyleSheet("QMenu { menu-scrollable: 1; }");
+    contextMenu.setMinimumSize(50, 80);
+    contextMenu.setMaximumSize(400, 300);
+    QString text = contextMenu.exec(ui->MessageBox->mapToGlobal(QPoint(600, 500)))->text();
+    ui->messageSender->setText(ui->messageSender->text() + text);
+}
 
 void MainFrame::closeEvent (QCloseEvent *event)
 {
@@ -103,3 +121,11 @@ void MainFrame::on_messageSender_returnPressed()
     ui->messageSender->setText("");
 }
 
+void MainFrame::on_pushButton_send_customContextMenuRequested(const QPoint &pos)
+{
+    QMenu contextMenu(tr("Context menu"), this);
+
+       QAction action1("Remove Data Point", this);
+       contextMenu.addAction(&action1);
+       contextMenu.exec(ui->pushButton_emojis->mapToGlobal(pos));
+}

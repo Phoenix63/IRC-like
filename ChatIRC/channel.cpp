@@ -92,9 +92,10 @@ void Channel::appendCurrent(QString string)
 
 void Channel::appendChannel(QString string, QString channel, QString send)
 {
-    channels[channel].appendChat(send + string);
+    qDebug() << string;
+    channels[channel].appendChat('[' + QTime::currentTime().toString() + "]    " + send + " : " +string);
     if (channel == currentChannel)
-        chanText->addLayout(parseur.parse(send + string.left(string.length()-1)));
+        chanText->addLayout(parseur.parse('[' + QTime::currentTime().toString() + "]    " + send + " : " +string.left(string.length()-1)));
     if(channel != "\"Debug\"" && channel != currentChannel)
         chanList->findItems(channel,Qt::MatchExactly)[0]->setForeground(QColor("red"));
 }
@@ -194,4 +195,9 @@ void Channel::clean()
     while ((item = chanText->takeAt(0))) {
         clearLayout(item->layout());
     }
+}
+
+QHash<QString, QPixmap> * Channel::getHashMap()
+{
+    return parseur.getHashMap();
 }

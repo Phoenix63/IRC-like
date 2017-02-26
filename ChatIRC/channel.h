@@ -10,7 +10,7 @@
 #include <QList>
 #include <QVBoxLayout>
 #include <QLabel>
-
+#include <QTime>
 
 #include "parseuremoji.h"
 #include "channelcontent.h"
@@ -54,7 +54,7 @@ public:
 
     void clean();
     void clearLayout(QLayout *layout);
-
+    QHash<QString, QPixmap> * getHashMap();
 private:
     // Qhash wich contain message: key = channel name, content = message list
     QHash<QString, ChannelContent> channels;
@@ -64,10 +64,10 @@ private:
     QVBoxLayout *chanText;
     QListWidget *userList;
     QLineEdit *topicText;
+    ParseurEmoji parseur;
 
     // Current channel name
     QString currentChannel;
-    ParseurEmoji parseur;
 };
 
 #endif // CHANNEL_H

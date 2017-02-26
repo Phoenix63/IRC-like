@@ -176,7 +176,7 @@ bool Parseur::out_isMsgMsg(QString string)
 
 bool Parseur::out_isPrivMsg(QString string)
 {
-    channel->appendCurrent("You : "+string);
+    channel->appendCurrent('[' + QTime::currentTime().toString() + "]    " +  "You : " + string);
     string.prepend("PRIVMSG "+ channel->channelName() + " :");
     socket->write(string.toLatin1().data());
         return true;
@@ -243,7 +243,7 @@ bool Parseur::in_isPrivMesg(QString string)
     if (!string.contains(IRC::RPL::PRIVMSG))
         return false;
     int j = string.indexOf(QRegularExpression(":.+$"));
-    channel->appendChannel(string.right(string.length()-j)+'\n', string.split(' ').at(2),string.split(' ').at(0));
+    channel->appendChannel(string.right(string.length()-j-1)+'\n', string.split(' ').at(2),string.split(' ').at(0));
     return true;
 }
 

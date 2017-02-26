@@ -134,7 +134,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pushButton_send">
+          <widget class="QPushButton" name="pushButton_emojis">
            <property name="minimumSize">
             <size>
              <width>0</width>

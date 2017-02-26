@@ -1,10 +1,15 @@
 #ifndef MAINFRAME_H
 #define MAINFRAME_H
 
+#include <QPixmap>
 #include <QTcpSocket>
 #include <QMainWindow>
 #include <QString>
 #include <QScrollBar>
+#include <QMenu>
+#include <QPoint>
+#include <QHash>
+#include <QList>
 
 #include "channel.h"
 #include "parseur.h"
@@ -32,11 +37,13 @@ public slots:
     void closeEvent (QCloseEvent *event);
 
     //UI slots
+    void on_pushButton_emojis_clicked();
     void moveScrollBarToBottom(int min, int max);
 
 private slots:
     void on_channelList_itemSelectionChanged();
     void on_messageSender_returnPressed();
+    void on_pushButton_send_customContextMenuRequested(const QPoint &pos);
 
 private:
     Ui::MainFrame *ui;
@@ -48,6 +55,7 @@ private:
     Parseur parseur;
     Channel channel;
     MsgList msgList;
+    QHash<QString, QPixmap> *emoji;
 };
 
 #endif // MAINFRAME_H

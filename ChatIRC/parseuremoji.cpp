@@ -49,3 +49,8 @@ QHBoxLayout * ParseurEmoji::parse(QString string)
     message->addStretch(0);
     return message;
 }
+
+QHash<QString, QPixmap> * ParseurEmoji::getHashMap()
+{
+    return &emotes;
+}

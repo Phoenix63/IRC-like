@@ -3,6 +3,7 @@
 
 #include <QString>
 #include <QTcpSocket>
+#include <QTime>
 
 #include "rpl_response.h"
 #include "err_response.h"

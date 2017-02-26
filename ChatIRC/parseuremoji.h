@@ -18,9 +18,9 @@ public:
     ParseurEmoji();
 
     QHBoxLayout *parse(QString string);
+    QHash<QString, QPixmap> * getHashMap();
 
 private:
-    // soon a hash map for easy config from file
     QHash<QString,QPixmap> emotes;
     QPixmap smile;
     QPixmap pandab;
