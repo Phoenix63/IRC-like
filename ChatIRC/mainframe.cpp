@@ -66,11 +66,12 @@ void MainFrame::on_pushButton_emojis_clicked()
         listAction.last()->setIcon(QPixmap(emoji->value(i)));
     }
     contextMenu.addActions(listAction);
-    contextMenu.setStyleSheet("QMenu { menu-scrollable: 1; }");
     contextMenu.setMinimumSize(50, 80);
-    contextMenu.setMaximumSize(400, 300);
-    QString text = contextMenu.exec(ui->MessageBox->mapToGlobal(QPoint(600, 500)))->text();
-    ui->messageSender->setText(ui->messageSender->text() + text);
+    QAction * action = contextMenu.exec(ui->MessageBox->mapToGlobal(QPoint(600, 500)));
+    QString emotes;
+    if (action)
+        emotes = action->text();
+    ui->messageSender->setText(ui->messageSender->text() + emotes);
 }
 
 void MainFrame::closeEvent (QCloseEvent *event)

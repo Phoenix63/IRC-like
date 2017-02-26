@@ -6,6 +6,8 @@ ParseurEmoji::ParseurEmoji()
     QStringList emojisList = emojis.entryList();
     for(auto i:emojisList)
     {
+        if (i== "." || i=="..")
+            continue;
         QPixmap j("img/"+i);
         i=i.left(i.length()-4);
         emotes[":"+i+":"] = j.scaled(15, 15, Qt::KeepAspectRatio,Qt::SmoothTransformation);
