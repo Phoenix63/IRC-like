@@ -24,7 +24,6 @@ void Parseur::setSocket(QTcpSocket *sock){
 bool Parseur::out(QString string)
 {
     string.append('\n');
-    channel->appendCurrent(string);
     if (out_isQuitMsg(string))
         return false;
     if (!out_isNickMsg(string))
@@ -37,7 +36,6 @@ bool Parseur::out(QString string)
     if (!out_isWhoMsg(string))
     if (!out_isWhoisMsg(string))
     if (!out_isMsgMsg(string))
-    if (!out_isDebugMsg(string))
     if (!out_isPrivMsg(string))
         return false;
     return true;
@@ -169,22 +167,17 @@ bool Parseur::out_isMsgMsg(QString string)
         return false;
     string.replace(QString("/msg"), QString("PRIVMSG"));
     channel->joinWhisper(string.split(' ').at(1));
+    channel->change(string.split(' ').at(1));
     socket->write(string.toLatin1().data());
-    return true;
-}
-
-bool Parseur::out_isDebugMsg(QString string)
-{
-    if (channel->channelName() == "\"Debug\"")
-        return false;
-    string.prepend("PRIVMSG " + channel->channelName() + " :");
-    socket->write(string.toLatin1().data());
+    int j = string.indexOf(QRegularExpression(":.+$"));
+    channel->appendCurrent("You : "+string.right(string.length()-j-1)+'\n');
     return true;
 }
 
 bool Parseur::out_isPrivMsg(QString string)
 {
-    string.prepend("PRIVMSG ");
+    channel->appendCurrent("You : "+string);
+    string.prepend("PRIVMSG "+ channel->channelName() + " :");
     socket->write(string.toLatin1().data());
         return true;
 }
@@ -250,9 +243,7 @@ bool Parseur::in_isPrivMesg(QString string)
     if (!string.contains(IRC::RPL::PRIVMSG))
         return false;
     int j = string.indexOf(QRegularExpression(":.+$"));
-    QString sender = string.split(' ').at(0);
-    channel->joinWhisper(sender);
-    channel->appendChannel(string.right(string.length()-j)+'\n', string.split(' ').at(2),sender);
+    channel->appendChannel(string.right(string.length()-j)+'\n', string.split(' ').at(2),string.split(' ').at(0));
     return true;
 }
 
@@ -261,7 +252,9 @@ bool Parseur::in_isWhisMesg(QString string)
     if (!string.contains(IRC::RPL::WHISPER))
         return false;
     int j = string.indexOf(QRegularExpression(":.+$"));
-    channel->appendChannel(string.right(string.length()-j)+'\n', string.split(' ').at(0),string.split(' ').at(0));
+    QString sender = string.split(' ').at(0);
+    channel->joinWhisper(sender);
+    channel->appendChannel(string.right(string.length()-j)+'\n', string.split(' ').at(0),sender);
     return true;
 }
 

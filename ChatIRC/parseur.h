@@ -31,7 +31,6 @@ private:
     bool out_isWhoMsg(QString string);
     bool out_isWhoisMsg(QString string);
     bool out_isMsgMsg(QString string);
-    bool out_isDebugMsg(QString string);
     bool out_isPrivMsg(QString string);
 
     // In private function's

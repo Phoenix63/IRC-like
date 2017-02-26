@@ -15,6 +15,7 @@ ParseurEmoji::ParseurEmoji()
 QHBoxLayout * ParseurEmoji::parse(QString string)
 {
     QHBoxLayout *message = new QHBoxLayout;
+    message->setSpacing(2);
     auto count = string.count(QRegularExpression(":\\S+:"));
     auto index = 0;
     for (auto i = 0; i < count; i++ )
@@ -27,7 +28,9 @@ QHBoxLayout * ParseurEmoji::parse(QString string)
             if (tmp.startsWith(i))
             {
                 tmp = string.left(index);
-                message->addWidget(new QLabel(string.left(index)));
+                QLabel *textLabel = new QLabel(string.left(index));
+                textLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+                message->addWidget(textLabel);
                 index += i.length();
                 string = string.right(string.length() - index);
                 QLabel *label = new QLabel;
@@ -40,7 +43,9 @@ QHBoxLayout * ParseurEmoji::parse(QString string)
         }
         if(!modified) index++;
     }
-    message->addWidget(new QLabel(string));
+    QLabel *textLabel = new QLabel(string);
+    textLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    message->addWidget(textLabel);
     message->addStretch(0);
     return message;
 }

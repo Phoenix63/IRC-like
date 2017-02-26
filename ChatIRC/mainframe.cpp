@@ -20,6 +20,7 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
     ui->messageSender->installEventFilter(this);
     ui->scrollArea->setStyleSheet("background-color: white");
     connect(ui->scrollArea->verticalScrollBar(), SIGNAL(rangeChanged(int,int)), this, SLOT(moveScrollBarToBottom(int, int)));
+    ui->pushButton_send->setIcon(QPixmap("img/smile.png"));
 }
 
 /*
@@ -53,18 +54,6 @@ void MainFrame::moveScrollBarToBottom(int min, int max)
 /*
  * mainFrame: UI slots
  */
-
-void MainFrame::on_pushButton_send_clicked()
-{
-    QString message = ui->messageSender->text();
-    //ui->messagePrinter->append(message);
-    msgList.addMsg(message);
-    if(!parseur.out(message))
-        this->close();
-    msgList.scrollReset();
-    //socket->write(message.toLatin1().data());
-    ui->messageSender->setText("");
-}
 
 void MainFrame::closeEvent (QCloseEvent *event)
 {
@@ -106,6 +95,11 @@ bool MainFrame::eventFilter(QObject *obj, QEvent *event)
 
 void MainFrame::on_messageSender_returnPressed()
 {
-    on_pushButton_send_clicked();
+    QString message = ui->messageSender->text();
+    msgList.addMsg(message);
+    if(!parseur.out(message))
+        this->close();
+    msgList.scrollReset();
+    ui->messageSender->setText("");
 }
 

@@ -32,12 +32,10 @@ public slots:
     void closeEvent (QCloseEvent *event);
 
     //UI slots
-    void on_pushButton_send_clicked();
     void moveScrollBarToBottom(int min, int max);
 
 private slots:
     void on_channelList_itemSelectionChanged();
-
     void on_messageSender_returnPressed();
 
 private:
