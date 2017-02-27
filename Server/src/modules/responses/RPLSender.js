@@ -123,8 +123,7 @@ let RPLSender = {
      * @static
      */
     NICK: (oldname, newname, client) => {
-        client.socket.broadcast(':' + oldname + ' NICK ' + newname, client);
-        client.socket.send(':' + oldname + ' NICK ' + newname);
+        client.socket.broadcast(':' + oldname + ' NICK ' + newname);
     },
     /**
      *
