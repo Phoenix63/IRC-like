@@ -331,14 +331,13 @@ class Channel {
         }
         if(this._users.indexOf(user) < 0) {
             this._users.push(user);
-            //if(user.isUser()) {
+            if(user.isUser()) {
 
                 if(!this._usersFlags[user.identity]) {
                     this._usersFlags[user.identity] = '';
                 }
 
                 if (this._users.length === 1 && this._temporary) {
-                    console.log("yep1");
                     this._addClientFlag(user,'o')
                 }
 
@@ -347,13 +346,9 @@ class Channel {
                 }
 
                 if(user.isAdmin() || user.isSuperAdmin() || user.identity === this._creator) {
-                    console.log("yep2");
-                    console.log("=>"+user.isAdmin() );
-                    console.log("=>"+user.isSuperAdmin());
-                    console.log("=>"+(user.identity === this._creator));
                     this._addClientFlag(user,'o')
                 }
-            //}
+            }
             this._change();
             user.addChannel(this);
             RPLSender.JOIN(user, this);
