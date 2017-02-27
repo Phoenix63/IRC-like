@@ -39,6 +39,7 @@ module.exports = function (socket, command) {
                 return;
             }
             if(!user.isUser()){
+                ERRSender.ERR_USERSDONTMATCH(socket.client);
                 return;
             }
             if(channel.isUserOperator(user) && !(operator.isAdmin() || operator.isSuperAdmin())){
