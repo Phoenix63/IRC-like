@@ -39,13 +39,13 @@ class Redis {
 
     /**
      * set a non guest client server admin
-     * @param {Client} client
+     * @param {Object<identity, role>} infos
      */
-    setAdmin(client) {
-        if(client.identity.indexOf("GUEST_") === 0) {
+    setAdmin(infos) {
+        if(infos.identity.indexOf("GUEST_") === 0) {
             throw "cannot set guest admin";
         } else {
-            this._client.hmset("admin", client.identity, 'admin');
+            this._client.hmset("admin", infos.identity, infos.role);
         }
     }
 
