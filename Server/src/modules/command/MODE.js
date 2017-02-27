@@ -44,6 +44,7 @@ module.exports = function (socket, command) {
             }
             if(user.isAdmin() && !operator.isSuperAdmin()){
                 ERRSender.ERR_USERSDONTMATCH(socket.client);
+                return;
             }
             //give/take channel operator privileges;
             if(flags.indexOf('o') > -1){
@@ -61,6 +62,7 @@ module.exports = function (socket, command) {
             }else if(arg4){
                 if(!(channel.pass === '')){
                     ERRSender.ERR_KEYSET(socket.client,channel.name);
+                    return;
                 }else{
                     channel.setPass(arg4);
                     RPLSender.RPL_CHANNELMODEIS(channel,nameChannel+' +k');
@@ -100,6 +102,7 @@ module.exports = function (socket, command) {
         let user = Client.getClient(nameUser);
         if(user !== socket.client){
             ERRSender.ERR_USERSDONTMATCH(socket.client);
+            return;
         }
         if(flags.indexOf('i') > -1){
             user.changeFlag(sign,'i');

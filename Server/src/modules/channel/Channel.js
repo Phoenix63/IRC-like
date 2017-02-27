@@ -50,7 +50,6 @@ class Channel {
 
         // not loaded from db
         if(creator instanceof Client) {
-            //isUser ??????
             if(creator.isAdmin()) {
                 this.setPersistent(true);
             }

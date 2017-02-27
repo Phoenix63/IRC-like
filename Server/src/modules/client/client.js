@@ -275,7 +275,7 @@ class Client {
         arrayFlags.forEach((flag) => {
             if(this._flags.indexOf(flag)===-1){
                 this._flags += flag;
-                RPLSender.RPL_UMODEIS(this,this._name+' +'+flag);
+                RPLSender.RPL_UMODEIS(this,this.name+' +'+flag);
             }
         });
     }
@@ -291,7 +291,7 @@ class Client {
             let tmp = this._flags.length;
             this._flags = this._flags.replace(flag,'');
             if(tmp-1 === this._flags.length){
-                RPLSender.RPL_UMODEIS(this,this._name+' -'+flag);
+                RPLSender.RPL_UMODEIS(this,this.name+' -'+flag);
             }
         });
     }
