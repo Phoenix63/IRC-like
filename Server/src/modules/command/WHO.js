@@ -14,7 +14,9 @@ module.exports = function (socket, command) {
     let name = command[1].split(' ')[0];
     if (name[0] === '#') {
         Channel.list().forEach(function (chan) {
-            RPLSender.RPL_WHOREPLY(socket.client, chan);
+            if(chan.name === name) {
+                RPLSender.RPL_WHOREPLY(socket.client, chan);
+            }
         });
     }
 };
