@@ -183,9 +183,17 @@ class Channel {
 
     /**
      *
-     * @param client
-     * @param flags
-     * @private
+     * @param newTopic
+     */
+    set topic(newTopic){
+        this._topic = newTopic;
+        this._change();
+    }
+
+    /**
+     * this method is only called when bdd is loading
+     * @param {Client} client
+     * @param {JSON} flags
      */
     _addClientFlag(client, flags) {
         let arrayFlags = flags.split('');
@@ -197,6 +205,7 @@ class Channel {
         });
         this._change();
     }
+
 
     /**
      *
