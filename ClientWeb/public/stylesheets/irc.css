@@ -1,0 +1,80 @@
+#channels {
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    width : 200px;
+    background-color: #8b564b;
+    text-align: center;
+}
+
+#messages {
+    position: absolute;
+    top:100px;
+    left: 200px;
+    right:200px;
+    bottom:50px;
+    background-color: #25608b;
+}
+
+#users {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0;
+    width: 200px;
+    background-color: #8b564b;
+    text-align: center;
+}
+#topic {
+    position: absolute;
+    top:0;
+    right:200px;
+    left:200px;
+    height:100px;
+    background-color: chocolate;
+}
+#divSendMessage {
+     position: absolute;
+     bottom: 0;
+     right: 300px;
+     left: 200px;
+     height:50px;
+     background-color: #3e348b;
+ }
+#divSubmit {
+    position: absolute;
+    bottom: 0;
+    right: 200px;
+    width: 100px;
+    height:50px;
+    background-color: #718b3e;
+}
+
+
+#inputSendMessage {
+    position: absolute;
+    bottom:0;
+    height:44px;
+    width:100%;
+}
+
+#submitSendMessage {
+    position: absolute;
+    bottom:0;
+    height:50px;
+    width:100%;
+}
+
+.notif-messageOn {
+	color:red;
+}
+
+.notif-messageOff {
+	color:black;
+}
+
+
+
+
+

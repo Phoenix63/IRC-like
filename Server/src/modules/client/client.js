@@ -32,9 +32,10 @@ class Client {
          s - marque un utilisateur comme recevant les notifications du serveur ;
          w - l'utilisateur reçoit les WALLOPs ;
          o - drapeau d'opérateur.
+         s - drapeau super admin
          */
-        this._flag = '';
-        this.addFlag('sw');
+        this._flags = '';
+        this._addFlag('sw');
         this._channels = [];
         this._pass = '';
         this._registeredWithPass = false;
@@ -177,17 +178,17 @@ class Client {
 
                         if(process.argv[2] === 'TEST') {
                             this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                            this.addFlag('o');
+                            this._addFlag('s');
                         } else {
                             redisClient.getAdmin((reply) => {
                                 if (!reply) {
                                     this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                                    this.addFlag('o');
+                                    this._addFlag('s');
                                     redisClient.setAdmin(this);
 
                                 } else if (reply[identity] === 'admin') {
                                     this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                                    this.addFlag('o');
+                                    this._addFlag('s');
                                 }
                             });
                         }
@@ -266,23 +267,44 @@ class Client {
 
     /**
      *
-     * @param {string} flag
+     * @param flags
+     * @private
      */
-    addFlag(flag) {
-        if(this._flag.indexOf(flag)<0) {
-            this._flag += flag;
-        }
+    _addFlag(flags) {
+        let arrayFlags = flags.split('');
+        arrayFlags.forEach((flag) => {
+            if(this._flags.indexOf(flag)===-1){
+                this._flags += flag;
+                RPLSender.RPL_UMODEIS(this,this.name+' +'+flag);
+            }
+        });
     }
 
     /**
      *
-     * @param {string} flag
+     * @param flags
+     * @private
      */
-    removeFlag(flag) {
-        if(this._flag.indexOf(flag)>=0) {
-            this._flag = this._flag.split(flag).join('');
+    _removeFlag(flags) {
+        let arrayFlags = flags.split('');
+        arrayFlags.forEach((flag) => {
+            let tmp = this._flags.length;
+            this._flags = this._flags.replace(flag,'');
+            if(tmp-1 === this._flags.length){
+                RPLSender.RPL_UMODEIS(this,this.name+' -'+flag);
+            }
+        });
+    }
+
+    changeFlag(operator, flag) {
+        if(operator==='+') {
+            this._addFlag(flag);
+        }else {
+            this._removeFlag(flag);
         }
     }
+    ///////////////////////////////////
+    ///////////////////////////
 
     isUser() {
         return this._registeredWithPass;
@@ -293,7 +315,10 @@ class Client {
      * @returns {boolean}
      */
     isAdmin() {
-        return this._flag.indexOf('o')>=0;
+        return this._flags.indexOf('o')>=0;
+    }
+    isSuperAdmin(){
+        return this._flags.indexOf('s')>=0;
     }
 
     /**
@@ -318,7 +343,7 @@ class Client {
      * @param id
      * @returns {null|Client}
      */
-    static find(id) {
+    static getClient(id) {
         for (let key in clients) {
             if (key === id || clients[key].name === id || client[key].id === id) {
                 return clients[key];

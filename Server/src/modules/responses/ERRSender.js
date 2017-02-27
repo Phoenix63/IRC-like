@@ -5,11 +5,12 @@ import config from './../../config.json';
 let ERRSender = {
     /**
      *
-     * @param {Client} client
-     * @param {Channel|Object} channel
+     * @param client
+     * @param nameChannel
+     * @constructor
      */
-    ERR_NOSUCHCHANNEL: (client, channel) => {
-        client.socket.send(':' + config.ip + ' 403 ' + channel.name + ' :No such channel');
+    ERR_NOSUCHCHANNEL: (client, nameChannel) => {
+        client.socket.send(':' + config.ip + ' 403 ' + nameChannel + ' :No such channel');
     },
     /**
      *
@@ -138,17 +139,52 @@ let ERRSender = {
     ERR_BADCHANNELKEY: (client, channel) => {
         client.socket.send(':' + config.ip + ' 475 ' + channel.name + ' :Cannot join channel (+k)');
     },
-
     /**
      *
-     * @param {Client} client
-     * @param {Channel} channel
+     * @param client
+     * @param channelName
      * @constructor
      */
-    ERR_CHANOPRIVSNEEDED: (client, channel) => {
-        client.socket.send(':'+config.ip+' 482 '+channel.name+' :You\'re not channel operator');
+    ERR_CHANOPRIVSNEEDED: (client, channelName) => {
+        client.socket.send(':'+config.ip+' 482 '+channelName+' :You\'re not channel operator');
+    },
+    /**
+     *
+     * @param client
+     * @param nameUser
+     * @param channelName
+     * @constructor
+     */
+    ERR_USERNOTINCHANNEL: (client, nameUser, channelName) => {
+        client.socket.send(':'+config.ip+' 441 '+nameUser +' '+channelName+' :They aren\'t on that channel');
+    },
+    /**
+     *
+     * @param client
+     * @param channel
+     * @constructor
+     */
+    ERR_USERSDONTMATCH: (client) => {
+        client.socket.send(':'+config.ip+' 502 :Cant change mode for other users');
+    },
+    /**
+     *
+     * @param client
+     * @param channel
+     * @constructor
+     */
+    ERR_UMODEUNKNOWNFLAG: (client) => {
+        client.socket.send(':'+config.ip+' 501 :Unknown MODE flag');
+    },
+    /**
+     *
+     * @param client
+     * @param channel
+     * @constructor
+     */
+    ERR_KEYSET: (client, channelName) => {
+        client.socket.send(':'+config.ip+' 467 '+channelName+' :Channel key already set');
     }
-
 
 };
 export default ERRSender;

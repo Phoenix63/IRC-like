@@ -1,5 +1,4 @@
 import Channel from './../channel/Channel';
-import Client from './../client/client';
 import config from './../../config.json';
 
 let RPLSender = {
@@ -82,7 +81,7 @@ let RPLSender = {
      * @static
      */
     JOIN: (client, channel) => {
-        channel.broadcast(':' + client.name + ' JOIN ' + channel.name);
+        channel.broadcast(':' + client.name + ' JOIN ' + channel.name, null);
     },
 
     /**
@@ -123,7 +122,7 @@ let RPLSender = {
      * @static
      */
     NICK: (oldname, newname, client) => {
-        client.socket.broadcast(':' + oldname + ' NICK ' + newname);
+        client.socket.broadcast(':' + oldname + ' NICK ' + newname, null);
     },
     /**
      *
@@ -179,7 +178,26 @@ let RPLSender = {
      * @static
      */
     QUIT: (client, message='Gone') => {
-        client.socket.broadcast(':'+client.name+' QUIT :'+message);
+        client.socket.broadcast(':'+client.name+' QUIT :'+message, null);
+    },
+
+    /**
+     *
+     * @param {Channel} chan
+     * @param {string} cmd
+     * @static
+     */
+    RPL_CHANNELMODEIS: (chan, cmd)=> {
+        chan.broadcast(':'+config.ip+' 324 '+cmd, null);
+    },
+    /**
+     *
+     * @param {Client} client
+     * @param {string} cmd
+     * @static
+     */
+    RPL_UMODEIS: (client, cmd)=> {
+        client.socket.send(':'+config.ip+' 221 '+cmd);
     }
 };
 export default RPLSender
