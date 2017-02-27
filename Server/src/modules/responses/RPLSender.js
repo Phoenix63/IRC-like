@@ -179,6 +179,7 @@ let RPLSender = {
      */
     QUIT: (client, message='Gone') => {
         client.socket.broadcast(':'+client.name+' QUIT :'+message);
-    }
+    },
+
 };
 export default RPLSender

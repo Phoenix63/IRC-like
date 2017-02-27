@@ -164,6 +164,16 @@ class Channel {
     }
 
     /**
+     *
+     * @param newTopic
+     */
+
+    set topic(newTopic){
+        this._topic = newTopic;
+        this._change();
+    }
+
+    /**
      * this method is only called when bdd is loading
      * @param {JSON} flags
      */
@@ -171,6 +181,7 @@ class Channel {
         this._usersFlags = flags;
         this._change();
     }
+
 
     /**
      *
