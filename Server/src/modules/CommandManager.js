@@ -16,7 +16,8 @@ let allowedCommand = {
     'PASS': require('./command/PASS'),
     'PONG': function(){},
     'WHOIS': require('./command/WHOIS'),
-    'MODE':require('./command/MODE')
+    'MODE':require('./command/MODE'),
+    'TOPIC': require('./command/TOPIC')
 };
 
 class CommandManager {
