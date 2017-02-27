@@ -12,7 +12,7 @@ module.exports = function (socket, command) {
 
 
         if(!name.match(/\W/g) || name.match(/\W/g).join('') !== '#' || name[0] !== '#' || name.length <= 1) {
-            ERRSender.ERR_NOSUCHCHANNEL(socket.client, {name: name});
+            ERRSender.ERR_NOSUCHCHANNEL(socket.client, name);
         } else {
             let err = true;
             Channel.list().forEach((channel) => {
