@@ -38,6 +38,10 @@ module.exports = function (socket, command) {
                 ERRSender.ERR_USERNOTINCHANNEL(socket.client,arg4,channel.name);
                 return;
             }
+            if(!user.isUser()){
+                ERRSender.ERR_USERSDONTMATCH(socket.client);
+                return;
+            }
             if(channel.isUserOperator(user) && !(operator.isAdmin() || operator.isSuperAdmin())){
                 ERRSender.ERR_USERSDONTMATCH(socket.client);
                 return;
