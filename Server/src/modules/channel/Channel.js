@@ -340,7 +340,7 @@ class Channel {
         }
         if(this._users.indexOf(user) < 0) {
             this._users.push(user);
-            //if(user.isUser()) {
+            if(user.isUser()) {
 
                 if(!this._usersFlags[user.identity]) {
                     this._usersFlags[user.identity] = '';
@@ -362,7 +362,7 @@ class Channel {
                     console.log("=>"+(user.identity === this._creator));
                     this._addClientFlag(user,'o')
                 }
-            //}
+            }
             this._change();
             user.addChannel(this);
             RPLSender.JOIN(user, this);
