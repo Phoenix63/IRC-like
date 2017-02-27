@@ -26,8 +26,8 @@ public:
     //Connection to channels
     void joinChannels(QListWidget *list);
     QList<QString>* convertChannelList(QListWidget *list);
-    void loadConfig();
-
+    void loadPreset(QString preset);
+    void loadPresetList();
     ~Login();
 
 
@@ -39,6 +39,10 @@ private slots:
     void on_pushButton_addChannel_clicked();
     void on_channelList_itemClicked(QListWidgetItem *item);
     void on_pushButton_deleteChannel_clicked();
+
+
+    void on_pushButton_createNew_clicked();
+    void on_configList_activated(const QString &arg1);
 
 private:
     MainFrame *main;

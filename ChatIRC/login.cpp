@@ -9,7 +9,7 @@ Login::Login(QWidget *parent) :
     ui(new Ui::Login)
 {
     ui->setupUi(this);
-    loadConfig();
+    loadPresetList();
 }
 
 Login::~Login()
@@ -111,7 +111,8 @@ void Login::on_channelList_itemClicked(QListWidgetItem *item)
 
 
 
-QList<QString>* Login::convertChannelList(QListWidget *channels){
+QList<QString>* Login::convertChannelList(QListWidget *channels)
+{
     QList<QString> *channelsToJoin=new QList<QString>;
     for(int i = 0; i < channels->count(); i++)
         channelsToJoin->append(channels->item(i)->text());
@@ -131,27 +132,74 @@ void Login::joinChannels(QListWidget *channels)
     }
 }
 
-void Login::loadConfig()
+
+void Login::loadPreset(QString preset)
 {
     QFile config("config.cfg");
     if (config.exists()) {
         config.open(QIODevice::ReadOnly);
-        QString buf(config.readLine());
-        if (buf.length() > 0) {
+        QString buf;
+        while(!config.atEnd() && buf.compare('<'+preset+">\n"))
+        {
+            buf = config.readLine();
+        }
+        //username
+        buf = config.readLine();
+        buf=buf.split(" = ").at(1);
+        if (buf.length() > 0)
             ui->lineEdit_username->setText(buf.left(buf.length()-1));
-        }
+        //password
         buf = config.readLine();
-        if (buf.length() > 0) {
+        buf=buf.split(" = ").at(1);
+        if (buf.length() > 0)
             ui->lineEdit_pass->setText(buf.left(buf.length()-1));
-        }
+        //host
         buf = config.readLine();
-        if (buf.length() > 0) {
+        buf=buf.split(" = ").at(1);
+        if (buf.length() > 0)
             ui->lineEdit_host->setText(buf.left(buf.length()-1));
-        }
+        //port
         buf = config.readLine();
-        if (buf.length() > 0) {
-            ui->lineEdit_port->setText(buf);
+        buf=buf.split(" = ").at(1);
+        if (buf.length() > 0)
+            ui->lineEdit_port->setText(buf.left(buf.length()-1));
+        //channel list
+        buf = config.readLine();
+        buf=buf.split(" = ").at(1);
+        if (buf.length() > 0){
+            QStringList channels = buf.split(' ');
+            for(auto i : channels){
+                ui->channelList->addItem(i);
+            }
         }
     }
+}
 
+void Login::loadPresetList()
+{
+    QFile config("config.cfg");
+    if (config.exists()) {
+        config.open(QIODevice::ReadOnly);
+        QString buf;
+        while(!config.atEnd() && !buf.startsWith('<'))
+        {
+            buf = config.readLine();
+            if(buf.startsWith('<')){
+               buf.remove(0,1);
+               buf.remove(buf.length()-2,2);
+               ui->configList->addItem(buf);
+            }
+        }
+    }
+}
+
+void Login::on_pushButton_createNew_clicked()
+{
+    ui->configList->addItem(ui->lineEdit_username->text()+" - "+ui->lineEdit_host->text()+':'+ui->lineEdit_port->text());
+}
+
+void Login::on_configList_activated(const QString &arg1)
+{
+    ui->channelList->clear();
+    loadPreset(arg1);
 }
