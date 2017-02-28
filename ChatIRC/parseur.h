@@ -14,10 +14,8 @@ class Parseur {
 public:
 
     // Initialisation functions
-    void setChannel(Channel *channel);
-    void setSocket(QTcpSocket *socket);
-    void setNickname(QString *nickname);
-    void setChanList(Channellist *list);
+    void initialize(Channel *channel, QTcpSocket *socket, QString *nickname, Channellist *list);
+    void setNickname(QString *nick);
     void Parseur::sendToServer(QTcpSocket *socket,QString string);
     // Parsing functions
     bool out(QString string);

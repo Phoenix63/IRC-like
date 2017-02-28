@@ -7,29 +7,22 @@
 /*
  * Parseur: Initialisation functions
  */
-
-void Parseur::setChannel(Channel *chan)
+void Parseur::initialize(Channel *chan, QTcpSocket *sock, QString *nick, Channellist *list)
 {
     channel = chan;
-}
-
-/*
- * Parse::Out: Parse client request
- */
-
-void Parseur::setSocket(QTcpSocket *sock)
-{
     socket = sock;
+    nickname = nick;
+    listOfChannels = list;
 }
 
 void Parseur::setNickname(QString *nick)
 {
     nickname = nick;
 }
-void Parseur::setChanList(Channellist *list)
-{
-    listOfChannels = list;
-}
+
+/*
+ * Parse::Out: Parse client request
+ */
 
 void Parseur::sendToServer(QTcpSocket *socket,QString string)
 {
@@ -139,6 +132,7 @@ bool Parseur::out_isNamesMsg(QString string)
     string = string.right(string.length()-6);
     string.prepend("NAMES");
     sendToServer(socket,string);
+    channel->change("\"Debug\"");
     return true;
 }
 
@@ -175,7 +169,7 @@ bool Parseur::out_isListMsg(QString string)
     string.replace(QString("/list"), QString("LIST"));
     sendToServer(socket,string);
     listOfChannels->show();
-    setChanList(listOfChannels);
+    listOfChannels->clear();
     return true;
 }
 
@@ -203,13 +197,14 @@ bool Parseur::out_isKickMsg(QString string)
 
 bool Parseur::out_isWhoMsg(QString string)
 {
-    if(!string.startsWith("/who "))
+    if(!string.startsWith("/who"))
         return false;
     string = string.right(string.length()-4);
     string.prepend("WHO");
     if (channel->channelName() != "\"Debug\"")
         string = QString("WHO "+ (channel->channelName()) +'\n');
     sendToServer(socket,string);
+    channel->change("\"Debug\"");
     return true;
 }
 
@@ -220,6 +215,7 @@ bool Parseur::out_isWhoisMsg(QString string)
     string = string.right(string.length()-6);
     string.prepend("WHOIS");
     sendToServer(socket,string);
+    channel->change("\"Debug\"");
     return true;
 }
 

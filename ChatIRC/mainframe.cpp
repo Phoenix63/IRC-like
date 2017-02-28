@@ -16,11 +16,7 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket,QString nick) :
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
     channel.setUi(ui->channelList, ui->chatBox,ui->userList,ui->topicDisplay,ui->messageSender, ui->nickBox);
     chanList = new Channellist(this);
-    chanList->setWindowTitle("List of channels");
-    parseur.setChannel(&channel);
-    parseur.setSocket(socket);
-    parseur.setNickname(&nick);
-    parseur.setChanList(chanList);
+    parseur.initialize(&channel,socket,&nick,chanList);
     msgList.setMsgSender(ui->messageSender);
     ui->messageSender->installEventFilter(this);
     ui->scrollArea->setStyleSheet("background-color: white");

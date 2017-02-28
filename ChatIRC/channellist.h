@@ -17,6 +17,7 @@ public:
     explicit Channellist(QWidget *parent = 0);
     ~Channellist();
     void addRow(QString channel);
+    void clear();
 private slots:
 
 private:

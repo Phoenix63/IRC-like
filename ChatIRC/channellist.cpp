@@ -13,6 +13,11 @@ Channellist::~Channellist()
     delete ui;
 }
 
+void Channellist::clear()
+{
+    ui->listWidget->clear();
+}
+
 void Channellist::addRow(QString channel)
 {
     QString name = channel.split(' ').at(3);
