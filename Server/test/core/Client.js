@@ -83,6 +83,20 @@ var Client = (function() {
             } else if (message.indexOf('KICK') > 0) {
                 this.emit('kick', message);
             }
+            else if (message.indexOf('501') > 0){
+                this.emit('err_unknownflag',message);
+            }
+            else if (message.indexOf('') > 0){
+                this.emit('',message);
+            }
+            else if (message.indexOf('') > 0){
+                this.emit('403',message);
+            }
+            /*
+            else if (message.indexOf('') > 0){
+                this.emit('',message);
+            }
+            */
 
         } else {
             this.emit('quit', message);
