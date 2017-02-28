@@ -18,7 +18,8 @@ let allowedCommand = {
     'WHOIS': require('./command/WHOIS'),
     'MODE':require('./command/MODE'),
     'TOPIC': require('./command/TOPIC'),
-    'RESTART': require('./command/RESTART')
+    'RESTART': require('./command/RESTART'),
+    'KICK': require('./command/KICK')
 };
 
 class CommandManager {

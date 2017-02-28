@@ -10,7 +10,6 @@ function throwError(client, message) {
         client.socket.emit('end');
     throw "ConfMessage : " + message;
 }
-const debug = require('debug')('logger');
 
 function log(txt) {
     if(process.argv[2] === 'DEV') {

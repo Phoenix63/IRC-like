@@ -21,7 +21,7 @@ import cluster from 'cluster';
 
 const numCPUs = require("os").cpus().length;
 
-    let quiting = false;
+let quiting = false;
 function quitHandle(e, callback=function(){}) {
     if(e) {
         console.log(e);

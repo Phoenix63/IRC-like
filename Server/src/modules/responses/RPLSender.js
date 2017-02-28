@@ -198,6 +198,17 @@ let RPLSender = {
      */
     RPL_UMODEIS: (client, cmd)=> {
         client.socket.send(':'+config.ip+' 221 '+cmd);
+    },
+
+    /**
+     *
+     * @param {Client} client
+     * @param {string} kicked
+     * @param {Channel} channel
+     * @static
+     */
+    KICK: (client, kicked, channel) => {
+        channel.broadcast(':'+client.name+' KICK '+kicked);
     }
 };
 export default RPLSender
