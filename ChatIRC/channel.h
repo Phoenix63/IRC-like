@@ -8,6 +8,12 @@
 #include <QLineEdit>
 #include <QColor>
 #include <QList>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QTime>
+
+#include "parseuremoji.h"
+#include "channelcontent.h"
 
 class Channel {
 public:
@@ -15,7 +21,7 @@ public:
     Channel();
 
     // Initialisation functions
-    void setUi(QListWidget *list, QTextBrowser *text, QListWidget *uList, QLineEdit *tText);
+    void setUi(QListWidget *list, QVBoxLayout *text, QListWidget *uList, QLineEdit *tText, QLineEdit *mText, QVBoxLayout *nText);
 
     // Channel creation functions
     void join(QString chan, QString topic);
@@ -24,6 +30,7 @@ public:
     // UI statues update functions
     void refreshText();
     void refreshChanList();
+    void clearContent();
 
     // Channel quit functions
     void leave(QString channel);
@@ -45,25 +52,25 @@ public:
 
     void refreshTopic();
     void changeNick(QString nick, QString newNick);
+
+    void clean();
+    void clearLayout(QLayout *layout);
+    QHash<QString, QPixmap> * getHashMap();
 private:
     // Qhash wich contain message: key = channel name, content = message list
-    QHash<QString, QString> channels;
-    QHash<QString, QList<QString>> users;
-    QHash<QString, QString> topics;
+    QHash<QString, ChannelContent> channels;
 
     // UI for interface update
     QListWidget *chanList;
-    QTextBrowser *chanText;
+    QVBoxLayout *chanText;
+    QVBoxLayout *nickText;
     QListWidget *userList;
     QLineEdit *topicText;
+    QLineEdit *messageText;
+    ParseurEmoji parseur;
 
     // Current channel name
-    QString currentKey;
-
-    // Pointer on current channel content for les Hash map loop
-    QString *current;
-    QList<QString> *currentList;
-    QString *currentTopic;
+    QString currentChannel;
 };
 
 #endif // CHANNEL_H
