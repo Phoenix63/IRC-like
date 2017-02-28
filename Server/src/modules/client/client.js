@@ -178,17 +178,19 @@ class Client {
 
                         if(process.argv[2] === 'TEST') {
                             this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                            this._addFlag('s');
+                            this._addFlag('o');
                         } else {
                             redisClient.getAdmin((reply) => {
                                 if (!reply) {
                                     this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                                    this._addFlag('s');
-                                    redisClient.setAdmin(this);
-
+                                    this._addFlag('Oo');
+                                    redisClient.setAdmin({identity: this.identity, role: 'superadmin'});
                                 } else if (reply[identity] === 'admin') {
                                     this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                                    this._addFlag('s');
+                                    this._addFlag('o');
+                                } else if (reply[identity] === 'superadmin') {
+                                    this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                                    this._addFlag('Oo');
                                 }
                             });
                         }
@@ -267,7 +269,7 @@ class Client {
 
     /**
      *
-     * @param flags
+     * @param {string} flags
      * @private
      */
     _addFlag(flags) {
@@ -282,7 +284,7 @@ class Client {
 
     /**
      *
-     * @param flags
+     * @param {string} flags
      * @private
      */
     _removeFlag(flags) {
@@ -296,6 +298,11 @@ class Client {
         });
     }
 
+    /**
+     *
+     * @param {string} operator
+     * @param {string} flag
+     */
     changeFlag(operator, flag) {
         if(operator==='+') {
             this._addFlag(flag);
@@ -303,9 +310,11 @@ class Client {
             this._removeFlag(flag);
         }
     }
-    ///////////////////////////////////
-    ///////////////////////////
 
+    /**
+     *
+     * @returns {boolean}
+     */
     isUser() {
         return this._registeredWithPass;
     }
@@ -317,8 +326,13 @@ class Client {
     isAdmin() {
         return this._flags.indexOf('o')>=0;
     }
+
+    /**
+     *
+     * @returns {boolean}
+     */
     isSuperAdmin(){
-        return this._flags.indexOf('s')>=0;
+        return this._flags.indexOf('O')>=0;
     }
 
     /**
@@ -340,7 +354,7 @@ class Client {
 
     /**
      * find a client in user list
-     * @param id
+     * @param {string} id
      * @returns {null|Client}
      */
     static getClient(id) {
@@ -354,7 +368,7 @@ class Client {
 
     /**
      * get client list
-     * @returns {Array}
+     * @returns {Array<Client>}
      */
     static list() {
         return clients;

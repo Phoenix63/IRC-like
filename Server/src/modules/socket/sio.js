@@ -1,9 +1,10 @@
 "use strict";
 import config from './../../config.json';
 import sio from 'socket.io';
-let io = sio(config.sio_server.port);
+
 
 function createServer(callback) {
+    let io = sio.listen(config.sio_server.port);
     io.on('connection', (socket) => {
         socket.remoteAddress = socket.request.connection.remoteAddress;
         callback(socket);

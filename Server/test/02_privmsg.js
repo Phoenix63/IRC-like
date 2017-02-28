@@ -36,6 +36,7 @@ describe('command PRIVMSG:', () => {
         });
         client.on('err_notexttosend', (message) => {
             client.close();
+            client = null;
             done();
         });
     });
@@ -79,7 +80,7 @@ describe('command PRIVMSG:', () => {
             });
         });
     });
-    it('should send a privmsg', (done) => {
+    it('should send a privmsg to user', (done) => {
         client1 = new Client(config.port, config.ip);
         client2 = new Client(config.port, config.ip);
 
@@ -89,21 +90,20 @@ describe('command PRIVMSG:', () => {
         });
 
         client1.on('auth', () => {
-            client1.send('JOIN #sendpriv');
             client2.send('NICK iamatest');
             client2.send('USER sendpriv2 0 * :sendpriv');
         });
 
         client2.on('auth', () => {
-            client2.send('JOIN #sendpriv');
+            client2.send('PRIVMSG sendpriv1 :this is a test');
         });
-
-        client2.on('join', () => {
-            client2.send('PRIVMSG #sendpriv :this is a test');
+        client2.on('err_norecipient', (message) => {
+            message.should.equal('');
+            done();
         });
 
         client1.on('privmsg', (message) => {
-            message.should.equal(':iamatest PRIVMSG #sendpriv :this is a test');
+            message.should.equal(':iamatest PRIVMSG sendpriv1 :this is a test');
             client1.close();
             client2.close();
             done();

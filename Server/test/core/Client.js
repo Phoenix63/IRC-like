@@ -78,6 +78,10 @@ var Client = (function() {
                 this.emit('rpl_whois', message);
             } else if (message.indexOf('352') > 0) {
                 this.emit('rpl_who', message);
+            } else if (message.indexOf('482') > 0) {
+                this.emit('err_chanoprivneeded', message);
+            } else if (message.indexOf('KICK') > 0) {
+                this.emit('kick', message);
             }
 
         } else {

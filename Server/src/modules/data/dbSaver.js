@@ -26,7 +26,6 @@ module.exports = function(bool, callback) {
         redis.getUsers((users) => {
             if(users) {
                 for(let i = 0; i<Object.keys(users).length; i++) {
-                    //console.log('user: '+(i+1)+'/'+Object.keys(users).length);
                     db.collection('users').findOneAndUpdate({identity: Object.keys(users)[i]}, {identity: Object.keys(users)[i], pass: users[Object.keys(users)[i]]}, {upsert:true}).then(() => {
                         caller.incSaved();
                     });
@@ -36,8 +35,7 @@ module.exports = function(bool, callback) {
             redis.getAdmin((admins) => {
                 if(admins) {
                     for(let j = 0; j<Object.keys(admins).length; j++) {
-                        //console.log('admin: '+(j+1)+'/'+Object.keys(admins).length);
-                        db.collection('admin').findOneAndUpdate({name: Object.keys(admins)[j]},{name: Object.keys(admins)[j]},{upsert:true}).then(() => {
+                        db.collection('admin').findOneAndUpdate({name: Object.keys(admins)[j]},{name: Object.keys(admins)[j], role: admins[Object.keys(admins)[j]]},{upsert:true}).then(() => {
                             caller.incSaved();
                         });
                     }
