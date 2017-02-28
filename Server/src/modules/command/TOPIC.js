@@ -25,7 +25,7 @@ module.exports = function(socket,command) {
     Channel.list().forEach((c) =>{
         if(c.name === chan){
             if (! c.isUserOperator(socket.client)){
-                ERRSender.ERR_CHANOPRIVSNEEDED(socket.client, c);
+                ERRSender.ERR_CHANOPRIVSNEEDED(socket.client, c.name);
                 return;
             }
             if(newTopic == null) {
