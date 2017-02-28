@@ -184,6 +184,15 @@ let ERRSender = {
      */
     ERR_KEYSET: (client, channelName) => {
         client.socket.send(':'+config.ip+' 467 '+channelName+' :Channel key already set');
+    },
+
+    /**
+     *
+     * @param {Client} client
+     * @constructor
+     */
+    ERR_NOPRIVILEGES: (client) => {
+        client.socket.send(':'+config.ip+' 481 :Permission Denied- You\'re not an IRC operator');
     }
 
 };

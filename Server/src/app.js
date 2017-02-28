@@ -14,13 +14,14 @@ import Logger from './modules/Logger';
 import MessageManager from './modules/CommandManager';
 import RPLSender from './modules/responses/RPLSender';
 import dbLoader from './modules/data/dbLoader';
+import child_process from 'child_process';
 
 import cluster from 'cluster';
 
 const numCPUs = require("os").cpus().length;
 
 let quiting = false;
-function quitHandle(e) {
+function quitHandle(e, callback=function(){}) {
     if(e) {
         console.log(e);
     }
@@ -32,6 +33,7 @@ function quitHandle(e) {
             for(let id in cluster.workers) {
                 cluster.workers[id].kill();
             }
+            callback();
             process.exit(0);
         });
     }
@@ -58,10 +60,21 @@ if(cluster.isMaster) {
         process.on('uncaughtException', quitHandle);
     }
 
-} else {
-    cluster.on('exit', (w, c, s) => {
-         cluster.fork();
+    cluster.on('message', (worker, msg) => {
+        if(msg && msg.quitmessage) {
+            console.log('restart...');
+            for(let key in cluster.workers) {
+                cluster.workers[key].kill();
+            }
+            cluster.worker.kill();
+        }
     });
+    cluster.on('exit', (worker, code, signal) => {
+        console.log('worker '+worker.process.pid+' died');
+    });
+
+}
+if(cluster.isWorker) {
     socketManager.create((socket) => {
         let client = new Client(socket);
         let logger = new Logger(client);
