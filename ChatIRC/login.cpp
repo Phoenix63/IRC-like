@@ -168,15 +168,19 @@ void Login::loadPreset(QString preset)
         buf=buf.split(" = ").at(1);
         if (buf.length() > 0){
             QStringList channels = buf.split(' ');
-            for(auto i : channels){
+            for(QString i : channels){
+                if(i.contains('\n'))
+                    i = i.left(i.length() - 1);
                 ui->channelList->addItem(i);
             }
         }
+        config.close();
     }
 }
 
 void Login::loadPresetList()
 {
+    ui->configList->clear();
     QFile config("config.cfg");
     if (config.exists()) {
         config.open(QIODevice::ReadOnly);
@@ -190,16 +194,101 @@ void Login::loadPresetList()
                ui->configList->addItem(buf);
             }
         }
+        config.close();
     }
 }
 
 void Login::on_pushButton_createNew_clicked()
 {
     ui->configList->addItem(ui->lineEdit_username->text()+" - "+ui->lineEdit_host->text()+':'+ui->lineEdit_port->text());
+    QFile config("config.cfg");
+    if (config.exists()) {
+        config.open(QIODevice::WriteOnly | QIODevice::Append);
+        QTextStream flux(&config);
+        flux.setCodec("UTF-8");
+        flux << '<' << ui->lineEdit_username->text() << " - " << ui->lineEdit_host->text() << ':' << ui->lineEdit_port->text() << '>' << endl;
+        flux << "Username = " << ui->lineEdit_username->text() << endl;
+        flux << "Password = " << ui->lineEdit_pass->text() << endl;
+        flux << "Host = " << ui->lineEdit_host->text() << endl;
+        flux << "Port = " << ui->lineEdit_port->text() << endl;
+        flux << "Channels = ";
+        for(int i=0; i<ui->channelList->count();i++)
+            flux << ui->channelList->item(i)->text() << ' ';
+        flux << endl;
+        config.close();
+    }
+    ui->configList->setCurrentIndex(ui->configList->count()-1);
 }
 
 void Login::on_configList_activated(const QString &arg1)
 {
+    qDebug() << ui->configList->currentIndex();
+    qDebug() << arg1;
     ui->channelList->clear();
     loadPreset(arg1);
+}
+
+void Login::on_pushButton_save_clicked()
+{
+    QString current = ui->configList->currentText();
+    current.prepend('<');
+    QString res;
+    QFile config("config.cfg");
+    if (config.exists()) {
+        config.open(QIODevice::ReadWrite);
+        QTextStream out(&config);
+        QString line = out.readLine();
+        while(!line.startsWith(current) && !out.atEnd()){
+            res.append(line + '\n');
+            line = out.readLine();
+        }
+        for(int i = 0; i < 5; i++)
+            QString line = out.readLine();
+        res.append('<'+ui->lineEdit_username->text()+" - "+ui->lineEdit_host->text()+':'+ui->lineEdit_port->text()+">\n");
+        res.append("Username = "+ui->lineEdit_username->text()+'\n');
+        res.append("Password = "+ui->lineEdit_pass->text()+'\n');
+        res.append("Host = "+ui->lineEdit_host->text()+'\n');
+        res.append("Port = "+ui->lineEdit_port->text()+'\n');
+        res.append("Channels =");
+        for(int i = 0; i < ui->channelList->count(); i++) {
+            QString tmp = ' ' + ui->channelList->item(i)->text();
+            res.append(tmp);
+        }
+        res.append('\n');
+        while(!out.atEnd()){
+            line = out.readLine();
+            res.append(line + '\n');
+        }
+        config.resize(0);
+        out << res;
+        config.close();
+        loadPresetList();
+    }
+}
+
+void Login::on_pushButton_delete_clicked()
+{
+    QString current = ui->configList->currentText();
+    current.prepend('<');
+    QString res;
+    QFile config("config.cfg");
+    if (config.exists()) {
+        config.open(QIODevice::ReadWrite);
+        QTextStream out(&config);
+        while(!out.atEnd()){
+            QString line = out.readLine();
+            while(!line.startsWith(current) && !out.atEnd()){
+                res.append(line + '\n');
+                line = out.readLine();
+            }
+            for(int i = 0; i < 5; i++){
+                QString line = out.readLine();
+            }
+        }
+        config.resize(0);
+        out << res;
+        config.close();
+        ui->configList->removeItem(ui->configList->currentIndex());
+        ui->configList->setCurrentIndex(0);
+    }
 }

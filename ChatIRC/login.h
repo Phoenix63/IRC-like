@@ -44,6 +44,10 @@ private slots:
     void on_pushButton_createNew_clicked();
     void on_configList_activated(const QString &arg1);
 
+
+    void on_pushButton_save_clicked();
+    void on_pushButton_delete_clicked();
+
 private:
     MainFrame *main;
     QTcpSocket *socket;

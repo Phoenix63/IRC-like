@@ -32,7 +32,7 @@
         <widget class="QComboBox" name="configList"/>
        </item>
        <item>
-        <widget class="QPushButton" name="pushButton">
+        <widget class="QPushButton" name="pushButton_save">
          <property name="maximumSize">
           <size>
            <width>50</width>
@@ -41,6 +41,19 @@
          </property>
          <property name="text">
           <string>Save</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_delete">
+         <property name="maximumSize">
+          <size>
+           <width>50</width>
+           <height>16777215</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>Delete</string>
          </property>
         </widget>
        </item>
@@ -160,7 +173,7 @@
            <bool>false</bool>
           </property>
           <property name="text">
-           <string>crismos.fr</string>
+           <string/>
           </property>
           <property name="placeholderText">
            <string>Host</string>
@@ -185,7 +198,7 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="text">
-           <string>8088</string>
+           <string/>
           </property>
           <property name="placeholderText">
            <string>Port</string>
@@ -290,25 +303,6 @@
             </property>
             <property name="text">
              <string>&amp;Delete</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="pushButton_lodaChannels">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>&amp;Load</string>
             </property>
            </widget>
           </item>
