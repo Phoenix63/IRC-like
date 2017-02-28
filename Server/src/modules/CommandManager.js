@@ -43,7 +43,7 @@ class CommandManager {
     static parseMessage(line) {
         //let command = line.match(/^[A-Z]+(.+)?/g);
         let command = /(^[A-Z]+)(.*)?/.exec(line);
-        if (command[1]) {
+        if (command && command[1]) {
             if(!command[2]) {
                 command[2] = '';
             }
