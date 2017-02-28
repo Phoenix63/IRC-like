@@ -371,14 +371,18 @@ class Channel {
      * @param {Client} user
      * @param {string} message
      */
-    removeUser(user, message='Gone') {
+    removeUser(user, message='Gone', bool) {
         let index = this._users.indexOf(user);
         if (index < 0) {
             ERRSender.ERR_NOTONCHANNEL(user, this);
         } else {
             this._users.splice(index, 1);
             RPLSender.PART(user, this, message);
-            user.removeChannel(this);
+
+            if(!bool) {
+                user.removeChannel(this);
+            }
+
 
             if(this._temporary && this._users.length <= 0) {
                 channels.splice(channels.indexOf(this), 1);

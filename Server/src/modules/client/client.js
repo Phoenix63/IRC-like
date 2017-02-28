@@ -259,10 +259,10 @@ class Client {
      * methods
      */
 
-    delete() {
-        this._channels.forEach((c) => {
-            c.removeUser(this);
-        });
+    del() {
+        for(let i = 0; i<this._channels.length; i++) {
+            this._channels[i].removeUser(this, 'Quit', true);
+        }
         RPLSender.QUIT(this, 'Gone');
         clients.splice(clients.indexOf(this), 1);
     };

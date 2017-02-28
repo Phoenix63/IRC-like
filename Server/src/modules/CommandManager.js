@@ -41,11 +41,18 @@ class CommandManager {
      * @returns {[string,*]}
      */
     static parseMessage(line) {
-        let command = line.match(/^[A-Z]+([ ][^[a-zA-Z0-9#&:][a-zA-Z0-9 ]+)?/g);
-        if (command) {
-            return [command[0], line.replace(new RegExp(command[0] + "[ ]?"), '')];
+        //let command = line.match(/^[A-Z]+(.+)?/g);
+        let command = /(^[A-Z]+)(.*)?/.exec(line);
+        if (command && command[1]) {
+            if(!command[2]) {
+                command[2] = '';
+            }
+            if(command[2] && command[2][0] === ' ') {
+                command[2] = command[2].slice(1,command[2].length);
+            }
+            return [command[1], command[2]];
         } else {
-            return [line.split(' ')[0], null];
+            return [line, null];
         }
     }
 
