@@ -2,6 +2,10 @@
 
 process.title = 'server';
 
+console.log = function(arg) {
+    process.stdout.write(arg+'\n');
+};
+
 import dbSaver from './modules/data/dbSaver';
 
 // globals
@@ -14,7 +18,6 @@ import Logger from './modules/Logger';
 import MessageManager from './modules/CommandManager';
 import RPLSender from './modules/responses/RPLSender';
 import dbLoader from './modules/data/dbLoader';
-import child_process from 'child_process';
 
 import cluster from 'cluster';
 
@@ -71,6 +74,7 @@ if(cluster.isMaster) {
     });
     cluster.on('exit', (worker, code, signal) => {
         console.log('worker '+worker.process.pid+' died');
+        cluster.fork();
     });
 
 }
