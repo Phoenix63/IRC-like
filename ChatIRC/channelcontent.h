@@ -14,6 +14,7 @@ public:
     void removeUser(QString userName);
     void replaceUser(QString oldNick, QString newNick);
     void appendChat(QString heure,QString pseudo,QString message);
+    void clearContent();
 
     QString getTopic();
     QList<QString> getUsers();

@@ -39,6 +39,10 @@ bool Parseur::out(QString string)
     if (!out_isPassMsg(string))
     if (!out_isPartMsg(string))
     if (!out_isListMsg(string))
+    if (!out_isCleanMsg(string))
+    if (!out_isDebugMsg(string))
+    if (!out_isModeMsg(string))
+    if (!out_isTopicMsg(string))
     if (!out_isWhoMsg(string))
     if (!out_isWhoisMsg(string))
     if (!out_isMsgMsg(string))
@@ -71,6 +75,24 @@ void Parseur::in(QString string)
 /*
  * Parseur: Out private function's
  */
+
+bool Parseur::out_isCleanMsg(QString string)
+{
+    if(!string.startsWith("/clean"))
+        return false;
+    qDebug() << "clean";
+    channel->clearContent();
+    channel->refreshText();
+    return true;
+}
+
+bool Parseur::out_isDebugMsg(QString string)
+{
+    if(!string.startsWith("/debug"))
+        return false;
+    socket->write(string.right(string.length()-7).toLatin1().data());
+    return true;
+}
 
 bool Parseur::out_isNickMsg(QString string)
 {
@@ -145,6 +167,18 @@ bool Parseur::out_isListMsg(QString string)
     return true;
 }
 
+bool Parseur::out_isTopicMsg(QString string)
+{
+    if(!string.startsWith("/topic"))
+        return false;
+    string=string.right(string.length()-6);
+    string.prepend("TOPIC");
+    if (string.contains(QRegularExpression("^TOPIC\\s*$")))
+        string="TOPIC "+channel->channelName()+'\n';
+    socket->write(string.toLatin1().data());
+    return true;
+}
+
 bool Parseur::out_isWhoMsg(QString string)
 {
     if(!string.startsWith("/who "))
@@ -161,8 +195,18 @@ bool Parseur::out_isWhoisMsg(QString string)
 {
     if (!string.startsWith("/whois"))
         return false;
-    string=string.right(string.length()-5);
+    string=string.right(string.length()-6);
     string.prepend("WHOIS");
+    socket->write(string.toLatin1().data());
+    return true;
+}
+
+bool Parseur::out_isModeMsg(QString string)
+{
+    if (!string.startsWith("/mode"))
+        return false;
+    string=string.right(string.length()-5);
+    string.prepend("MODE");
     socket->write(string.toLatin1().data());
     return true;
 }

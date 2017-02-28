@@ -72,6 +72,11 @@ void Channel::refreshChanList()
    }
 }
 
+void Channel::clearContent()
+{
+    channels[currentChannel].clearContent();
+}
+
 /*
  * Channel: Channel quit functions
  */

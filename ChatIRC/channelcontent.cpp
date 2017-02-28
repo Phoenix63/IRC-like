@@ -48,3 +48,10 @@ QList<QList<QString>> ChannelContent::getChatContent()
 {
     return chatContent;
 }
+
+void ChannelContent::clearContent()
+{
+    while(!chatContent.isEmpty()){
+        chatContent.pop_back();
+    }
+}

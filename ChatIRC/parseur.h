@@ -31,6 +31,10 @@ private:
     bool out_isPartMsg(QString string);
     bool out_isQuitMsg(QString string);
     bool out_isListMsg(QString string);
+    bool out_isCleanMsg(QString string);
+    bool out_isDebugMsg(QString string);
+    bool out_isModeMsg(QString string);
+    bool out_isTopicMsg(QString string);
     bool out_isWhoMsg(QString string);
     bool out_isWhoisMsg(QString string);
     bool out_isMsgMsg(QString string);

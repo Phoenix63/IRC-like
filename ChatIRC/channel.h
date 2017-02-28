@@ -30,6 +30,7 @@ public:
     // UI statues update functions
     void refreshText();
     void refreshChanList();
+    void clearContent();
 
     // Channel quit functions
     void leave(QString channel);
