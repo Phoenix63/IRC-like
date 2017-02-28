@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
-QT += network
+QT       += network
 RC_FILE = myapp.rc
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -17,12 +17,16 @@ TEMPLATE = app
 SOURCES += main.cpp\
     login.cpp \
     mainframe.cpp \
-    parseur.cpp
+    parseur.cpp \
+    channel.cpp \
+    msglist.cpp
 
 HEADERS  += \
     login.h \
     mainframe.h \
-    parseur.h
+    channel.h \
+    parseur.h \
+    msglist.h
 
 FORMS    += \
     login.ui \
