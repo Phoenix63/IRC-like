@@ -22,8 +22,16 @@ module.exports = function(bool, callback) {
             db.collection('channels').drop();
 
             let caller = new Caller(() => {
-                db.close();
-                callback();
+                if(bool) {
+                    redis.flush(() => {
+                        db.close();
+                        callback();
+                    });
+                } else {
+                    db.close();
+                    callback();
+                }
+
             });
 
             redis.getUsers((users) => {
@@ -59,7 +67,13 @@ module.exports = function(bool, callback) {
             });
         });
     } else {
-        callback();
+        if(bool) {
+            redis.flush(() => {
+                callback();
+            });
+        } else {
+            callback()
+        }
     }
 
 };

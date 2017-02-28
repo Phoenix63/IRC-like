@@ -49,6 +49,10 @@ class Redis {
         }
     }
 
+    flush(callback=function(){}) {
+        this._client.flushdb(callback);
+    }
+
     /**
      * get admin if not error
      * @param {function(reply)} callback

@@ -29,7 +29,7 @@ function quitHandle(e, callback=function(){}) {
     if(!quiting) {
         quiting = true;
         console.log('saving database...');
-        dbSaver(false, () => {
+        dbSaver(true, () => {
             console.log('database saved!');
             for(let id in cluster.workers) {
                 cluster.workers[id].kill();
