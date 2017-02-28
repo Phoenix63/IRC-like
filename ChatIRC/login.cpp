@@ -31,7 +31,7 @@ void Login::on_pushButton_connect_clicked()
             {
                 password.prepend("PASS ");
                 password.append('\n');
-                socket->write(password.toLatin1().data());
+                socket->write(password.toUtf8());
             }
             sendInfos();
             while (!socket->waitForReadyRead(-1));
@@ -63,7 +63,7 @@ bool Login::doConnect()
         return false;
     }
     else{
-        main=new MainFrame(this,socket);
+        main = new MainFrame(this,socket);
         main->show();
         main->setWindowTitle("Guest@"+host+":"+QString::number(port));
         return true;
@@ -83,10 +83,10 @@ void Login::sendInfos()
     QString nick=username;
     nick.prepend("NICK ");
     nick.append('\n');
-    socket->write(nick.toLatin1().data());
+    socket->write(nick.toUtf8());
     QString user=username.prepend("USER "+username+" 0 * :");
     user.append('\n');
-    socket->write(user.toLatin1().data());
+    socket->write(user.toUtf8());
 }
 
 
@@ -128,7 +128,7 @@ void Login::joinChannels(QListWidget *channels)
         QString chan = channelsToJoin->at(i);
         chan.append('\n');
         chan.prepend("JOIN ");
-        socket->write(chan.toLatin1().data());
+        socket->write(chan.toUtf8());
     }
 }
 
@@ -222,8 +222,6 @@ void Login::on_pushButton_createNew_clicked()
 
 void Login::on_configList_activated(const QString &arg1)
 {
-    qDebug() << ui->configList->currentIndex();
-    qDebug() << arg1;
     ui->channelList->clear();
     loadPreset(arg1);
 }
