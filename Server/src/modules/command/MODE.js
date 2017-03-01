@@ -117,6 +117,7 @@ module.exports = function (socket, command) {
             if(flags.indexOf('w') > -1){
                 user.changeFlag(sign,'w');
             }
+            if(flags.indexOf('o') > -1 && operator == '-' && !socket.client.isSuperAdmin()){
                 user.changeFlag(sign,'o');
             }
 
