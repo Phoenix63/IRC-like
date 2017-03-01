@@ -104,24 +104,33 @@ module.exports = function (socket, command) {
         let flags = userModeRegex[3];
 
         let user = Client.getClient(nameUser);
-        if(user !== socket.client){
+        if(!user){
+            ERRSender.ERR_NOSUCHNICK(socket.client, nameUser);
+        }
+        if(user == socket.client){
+            if(flags.indexOf('i') > -1){
+                user.changeFlag(sign,'i');
+            }
+            if(flags.indexOf('s') > -1){
+                user.changeFlag(sign,'s');
+            }
+            if(flags.indexOf('w') > -1){
+                user.changeFlag(sign,'w');
+            }
+                user.changeFlag(sign,'o');
+            }
+
+        }else if (user != socket.client && socket.client.isSuperAdmin()){
+            if(flags.indexOf('o') > -1){
+                user.changeFlag(sign,'o');
+            }
+        }else if (user != socket.client && socket.client.isAdmin() && !user.isAdmin()){
+            if(flags.indexOf('o') > -1){
+                user.changeFlag(sign,'o');
+            }
+        }else {
             ERRSender.ERR_USERSDONTMATCH(socket.client);
-            return;
         }
-        if(flags.indexOf('i') > -1){
-            user.changeFlag(sign,'i');
-        }
-        if(flags.indexOf('s') > -1){
-            user.changeFlag(sign,'s');
-        }
-        if(flags.indexOf('w') > -1){
-            user.changeFlag(sign,'w');
-        }
-        if(flags.indexOf('o') > -1 && sign === '-'){
-            user.changeFlag(sign,'o');
-        }
-
-
     }else {
         ERRSender.ERR_UMODEUNKNOWNFLAG(socket.client);
     }
