@@ -10,7 +10,7 @@
 #include <QList>
 #include <QVBoxLayout>
 #include <QLabel>
-#include <QTime>
+
 
 #include "parseuremoji.h"
 #include "channelcontent.h"
@@ -21,7 +21,7 @@ public:
     Channel();
 
     // Initialisation functions
-    void setUi(QListWidget *list, QVBoxLayout *text, QListWidget *uList, QLineEdit *tText, QLineEdit *mText, QVBoxLayout *nText);
+    void setUi(QListWidget *list, QVBoxLayout *text, QListWidget *uList, QLineEdit *tText);
 
     // Channel creation functions
     void join(QString chan, QString topic);
@@ -30,7 +30,6 @@ public:
     // UI statues update functions
     void refreshText();
     void refreshChanList();
-    void clearContent();
 
     // Channel quit functions
     void leave(QString channel);
@@ -55,7 +54,7 @@ public:
 
     void clean();
     void clearLayout(QLayout *layout);
-    QHash<QString, QPixmap> * getHashMap();
+
 private:
     // Qhash wich contain message: key = channel name, content = message list
     QHash<QString, ChannelContent> channels;
@@ -63,14 +62,12 @@ private:
     // UI for interface update
     QListWidget *chanList;
     QVBoxLayout *chanText;
-    QVBoxLayout *nickText;
     QListWidget *userList;
     QLineEdit *topicText;
-    QLineEdit *messageText;
-    ParseurEmoji parseur;
 
     // Current channel name
     QString currentChannel;
+    ParseurEmoji parseur;
 };
 
 #endif // CHANNEL_H

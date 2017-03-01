@@ -5,7 +5,6 @@
 #include <QObject>
 #include <QTcpSocket>
 #include <QAbstractSocket>
-#include <QFile>
 #include "mainframe.h"
 
 namespace Ui {
@@ -26,8 +25,6 @@ public:
     //Connection to channels
     void joinChannels(QListWidget *list);
     QList<QString>* convertChannelList(QListWidget *list);
-    void loadPreset(QString preset);
-    void loadPresetList();
     ~Login();
 
 
@@ -39,14 +36,6 @@ private slots:
     void on_pushButton_addChannel_clicked();
     void on_channelList_itemClicked(QListWidgetItem *item);
     void on_pushButton_deleteChannel_clicked();
-
-
-    void on_pushButton_createNew_clicked();
-    void on_configList_activated(const QString &arg1);
-
-
-    void on_pushButton_save_clicked();
-    void on_pushButton_delete_clicked();
 
 private:
     MainFrame *main;

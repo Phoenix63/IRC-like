@@ -6,25 +6,20 @@
  * Mainframe: constructor
  */
 
-MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket,QString nick) :
+MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
     QMainWindow(parent),
     ui(new Ui::MainFrame),
-    socket(socket),
-    nickname(nick)
+    socket(socket)
 {
     ui->setupUi(this);
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
-    channel.setUi(ui->channelList, ui->chatBox,ui->userList,ui->topicDisplay,ui->messageSender, ui->nickBox);
-    chanList = new Channellist(this);
-    parseur.initialize(&channel,socket,&nick,chanList);
+    channel.setUi(ui->channelList, ui->chatBox,ui->userList,ui->topicDisplay);
+    parseur.setChannel(&channel);
+    parseur.setSocket(socket);
     msgList.setMsgSender(ui->messageSender);
     ui->messageSender->installEventFilter(this);
     ui->scrollArea->setStyleSheet("background-color: white");
     connect(ui->scrollArea->verticalScrollBar(), SIGNAL(rangeChanged(int,int)), this, SLOT(moveScrollBarToBottom(int, int)));
-    ui->pushButton_emojis->setIcon(QPixmap("img/smile.png"));
-    ui->pushButton_upload->setIcon(QPixmap("img/upload.png"));
-    ui->pushButton_emojis->setContextMenuPolicy(Qt::CustomContextMenu);
-    emoji = channel.getHashMap();
 }
 
 /*
@@ -35,13 +30,6 @@ MainFrame::~MainFrame()
 {
     delete ui;
     delete socket;
-}
-
-
-void MainFrame::setNickname(QString nick)
-{
-    nickname = nick;
-    parseur.setNickname(&nickname);
 }
 
 /*
@@ -65,24 +53,17 @@ void MainFrame::moveScrollBarToBottom(int min, int max)
 /*
  * mainFrame: UI slots
  */
-void MainFrame::on_pushButton_emojis_clicked()
+
+void MainFrame::on_pushButton_send_clicked()
 {
-    QMenu contextMenu(tr("Context menu"), this);
-    QList<QAction* > listAction;
-    QStringList emojis = emoji->keys();
-    emojis.sort(Qt::CaseInsensitive);
-    for (auto i:emojis)
-    {
-        listAction.append(new QAction(i, this));
-        listAction.last()->setIcon(QPixmap(emoji->value(i)));
-    }
-    contextMenu.addActions(listAction);
-    contextMenu.setMinimumSize(50, 80);
-    QAction * action = contextMenu.exec(ui->MessageBox->mapToGlobal(QPoint(600, 500)));
-    QString emotes;
-    if (action)
-        emotes = action->text();
-    ui->messageSender->setText(ui->messageSender->text() + emotes);
+    QString message = ui->messageSender->text();
+    //ui->messagePrinter->append(message);
+    msgList.addMsg(message);
+    if(!parseur.out(message))
+        this->close();
+    msgList.scrollReset();
+    //socket->write(message.toLatin1().data());
+    ui->messageSender->setText("");
 }
 
 void MainFrame::closeEvent (QCloseEvent *event)
@@ -125,32 +106,6 @@ bool MainFrame::eventFilter(QObject *obj, QEvent *event)
 
 void MainFrame::on_messageSender_returnPressed()
 {
-    QString message = ui->messageSender->text();
-    msgList.addMsg(message);
-    if(!parseur.out(message))
-        this->close();
-    msgList.scrollReset();
-    ui->messageSender->setText("");
-    ui->messageSender->setPlaceholderText("Message "+channel.channelName());
+    on_pushButton_send_clicked();
 }
 
-void MainFrame::on_pushButton_send_customContextMenuRequested(const QPoint &pos)
-{
-    QMenu contextMenu(tr("Context menu"), this);
-
-       QAction action1("Remove Data Point", this);
-       contextMenu.addAction(&action1);
-       contextMenu.exec(ui->pushButton_emojis->mapToGlobal(pos));
-}
-
-void MainFrame::on_pushButton_upload_clicked()
-{
-    QStringList homePath = QStandardPaths::standardLocations(QStandardPaths::HomeLocation);
-    QStringList files = QFileDialog::getOpenFileNames(this,"Select one or more files to open", homePath.first());
-}
-
-
-void MainFrame::on_actionConnect_changed()
-{
-
-}

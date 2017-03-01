@@ -21,8 +21,6 @@ SOURCES += main.cpp\
     channel.cpp \
     msglist.cpp \
     channelcontent.cpp \
-    parseuremoji.cpp \
-    channellist.cpp
 
 HEADERS  += \
     login.h \
@@ -30,15 +28,10 @@ HEADERS  += \
     channel.h \
     parseur.h \
     msglist.h \
-    err_response.h \
-    rpl_response.h \
-    channelcontent.h \
-    parseuremoji.h \
-    channellist.h
+    channelcontent.h 
 
 FORMS    += \
     login.ui \
-    mainframe.ui \
-    channellist.ui
+    mainframe.ui
 
 RESOURCES +=
