@@ -193,6 +193,15 @@ let ERRSender = {
      */
     ERR_NOPRIVILEGES: (client) => {
         client.socket.send(':'+config.ip+' 481 :Permission Denied- You\'re not an IRC operator');
+    },
+    /**
+     *
+     * @param client
+     * @param nick
+     * @constructor
+     */
+    ERR_NOSUCHNICK: (client, nick) => {
+        client.socket.send(':'+config.ip+' 401 '+nick+' :No such nick/channel');
     }
 
 };
