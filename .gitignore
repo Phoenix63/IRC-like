@@ -7,3 +7,4 @@ Server/node_modules/
 /Server/src/ENV.json
 /Server/npm-debug.log.3478079806
 npm-debug.log
+/Server/dist/
