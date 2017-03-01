@@ -36,6 +36,7 @@ var Client = (function() {
     }
 
     Client.prototype.parse = function(message) {
+        //console.log(message);
         if(message.indexOf('QUIT') < 0) {
 
             this.emit('message', message);
@@ -86,12 +87,7 @@ var Client = (function() {
             else if (message.indexOf('501') > 0){
                 this.emit('err_unknownflag',message);
             }
-            else if (message.indexOf('') > 0){
-                this.emit('',message);
-            }
-            else if (message.indexOf('') > 0){
-                this.emit('403',message);
-            }
+
             /*
             else if (message.indexOf('') > 0){
                 this.emit('',message);
