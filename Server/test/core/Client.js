@@ -1,15 +1,12 @@
 var net = require('net');
+var config = require('./config.json');
 
 var Client = (function() {
-    function Client(port, ip) {
+    function Client() {
         this.id = Math.floor(Math.random()*10000);
-        this._config = {
-            port: port,
-            ip: ip
-        };
         this._callbacks = {};
         this._socket = new net.Socket();
-        this._socket.connect(port, ip, () => {
+        this._socket.connect(config.port, config.ip, () => {
             this._socket.buffer = '';
             this._socket.on('data', (data) => {
                 var lines = data.toString().split(/\n|\r/),
@@ -41,7 +38,7 @@ var Client = (function() {
 
             this.emit('message', message);
 
-            if(message === ':'+this._config.ip+' NOTICE AUTH :*** YOU ARE CONNECTED') {
+            if(message === ':'+config.name+' NOTICE AUTH :*** YOU ARE CONNECTED') {
                 this.emit('connect', message);
             } else if (message.indexOf('372 :- Welcome') >= 0) {
                 this.emit('auth', message);

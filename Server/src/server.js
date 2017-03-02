@@ -19,7 +19,8 @@ import dbLoader from './modules/data/dbLoader';
 
 import cluster from 'cluster';
 
-const numCPUs = require("os").cpus().length;
+//const numCPUs = require("os").cpus().length;
+const numCPUs = 1;
 
 let quiting = false;
 function quitHandle(e, callback=function(){}) {
