@@ -56,14 +56,6 @@ function createServer(callback) {
 
     });
 
-    server.on('listening', () => {
-        console.log('Server listening');
-    });
-
-    server.on('close', () => {
-        console.log('Server is now closed');
-    });
-
     server.on('error', (err) => {
         console.log('error:', err);
     });

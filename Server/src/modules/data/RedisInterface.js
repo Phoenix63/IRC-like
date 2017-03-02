@@ -14,7 +14,8 @@ class Redis {
     constructor(client) {
 
         this._client = client;
-        this._client.auth(conf.redis.pass);
+
+        this._save = (process.argv[2] !== 'TEST');
 
         this._client.on("error", function(err) {
             console.log(err);
@@ -39,14 +40,25 @@ class Redis {
 
     /**
      * set a non guest client server admin
-     * @param {Client} client
+     * @param {Object<identity, role>} infos
      */
-    setAdmin(client) {
-        if(client.identity.indexOf("GUEST_") === 0) {
-            throw "cannot set guest admin";
-        } else {
-            this._client.hmset("admin", client.identity, 'admin');
+    setAdmin(infos) {
+        if(this._save) {
+            if(infos.identity.indexOf("GUEST_") === 0) {
+                throw "cannot set guest admin";
+            } else {
+                this._client.hmset("admin", infos.identity, infos.role);
+            }
         }
+
+    }
+
+    flush(callback=function(){}) {
+        this._client.flushdb(callback);
+    }
+
+    flush(callback=function(){}) {
+        this._client.flushdb(callback);
     }
 
     /**
@@ -84,7 +96,9 @@ class Redis {
      * @param {string} pass
      */
     addUser(identity, pass) {
-        this._client.hmset("PASS", identity, pass);
+        if(this._save) {
+            this._client.hmset("PASS", identity, pass);
+        }
     }
 
     getUsers(callback) {
@@ -98,18 +112,20 @@ class Redis {
      * @param {Channel} channel
      */
     upsertChannel(channel) {
-        this._client.hmset(
-            "channels",
-            channel.name,
-            JSON.stringify({
-                name: channel.name,
-                creator: channel.creator,
-                flags: channel.flags,
-                userflags: channel._usersFlags,
-                pass: channel.pass,
-                size: channel.size,
-                topic: (channel.topic||'')
-            }));
+        if(this._save) {
+            this._client.hmset(
+                "channels",
+                channel.name,
+                JSON.stringify({
+                    name: channel.name,
+                    creator: channel.creator,
+                    flags: channel.flags,
+                    userflags: channel._usersFlags,
+                    pass: channel.pass,
+                    size: channel.size,
+                    topic: (channel.topic||'')
+                }));
+        }
     }
 
     getChannels(callback) {
@@ -123,7 +139,9 @@ class Redis {
      * @param {Channel} channel
      */
     deleteChannel(channel) {
-        this._client.hdel("channels", channel.name);
+        if(this._save) {
+            this._client.hdel("channels", channel.name);
+        }
     }
 }
 

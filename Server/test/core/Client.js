@@ -1,15 +1,12 @@
 var net = require('net');
+var config = require('./config.json');
 
 var Client = (function() {
-    function Client(port, ip) {
+    function Client() {
         this.id = Math.floor(Math.random()*10000);
-        this._config = {
-            port: port,
-            ip: ip
-        };
         this._callbacks = {};
         this._socket = new net.Socket();
-        this._socket.connect(port, ip, () => {
+        this._socket.connect(config.port, config.ip, () => {
             this._socket.buffer = '';
             this._socket.on('data', (data) => {
                 var lines = data.toString().split(/\n|\r/),
@@ -36,11 +33,12 @@ var Client = (function() {
     }
 
     Client.prototype.parse = function(message) {
+        //console.log(message);
         if(message.indexOf('QUIT') < 0) {
 
             this.emit('message', message);
 
-            if(message === ':'+this._config.ip+' NOTICE AUTH :*** YOU ARE CONNECTED') {
+            if(message === ':'+config.name+' NOTICE AUTH :*** YOU ARE CONNECTED') {
                 this.emit('connect', message);
             } else if (message.indexOf('372 :- Welcome') >= 0) {
                 this.emit('auth', message);
@@ -78,7 +76,24 @@ var Client = (function() {
                 this.emit('rpl_whois', message);
             } else if (message.indexOf('352') > 0) {
                 this.emit('rpl_who', message);
+            } else if (message.indexOf('482') > 0) {
+                this.emit('err_chanoprivneeded', message);
+            } else if (message.indexOf('KICK') > 0) {
+                this.emit('kick', message);
             }
+            else if (message.indexOf('501') > 0){
+                this.emit('err_unknownflag',message);
+            }else if (message.indexOf('401') > 0) {
+                this.emit('err_nosuchnick', message);
+            }else if(message.indexOf('443') > 0) {
+                this.emit('err_useronchannel',message);
+            }
+
+            /*
+            else if (message.indexOf('') > 0){
+                this.emit('',message);
+            }
+            */
 
         } else {
             this.emit('quit', message);
@@ -88,21 +103,21 @@ var Client = (function() {
 
     Client.prototype.send = function(cmd) {
         this._socket.write(cmd+'\n');
-    }
+    };
 
     Client.prototype.on = function(event, callback) {
         this._callbacks[event] = callback;
-    }
+    };
 
     Client.prototype.emit = function(event, message) {
         if(this._callbacks[event]) {
             this._callbacks[event](message);
         }
-    }
+    };
 
     Client.prototype.close = function() {
         this._socket.destroy();
-    }
+    };
 
     return Client;
 })();

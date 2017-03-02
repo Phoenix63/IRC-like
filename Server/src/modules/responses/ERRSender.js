@@ -184,6 +184,34 @@ let ERRSender = {
      */
     ERR_KEYSET: (client, channelName) => {
         client.socket.send(':'+config.ip+' 467 '+channelName+' :Channel key already set');
+    },
+
+    /**
+     *
+     * @param {Client} client
+     * @constructor
+     */
+    ERR_NOPRIVILEGES: (client) => {
+        client.socket.send(':'+config.ip+' 481 :Permission Denied- You\'re not an IRC operator');
+    },
+    /**
+     *
+     * @param client
+     * @param nick
+     * @constructor
+     */
+    ERR_NOSUCHNICK: (client, nick) => {
+        client.socket.send(':'+config.ip+' 401 '+nick+' :No such nick/channel');
+    },
+    /**
+     *
+     * @param socket
+     * @param nameGuest
+     * @param nameChannel
+     * @constructor
+     */
+    ERR_USERONCHANNEL: (socket, nameGuest, nameChannel)=>{
+        socket.send(':'+config.ip+' 443 '+nameGuest+' '+nameChannel+' :is already on channel');
     }
 
 };

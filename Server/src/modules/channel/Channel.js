@@ -42,7 +42,7 @@ class Channel {
          v 	+ 	nom de l'utilisateur concerné 	verbose ou voiced : autorise l'utilisateur à parler sur un canal modéré (mode +m)
          */
         this._usersFlags = {};
-        this._invitation = [];
+        this._invitations = [];
         this._name = name;
         this._temporary = true;
         this._topic = topic;
@@ -64,7 +64,7 @@ class Channel {
     }
 
     _change() {
-        if(!this._temporary) {
+        if(!this._temporary && process.argv[2] !== 'TEST') {
             redis.upsertChannel(this);
         }
     }
@@ -326,7 +326,7 @@ class Channel {
             ERRSender.ERR_BANNEDFROMCHAN(user, this);
             return;
         }
-        if (this.isInvitation && this.isInvitation.indexOf(user) === -1) {
+        if (this.isInvitation && this._invitations.indexOf(user) === -1) {
             ERRSender.ERR_INVITEONLYCHAN(user, this);
             return;
         }
@@ -371,14 +371,18 @@ class Channel {
      * @param {Client} user
      * @param {string} message
      */
-    removeUser(user, message='Gone') {
+    removeUser(user, message='Gone', bool) {
         let index = this._users.indexOf(user);
         if (index < 0) {
             ERRSender.ERR_NOTONCHANNEL(user, this);
         } else {
             this._users.splice(index, 1);
             RPLSender.PART(user, this, message);
-            user.removeChannel(this);
+
+            if(!bool) {
+                user.removeChannel(this);
+            }
+
 
             if(this._temporary && this._users.length <= 0) {
                 channels.splice(channels.indexOf(this), 1);
@@ -403,6 +407,14 @@ class Channel {
             if (u !== except)
                 u.socket.send(message);
         });
+    }
+
+    invite(socket, client){
+        if(this._invitations.indexOf(client)===-1){
+            this._invitations.push(client);
+            RPLSender.RPL_SERVER_ACCEPT_THE_INVITATION(socket, client, this);
+            RPLSender.RPL_YOU_HAVE_BEEN_INVITED(socket, client, this);
+        }
     }
 
     /**

@@ -25,13 +25,11 @@ module.exports = function(socket,command) {
     Channel.list().forEach((c) =>{
         if(c.name === chan){
             if (! c.isUserOperator(socket.client)){
-                ERRSender.ERR_CHANOPRIVSNEEDED(socket.client, c);
-                return;
-            }
-            if(newTopic == null) {
+                ERRSender.ERR_CHANOPRIVSNEEDED(socket.client, c.name);
+            } else if(newTopic === null || newTopic === '') {
                 RPLSender.RPL_TOPIC('TOPIC', socket.client, c);
-            }else{
-                c.topic =newTopic;
+            } else {
+                c.topic = newTopic;
                 RPLSender.RPL_TOPIC('TOPIC', socket.client, c);
             }
         }
