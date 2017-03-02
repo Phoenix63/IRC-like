@@ -57,7 +57,7 @@
            <x>0</x>
            <y>0</y>
            <width>565</width>
-           <height>475</height>
+           <height>474</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -105,9 +105,6 @@
           <height>1677215</height>
          </size>
         </property>
-        <property name="styleSheet">
-         <string notr="true">background-color: rgba(255,255,255);</string>
-        </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>
@@ -144,9 +141,6 @@
              <width>16777215</width>
              <height>20</height>
             </size>
-           </property>
-           <property name="styleSheet">
-            <string notr="true"> background-color: rgba(255, 255, 255, 0);</string>
            </property>
            <property name="frame">
             <bool>false</bool>
@@ -204,7 +198,7 @@
      <x>0</x>
      <y>0</y>
      <width>899</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFichier">
@@ -212,6 +206,7 @@
      <string>Fichier</string>
     </property>
     <addaction name="actionConnect"/>
+    <addaction name="actionDisconnect"/>
    </widget>
    <widget class="QMenu" name="menuEdition">
     <property name="title">
@@ -222,6 +217,14 @@
     <property name="title">
      <string>Fenetre</string>
     </property>
+    <widget class="QMenu" name="menuTheme">
+     <property name="title">
+      <string>Theme</string>
+     </property>
+     <addaction name="actionLight"/>
+     <addaction name="actionDark"/>
+    </widget>
+    <addaction name="menuTheme"/>
    </widget>
    <widget class="QMenu" name="menuAide">
     <property name="title">
@@ -240,7 +243,22 @@
   </action>
   <action name="actionConnect">
    <property name="text">
-    <string>Connect</string>
+    <string>Connection</string>
+   </property>
+  </action>
+  <action name="actionDisconnect">
+   <property name="text">
+    <string>Deconnection</string>
+   </property>
+  </action>
+  <action name="actionLight">
+   <property name="text">
+    <string>Light</string>
+   </property>
+  </action>
+  <action name="actionDark">
+   <property name="text">
+    <string>Dark</string>
    </property>
   </action>
  </widget>

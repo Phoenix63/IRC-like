@@ -1,6 +1,7 @@
 #include "login.h"
 #include "ui_login.h"
 #include "mainframe.h"
+#include "theme.h"
 
 
 #include <QListWidgetItem>

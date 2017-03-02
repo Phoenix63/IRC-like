@@ -34,7 +34,8 @@ HEADERS  += \
     rpl_response.h \
     channelcontent.h \
     parseremoji.h \
-    channellist.h
+    channellist.h \
+    theme.h
 
 FORMS    += \
     login.ui \

@@ -7,6 +7,8 @@
 #include <QStandardPaths>
 #include <QFileDialog>
 #include <QDebug>
+#include <QMessageBox>
+#include <QPushButton>
 /*
  * Mainframe: constructor and destructor
  */
@@ -18,13 +20,15 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket,QString nick) :
     nickname(nick)
 {
     ui->setupUi(this);
+    this->setStyleSheet("background-color : " + IRC::COLOR::LIGHT::BACKGROUND + " color : " + IRC::COLOR::LIGHT::TEXT);
+    ui->actionDark->setCheckable(true);
+    ui->actionLight->setCheckable(true);
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
     channel.setUi(ui->channelList, ui->chatBox,ui->userList,ui->topicDisplay,ui->messageSender, ui->nickBox);
     chanList = new Channellist(this);
     parser.initialize(&channel, socket, &nick, chanList);
     msgList.setMsgSender(ui->messageSender);
     ui->messageSender->installEventFilter(this);
-    ui->scrollArea->setStyleSheet("background-color: white");
     connect(ui->scrollArea->verticalScrollBar(), SIGNAL(rangeChanged(int, int)), this, SLOT(moveScrollBarToBottom(int, int)));
     ui->pushButton_emojis->setIcon(QPixmap("img/smile.png"));
     ui->pushButton_upload->setIcon(QPixmap("img/upload.png"));
@@ -155,4 +159,28 @@ void MainFrame::on_pushButton_upload_clicked()
 void MainFrame::on_actionConnect_triggered()
 {
     emit showLogin();
+}
+
+void MainFrame::on_actionDisconnect_triggered()
+{
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Disconnect", "Voulez-vous quitter?", QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        this->close();
+        emit showLogin();
+    }
+}
+
+
+
+void MainFrame::on_actionDark_toggled(bool arg1)
+{
+    ui->actionLight->setChecked(!arg1);
+    this->setStyleSheet("background-color : " + IRC::COLOR::DARK::BACKGROUND + "color : " + IRC::COLOR::DARK::TEXT);
+}
+
+void MainFrame::on_actionLight_toggled(bool arg1)
+{
+    ui->actionDark->setChecked(!arg1);
+    this->setStyleSheet("background-color : " + IRC::COLOR::LIGHT::BACKGROUND + "color : " + IRC::COLOR::LIGHT::TEXT);
 }

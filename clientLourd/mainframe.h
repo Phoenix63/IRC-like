@@ -4,6 +4,7 @@
 #include "channel.h"
 #include "parser.h"
 #include "msglist.h"
+#include "theme.h"
 
 #include <QMainWindow>
 #include <QString>
@@ -57,6 +58,12 @@ private slots:
     void on_pushButton_upload_clicked();
 
     void on_actionConnect_triggered();
+
+    void on_actionDisconnect_triggered();
+
+    void on_actionDark_toggled(bool arg1);
+
+    void on_actionLight_toggled(bool arg1);
 
 private:
     Ui::MainFrame *ui;

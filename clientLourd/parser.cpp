@@ -73,6 +73,7 @@ void Parser::in(QString string)
     if (!in_isWhisMesg(string))
     if (!in_isNickEdit(string))
     if (!in_isListMesg(string))
+    if (!in_isSetTopic(string))
     if (!in_isPing(string))
         channel->appendChannel(string+'\n', "\"Debug\"", "");
 }

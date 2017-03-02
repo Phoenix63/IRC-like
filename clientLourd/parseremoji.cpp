@@ -1,4 +1,5 @@
 #include "parseremoji.h"
+#include "theme.h"
 
 #include <QDir>
 #include <QStringList>
@@ -28,11 +29,12 @@ QList<QHBoxLayout *> ParserEmoji::parse(QString heure, QString pseudo, QString s
     auto count = string.count(QRegularExpression(":\\S+:"));
     auto index = 0;
     QLabel *LHeure = new QLabel(heure);
-    LHeure->setStyleSheet("color: rgb(115, 115, 115);");
+    LHeure->setStyleSheet(IRC::COLOR::LIGHT::HOUR);
     pseudoBox->addWidget(LHeure);
     QLabel *lPseudo= new QLabel(pseudo);
-    lPseudo->setStyleSheet("color: rgb(0, 150, 250);");
+    lPseudo->setStyleSheet(IRC::COLOR::LIGHT::NAME);
     pseudoBox->addWidget(lPseudo);
+
     for (auto i = 0; i < count; i++ )
     {
         bool modified = false;

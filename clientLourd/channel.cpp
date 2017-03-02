@@ -224,3 +224,9 @@ QHash<QString, QPixmap> * Channel::getHashMap()
 {
     return parser.getHashMap();
 }
+
+void Channel::setTopic(QString topic, QString channel)
+{
+    channels[channel].setTopic(topic);
+    refreshTopic();
+}
