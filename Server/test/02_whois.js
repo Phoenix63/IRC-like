@@ -49,7 +49,7 @@ describe('command WHOIS:', () => {
         });
 
         client.on('rpl_whois', (message) => {
-            message.should.equal(':'+config.ip+' 311 test GUEST_test ' + config.ip + ' * :test');
+            message.should.equal(':'+config.name+' 311 test GUEST_test ' + config.name + ' * :test');
             client.close();
             done();
         });
