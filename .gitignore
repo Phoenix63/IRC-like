@@ -55,3 +55,5 @@ node_modules/
 *.pro.user
 *.pro.user.*
 *.o
+
+build-ChatIRC-Desktop_Qt_5_8_0_MinGW_32bit-Debug/

@@ -267,7 +267,7 @@ bool Parser::out_isQuitMsg(QString string)
 bool Parser::in_isChanList(QString string)
 {
     int i = string.indexOf(QRegularExpression(":.+$"));
-    if (!string.contains(QRegularExpression("^.+\\s(331|332)")))
+    if (!string.contains(QRegularExpression("^.+\\s(331|332)\\sJOIN")))
         return false;
     channel->join(string.split(' ')[3], string.right(string.length() - i - 1));
     return true;
@@ -362,5 +362,14 @@ bool Parser::in_isListMesg(QString string)
     {
         listOfChannels->addRow(string);
     }
+    return true;
+}
+
+bool Parser::in_isSetTopic(QString string)
+{
+    if (!string.contains(QRegularExpression("^.+\\s(331|332)\\sTOPIC")))
+        return false;
+    int j = string.indexOf(QRegularExpression(":.+$"));
+    channel->setTopic(string.right(string.length() - j - 1),string.split(' ').at(3));
     return true;
 }
