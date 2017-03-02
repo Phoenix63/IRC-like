@@ -86,6 +86,10 @@ var Client = (function() {
             }
             else if (message.indexOf('501') > 0){
                 this.emit('err_unknownflag',message);
+            }else if (message.indexOf('401') > 0) {
+                this.emit('err_nosuchnick', message);
+            }else if(message.indexOf('443') > 0) {
+                this.emit('err_useronchannel',message);
             }
 
             /*
@@ -102,21 +106,21 @@ var Client = (function() {
 
     Client.prototype.send = function(cmd) {
         this._socket.write(cmd+'\n');
-    }
+    };
 
     Client.prototype.on = function(event, callback) {
         this._callbacks[event] = callback;
-    }
+    };
 
     Client.prototype.emit = function(event, message) {
         if(this._callbacks[event]) {
             this._callbacks[event](message);
         }
-    }
+    };
 
     Client.prototype.close = function() {
         this._socket.destroy();
-    }
+    };
 
     return Client;
 })();

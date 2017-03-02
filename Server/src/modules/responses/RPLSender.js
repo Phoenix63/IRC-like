@@ -188,7 +188,7 @@ let RPLSender = {
      * @static
      */
     RPL_CHANNELMODEIS: (chan, cmd)=> {
-        chan.broadcast(':'+config.ip+' 324 '+cmd, null);
+        chan.broadcast(':'+config.ip+' 324 MODE '+cmd, null);
     },
     /**
      *
@@ -197,18 +197,39 @@ let RPLSender = {
      * @static
      */
     RPL_UMODEIS: (client, cmd)=> {
-        client.socket.send(':'+config.ip+' 221 '+cmd);
+        client.socket.send(':'+config.ip+' 221 MODE '+cmd);
     },
 
     /**
      *
      * @param {Client} client
-     * @param {string} kicked
+     * @param {string} kicked+-
      * @param {Channel} channel
      * @static
      */
     KICK: (client, kicked, channel) => {
         channel.broadcast(':'+client.name+' KICK '+kicked);
+    },
+    /**
+     *
+     * @param socket
+     * @param guest
+     * @param chan
+     * @constructor
+     */
+    RPL_SERVER_ACCEPT_THE_INVITATION: (socket, guest, chan)=>{
+        socket.send(':SERVER_ACCEPT_THE_INVITATION '+guest.name+' '+chan.name);
+    },
+    /**
+     *
+     * @param socket
+     * @param guest
+     * @param chan
+     * @constructor
+     */
+    RPL_YOU_HAVE_BEEN_INVITED: (socket, guest, chan)=>{
+        guest.socket.send(':YOU_HAVE_BEEN_INVITED '+socket.client.name+' '+chan.name);
     }
+
 };
 export default RPLSender

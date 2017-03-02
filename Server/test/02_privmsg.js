@@ -1,18 +1,11 @@
-let should = require('should');
-let Client = require('./core/Client');
-let config = require('./core/config.json');
+var should = require('should');
+var Client = require('./core/Client');
+var config = require('./core/config.json');
 
 describe('command PRIVMSG:', () => {
-    let client = null;
-    let client1 = null;
-    let client2 = null;
-    beforeEach(() => {
-        client = null;
-        client1 = null;
-        client2 = null;
-    });
+    var client, client1, client2;
     it('should say not registered', (done) => {
-        var client = new Client(config.port, config.ip);
+        client = new Client(config.port, config.ip);
 
         client.on('connect', () => {
             client.send('PRIVMSG #test :test');
@@ -23,7 +16,7 @@ describe('command PRIVMSG:', () => {
         });
     });
     it('sould say no text to send', (done) => {
-        var client = new Client(config.port, config.ip);
+        client = new Client(config.port, config.ip);
 
         client.on('connect', () => {
             client.send('USER test 0 * :test');
@@ -41,7 +34,7 @@ describe('command PRIVMSG:', () => {
         });
     });
     it('should say no recipient', (done) => {
-        var client = new Client(config.port, config.ip);
+        client = new Client(config.port, config.ip);
         client.on('connect', () => {
             client.send('USER test 0 * :test');
         });
@@ -54,7 +47,7 @@ describe('command PRIVMSG:', () => {
         });
     });
     it('should say not on channel', (done) => {
-        var client1 = new Client(config.port, config.ip);
+        client1 = new Client(config.port, config.ip);
         client1.on('connect', () => {
             client1.send('USER test 0 * :test');
         });
@@ -63,7 +56,7 @@ describe('command PRIVMSG:', () => {
         });
 
         client1.on('rpl_namreply', () => {
-            var client2 = new Client(config.port, config.ip);
+            client2 = new Client(config.port, config.ip);
 
             client2.on('connect', () => {
                 client2.send('USER test2 0 * :test2');
