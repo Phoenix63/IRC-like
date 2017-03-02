@@ -11,14 +11,14 @@
  * Mainframe: constructor and destructor
  */
 
-MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
+MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket,QString nick) :
     QMainWindow(parent),
     ui(new Ui::MainFrame),
-    socket(socket)
+    socket(socket),
+    nickname(nick)
 {
     ui->setupUi(this);
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
-<<<<<<< HEAD
     channel.setUi(ui->channelList, ui->chatBox,ui->userList,ui->topicDisplay,ui->messageSender, ui->nickBox);
     chanList = new Channellist(this);
     parser.initialize(&channel, socket, &nick, chanList);
@@ -30,15 +30,6 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
     ui->pushButton_upload->setIcon(QPixmap("img/upload.png"));
     ui->pushButton_emojis->setContextMenuPolicy(Qt::CustomContextMenu);
     emoji = channel.getHashMap();
-=======
-    channel.setUi(ui->channelList, ui->chatBox,ui->userList,ui->topicDisplay);
-    parseur.setChannel(&channel);
-    parseur.setSocket(socket);
-    msgList.setMsgSender(ui->messageSender);
-    ui->messageSender->installEventFilter(this);
-    ui->scrollArea->setStyleSheet("background-color: white");
-    connect(ui->scrollArea->verticalScrollBar(), SIGNAL(rangeChanged(int,int)), this, SLOT(moveScrollBarToBottom(int, int)));
->>>>>>> origin/ClientLourd
 }
 
 MainFrame::~MainFrame()
@@ -47,7 +38,6 @@ MainFrame::~MainFrame()
     delete socket;
 }
 
-<<<<<<< HEAD
 
 void MainFrame::setNickname(QString nick)
 {
@@ -55,8 +45,6 @@ void MainFrame::setNickname(QString nick)
     parser.setNickname(&nickname);
 }
 
-=======
->>>>>>> origin/ClientLourd
 /*
  * MainFrame: socket slots
  */
@@ -81,10 +69,8 @@ void MainFrame::closeEvent (QCloseEvent *event)
 /*
  * mainFrame: UI slots
  */
-
-void MainFrame::on_pushButton_send_clicked()
+void MainFrame::on_pushButton_emojis_clicked()
 {
-<<<<<<< HEAD
     QMenu contextMenu(tr("Context menu"), this);
     QList<QAction* > listAction;
     QStringList emojis = emoji->keys();
@@ -101,16 +87,6 @@ void MainFrame::on_pushButton_send_clicked()
     if (action)
         emotes = action->text();
     ui->messageSender->setText(ui->messageSender->text() + emotes);
-=======
-    QString message = ui->messageSender->text();
-    //ui->messagePrinter->append(message);
-    msgList.addMsg(message);
-    if(!parseur.out(message))
-        this->close();
-    msgList.scrollReset();
-    //socket->write(message.toLatin1().data());
-    ui->messageSender->setText("");
->>>>>>> origin/ClientLourd
 }
 
 void MainFrame::moveScrollBarToBottom(int min, int max)
@@ -153,7 +129,6 @@ bool MainFrame::eventFilter(QObject *obj, QEvent *event)
 
 void MainFrame::on_messageSender_returnPressed()
 {
-<<<<<<< HEAD
     QString message = ui->messageSender->text();
     msgList.addMsg(message);
     if(!parser.out(message))
@@ -181,8 +156,3 @@ void MainFrame::on_actionConnect_triggered()
 {
     emit showLogin();
 }
-=======
-    on_pushButton_send_clicked();
-}
-
->>>>>>> origin/ClientLourd

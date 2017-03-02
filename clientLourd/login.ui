@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>320</width>
-    <height>424</height>
+    <width>344</width>
+    <height>498</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -16,7 +16,6 @@
   <property name="styleSheet">
    <string notr="true"/>
   </property>
-<<<<<<< HEAD
   <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
     <layout class="QVBoxLayout" name="configLayout">
@@ -77,11 +76,6 @@
    </item>
    <item>
     <widget class="QWidget" name="userLayout" native="true">
-=======
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <widget class="QWidget" name="layout" native="true">
->>>>>>> origin/ClientLourd
      <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QLabel" name="UserLabel">
@@ -179,7 +173,7 @@
            <bool>false</bool>
           </property>
           <property name="text">
-           <string>crismos.fr</string>
+           <string/>
           </property>
           <property name="placeholderText">
            <string>Host</string>
@@ -204,7 +198,7 @@
            <enum>Qt::LeftToRight</enum>
           </property>
           <property name="text">
-           <string>8088</string>
+           <string/>
           </property>
           <property name="placeholderText">
            <string>Port</string>
@@ -313,30 +307,7 @@
            </widget>
           </item>
           <item>
-<<<<<<< HEAD
            <layout class="QVBoxLayout" name="SpacerLayout">
-=======
-           <widget class="QPushButton" name="pushButton_lodaChannels">
-            <property name="minimumSize">
-             <size>
-              <width>100</width>
-              <height>0</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>100</width>
-              <height>16777215</height>
-             </size>
-            </property>
-            <property name="text">
-             <string>&amp;Load</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <layout class="QVBoxLayout" name="verticalLayout_5">
->>>>>>> origin/ClientLourd
             <item>
              <spacer name="verticalSpacer_2">
               <property name="orientation">

@@ -7,12 +7,6 @@
 #include <QString>
 #include <QHash>
 #include <QList>
-<<<<<<< HEAD
-=======
-#include <QVBoxLayout>
-#include <QLabel>
-
->>>>>>> origin/ClientLourd
 
 class QListWidget;
 class QTextBrowser;
@@ -28,7 +22,7 @@ public:
     Channel();
 
     // Initialisation functions
-    void setUi(QListWidget *list, QVBoxLayout *text, QListWidget *uList, QLineEdit *tText);
+    void setUi(QListWidget *list, QVBoxLayout *text, QListWidget *uList, QLineEdit *tText, QLineEdit *mText, QVBoxLayout *nText);
 
     // Channel creation functions
     void join(QString chan, QString topic);
@@ -37,14 +31,11 @@ public:
     // UI update functions
     void refreshText();
     void refreshChanList();
-<<<<<<< HEAD
     void clearContent();
     void refreshTopic();
     void refreshUserList();
     void clean();
     void clearLayout(QLayout *layout);
-=======
->>>>>>> origin/ClientLourd
 
     // Channel quit functions
     void leave(QString channel);
@@ -64,13 +55,7 @@ public:
     void delUser(QString user, QString channel);
     void changeNick(QString nick, QString newNick);
 
-<<<<<<< HEAD
     QHash<QString, QPixmap> * getHashMap();
-=======
-    void clean();
-    void clearLayout(QLayout *layout);
-
->>>>>>> origin/ClientLourd
 private:
     // Qhash wich contain message: key = channel name, content = message list
     QHash<QString, ChannelContent> channels;
@@ -78,17 +63,14 @@ private:
     // UI for interface update
     QListWidget *chanList;
     QVBoxLayout *chanText;
+    QVBoxLayout *nickText;
     QListWidget *userList;
     QLineEdit *topicText;
-<<<<<<< HEAD
     QLineEdit *messageText;
     ParserEmoji parser;
-=======
->>>>>>> origin/ClientLourd
 
     // Current channel name
     QString currentChannel;
-    ParseurEmoji parseur;
 };
 
 #endif // CHANNEL_H

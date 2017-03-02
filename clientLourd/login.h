@@ -5,16 +5,11 @@
 #include <QDialog>
 #include <QObject>
 #include <QTcpSocket>
-<<<<<<< HEAD
 
 class MainFrame;
 class QListWidgetItem;
 class QFile;
 class QListWidget;
-=======
-#include <QAbstractSocket>
-#include "mainframe.h"
->>>>>>> origin/ClientLourd
 
 namespace Ui {
 class Login;
@@ -36,15 +31,10 @@ public:
     //Connection to channels
     void joinChannels(QListWidget *list);
     QList<QString>* convertChannelList(QListWidget *list);
-<<<<<<< HEAD
 
     //Preset functions
     void loadPreset(QString preset);
     void loadPresetList();
-=======
-    ~Login();
-
->>>>>>> origin/ClientLourd
 
 private slots:
     //Connection buttons
@@ -57,15 +47,12 @@ private slots:
     void on_channelList_itemClicked(QListWidgetItem *item);
     void on_pushButton_deleteChannel_clicked();
 
-<<<<<<< HEAD
     //Preset functions
     void on_pushButton_newPreset_clicked();
     void on_pushButton_savePreset_clicked();
     void on_pushButton_deletePreset_clicked();
     void on_presetList_activated(const QString &arg1);
 
-=======
->>>>>>> origin/ClientLourd
 private:
     MainFrame *main;
     QTcpSocket *socket;

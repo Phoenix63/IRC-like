@@ -16,6 +16,7 @@ Login::Login(QWidget *parent) :
     ui(new Ui::Login)
 {
     ui->setupUi(this);
+    loadPresetList();
 }
 
 Login::~Login()
@@ -26,33 +27,7 @@ Login::~Login()
 
 void Login::closeEvent (QCloseEvent *event)
 {
-<<<<<<< HEAD
      event->accept();
-=======
-    QString username = ui->lineEdit_username->text();
-    QString password = ui->lineEdit_pass->text();
-    if(doConnect())
-    {
-        if(username != NULL)
-        {
-            if(password != NULL)
-            {
-                password.prepend("PASS ");
-                password.append('\n');
-                socket->write(password.toLatin1().data());
-            }
-            sendInfos();
-            while (!socket->waitForReadyRead());
-            joinChannels(ui->channelList);
-        }
-    }
-}
-
-
-void Login::on_pushButton_guest_clicked()
-{
-    doConnect();
->>>>>>> origin/ClientLourd
 }
 
 /*
@@ -71,12 +46,8 @@ bool Login::doConnect()
         return false;
     }
     else{
-<<<<<<< HEAD
         main = new MainFrame(NULL,socket);
         connect(main, &MainFrame::showLogin, this, &Login::show);
-=======
-        main=new MainFrame(this,socket);
->>>>>>> origin/ClientLourd
         main->show();
         main->setWindowTitle("Guest@" + host + ":" + QString::number(port));
 		hide();
@@ -86,7 +57,6 @@ bool Login::doConnect()
 
 void Login::sendInfos()
 {
-<<<<<<< HEAD
     QString host = ui->lineEdit_host->text();
     int port = ui->lineEdit_port->text().toInt(0, 10);
     QString username = ui->lineEdit_username->text();
@@ -97,19 +67,8 @@ void Login::sendInfos()
     nick.append('\n');
     socket->write(nick.toUtf8());
     QString user = username.prepend("USER " + username  +" 0 * :");
-=======
-    QString host= ui->lineEdit_host->text();
-    int port = ui->lineEdit_port->text().toInt(0,10);
-    QString username=ui->lineEdit_username->text();
-    main->setWindowTitle(username +"@"+host+":"+QString::number(port));
-    QString nick=username;
-    nick.prepend("NICK ");
-    nick.append('\n');
-    socket->write(nick.toLatin1().data());
-    QString user=username.prepend("USER "+username+" 0 * :");
->>>>>>> origin/ClientLourd
     user.append('\n');
-    socket->write(user.toLatin1().data());
+    socket->write(user.toUtf8());
 }
 
 /*
@@ -169,16 +128,9 @@ void Login::on_channelList_itemClicked(QListWidgetItem *item)
     ui->channelList->editItem(item);
 }
 
-<<<<<<< HEAD
 QList<QString>* Login::convertChannelList(QListWidget *channels)
 {
     QList<QString> *channelsToJoin = new QList<QString>;
-=======
-
-
-QList<QString>* Login::convertChannelList(QListWidget *channels){
-    QList<QString> *channelsToJoin=new QList<QString>;
->>>>>>> origin/ClientLourd
     for(int i = 0; i < channels->count(); i++)
         channelsToJoin->append(channels->item(i)->text());
     return channelsToJoin;
@@ -192,7 +144,6 @@ void Login::joinChannels(QListWidget *channels)
         QString chan = channelsToJoin->at(i);
         chan.append('\n');
         chan.prepend("JOIN ");
-<<<<<<< HEAD
         socket->write(chan.toUtf8());
     }
 }
@@ -356,8 +307,5 @@ void Login::on_pushButton_deletePreset_clicked()
         config.close();
         ui->presetList->removeItem(ui->presetList->currentIndex());
         ui->presetList->setCurrentIndex(0);
-=======
-        socket->write(chan.toLatin1().data());
->>>>>>> origin/ClientLourd
     }
 }

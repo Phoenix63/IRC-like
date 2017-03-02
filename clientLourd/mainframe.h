@@ -1,7 +1,6 @@
 #ifndef MAINFRAME_H
 #define MAINFRAME_H
 
-<<<<<<< HEAD
 #include "channel.h"
 #include "parser.h"
 #include "msglist.h"
@@ -21,17 +20,6 @@ class QFileDialog;
 class QStandardPaths;
 class Channellist;
 
-=======
-#include <QTcpSocket>
-#include <QMainWindow>
-#include <QString>
-#include <QScrollBar>
-
-#include "channel.h"
-#include "parseur.h"
-#include "msglist.h"
-
->>>>>>> origin/ClientLourd
 namespace Ui {
 class MainFrame;
 }
@@ -42,13 +30,10 @@ class MainFrame : public QMainWindow
 
 public:
     //Constructor and Destructor
-    explicit MainFrame(QWidget *parent = 0,QTcpSocket *socket=NULL);
+    explicit MainFrame(QWidget *parent = 0,QTcpSocket *socket=NULL,QString nick=NULL);
     ~MainFrame();
-<<<<<<< HEAD
     //Nickname setter (switch slot implementation ?)
     void setNickname(QString nick);
-=======
->>>>>>> origin/ClientLourd
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
@@ -59,7 +44,7 @@ public slots:
     void closeEvent (QCloseEvent *event);
 
     //UI slots
-    void on_pushButton_send_clicked();
+    void on_pushButton_emojis_clicked();
     void moveScrollBarToBottom(int min, int max);
 
 signals:
@@ -67,12 +52,11 @@ signals:
 
 private slots:
     void on_channelList_itemSelectionChanged();
-
-<<<<<<< HEAD
-    void on_actionConnect_triggered();
-=======
     void on_messageSender_returnPressed();
->>>>>>> origin/ClientLourd
+    void on_pushButton_send_customContextMenuRequested(const QPoint &pos);
+    void on_pushButton_upload_clicked();
+
+    void on_actionConnect_triggered();
 
 private:
     Ui::MainFrame *ui;
@@ -81,14 +65,12 @@ private:
     QTcpSocket *socket;
 
     //Parser and channel for message handling
-<<<<<<< HEAD
     QString nickname;
     Parser parser;
-=======
-    Parseur parseur;
->>>>>>> origin/ClientLourd
     Channel channel;
     MsgList msgList;
+    Channellist *chanList;
+    QHash<QString, QPixmap> *emoji;
 };
 
 #endif // MAINFRAME_H
