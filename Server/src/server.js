@@ -27,6 +27,9 @@ function quitHandle(e, callback=function(){}) {
         console.log(e);
     }
     if(!quiting) {
+        for(let key in cluster.workers) {
+            cluster.workers[key].kill();
+        }
         quiting = true;
         console.log('saving database...');
         dbSaver(true, () => {
@@ -43,6 +46,7 @@ function quitHandle(e, callback=function(){}) {
 
 if(cluster.isMaster) {
     process.title = 'MasterServer';
+    console.log('master');
     dbLoader(() => {
         console.log('Database loaded!');
         for(let i = 0 ; i<numCPUs; i++) {
@@ -65,10 +69,6 @@ if(cluster.isMaster) {
 
     cluster.on('message', (worker, msg) => {
         if(msg && msg.quitmessage) {
-            for(let key in cluster.workers) {
-                cluster.workers[key].kill();
-            }
-            //process.kill(process.pid, 'restart');
             console.log('restarting...');
             quitHandle(null, ()=> {
 
@@ -77,13 +77,14 @@ if(cluster.isMaster) {
     });
     cluster.on('exit', (worker, code, signal) => {
 
-        if(signal !== 'SIGTERM') {
+        if(signal !== 'SIGTERM' && signal !== 'SIGINT') {
             cluster.fork();
         }
     });
 
 }
 if(cluster.isWorker) {
+    console.log('worker');
     process.title = 'server';
     socketManager.create((socket) => {
         let client = new Client(socket);

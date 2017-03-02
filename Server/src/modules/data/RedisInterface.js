@@ -14,7 +14,6 @@ class Redis {
     constructor(client) {
 
         this._client = client;
-        this._client.auth(conf.redis.pass);
 
         this._save = (process.argv[2] !== 'TEST');
 

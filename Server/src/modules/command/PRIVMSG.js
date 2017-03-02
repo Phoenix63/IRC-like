@@ -12,13 +12,18 @@ module.exports = function (socket, command) {
     }
 
     let receivers = command[1].split(' ')[0].split(',');
+
     let message = command[1].replace(receivers + " ", "");
     if (!message || message[0] !== ':' || message.length < 2) {
         ERRSender.ERR_NOTEXTTOSEND(socket.client);
         return;
     }
     message = message.slice(1, message.length);
-
+    let error = true;
+    if(receivers.indexOf('@global') >= 0 && socket.client.isAdmin()) {
+        socket.broadcast(':@[ADMIN]'+socket.client.name+' PRIVMSG @global :'+message);
+        error = false;
+    }
     let clients = {};
     let channels = {};
     Channel.list().forEach((chan) => {
@@ -27,7 +32,7 @@ module.exports = function (socket, command) {
     Client.list().forEach((cli) => {
         clients[cli.name] = cli;
     });
-    let error = true;
+
     receivers.forEach((r) => {
         if (clients[r]) {
             clients[r].socket.send(':' + socket.client.name + ' PRIVMSG ' + r + ' :' + message);
@@ -44,4 +49,7 @@ module.exports = function (socket, command) {
     if (error) {
         ERRSender.ERR_NORECIPIENT(socket.client, 'PRIVMSG');
     }
+
+
+
 };
