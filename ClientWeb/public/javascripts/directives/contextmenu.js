@@ -52,7 +52,7 @@ myApp.directive('ngContextMenu', function ($parse) {
 			event.preventDefault();
 			var options = $scope.$eval(attrs.ngContextMenu);
 			renderContextMenu($scope, event, options);
-			$scope.apply();
+			$scope.$apply();
         });
     };
 });
