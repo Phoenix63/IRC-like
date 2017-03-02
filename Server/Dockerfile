@@ -1,7 +1,0 @@
-FROM bitnami/node
-MAINTAINER romain <romain879@gmail.com>
-
-EXPOSE 8088
-EXPOSE 8089
-EXPOSE 27017
-EXPOSE 6379
