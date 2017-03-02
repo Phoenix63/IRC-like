@@ -1,15 +1,7 @@
-<% include layout-head.ejs %>
+
 <div ng-controller="log_in_controller">
     <section id="connexionGuest" class="formulaire">
-        <form action="irc" method="get" class="formType">
-            <div class="form">
-                <fieldset>
-                    <legend>Invites</legend>
-                    <p>Se connecter en tant qu'invite</p>
-                </fieldset>
-                <input type="submit" name="submit" value="Connexion"/>
-            </div>
-        </form>
+        <button ng-click="loadChat()">Se connecter</button>
     </section>
     <section id="connexion" class="formulaire">
         <form ng-submit="index.html" class="formType">
@@ -26,5 +18,3 @@
         </form>
     </section>
 </div>
-
-<% include layout-foot.ejs %>

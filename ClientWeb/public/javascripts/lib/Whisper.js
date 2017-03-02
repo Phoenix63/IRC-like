@@ -21,6 +21,9 @@
 		Whisper.prototype.setNotifOff = function() {
 			this.notif = 0;
 		}
+		Whisper.prototype.setNotifOffTemp = function() {
+			this.notif = 2;
+		}
 		Whisper.prototype.setTopic = function(top) {
 			this.topic = top;
 		}

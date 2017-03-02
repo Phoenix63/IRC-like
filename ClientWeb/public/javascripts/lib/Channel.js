@@ -27,6 +27,9 @@
 		Channel.prototype.setNotifOff = function() {
 			this.notif = 0;
 		}
+		Channel.prototype.setNotifOffTemp = function() {
+			this.notif = 2;
+		}
 		Channel.prototype.setTopic = function(top) {
 			this.topic = top;
 		}

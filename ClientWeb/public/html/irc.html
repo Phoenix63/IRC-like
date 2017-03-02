@@ -1,13 +1,13 @@
-<% include layout-head.ejs %>
+
 <div ng-controller="ircCtrl">
     <div id="channels">
         <h3>Channels list</h3>
         <div ng-repeat="channel in channels">
-            <button ng-click="joinChannel(channel)" ng-class="channel.notif == 1 ? 'notif-messageOn' : 'notif-messageOff'">{{channel.chan}}</button>
+            <button ng-click="joinChannel(channel)" ng-class="channel.notif == 1 ? 'notif-messageOn' : 'notif-messageOff'" ng-context-menu="menuOptions(channel)">{{channel.chan}}</button>
         </div>
-    </div>div
+    </div>
 
-    <div id="messages">
+    <div id="messages" scroll-bottom="currentChannel.messages">
         <h3>Channel messages</h3>
         <div ng-repeat="message in currentChannel.messages track by $index">
             <p>{{message}}</p>
@@ -17,7 +17,7 @@
     <div id="users">
         <h3>Users list</h3>
         <div ng-repeat="user in currentChannel.listU">
-            <p>{{user}}</p>
+            <button ng-context-menu="menuOptionsUser(user)">{{user}}</button>
         </div>
     </div>
     <div id="topic">
