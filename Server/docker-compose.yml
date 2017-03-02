@@ -1,6 +1,6 @@
 node:
   image: bitnami/node
-  command: sh -c 'npm run build && node dist/server.js DEV'
+  command: sh -c 'npm run build && node dist/app.js DEV'
   hostname: node
   volumes:
    - .:/app
