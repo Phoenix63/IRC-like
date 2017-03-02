@@ -211,7 +211,7 @@ let ERRSender = {
      * @constructor
      */
     ERR_USERONCHANNEL: (socket, nameGuest, nameChannel)=>{
-        client.socket.send(':'+config.ip+' 443 '+nameGuest+' '+nameChannel+' :is already on channel');
+        socket.send(':'+config.ip+' 443 '+nameGuest+' '+nameChannel+' :is already on channel');
     }
 
 };

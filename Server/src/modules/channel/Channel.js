@@ -411,7 +411,6 @@ class Channel {
 
     invite(socket, client){
         if(this._invitations.indexOf(client)===-1){
-            console.log("emission on");
             this._invitations.push(client);
             RPLSender.RPL_SERVER_ACCEPT_THE_INVITATION(socket, client, this);
             RPLSender.RPL_YOU_HAVE_BEEN_INVITED(socket, client, this);

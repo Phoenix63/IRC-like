@@ -106,21 +106,21 @@ var Client = (function() {
 
     Client.prototype.send = function(cmd) {
         this._socket.write(cmd+'\n');
-    }
+    };
 
     Client.prototype.on = function(event, callback) {
         this._callbacks[event] = callback;
-    }
+    };
 
     Client.prototype.emit = function(event, message) {
         if(this._callbacks[event]) {
             this._callbacks[event](message);
         }
-    }
+    };
 
     Client.prototype.close = function() {
         this._socket.destroy();
-    }
+    };
 
     return Client;
 })();

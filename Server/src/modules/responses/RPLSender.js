@@ -203,7 +203,7 @@ let RPLSender = {
     /**
      *
      * @param {Client} client
-     * @param {string} kicked
+     * @param {string} kicked+-
      * @param {Channel} channel
      * @static
      */

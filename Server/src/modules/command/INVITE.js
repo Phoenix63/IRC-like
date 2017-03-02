@@ -27,7 +27,8 @@ module.exports = function (socket, command) {
             ERRSender.ERR_CHANOPRIVSNEEDED(socket.client, nameChannel);
             return;
         }
-        if (channel.getUser(guest)){
+
+        if (channel.getUser(guest.name)){
             ERRSender.ERR_USERONCHANNEL(socket, guest.name, channel.name);
             return;
         }
