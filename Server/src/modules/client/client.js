@@ -359,7 +359,7 @@ class Client {
      */
     static getClient(id) {
         for (let key in clients) {
-            if (key === id || clients[key].name === id || client[key].id === id) {
+            if (key === id || clients[key].name === id || clients[key].id === id) {
                 return clients[key];
             }
         }

@@ -3,14 +3,7 @@ var Client = require('./core/Client');
 var config = require('./core/config.json');
 
 describe('command PART:', () => {
-    var client = null;
-    var client1 = null;
-    var client2 = null;
-    beforeEach(() => {
-        client = null;
-        client1 = null;
-        client2 = null;
-    });
+    var client;
     it('should say not registered', (done) => {
         client = new Client(config.port, config.ip);
 

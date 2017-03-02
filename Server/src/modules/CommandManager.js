@@ -19,7 +19,8 @@ let allowedCommand = {
     'MODE':require('./command/MODE'),
     'TOPIC': require('./command/TOPIC'),
     'RESTART': require('./command/RESTART'),
-    'KICK': require('./command/KICK')
+    'KICK': require('./command/KICK'),
+    'INVITE': require('./command/INVITE')
 };
 
 class CommandManager {
