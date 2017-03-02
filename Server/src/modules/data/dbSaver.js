@@ -7,7 +7,7 @@ let config = require('./../../ENV.json');
 import Redis from './RedisInterface';
 let redis = Redis.instance;
 
-var url = 'mongodb://'+config.mongo.user+':'+config.mongo.pass+'@'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db+config.mongo.method;
+var url = 'mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db;
 
 /**
  * if bool is set to true we flush redis

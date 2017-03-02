@@ -8,12 +8,13 @@ let redis = Redis.instance;
 import Caller from './Caller';
 import Channel from './../channel/Channel';
 
-var url = 'mongodb://'+config.mongo.user+':'+config.mongo.pass+'@'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db+config.mongo.method;
+var url = 'mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db;
 
 module.exports = function(callback) {
 
     if(process.argv[2] !== 'TEST') {
         MongoClient.connect(url, (err, db) => {
+            console.log(err);
 
             let caller = new Caller(() => {
                 db.close();
