@@ -55,6 +55,10 @@ public:
     void delUser(QString user, QString channel);
     void changeNick(QString nick, QString newNick);
 
+    // Topic
+    void setTopic(QString topic, QString channel);
+
+
     QHash<QString, QPixmap> * getHashMap();
 private:
     // Qhash wich contain message: key = channel name, content = message list

@@ -73,6 +73,7 @@ void Parser::in(QString string)
     if (!in_isWhisMesg(string))
     if (!in_isNickEdit(string))
     if (!in_isListMesg(string))
+    if (!in_isSetTopic(string))
     if (!in_isPing(string))
         channel->appendChannel(string+'\n', "\"Debug\"", "");
 }
@@ -362,5 +363,14 @@ bool Parser::in_isListMesg(QString string)
     {
         listOfChannels->addRow(string);
     }
+    return true;
+}
+
+bool Parser::in_isSetTopic(QString string)
+{
+    if (!string.contains(QRegularExpression("^.+\\s(331|332)\\sTOPIC")))
+        return false;
+    int j = string.indexOf(QRegularExpression(":.+$"));
+    channel->setTopic(string.right(string.length() - j),string.split(' ').at(4));
     return true;
 }
