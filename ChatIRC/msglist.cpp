@@ -1,5 +1,6 @@
 #include "msglist.h"
 
+
 MsgList::MsgList()
 {
     index = 0;

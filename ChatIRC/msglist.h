@@ -22,4 +22,5 @@ private:
     int index;
 };
 
+
 #endif // MSGLIST_H
