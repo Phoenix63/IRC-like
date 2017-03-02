@@ -50,6 +50,7 @@ private:
     bool in_isWhisMesg(QString string);
     bool in_isNickEdit(QString string);
     bool in_isKickMesg(QString string);
+    bool in_isSetTopic(QString string);
     bool in_isPing(QString string);
     bool in_isListMesg(QString string);
 
