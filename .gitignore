@@ -52,5 +52,6 @@ Server/test/
 out/
 node_modules/
 
+*.pro.user
 *.pro.user.*
 *.o
