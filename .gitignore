@@ -1,33 +1,6 @@
-#built application files
-*.apk
-*.ap_
-
-# files for the dex VM
-*.dex
-
-# Java class files
-*.class
-
-# generated files
-bin/
-gen/
-
-# Local configuration file (sdk path, etc)
-local.properties
-
-# Windows thumbnail db
-Thumbs.db
-
-# OSX files
-.DS_Store
-
-# Eclipse project files
-.classpath
-.project
-
-# Android Studio
-*.iml
+bin
 .idea
+
 #.idea/workspace.xml - remove # and delete .idea if it better suit your needs.
 .gradle
 build/
@@ -42,14 +15,10 @@ idea/*.xml
 
 out/
 node_modules/
-
-
-Server/
-ChatIRC/
-
-
-out/
-node_modules/
+Server/node_modules/
+Server/src/ENV.json
+Server/npm-debug.log.3478079806
+npm-debug.log
 
 *.pro.user
 *.pro.user.*

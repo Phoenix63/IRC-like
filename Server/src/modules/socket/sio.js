@@ -20,11 +20,11 @@ function createServer(callback) {
         });
 
         socket.on('error', () => {
-            socket.manager.emit('close');
+            socket.manager.close();
         });
 
         socket.on('disconnect', () => {
-            socket.manager.emit('close');
+            socket.manager.close();
         });
     });
 }

@@ -3,8 +3,11 @@
 import tcp from './tcp';
 import sio from './sio';
 import shortid from 'shortid';
+import config from './../../config.json';
 
 let sockets = [];
+
+const interval = config.timeout;
 
 class Socket {
     /**
@@ -21,6 +24,19 @@ class Socket {
         this._messageManager = null;
         sockets.push(this);
         this._onSignal = {};
+
+        this._life = 1;
+        if(interval>0) {
+            this._interval = setInterval(() => {
+                if(this._life <= 0) {
+                    this._socket.destroy();
+                }  else {
+                    this._life--;
+                    this.send(':'+config.ip+' PING :'+shortid.generate());
+                }
+            }, interval/2);
+        }
+
     }
 
     /**
@@ -100,7 +116,7 @@ class Socket {
      */
     broadcast(str, except) {
         sockets.forEach((s) => {
-            if (except !== s) {
+            if (!except || except !== s) {
                 s.send(str);
             }
         });
@@ -121,6 +137,7 @@ class Socket {
      * @param {string} data
      */
     emit(event, data) {
+        this._life = 1;
         if (this._onSignal[event])
             this._onSignal[event](data);
     }
@@ -129,6 +146,7 @@ class Socket {
      * delete socket
      */
     close() {
+        clearInterval(this._interval);
         if (this._client) {
             this._client.delete();
         }

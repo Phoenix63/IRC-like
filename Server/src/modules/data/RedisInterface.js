@@ -45,7 +45,7 @@ class Redis {
         if(client.identity.indexOf("GUEST_") === 0) {
             throw "cannot set guest admin";
         } else {
-            this._client.set("admin", client.identity, redisLib.print);
+            this._client.hmset("admin", client.identity, 'admin');
         }
     }
 
@@ -54,11 +54,11 @@ class Redis {
      * @param {function(reply)} callback
      */
     getAdmin(callback=function(reply){}) {
-        this._client.get("admin", (err,reply) => {
-            if(err) {
-                throw err;
+        this._client.hgetall("admin", (err,obj) => {
+            if(obj) {
+                callback(obj);
             } else {
-                callback(reply);
+                callback(null);
             }
         });
     }
@@ -78,8 +78,52 @@ class Redis {
         });
     }
 
-    setPass(identity, pass) {
+    /**
+     *
+     * @param {Client.identity} identity
+     * @param {string} pass
+     */
+    addUser(identity, pass) {
         this._client.hmset("PASS", identity, pass);
+    }
+
+    getUsers(callback) {
+        this._client.hgetall("PASS", (err, obj) => {
+             callback(obj);
+        });
+    }
+
+    /**
+     *
+     * @param {Channel} channel
+     */
+    upsertChannel(channel) {
+        this._client.hmset(
+            "channels",
+            channel.name,
+            JSON.stringify({
+                name: channel.name,
+                creator: channel.creator,
+                flags: channel.flags,
+                userflags: channel._usersFlags,
+                pass: channel.pass,
+                size: channel.size,
+                topic: (channel.topic||'')
+            }));
+    }
+
+    getChannels(callback) {
+        this._client.hgetall("channels", (err, obj) => {
+            callback(obj);
+        });
+    }
+
+    /**
+     *
+     * @param {Channel} channel
+     */
+    deleteChannel(channel) {
+        this._client.hdel("channels", channel.name);
     }
 }
 

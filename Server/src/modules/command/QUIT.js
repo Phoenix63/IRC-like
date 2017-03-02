@@ -1,7 +1,5 @@
 "use strict";
 
-import ERRSender from './../responses/ERRSender';
-
 /**
  *
  * @param {Socket} socket

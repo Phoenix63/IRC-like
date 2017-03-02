@@ -1,6 +1,0 @@
-/nick <Nouveau nickname>  -- Setup a nickname
-/join <#channel>  --Join a server
-/names --Users connected under every channels
-/list  --List every channels and their topics
-
-"#channel : message" --Send message to #channel

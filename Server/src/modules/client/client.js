@@ -32,11 +32,13 @@ class Client {
          s - marque un utilisateur comme recevant les notifications du serveur ;
          w - l'utilisateur reçoit les WALLOPs ;
          o - drapeau d'opérateur.
+         s - drapeau super admin
          */
-        this._flag = '';
-        this.addFlag('sw');
+        this._flags = '';
+        this._addFlag('sw');
         this._channels = [];
         this._pass = '';
+        this._registeredWithPass = false;
         clients.push(this);
 
     }
@@ -112,6 +114,9 @@ class Client {
      * @param {string} val
      */
     set realname(val) {
+        if(val[0] === ':') {
+            val = val.slice(1, val.length);
+        }
         this._realname = val;
     }
 
@@ -120,7 +125,7 @@ class Client {
      * @returns {boolean}
      */
     get isRegistered() {
-        return (this._realname !== null) && (this._name !== null) && (this._identity !== null);
+        return this._identity !== null;
     }
 
     /**
@@ -159,8 +164,9 @@ class Client {
                         ERRSender.ERR_PASSWDMISMATCH(this);
                     }  else {
                         if(err) {
-                            redisClient.setPass(identity, this._pass);
+                            redisClient.addUser(identity, this._pass);
                         }
+                        this._registeredWithPass = true;
 
                         this._identity = identity;
                         this._realname = realname;
@@ -170,16 +176,23 @@ class Client {
                         RPLSender.RPL_MOTD(this.socket);
                         RPLSender.RPL_ENDOFMOTD(this.socket);
 
-                        redisClient.getAdmin((reply) => {
-                            if (!reply) {
-                                this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                                this.addFlag('o');
-                                redisClient.setAdmin(this);
-                            } else if (reply === identity) {
-                                this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                                this.addFlag('o');
-                            }
-                        });
+                        if(process.argv[2] === 'TEST') {
+                            this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                            this._addFlag('s');
+                        } else {
+                            redisClient.getAdmin((reply) => {
+                                if (!reply) {
+                                    this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                                    this._addFlag('s');
+                                    redisClient.setAdmin(this);
+
+                                } else if (reply[identity] === 'admin') {
+                                    this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                                    this._addFlag('s');
+                                }
+                            });
+                        }
+
 
                     }
                 });
@@ -201,29 +214,42 @@ class Client {
      * @param {string} name
      */
     set name(name) {
-        if (name[0] === ':') {
-            name = name.slice(1, name.length);
-        }
-
         let error = false;
+        if(name === null) {
+            this.socket.logger._USER_CHANGE_NICK('Guest_'+this._id);
+            RPLSender.NICK(this.name, 'Guest_'+this._id, this);
+            this._name = null;
+            error = true;
+        } else {
+            if (name[0] === ':') {
+                name = name.slice(1, name.length);
+            }
 
-        clients.forEach((c) => {
-            if (c.name === name) {
-                ERRSender.ERR_NICKNAMEINUSE(this);
+
+
+            clients.forEach((c) => {
+                if (c.name === name) {
+                    if(!c.isUser() && this.isUser()) {
+                        c.name = null;
+                    } else {
+                        ERRSender.ERR_NICKNAMEINUSE(this);
+                        error = true;
+                    }
+                }
+            });
+
+            let match = name.match(/[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]+/);
+            if (!match || (match && match[0] !== name) || name === '' || name.length > 15) {
+                ERRSender.ERR_NONICKNAMEGIVEN(this);
                 error = true;
             }
-        });
+            if (!error) {
+                this.socket.logger._USER_CHANGE_NICK(name);
+                RPLSender.NICK(this.name, name, this);
+                this._name = name;
+            }
+        }
 
-        let match = name.match(/[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]+/);
-        if (!match || (match && match[0] !== name) || name === '' || name.length > 15) {
-            ERRSender.ERR_NONICKNAMEGIVEN(this);
-            error = true;
-        }
-        if (!error) {
-            this.socket.logger._USER_CHANGE_NICK(name);
-            RPLSender.NICK(this.name, name, this);
-            this._name = name;
-        }
 
     }
 
@@ -231,36 +257,68 @@ class Client {
      * methods
      */
 
-    /**
-     * delete the current user
-     *
-     */
     delete() {
         this._channels.forEach((c) => {
             c.removeUser(this);
         });
+        RPLSender.QUIT(this, 'Gone');
         clients.splice(clients.indexOf(this), 1);
-        delete this;
     };
 
     /**
      *
-     * @param {string} flag
+     * @param flags
+     * @private
      */
-    addFlag(flag) {
-        if(this._flag.indexOf(flag)<0) {
-            this._flag += flag;
-        }
+    _addFlag(flags) {
+        let arrayFlags = flags.split('');
+        arrayFlags.forEach((flag) => {
+            if(this._flags.indexOf(flag)===-1){
+                this._flags += flag;
+                RPLSender.RPL_UMODEIS(this,this.name+' +'+flag);
+            }
+        });
     }
 
     /**
      *
-     * @param {string} flag
+     * @param flags
+     * @private
      */
-    removeFlag(flag) {
-        if(this._flag.indexOf(flag)>=0) {
-            this._flag = this._flag.split(flag).join('');
+    _removeFlag(flags) {
+        let arrayFlags = flags.split('');
+        arrayFlags.forEach((flag) => {
+            let tmp = this._flags.length;
+            this._flags = this._flags.replace(flag,'');
+            if(tmp-1 === this._flags.length){
+                RPLSender.RPL_UMODEIS(this,this.name+' -'+flag);
+            }
+        });
+    }
+
+    changeFlag(operator, flag) {
+        if(operator==='+') {
+            this._addFlag(flag);
+        }else {
+            this._removeFlag(flag);
         }
+    }
+    ///////////////////////////////////
+    ///////////////////////////
+
+    isUser() {
+        return this._registeredWithPass;
+    }
+
+    /**
+     *
+     * @returns {boolean}
+     */
+    isAdmin() {
+        return this._flags.indexOf('o')>=0;
+    }
+    isSuperAdmin(){
+        return this._flags.indexOf('s')>=0;
     }
 
     /**
@@ -285,7 +343,7 @@ class Client {
      * @param id
      * @returns {null|Client}
      */
-    static find(id) {
+    static getClient(id) {
         for (let key in clients) {
             if (key === id || clients[key].name === id || client[key].id === id) {
                 return clients[key];
