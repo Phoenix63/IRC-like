@@ -1,6 +1,6 @@
 node:
   build: .
-  command: sh -c 'npm run build && node dist/app.js PROD'
+  command: sh -c 'npm run build && node dist/server.js DEV'
   hostname: node
   volumes:
    - .:/app
