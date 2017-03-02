@@ -20,7 +20,7 @@ module.exports = function (socket, command) {
             ERRSender.ERR_NOSUCHCHANNEL(socket.client, nameChannel);
             return;
         }
-        if (!channel.isInvitation()){
+        if (!channel.isInvitation){
             return;
         }
         if(!channel.isUserOperator(socket.client)){
