@@ -209,6 +209,27 @@ let RPLSender = {
      */
     KICK: (client, kicked, channel) => {
         channel.broadcast(':'+client.name+' KICK '+kicked);
+    },
+    /**
+     *
+     * @param socket
+     * @param guest
+     * @param chan
+     * @constructor
+     */
+    RPL_SERVER_ACCEPT_THE_INVITATION: (socket, guest, chan)=>{
+        socket.send(':SERVER_ACCEPT_THE_INVITATION '+guest.name+' '+chan.name);
+    },
+    /**
+     *
+     * @param socket
+     * @param guest
+     * @param chan
+     * @constructor
+     */
+    RPL_YOU_HAVE_BEEN_INVITED: (socket, guest, chan)=>{
+        guest.send(':YOU_HAVE_BEEN_INVITED '+socket.client.name+' '+chan.name);
     }
+
 };
 export default RPLSender

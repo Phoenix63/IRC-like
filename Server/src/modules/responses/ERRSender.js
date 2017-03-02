@@ -202,6 +202,16 @@ let ERRSender = {
      */
     ERR_NOSUCHNICK: (client, nick) => {
         client.socket.send(':'+config.ip+' 401 '+nick+' :No such nick/channel');
+    },
+    /**
+     *
+     * @param socket
+     * @param nameGuest
+     * @param nameChannel
+     * @constructor
+     */
+    ERR_USERONCHANNEL: (socket, nameGuest, nameChannel)=>{
+        client.socket.send(':'+config.ip+' 443 '+nameGuest+' '+nameChannel+' :is already on channel');
     }
 
 };

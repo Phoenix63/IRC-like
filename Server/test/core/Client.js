@@ -86,6 +86,10 @@ var Client = (function() {
             }
             else if (message.indexOf('501') > 0){
                 this.emit('err_unknownflag',message);
+            }else if (message.indexOf('401') > 0) {
+                this.emit('err_nosuchnick', message);
+            }else if(message.indexOf('443') > 0) {
+                this.emit('err_useronchannel',message);
             }
 
             /*
