@@ -2,7 +2,7 @@ myApp.controller("ircCtrl",function($scope) {
     var realN = "Guest";
 	var boolNames = undefined;
 	var countNick = 0;
-    socket.emit("message","USER Gil630 0 * : " + realN);
+    socket.emit("message","USER Gilou63 0 * : " + realN);
 	$scope.currentChannel = new Channel("@accueil");
     $scope.channels = [];
 	$scope.topicChannel = "PANDIRC";
@@ -90,7 +90,8 @@ myApp.controller("ircCtrl",function($scope) {
     $scope.sendMessage = function() {
         var cmdJoin = $scope.newMessage.match(/^\/[a-z]+[ ][\w#&é"'\(è_çà@€^$:!ù;¨?%£*\-*\/+]+$/);
 		var cmdPart = $scope.newMessage.match(/^\/[a-z]+[ ][\w#&é"'\(è_çà@€^$:!ù;¨?%£*\-*\/+, ]+$/);
-		var cmdTopic = $scope.newMessage.match(/^\/[a-z]+[ ]#[a-zA-Z0-9]+[ ][\w\W ]$/);
+		var cmdTopic = $scope.newMessage.match(/^\/[a-z]+[ ][#][a-zA-Z0-9]+[ ][\w\W ]+$/);
+		var cmdTopic1 = $scope.newMessage.match(/^\/[a-z]+[ ][#][a-zA-Z0-9]+$/);
 		var cmdUser = $scope.newMessage.match(/^\/[a-z]+[ ][\w_\-é"'ëäïöüâêîôûç`è]+$/);
 		var cmdMess = $scope.newMessage.match(/^\/[a-z]+[ ][\w_\-é"'ëäïöüâêîôûç`è]+[ ][\w\W ]+$/);
 		var cmdNoParam = $scope.newMessage.match(/^\/[a-z]+$/);
@@ -112,11 +113,17 @@ myApp.controller("ircCtrl",function($scope) {
 					}
 				}
 			}
+			
 			if(cmdTopic != null) {
-				var command = (/^\/[a-z]+[ ](#[a-zA-Z0-9]+)[ ]([\w\W ]+)$/).exec($scope.newMessage);
+				var command = (/^\/[a-z]+[ ]([#][a-zA-Z0-9]+)[ ]([\w\W ]+)$/).exec($scope.newMessage);
 				var commandChannel = command[1];
 				var commandMess = command[2];
 				socket.emit("message","TOPIC " + commandChannel + " " + commandMess);
+			}
+			if(cmdTopic1 != null) {
+				var command = (/^\/[a-z]+[ ]([#][a-zA-Z0-9]+)$/).exec($scope.newMessage);
+				
+				socket.emit("message","TOPIC " + command[1]);
 			}
 			if(cmdPart != null) {
 				var command = (/^(\/[a-z]+)[ ]([\w#&é"'\è_çà@€^$:!ù;¨?%£*\-*\/+ ]+)$/).exec($scope.newMessage);
@@ -569,6 +576,7 @@ myApp.controller("ircCtrl",function($scope) {
 			var topic = in_isTopic(msg);
 			
 			$scope.currentChannel.setTopic(topic[0] + " :" + topic[1]);
+			$scope.currentChannel.messages.push("Topic -> " + topic[1]);
 			$scope.topicChannel = $scope.currentChannel.topic;
 		}
 		else if(msg.match(/^:[0-9.a-z:]+[ ][3][3][2][ ][a-zA-Z]+[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?%£*\-*\/+]+[ ][:][a-zA-Z0-9 ,?;.\/!§ù%*µ$£^=+)@àç_è\-('"é&²]+$/)) {
@@ -577,11 +585,9 @@ myApp.controller("ircCtrl",function($scope) {
 			var commandMsg = command[2];
 			for(var i = 0; i<$scope.channels.length; i++) {
 				if($scope.channels[i].chan === commandChannel) {
+					$scope.channels[i].setTopic = commandChannel + " : " + commandMsg;
 					if($scope.currentChannel.chan === commandChannel) {
-						$scope.channels[i].setTopic = commandMsg;
-					}
-					else {
-						
+						$scope.topicChannel = commandChannel + " : " + commandMsg;
 					}
 				}
 			}
