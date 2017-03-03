@@ -47,8 +47,8 @@ bool Parser::out(QString string)
     if (!out_isModeMsg(string))
     if (!out_isTopicMsg(string))
     if (!out_isKickMsg(string))
-    if (!out_isWhoMsg(string))
     if (!out_isWhoisMsg(string))
+    if (!out_isWhoMsg(string))
     if (!out_isMsgMsg(string))
     if (!out_isPrivMsg(string))
         return false;
@@ -74,6 +74,7 @@ void Parser::in(QString string)
     if (!in_isNickEdit(string))
     if (!in_isListMesg(string))
     if (!in_isSetTopic(string))
+    if (!in_isKickMesg(string))
     if (!in_isPing(string))
         channel->appendChannel(string+'\n', "\"Debug\"", "");
 }
@@ -349,9 +350,17 @@ bool Parser::in_isKickMesg(QString string)
 {
     if(!string.contains(IRC::RPL::KICK))
         return false;
-    QString pseudo = string.split(' ').at(2);
-    if(pseudo.compare(*nickname))
-        channel->leave(string.split(' ').at(1));
+    QString admin = string.split(' ').at(0);
+    qDebug() << admin;
+    QString chan = string.split(' ').at(2);
+    QString kicked = string.split(' ').at(3);
+    if(!kicked.compare(*nickname)){
+        channel->appendChannel("You were kicked from " + chan + " by " + admin, "\"Debug\"", "");
+        channel->leave(chan);
+    }
+    else{
+        channel->appendChannel(kicked + " was kicked from " + chan + " by " + admin, "\"Debug\"", "");
+    }
     return true;
 }
 
