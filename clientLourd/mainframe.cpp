@@ -32,6 +32,13 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
     ui->pushButton_upload->setIcon(QPixmap("img/upload.png"));
     ui->pushButton_emojis->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->messageSender->setFocus();
+    QStringList CompletionList;
+    CompletionList << "/clean " << "/debug " << "/nick " << "/user " << "/join " << "/names "
+                   << "/pass " << "/part " << "/list " << "/topic " << "/kick " << "/who "
+                   << "/whois " << "/mode " << "/msg " << "/quit";
+    StringCompleter = new QCompleter(CompletionList,this);
+    StringCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    ui->messageSender->setCompleter(StringCompleter);
     emoji = channel.getHashMap();
 }
 
