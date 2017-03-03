@@ -289,10 +289,12 @@ bool Parser::in_isJoinNote(QString string)
 {
     if (!string.contains(IRC::RPL::JOIN))
         return false;
-    channel->appendChannel(string + '\n', "\"Debug\"", "");
-    QString user = string.split(' ')[0];
-    if(user.compare(*nickname))
-        channel->addUser(user, string.split(' ')[2]);
+    QString chan = string.split(' ').at(2);
+    QString nick = string.split(' ').at(0);
+    if(nick.compare(*nickname)) {
+        channel->addUser(nick, chan);
+        channel->appendChannel(nick + " joined " + chan + '\n', chan, "");
+    }
     return true;
 }
 
@@ -300,8 +302,15 @@ bool Parser::in_isPartNote(QString string)
 {
     if (!string.contains(IRC::RPL::PART))
             return false;
-    channel->appendChannel(string + '\n', "\"Debug\"", "");
-    channel->delUser(string.split(' ')[0], string.split(' ')[2]);
+    QString user = string.split(' ').at(0);
+    QString chan = string.split(' ').at(2);
+    int j = string.indexOf(QRegularExpression(":.+$"));
+    QString message = string.right(string.length() - j);
+    if(user.compare(*nickname)) {
+        channel->appendChannel(user + " left " + chan + ' ' + message + '\n', chan, "");
+        channel->delUser(user, chan);
+        channel->delUser("@"+ user, chan);
+    }
     return true;
 }
 
@@ -329,8 +338,10 @@ bool Parser::in_isNickEdit(QString string)
 {
     if (!string.contains(IRC::RPL::NICK))
         return false;
-    channel->changeNick(string.split(' ')[0], string.split(' ')[2]);
-    channel->appendChannel(string + '\n', "\"Debug\"", "");
+    QString nick = string.split(' ').at(0);
+    QString newNick = string.split(' ').at(2);
+    channel->changeNick(nick, newNick);
+    channel->appendChannel(nick + " changed his nickname to " + newNick + '\n', "\"Debug\"", "");
     return true;
 }
 

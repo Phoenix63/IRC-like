@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QString>
+#include <QTableWidget>
 
 namespace Ui {
 class Channellist;
@@ -24,6 +25,7 @@ private slots:
 
 private:
     Ui::Channellist *ui;
+    QTableWidget *table;
 };
 
 #endif // CHANNELLIST_H

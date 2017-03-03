@@ -57,7 +57,7 @@
            <x>0</x>
            <y>0</y>
            <width>565</width>
-           <height>474</height>
+           <height>475</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -198,7 +198,7 @@
      <x>0</x>
      <y>0</y>
      <width>899</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFichier">
@@ -243,12 +243,12 @@
   </action>
   <action name="actionConnect">
    <property name="text">
-    <string>Connection</string>
+    <string>Connect</string>
    </property>
   </action>
   <action name="actionDisconnect">
    <property name="text">
-    <string>Deconnection</string>
+    <string>Disconnect</string>
    </property>
   </action>
   <action name="actionLight">

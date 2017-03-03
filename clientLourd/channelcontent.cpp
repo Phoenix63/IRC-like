@@ -25,7 +25,9 @@ void ChannelContent::removeUser(QString userName)
 
 void ChannelContent::replaceUser(QString oldNick, QString newNick)
 {
-    if (users.contains(oldNick))
+    if (users.contains("@" + oldNick))
+        users[users.indexOf("@" + oldNick)].replace(oldNick, newNick);
+    else if (users.contains(oldNick))
         users[users.indexOf(oldNick)].replace(oldNick, newNick);
 }
 

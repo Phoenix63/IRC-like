@@ -10,6 +10,7 @@ class MainFrame;
 class QListWidgetItem;
 class QFile;
 class QListWidget;
+#include "configlist.h"
 
 namespace Ui {
 class Login;
@@ -33,7 +34,7 @@ public:
     QList<QString>* convertChannelList(QListWidget *list);
 
     //Preset functions
-    void loadPreset(QString preset);
+    void loadPreset();
     void loadPresetList();
 
 private slots:
@@ -58,6 +59,7 @@ private:
     QTcpSocket *socket;
     Ui::Login *ui;
     QList<QString>* channelsToJoin;
+    ConfigList config;
 };
 
 #endif // LOGIN_H

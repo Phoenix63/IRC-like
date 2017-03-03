@@ -22,7 +22,9 @@ SOURCES += main.cpp\
     msglist.cpp \
     channelcontent.cpp \
     parseremoji.cpp \
-    channellist.cpp
+    channellist.cpp \
+    config.cpp \
+    configlist.cpp
 
 HEADERS  += \
     login.h \
@@ -35,7 +37,10 @@ HEADERS  += \
     channelcontent.h \
     parseremoji.h \
     channellist.h \
-    theme.h
+    theme.h \
+    config.h \
+    configlist.h \
+    config_in.h
 
 FORMS    += \
     login.ui \

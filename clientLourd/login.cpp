@@ -1,12 +1,12 @@
 #include "login.h"
 #include "ui_login.h"
 #include "mainframe.h"
-#include "theme.h"
 
-
+#include <QListWidget>
 #include <QListWidgetItem>
-#include <QFile>
 #include <QMessageBox>
+
+#include <QStringList>
 
 /*
  * Constructor and destructor
@@ -17,6 +17,7 @@ Login::Login(QWidget *parent) :
     ui(new Ui::Login)
 {
     ui->setupUi(this);
+	config.loadConfig();
     loadPresetList();
 }
 
@@ -42,7 +43,6 @@ bool Login::doConnect()
     socket->connectToHost(host,port);
     if(!socket->waitForConnected(5000))
     {
-        qDebug() << "Error: " << socket->errorString();
         QMessageBox::information(this, "Error", "Host not found");
         return false;
     }
@@ -153,160 +153,62 @@ void Login::joinChannels(QListWidget *channels)
  * Preset functions
  */
 
-void Login::loadPreset(QString preset)
+void Login::loadPreset()
 {
-    QFile config("config.cfg");
-    if (config.exists()) {
-        config.open(QIODevice::ReadOnly);
-        QString buf;
-        while(!config.atEnd() && buf.compare('<' + preset + ">\n"))
-        {
-            buf = config.readLine();
-        }
-        //username
-        buf = config.readLine();
-        buf=buf.split(" = ").at(1);
-        if (buf.length() > 0)
-            ui->lineEdit_username->setText(buf.left(buf.length() - 1));
-        //password
-        buf = config.readLine();
-        buf=buf.split(" = ").at(1);
-        if (buf.length() > 0)
-            ui->lineEdit_pass->setText(buf.left(buf.length() - 1));
-        //host
-        buf = config.readLine();
-        buf=buf.split(" = ").at(1);
-        if (buf.length() > 0)
-            ui->lineEdit_host->setText(buf.left(buf.length() - 1));
-        //port
-        buf = config.readLine();
-        buf=buf.split(" = ").at(1);
-        if (buf.length() > 0)
-            ui->lineEdit_port->setText(buf.left(buf.length() - 1));
-        //channel list
-        buf = config.readLine();
-        buf=buf.split(" = ").at(1);
-        if (buf.length() > 0){
-            QStringList channels = buf.split(' ');
-            for(QString i : channels){
-                if(i.contains('\n'))
-                    i = i.left(i.length() - 1);
-                ui->channelList->addItem(i);
-            }
-        }
-        config.close();
-    }
+		ui->presetList->setCurrentIndex(config.getCurrentIndex());
+		ui->lineEdit_username->setText(config.getPseudo());
+		ui->lineEdit_pass->setText(config.getPassword());
+		ui->lineEdit_host->setText(config.getHost());
+		ui->lineEdit_port->setText(config.getPort());
+		ui->channelList->clear();
+		for (auto i:config.getChannels()) {
+			ui->channelList->addItem(i);
+		}
 }
 
 void Login::loadPresetList()
 {
-    ui->presetList->clear();
-    QFile config("config.cfg");
-    if (config.exists()) {
-        config.open(QIODevice::ReadOnly);
-        QString buf;
-        while(!config.atEnd() && !buf.startsWith('<'))
-        {
-            buf = config.readLine();
-            if(buf.startsWith('<')){
-               buf.remove(0, 1);
-               buf.remove(buf.length() - 2, 2);
-               ui->presetList->addItem(buf);
-            }
-        }
-        config.close();
-    }
+
+	ui->presetList->clear();
+   for (auto i:config.getNames()) {
+		   ui->presetList->addItem(i);
+   }
+   loadPreset();
 }
 
 void Login::on_pushButton_newPreset_clicked()
 {
-    ui->presetList->addItem(ui->lineEdit_username->text() + " - " + ui->lineEdit_host->text() + ':' + ui->lineEdit_port->text());
-    QFile config("config.cfg");
-    if (config.exists()) {
-        config.open(QIODevice::WriteOnly | QIODevice::Append);
-        QTextStream flux(&config);
-        flux.setCodec("UTF-8");
-        flux << '<' << ui->lineEdit_username->text() << " - " << ui->lineEdit_host->text() << ':' << ui->lineEdit_port->text() << '>' << endl;
-        flux << "Username = " << ui->lineEdit_username->text() << endl;
-        flux << "Password = " << ui->lineEdit_pass->text() << endl;
-        flux << "Host = " << ui->lineEdit_host->text() << endl;
-        flux << "Port = " << ui->lineEdit_port->text() << endl;
-        flux << "Channels = ";
-        for(int i = 0; i < ui->channelList->count(); i++)
-            flux << ui->channelList->item(i)->text() << ' ';
-        flux << endl;
-        config.close();
-    }
-    ui->presetList->setCurrentIndex(ui->presetList->count() - 1);
+	config.addConfig();
+	loadPresetList();
 }
 
 void Login::on_presetList_activated(const QString &arg1)
 {
     ui->channelList->clear();
-    loadPreset(arg1);
+	loadPresetList();
+	config.change(ui->presetList->findText(arg1));
+    loadPreset();
 }
 
 void Login::on_pushButton_savePreset_clicked()
 {
-    QString current = ui->presetList->currentText();
-    current.prepend('<');
-    QString res;
-    QFile config("config.cfg");
-    if (config.exists()) {
-        config.open(QIODevice::ReadWrite);
-        QTextStream out(&config);
-        QString line = out.readLine();
-        while(!line.startsWith(current) && !out.atEnd()){
-            res.append(line + '\n');
-            line = out.readLine();
-        }
-        for(int i = 0; i < 5; i++)
-            QString line = out.readLine();
-        res.append('<'+ui->lineEdit_username->text() + " - " + ui->lineEdit_host->text() + ':' + ui->lineEdit_port->text() + ">\n");
-        res.append("Username = " + ui->lineEdit_username->text() + '\n');
-        res.append("Password = " + ui->lineEdit_pass->text() + '\n');
-        res.append("Host = " + ui->lineEdit_host->text() + '\n');
-        res.append("Port = " + ui->lineEdit_port->text() + '\n');
-        res.append("Channels =");
-        for(int i = 0; i < ui->channelList->count(); i++) {
-            QString tmp = ' ' + ui->channelList->item(i)->text();
-            res.append(tmp);
-        }
-        res.append('\n');
-        while(!out.atEnd()){
-            line = out.readLine();
-            res.append(line + '\n');
-        }
-        config.resize(0);
-        out << res;
-        config.close();
-        loadPresetList();
-    }
+        config.setName(ui->lineEdit_username->text() + "-" + ui->lineEdit_host->text() + ":" + ui->lineEdit_port->text());
+		config.setPseudo(ui->lineEdit_username->text());
+		config.setPassword(ui->lineEdit_pass->text());
+		config.setHost(ui->lineEdit_host->text());
+		config.setPort(ui->lineEdit_port->text());
+		QStringList chanList;
+        for (int i = 0; i < ui->channelList->count(); i++) {
+                chanList.append(ui->channelList->item(i)->text());
+	}
+	config.setChannels(chanList);
+        config.saveConfig();
+	loadPresetList();
 }
 
 void Login::on_pushButton_deletePreset_clicked()
 {
-    QString current = ui->presetList->currentText();
-    current.prepend('<');
-    QString res;
-    QFile config("config.cfg");
-    if (config.exists()) {
-        config.open(QIODevice::ReadWrite);
-        QTextStream out(&config);
-        while(!out.atEnd()){
-            QString line = out.readLine();
-            while(!line.startsWith(current) && !out.atEnd()){
-                res.append(line + '\n');
-                line = out.readLine();
-            }
-            for(int i = 0; i < 5; i++){
-                QString line = out.readLine();
-            }
-        }
-        config.resize(0);
-        out << res;
-        config.close();
-        ui->presetList->removeItem(ui->presetList->currentIndex());
-        ui->presetList->setCurrentIndex(0);
-    }
+	config.delConfig();
+	config.saveConfig();
+	loadPresetList();
 }

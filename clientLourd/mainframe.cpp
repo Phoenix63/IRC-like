@@ -25,7 +25,7 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket,QString nick) :
     ui->actionLight->setCheckable(true);
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
     channel.setUi(ui->channelList, ui->chatBox,ui->userList,ui->topicDisplay,ui->messageSender, ui->nickBox);
-    chanList = new Channellist(this);
+    chanList = new Channellist(NULL);
     parser.initialize(&channel, socket, &nick, chanList);
     msgList.setMsgSender(ui->messageSender);
     ui->messageSender->installEventFilter(this);
@@ -33,6 +33,7 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket,QString nick) :
     ui->pushButton_emojis->setIcon(QPixmap("img/smile.png"));
     ui->pushButton_upload->setIcon(QPixmap("img/upload.png"));
     ui->pushButton_emojis->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->messageSender->setFocus();
     emoji = channel.getHashMap();
 }
 
@@ -86,11 +87,12 @@ void MainFrame::on_pushButton_emojis_clicked()
     }
     contextMenu.addActions(listAction);
     contextMenu.setMinimumSize(50, 80);
-    QAction * action = contextMenu.exec(ui->MessageBox->mapToGlobal(QPoint(600, 500)));
+    QAction * action = contextMenu.exec(ui->MessageBox->mapToGlobal(QCursor::pos()));
     QString emotes;
     if (action)
         emotes = action->text();
     ui->messageSender->setText(ui->messageSender->text() + emotes);
+    ui->messageSender->setFocus();
 }
 
 void MainFrame::moveScrollBarToBottom(int min, int max)
@@ -102,6 +104,7 @@ void MainFrame::moveScrollBarToBottom(int min, int max)
 void MainFrame::on_channelList_itemSelectionChanged()
 {
     channel.change(ui->channelList->currentItem()->text());
+    ui->messageSender->setFocus();
 }
 
 
@@ -164,7 +167,7 @@ void MainFrame::on_actionConnect_triggered()
 void MainFrame::on_actionDisconnect_triggered()
 {
     QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, "Disconnect", "Voulez-vous quitter?", QMessageBox::Yes|QMessageBox::No);
+    reply = QMessageBox::question(this, "Disconnect", "Are you sure ?", QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes) {
         this->close();
         emit showLogin();
