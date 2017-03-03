@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QString>
 #include <QTableWidget>
+#include <QTcpSocket>
 
 namespace Ui {
 class Channellist;
@@ -15,7 +16,7 @@ class Channellist : public QDialog
 
 public:
     //Constructor and destructor
-    explicit Channellist(QWidget *parent = 0);
+    explicit Channellist(QWidget *parent = 0,QTcpSocket *socket = NULL);
     ~Channellist();
 
     //Ui update functions
@@ -23,7 +24,9 @@ public:
     void clear();
 private slots:
 
+    void on_tableWidget_doubleClicked(const QModelIndex &index);
 private:
+    QTcpSocket *socket;
     Ui::Channellist *ui;
     QTableWidget *table;
 };

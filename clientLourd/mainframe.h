@@ -72,7 +72,6 @@ private:
     Parser parser;
     Channel channel;
     MsgList msgList;
-    Channellist *chanList;
     QHash<QString, QPixmap> *emoji;
 };
 

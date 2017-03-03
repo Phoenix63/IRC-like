@@ -8,12 +8,12 @@
 /*
  * Parseur: Initialisation functions
  */
-void Parser::initialize(Channel *chan, QTcpSocket *sock, QString nick, Channellist *list)
+void Parser::initialize(Channel *chan, QTcpSocket *sock, QString nick)
 {
     channel = chan;
     socket = sock;
     nickname = nick;
-    listOfChannels = list;
+    listOfChannels = new Channellist(NULL, sock);
 }
 
 void Parser::setNickname(QString nick)

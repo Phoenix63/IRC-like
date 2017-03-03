@@ -24,8 +24,7 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
     ui->actionLight->setCheckable(true);
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
     channel.setUi(ui->channelList, ui->chatBox,ui->userList,ui->topicDisplay,ui->messageSender, ui->nickBox);
-    chanList = new Channellist(NULL);
-    parser.initialize(&channel, socket, "Guest", chanList);
+    parser.initialize(&channel, socket, "Guest");
     msgList.setMsgSender(ui->messageSender);
     ui->messageSender->installEventFilter(this);
     connect(ui->scrollArea->verticalScrollBar(), SIGNAL(rangeChanged(int, int)), this, SLOT(moveScrollBarToBottom(int, int)));
