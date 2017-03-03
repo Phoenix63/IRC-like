@@ -131,6 +131,7 @@ let RPLSender = {
      */
     HEADER: (socket) => {
         socket.send(':' + config.ip + ' NOTICE AUTH :*** YOU ARE CONNECTED');
+        socket.send(':' + config.ip + ' NOTICE NICK :*** '+socket.client.name);
     },
 
     /**
