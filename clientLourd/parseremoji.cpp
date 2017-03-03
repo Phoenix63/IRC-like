@@ -29,10 +29,10 @@ QList<QHBoxLayout *> ParserEmoji::parse(QString heure, QString pseudo, QString s
     auto count = string.count(QRegularExpression(":\\S+:"));
     auto index = 0;
     QLabel *LHeure = new QLabel(heure);
-    LHeure->setStyleSheet(IRC::COLOR::LIGHT::HOUR);
+    LHeure->setStyleSheet("color : "+IRC::COLOR::LIGHT::HOUR);
     pseudoBox->addWidget(LHeure);
     QLabel *lPseudo= new QLabel(pseudo);
-    lPseudo->setStyleSheet(IRC::COLOR::LIGHT::NAME);
+    lPseudo->setStyleSheet("color : "+IRC::COLOR::LIGHT::NAME);
     pseudoBox->addWidget(lPseudo);
 
     for (auto i = 0; i < count; i++ )

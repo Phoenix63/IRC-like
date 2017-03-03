@@ -31,10 +31,8 @@ class MainFrame : public QMainWindow
 
 public:
     //Constructor and Destructor
-    explicit MainFrame(QWidget *parent = 0,QTcpSocket *socket=NULL,QString nick=NULL);
+    explicit MainFrame(QWidget *parent = 0,QTcpSocket *socket=NULL);
     ~MainFrame();
-    //Nickname setter (switch slot implementation ?)
-    void setNickname(QString nick);
 
 protected:
     bool eventFilter(QObject *obj, QEvent *event);
@@ -71,7 +69,6 @@ private:
     QTcpSocket *socket;
 
     //Parser and channel for message handling
-    QString nickname;
     Parser parser;
     Channel channel;
     MsgList msgList;

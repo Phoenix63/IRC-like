@@ -14,8 +14,8 @@ class Parser {
 public:
 
     // Initialisation functions
-    void initialize(Channel *channel, QTcpSocket *socket, QString *nickname, Channellist *list);
-    void setNickname(QString *nick);
+    void initialize(Channel *channel, QTcpSocket *socket, QString nickname, Channellist *list);
+    void setNickname(QString nick);
     void sendToServer(QTcpSocket *socket, QString string);
     // Parsing functions
     bool out(QString string);
@@ -42,6 +42,7 @@ private:
     bool out_isPrivMsg(QString string);
 
     // In functions
+    bool in_isInitMesg(QString string);
     bool in_isChanList(QString string);
     bool in_isNameList(QString string);
     bool in_isJoinNote(QString string);
@@ -58,7 +59,7 @@ private:
     // Pointer to the channel and socket created in mainframe
     Channel *channel;
     QTcpSocket *socket;
-    QString *nickname;
+    QString nickname;
     Channellist *listOfChannels;
 };
 

@@ -8,7 +8,7 @@
 /*
  * Parseur: Initialisation functions
  */
-void Parser::initialize(Channel *chan, QTcpSocket *sock, QString *nick, Channellist *list)
+void Parser::initialize(Channel *chan, QTcpSocket *sock, QString nick, Channellist *list)
 {
     channel = chan;
     socket = sock;
@@ -16,7 +16,7 @@ void Parser::initialize(Channel *chan, QTcpSocket *sock, QString *nick, Channell
     listOfChannels = list;
 }
 
-void Parser::setNickname(QString *nick)
+void Parser::setNickname(QString nick)
 {
     nickname = nick;
 }
@@ -65,6 +65,7 @@ void Parser::in(QString string)
     string = string.left(string.length() - 1);
     string = string.right(string.length() - 2);
     //Parse the message starting from error code to detect server name
+    if (!in_isInitMesg(string))
     if (!in_isChanList(string))
     if (!in_isNameList(string))
     if (!in_isJoinNote(string))
@@ -265,13 +266,22 @@ bool Parser::out_isQuitMsg(QString string)
 /*
  * Parseur: In private function's
  */
+bool Parser::in_isInitMesg(QString string)
+{
+    if (!string.contains(IRC::RPL::NOTICE))
+        return false;
+    int j = string.indexOf(QRegularExpression(":.+$"));
+    QString nick = string.right(string.length() - j - 5);
+    setNickname(nick);
+    return true;
+}
 
 bool Parser::in_isChanList(QString string)
 {
     int i = string.indexOf(QRegularExpression(":.+$"));
     if (!string.contains(QRegularExpression("^.+\\s(331|332)\\sJOIN")))
         return false;
-    channel->join(string.split(' ')[3], string.right(string.length() - i - 1));
+    channel->join(string.split(' ').at(3), string.right(string.length() - i - 1));
     return true;
 }
 
@@ -288,11 +298,14 @@ bool Parser::in_isNameList(QString string)
 
 bool Parser::in_isJoinNote(QString string)
 {
-    if (!string.contains(IRC::RPL::JOIN))
+    if (!string.contains(IRC::RPL::JOIN)){
         return false;
-    QString chan = string.split(' ').at(2);
+    }
     QString nick = string.split(' ').at(0);
-    if(nick.compare(*nickname)) {
+    if(nick.startsWith('@'))
+        nick.remove(0,1);
+    QString chan = string.split(' ').at(2);
+    if(nick.compare(nickname)) {
         channel->addUser(nick, chan);
         channel->appendChannel(nick + " joined " + chan + '\n', chan, "");
     }
@@ -307,7 +320,7 @@ bool Parser::in_isPartNote(QString string)
     QString chan = string.split(' ').at(2);
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString message = string.right(string.length() - j);
-    if(user.compare(*nickname)) {
+    if(user.compare(nickname)) {
         channel->appendChannel(user + " left " + chan + ' ' + message + '\n', chan, "");
         channel->delUser(user, chan);
         channel->delUser("@"+ user, chan);
@@ -341,6 +354,8 @@ bool Parser::in_isNickEdit(QString string)
         return false;
     QString nick = string.split(' ').at(0);
     QString newNick = string.split(' ').at(2);
+    if (!nick.compare(nickname))
+        setNickname(newNick);
     channel->changeNick(nick, newNick);
     channel->appendChannel(nick + " changed his nickname to " + newNick + '\n', "\"Debug\"", "");
     return true;
@@ -351,10 +366,9 @@ bool Parser::in_isKickMesg(QString string)
     if(!string.contains(IRC::RPL::KICK))
         return false;
     QString admin = string.split(' ').at(0);
-    qDebug() << admin;
     QString chan = string.split(' ').at(2);
     QString kicked = string.split(' ').at(3);
-    if(!kicked.compare(*nickname)){
+    if(!kicked.compare(nickname)){
         channel->appendChannel("You were kicked from " + chan + " by " + admin, "\"Debug\"", "");
         channel->leave(chan);
     }

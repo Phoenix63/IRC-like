@@ -13,11 +13,10 @@
  * Mainframe: constructor and destructor
  */
 
-MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket,QString nick) :
+MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
     QMainWindow(parent),
     ui(new Ui::MainFrame),
-    socket(socket),
-    nickname(nick)
+    socket(socket)
 {
     ui->setupUi(this);
     this->setStyleSheet("background-color : " + IRC::COLOR::LIGHT::BACKGROUND + " color : " + IRC::COLOR::LIGHT::TEXT);
@@ -26,7 +25,7 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket,QString nick) :
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
     channel.setUi(ui->channelList, ui->chatBox,ui->userList,ui->topicDisplay,ui->messageSender, ui->nickBox);
     chanList = new Channellist(NULL);
-    parser.initialize(&channel, socket, &nick, chanList);
+    parser.initialize(&channel, socket, "Guest", chanList);
     msgList.setMsgSender(ui->messageSender);
     ui->messageSender->installEventFilter(this);
     connect(ui->scrollArea->verticalScrollBar(), SIGNAL(rangeChanged(int, int)), this, SLOT(moveScrollBarToBottom(int, int)));
@@ -41,13 +40,6 @@ MainFrame::~MainFrame()
 {
     delete ui;
     delete socket;
-}
-
-
-void MainFrame::setNickname(QString nick)
-{
-    nickname = nick;
-    parser.setNickname(&nickname);
 }
 
 /*

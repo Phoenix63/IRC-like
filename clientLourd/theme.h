@@ -8,7 +8,7 @@ namespace IRC {
 namespace COLOR {
 
 namespace DARK{
-const QString BACKGROUND ("rgb(100, 100, 100);");
+const QString BACKGROUND ("rgb(54, 57, 62);");
 const QString HOUR ("rgb(255, 255, 255);");
 const QString NAME ("rgb(255, 255, 255);");
 const QString SELFNAME ("rgb(255, 255, 255);");

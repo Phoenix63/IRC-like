@@ -18,7 +18,7 @@ const QRegularExpression LISTSTART    ("^\\S+\\s321\\s");
 const QRegularExpression LIST         ("^\\S+\\s322\\s");
 const QRegularExpression LISTEND      ("^\\S+\\s323\\s");
 const QRegularExpression NICK         ("^\\S+\\sNICK\\s");
-const QRegularExpression NOTICE       ("^\\S+\\sNOTICE\\s");
+const QRegularExpression NOTICE       ("^\\S+\\sNOTICE\\sNICK");
 const QRegularExpression PRIVMSG      ("^\\S+\\sPRIVMSG\\s#\\S+");
 const QRegularExpression WHISPER      ("^\\S+\\sPRIVMSG\\s\\S+");
 const QRegularExpression MOTDSTART    ("^\\S+\\s375\\s");
