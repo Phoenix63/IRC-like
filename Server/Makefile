@@ -1,9 +1,28 @@
 .SILENT:
 
+all:
+	make help
+
+head:
+	echo
+	echo -e "\033[0;32m "
+	echo -e "__________                    .__/\.______________________  "
+	echo -e "\______   \_____    ____    __| _)/|   \______   \_   ___ \ "
+	echo -e " |     ___/\__  \  /    \  / __ |  |   ||       _/    \  \/ "
+	echo -e " |    |     / __ \|   |  \/ /_/ |  |   ||    |   \     \____"
+	echo -e " |____| ___|____/|___|__/\____ _|  |___||____|_  /\______  /"
+	echo -e "       //  \________________//  \              \/        \/ "
+	echo -e "       \ \ / ____      ____ \   /      "
+	echo -e "        \_/ / #  \    /  # \ \_/    \e[0mServer\033[0;32m    "
+	echo -e "          | |     \  /     | |        \e[0m(v0.1.0)\033[0;32m "
+	echo -e "          |  \____/  \____/  |        "
+	echo -e "          ||       @@        |        "
+	echo -e "          ||     \_/\_/      |        "
+	echo -e "           \________________/        "
+	echo -e "\e[0m"
+
 help:
-	echo
-	echo "PandIrc Server"
-	echo
+	make head
 	echo "      Commands: "
 	echo
 	echo "            help - Show this message"
@@ -23,20 +42,24 @@ help:
 	echo -e "            \033[0;32mclean\e[0m - clean docker-compose"
 	echo
 
-build: clean
+build:
+	make head
 	docker pull bitnami/node:7
 	docker build -f docker/runtest.Dockerfile -t pandirc/runtest .
 
-deps: clean
+deps:
+	make head
 	docker-compose -f ./docker/deps.yml up
 
-prod: clean
+prod:
+	make head
 	docker-compose -f ./docker/prod.yml up
 
-dev: clean
+dev:
+	make head
 	docker-compose -f ./docker/dev.yml up
 
-test: clean
+test:
 	docker-compose -f ./docker/test.yml up
 
 clean:
