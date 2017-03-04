@@ -9,6 +9,7 @@
 #include <QMainWindow>
 #include <QString>
 #include <QList>
+#include <QCompleter>
 
 class QPixmap;
 class QTcpSocket;
@@ -73,6 +74,7 @@ private:
     Channel channel;
     MsgList msgList;
     QHash<QString, QPixmap> *emoji;
+    QCompleter *StringCompleter;
 };
 
 #endif // MAINFRAME_H

@@ -1,12 +1,12 @@
 #include "channel.h"
 
-#include<QListWidget>
-#include<QTextBrowser>
-#include<QLineEdit>
-#include<QColor>
-#include<QVBoxLayout>
-#include<QLabel>
-#include<QTime>
+#include <QListWidget>
+#include <QTextBrowser>
+#include <QLineEdit>
+#include <QColor>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QTime>
 
 /*
  * Channel: Constructor
