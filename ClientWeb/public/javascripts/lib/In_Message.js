@@ -1,16 +1,4 @@
 
-	function in_isMsg(msg) {
-		var msSplit = msg.split(' ');
-		msSplit[0] = msSplit[0].replace(":","");
-		var channel = msSplit[2];
-		msSplit[3] = msSplit[3].replace(":","");
-		var mess = "";
-		for(var i = 3; i<msSplit.length; i++) {
-			mess = mess + " " + msSplit[i];
-		}
-		var msgBox = [msSplit[0], channel, mess];
-		return msgBox;
-	}
 	function in_isNickname(msg) {
 		var msSplit = msg.split(' ');
 		msSplit[0] = msSplit[0].replace(":","");
@@ -23,12 +11,20 @@
 		var msSplit = msg.split(' ');
 		var listUsers = [];
 		var chann = msSplit[4];
-		msSplit[5] = msSplit[5].replace(":","");
-		msSplit[5] = msSplit[5].replace("@","");
-		listUsers.push(msSplit[5]);
-		for(var i = 6; i<msSplit.length; i++) {
-			msSplit[i] = msSplit[i].replace("@","");
-			listUsers.push(msSplit[i]);
+		//alert("1");
+		for(var i = 5; i<msSplit.length; i++) {
+			//alert("2");
+			msSplit[i] = msSplit[i].replace(":","");
+			if(msSplit[i].includes("@")) {
+				msSplit[i] = msSplit[i].replace("@","");
+				var newUser = new User(msSplit[i]);
+				newUser.setRight(1);
+				listUsers.push(newUser);
+			}
+			else {
+				var newUser = new User(msSplit[i]);
+				listUsers.push(newUser);
+			}
 		}
 		return [chann, listUsers];
 	}
