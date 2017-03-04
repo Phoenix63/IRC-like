@@ -4,12 +4,11 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon --exec babel-node ./src/app.js DEV",
+    "dev": "docker-compose -f ./docker/dev.yml up",
     "watch": "babel --watch src --out-dir dist --source-maps inline --copy-files",
     "build": "babel src --out-dir dist --source-maps inline --copy-files",
-    "start": "npm run build && node dist/app.js PROD",
-    "stest": "npm run build && node dist/app.js TEST",
-    "test": "mocha"
+    "prod": "docker-compose -f ./docker/prod.yml up",
+    "test": "docker-compose -f ./docker/test.yml up"
   },
   "author": "",
   "license": "ISC",

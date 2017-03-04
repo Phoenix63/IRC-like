@@ -5,6 +5,7 @@ console.log = function(arg) {
 };
 
 import dbSaver from './modules/data/dbSaver';
+import child_process from 'child_process';
 
 // globals
 import colors from 'colors';
@@ -78,7 +79,7 @@ if(cluster.isMaster) {
     });
     cluster.on('exit', (worker, code, signal) => {
 
-        if(signal !== 'SIGTERM' && signal !== 'SIGINT') {
+        if(signal !== 'SIGTERM' && signal !== 'SIGINT' && process.arv[2] !== 'TEST') {
             cluster.fork();
         }
     });
@@ -97,6 +98,18 @@ if(cluster.isWorker) {
             logger._CLIENT_CONNECTED();
         });
     });
+
+    if(process.argv[2] === 'TEST') {
+        let child = child_process.spawn('mocha', []);
+        child.stdout.on('data', function (data) {
+            console.log(data.toString());
+        });
+
+        child.on('exit', function (code) {
+            console.log('Test process ' + code.toString());
+            quitHandle();
+        });
+    }
 }
 
 
