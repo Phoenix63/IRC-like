@@ -5,14 +5,14 @@
 #include <QString>
 #include <QStringList>
 #include <QFile>
-#include <QDebug>
+#include <QTextStream>
 
 #include "config_in.h"
 
 ConfigList::ConfigList()
 {
 	configs.append(Config());
-	currentIndex = 0;
+    aCurrentIndex = 0;
 }
 
 /*
@@ -21,22 +21,22 @@ ConfigList::ConfigList()
 
 void ConfigList::change(int newIndex)
 {
-	currentIndex = newIndex;
+    aCurrentIndex = newIndex;
 }
 
 void ConfigList::addConfig()
 {
 	Config conf;
 	configs.append(conf);
-	currentIndex = configs.size() - 1;
+    aCurrentIndex = configs.size() - 1;
 }
 
 void ConfigList::delConfig()
 {
 
 	if (configs.size() > 1) {
-		configs.removeAt(currentIndex);
-		currentIndex = 0;
+        configs.removeAt(aCurrentIndex);
+        aCurrentIndex = 0;
 	}
 }
 
@@ -64,13 +64,13 @@ void ConfigList::saveConfig()
 		configFile.resize(0);
         QTextStream out(&configFile);
 		for (auto i:configs) {
-            out << "<" + i.getName() + "> \n";
-            out << "User = \"" + i.getPseudo() + "\"\n";
-            out << "Pass = \"" + i.getPassword() + "\"\n";
-            out << "Host = \"" + i.getHost() + "\"\n";
-            out << "Port = \"" + i.getPort() + "\"\n";
+            out << "<" + i.name() + "> \n";
+            out << "User = \"" + i.pseudo() + "\"\n";
+            out << "Pass = \"" + i.password() + "\"\n";
+            out << "Host = \"" + i.host() + "\"\n";
+            out << "Port = \"" + i.port() + "\"\n";
             out << "Channels = ";
-			for (auto j:i.getChannels()) {
+            for (auto j:i.channels()) {
                 		out << "\"" + j +"\" ";
 			}
             out << "\n";
@@ -82,82 +82,82 @@ void ConfigList::saveConfig()
  * Setters for current config
  */
 
-void ConfigList::setName(QString newName)
+void ConfigList::name(QString newName)
 {
-	configs[currentIndex].setName(newName);
+    configs[aCurrentIndex].name(newName);
 }
 
-void ConfigList::setPseudo(QString newPseudo)
+void ConfigList::pseudo(QString newPseudo)
 {
-	configs[currentIndex].setPseudo(newPseudo);
+    configs[aCurrentIndex].pseudo(newPseudo);
 }
 
-void ConfigList::setPassword(QString newPassword)
+void ConfigList::password(QString newPassword)
 {
-	configs[currentIndex].setPassword(newPassword);
+    configs[aCurrentIndex].password(newPassword);
 }
 
-void ConfigList::setHost(QString newHost)
+void ConfigList::host(QString newHost)
 {
-	configs[currentIndex].setHost(newHost);
+    configs[aCurrentIndex].host(newHost);
 }
 
-void ConfigList::setPort(QString newPort)
+void ConfigList::port(QString newPort)
 {
-	configs[currentIndex].setPort(newPort);
+    configs[aCurrentIndex].port(newPort);
 }
 
-void ConfigList::setChannels(QStringList newChannels)
+void ConfigList::channels(QStringList newChannels)
 {
-	configs[currentIndex].setChannels(newChannels);
+    configs[aCurrentIndex].channels(newChannels);
 }
 
 /*
  * Getters for current config
  */
 
-QStringList ConfigList::getNames()
+QStringList ConfigList::names()
 {
 	QStringList nameList;
 	for (auto i:configs) {
-		nameList.append(i.getName());
+        nameList.append(i.name());
 	}
 	return nameList;
 }
 
-int ConfigList::getCurrentIndex()
+int ConfigList::currentIndex()
 {
-	return currentIndex;
+    return aCurrentIndex;
 }
 
-QString ConfigList::getName()
+QString ConfigList::name()
 {
-	return configs[currentIndex].getName();
+    return configs[aCurrentIndex].name();
 }
 
-QString ConfigList::getPseudo()
+QString ConfigList::pseudo()
 {
-	return configs[currentIndex].getPseudo();
+    return configs[aCurrentIndex].pseudo();
 }
 
-QString ConfigList::getPassword()
+QString ConfigList::password()
 {
-	return configs[currentIndex].getPassword();
+    return configs[aCurrentIndex].password();
 }
 
-QString ConfigList::getHost()
+QString ConfigList::host()
 {
-	return configs[currentIndex].getHost();
+    return configs[aCurrentIndex].host();
 }
 
-QString ConfigList::getPort()
+QString ConfigList::port()
 {
-	return configs[currentIndex].getPort();
+    return configs[aCurrentIndex].port();
 }
 
-QStringList ConfigList::getChannels()
+QStringList ConfigList::channels()
 {
-	return configs[currentIndex].getChannels();
+    return configs[aCurrentIndex].channels();
 }
 
 /*
@@ -172,22 +172,22 @@ void ConfigList::readConfig(QFile *configFile)
 		QStringList lineSplit = line.split(IRC::CFG::NAME_SEP, QString::SkipEmptyParts);
 		if (lineSplit[0].contains(IRC::CFG::NAME)) {
 				addConfig();
-				setName(lineSplit[0].section(IRC::CFG::NAME, 1, 1));
+                name(lineSplit[0].section(IRC::CFG::NAME, 1, 1));
 		} else if (lineSplit.size() > 1) {
 			if (lineSplit[0].contains(IRC::CFG::PSEUDO)) {
-				setPseudo(lineSplit[1].section("\"", 1, 1));
+                pseudo(lineSplit[1].section("\"", 1, 1));
 			} else if (lineSplit[0].contains(IRC::CFG::PASSWORD)) {
-				setPassword(lineSplit[1].section("\"", 1, 1));
+                password(lineSplit[1].section("\"", 1, 1));
 			} else if (lineSplit[0].contains(IRC::CFG::HOST)) {
-				setHost(lineSplit[1].section("\"", 1, 1));
+                host(lineSplit[1].section("\"", 1, 1));
 			} else if (lineSplit[0].contains(IRC::CFG::PORT)) {
-				setPort(lineSplit[1].section("\"", 1, 1));
+                port(lineSplit[1].section("\"", 1, 1));
 			} else if (lineSplit[0].contains(IRC::CFG::CHANNELS)) {
 				QStringList chanList;
 				for (auto i:lineSplit[1].split(IRC::CFG::LIST_SEP, QString::SkipEmptyParts)) {
 					chanList.append(i.section("\"", 1, 1));
 				}
-				setChannels(chanList);
+                channels(chanList);
 			}
 				
 		}

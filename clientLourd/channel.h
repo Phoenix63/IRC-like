@@ -34,7 +34,7 @@ public:
 
     // Text adding function
     void appendChannel(QString string, QString channel, QString send);
-    void appendCurrent(QString string);
+    void appendCurrent(QString string, QString pseudo);
 
     // Current channel change function
     void change(QString newChannel);

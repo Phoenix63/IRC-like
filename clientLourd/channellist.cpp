@@ -1,12 +1,11 @@
 #include "channellist.h"
 #include "ui_channellist.h"
 
-#include <QDebug>
 /*
  * Constructor and destructor
  */
 
-Channellist::Channellist(QWidget *parent, QTcpSocket *socket) :
+Channellist::Channellist(QWidget *parent, QTcpSocket *socket):
     QDialog(parent),
     ui(new Ui::Channellist),
     socket(socket)

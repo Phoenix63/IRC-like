@@ -14,17 +14,28 @@
 
 Login::Login(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::Login)
+    ui(new Ui::Login),
+    main(nullptr),
+    socket(nullptr)
+
 {
     ui->setupUi(this);
 	config.loadConfig();
     loadPresetList();
+    initUIStyle();
+}
+
+void Login::initUIStyle()
+{
+    theme = ThemeList::instance();
+    this->setStyleSheet("background-color : " + theme->background() + " color : " + theme->text());
 }
 
 Login::~Login()
 {
     delete ui;
     delete main;
+    delete socket;
 }
 
 void Login::closeEvent (QCloseEvent *event)
@@ -47,7 +58,7 @@ bool Login::doConnect()
         return false;
     }
     else{
-        main = new MainFrame(NULL,socket);
+        main = new MainFrame(NULL, socket);
         connect(main, &MainFrame::showLogin, this, &Login::show);
         main->show();
         main->setWindowTitle("Guest@" + host + ":" + QString::number(port));
@@ -128,20 +139,20 @@ void Login::on_channelList_itemClicked(QListWidgetItem *item)
     ui->channelList->editItem(item);
 }
 
-QList<QString>* Login::convertChannelList(QListWidget *channels)
+QStringList Login::convertChannelList(QListWidget *channels)
 {
-    QList<QString> *channelsToJoin = new QList<QString>;
+    QStringList channelsToJoin;
     for(int i = 0; i < channels->count(); i++)
-        channelsToJoin->append(channels->item(i)->text());
+        channelsToJoin.append(channels->item(i)->text());
     return channelsToJoin;
 }
 
 void Login::joinChannels(QListWidget *channels)
 {
-    QList<QString>* channelsToJoin = convertChannelList(channels);
-    for(int i = 0; i < channelsToJoin->size() ; i++)
+    QStringList channelsToJoin = convertChannelList(channels);
+    for(int i = 0; i < channelsToJoin.size() ; i++)
     {
-        QString chan = channelsToJoin->at(i);
+        QString chan = channelsToJoin.at(i);
         chan.append('\n');
         chan.prepend("JOIN ");
         socket->write(chan.toUtf8());
@@ -154,13 +165,13 @@ void Login::joinChannels(QListWidget *channels)
 
 void Login::loadPreset()
 {
-		ui->presetList->setCurrentIndex(config.getCurrentIndex());
-		ui->lineEdit_username->setText(config.getPseudo());
-		ui->lineEdit_pass->setText(config.getPassword());
-		ui->lineEdit_host->setText(config.getHost());
-		ui->lineEdit_port->setText(config.getPort());
+        ui->presetList->setCurrentIndex(config.currentIndex());
+        ui->lineEdit_username->setText(config.pseudo());
+        ui->lineEdit_pass->setText(config.password());
+        ui->lineEdit_host->setText(config.host());
+        ui->lineEdit_port->setText(config.port());
 		ui->channelList->clear();
-		for (auto i:config.getChannels()) {
+        for (auto i:config.channels()) {
 			ui->channelList->addItem(i);
 		}
 }
@@ -169,7 +180,7 @@ void Login::loadPresetList()
 {
 
 	ui->presetList->clear();
-   for (auto i:config.getNames()) {
+   for (auto i:config.names()) {
 		   ui->presetList->addItem(i);
    }
    loadPreset();
@@ -191,16 +202,16 @@ void Login::on_presetList_activated(const QString &arg1)
 
 void Login::on_pushButton_savePreset_clicked()
 {
-        config.setName(ui->lineEdit_username->text() + "-" + ui->lineEdit_host->text() + ":" + ui->lineEdit_port->text());
-		config.setPseudo(ui->lineEdit_username->text());
-		config.setPassword(ui->lineEdit_pass->text());
-		config.setHost(ui->lineEdit_host->text());
-		config.setPort(ui->lineEdit_port->text());
+        config.name(ui->lineEdit_username->text() + "-" + ui->lineEdit_host->text() + ":" + ui->lineEdit_port->text());
+        config.pseudo(ui->lineEdit_username->text());
+        config.password(ui->lineEdit_pass->text());
+        config.host(ui->lineEdit_host->text());
+        config.port(ui->lineEdit_port->text());
 		QStringList chanList;
         for (int i = 0; i < ui->channelList->count(); i++) {
                 chanList.append(ui->channelList->item(i)->text());
 	}
-	config.setChannels(chanList);
+    config.channels(chanList);
         config.saveConfig();
 	loadPresetList();
 }

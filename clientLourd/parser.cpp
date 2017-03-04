@@ -253,14 +253,14 @@ bool Parser::out_isMsgMsg(QString string)
     emit changeChannelSignal();
     sendToServer(socket, string);
     int j = string.indexOf(QRegularExpression(":.+$"));
-    channel->appendCurrent(string.right(string.length() - j - 1) + '\n');
+    channel->appendCurrent(string.right(string.length() - j - 1) + '\n', nickname);
     emit chatModifiedSignal();
     return true;
 }
 
 bool Parser::out_isPrivMsg(QString string)
 {
-    channel->appendCurrent(string);
+    channel->appendCurrent(string, nickname);
     string.prepend("PRIVMSG " + channel->channelName() + " :");
     sendToServer(socket, string);
     emit chatModifiedSignal();

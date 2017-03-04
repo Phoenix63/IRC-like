@@ -62,10 +62,10 @@ void Channel::leave(QString chan){
  * Channel: Text adding functions
  */
 
-void Channel::appendCurrent(QString string)
+void Channel::appendCurrent(QString string, QString pseudo)
 {
     QString time = '['+QTime::currentTime().toString() + ']';
-    channels[currentChannel].appendChat(time + "    ", "You", " : " + string);
+    channels[currentChannel].appendChat(time + "    ", pseudo , " : " + string);
 }
 
 void Channel::appendChannel(QString string, QString channel, QString send)

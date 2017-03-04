@@ -1,11 +1,11 @@
 #include "config.h"
 
 Config::Config():
-	name("Default"),
-	pseudo("User"),
-	password("Password"),
-	host("Host"),
-	port("Port")
+    aName("Default"),
+    aPseudo("User"),
+    aPassword("Password"),
+    aHost("Host"),
+    aPort("Port")
 {
 }	
 
@@ -13,67 +13,67 @@ Config::Config():
  * Setters
  */
 
-void Config::setName(QString newName)
+void Config::name(QString newName)
 {
-	name = newName;
+    aName = newName;
 }
 
-void Config::setPseudo(QString newPseudo)
+void Config::pseudo(QString newPseudo)
 {
-	pseudo = newPseudo;
+    aPseudo = newPseudo;
 }
 
-void Config::setPassword(QString newPassword)
+void Config::password(QString newPassword)
 {
-	password = newPassword;
+    aPassword = newPassword;
 }
 
-void Config::setHost(QString newHost)
+void Config::host(QString newHost)
 {
-	host = newHost;
+    aHost = newHost;
 }
 
-void Config::setPort(QString newPort)
+void Config::port(QString newPort)
 {
-	port = newPort;
+    aPort = newPort;
 }
 
-void Config::setChannels(QStringList newChannels)
+void Config::channels(QStringList newChannels)
 {
-	channels = newChannels;
+    aChannels = newChannels;
 }
 
 /*
  * Getters
  */
 
-QString Config::getName()
+QString Config::name()
 {
-	return name;
+    return aName;
 }
 
-QString Config::getPseudo()
+QString Config::pseudo()
 {
-	return pseudo;
+    return aPseudo;
 }
 
-QString Config::getPassword()
+QString Config::password()
 {
-	return password;
+    return aPassword;
 }
 
-QString Config::getHost()
+QString Config::host()
 {
-	return host;
+    return aHost;
 }
 
-QString Config::getPort()
+QString Config::port()
 {
-	return port;
+    return aPort;
 }
 
-QStringList Config::getChannels()
+QStringList Config::channels()
 {
-	return channels;
+    return aChannels;
 }
 

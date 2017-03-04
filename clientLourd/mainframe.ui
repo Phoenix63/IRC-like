@@ -84,7 +84,7 @@
            <x>0</x>
            <y>0</y>
            <width>565</width>
-           <height>473</height>
+           <height>457</height>
           </rect>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -259,6 +259,7 @@
      </property>
      <addaction name="actionLight"/>
      <addaction name="actionDark"/>
+     <addaction name="separator"/>
     </widget>
     <addaction name="menuTheme"/>
    </widget>

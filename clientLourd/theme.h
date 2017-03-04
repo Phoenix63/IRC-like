@@ -2,29 +2,34 @@
 #define THEME_H
 
 #include <QRegularExpression>
+#include <QString>
 
-namespace IRC {
+class Theme {
+public:
+    Theme();
 
-namespace COLOR {
+    //Setters
+    void name(QString newName);
+    void background(QString newBackground);
+    void hour(QString newHour);
+    void nick(QString newNick);
+    void self(QString newSelf);
+    void text(QString newText);
 
-namespace DARK{
-const QString BACKGROUND ("rgb(54, 57, 62);");
-const QString HOUR ("rgb(255, 255, 255);");
-const QString NAME ("rgb(255, 255, 255);");
-const QString SELFNAME ("rgb(255, 255, 255);");
-const QString TEXT ("rgb(255, 255, 255);");
-}
-
-namespace LIGHT{
-const QString BACKGROUND ("rgb(255, 255, 255);");
-const QString HOUR ("rgb(115, 115, 115);");
-const QString NAME ("rgb(0, 150, 250);");
-const QString SELFNAME ("rgb(220, 15, 15);");
-const QString TEXT ("rgb(32, 32, 32);");
-}
-
-}
-
-}
+    //Getters
+    QString name();
+    QString background();
+    QString hour();
+    QString nick();
+    QString self();
+    QString text();
+private:
+    QString aName;
+    QString aBackground;
+    QString aHour;
+    QString aNick;
+    QString aSelf;
+    QString aText;
+};
 
 #endif // THEME_H

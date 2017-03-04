@@ -1,26 +1,28 @@
 #ifndef MAINFRAME_H
 #define MAINFRAME_H
 
+#include <QMainWindow>
+#include <QCompleter>
+
 #include "channel.h"
 #include "parser.h"
 #include "msglist.h"
-#include "theme.h"
-
-#include <QMainWindow>
-#include <QString>
-#include <QList>
-#include <QCompleter>
+#include "themelist.h"
 
 class QPixmap;
 class QTcpSocket;
 class QScrollBar;
 class QPoint;
-template <typename,typename> class QHash;
 class QStringList;
 class QFileDialog;
 class QStandardPaths;
 class Channellist;
 class Message;
+
+template <typename>
+class Qlist;
+template <typename, typename>
+class QHash;
 
 namespace Ui {
 class MainFrame;
@@ -32,9 +34,8 @@ class MainFrame : public QMainWindow
 
 public:
 	//Constructor and Destructor
-	explicit MainFrame(QWidget *parent = 0,QTcpSocket *socket=NULL);
+	explicit MainFrame(QWidget *parent = 0, QTcpSocket *socket=NULL);
 	~MainFrame();
-
 
 	void printMsgLine(Message chatMsgLine);
 	void PrintMsg(QList<Message> chatMsgList);
@@ -67,7 +68,6 @@ signals:
 private slots:
 	void on_channelList_itemSelectionChanged();
 	void on_messageSender_returnPressed();
-	void on_pushButton_send_customContextMenuRequested(const QPoint &pos);
 	void on_pushButton_upload_clicked();
 
 	//QMenus
@@ -78,8 +78,15 @@ private slots:
 	void on_actionLight_toggled(bool arg1);
 
 private:
-	ParserEmoji parserEmoji;
+	// Initialisation functions
+	void initUiConf();
+	void initUIStyle();
+	void initConnect();
+	void initCompletion();
 
+private:
+	ParserEmoji parserEmoji;
+    ThemeList *theme;
 	Ui::MainFrame *ui;
 
 	//Tcp pointer from login
