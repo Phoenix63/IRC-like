@@ -253,14 +253,14 @@ bool Parser::out_isMsgMsg(QString string)
     emit changeChannelSignal();
     sendToServer(socket, string);
     int j = string.indexOf(QRegularExpression(":.+$"));
-    channel->appendCurrent(string.right(string.length() - j - 1) + '\n');
+    channel->appendCurrent(string.right(string.length() - j - 1) + '\n', nickname);
     emit chatModifiedSignal();
     return true;
 }
 
 bool Parser::out_isPrivMsg(QString string)
 {
-    channel->appendCurrent(string);
+    channel->appendCurrent(string, nickname);
     string.prepend("PRIVMSG " + channel->channelName() + " :");
     sendToServer(socket, string);
     emit chatModifiedSignal();
@@ -390,11 +390,9 @@ bool Parser::in_isKickMesg(QString string)
 {
     if(!string.contains(IRC::RPL::KICK))
         return false;
-    qDebug() << string;
     QString admin = string.split(' ').at(0);
     QString chan = string.split(' ').at(2);
     QString kicked = string.split(' ').at(3);
-    qDebug() << admin << chan << kicked;
     if(!kicked.compare(nickname)){
         channel->appendChannel("You were kicked from " + chan + " by " + admin, "\"Debug\"", "");
         channel->leave(chan);

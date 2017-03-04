@@ -14,17 +14,28 @@
 
 Login::Login(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::Login)
+    ui(new Ui::Login),
+    main(nullptr),
+    socket(nullptr)
+
 {
     ui->setupUi(this);
 	config.loadConfig();
     loadPresetList();
+    initUIStyle();
+}
+
+void Login::initUIStyle()
+{
+    theme = ThemeList::instance();
+    this->setStyleSheet("background-color : " + theme->background() + " color : " + theme->text());
 }
 
 Login::~Login()
 {
     delete ui;
     delete main;
+    delete socket;
 }
 
 void Login::closeEvent (QCloseEvent *event)
@@ -47,7 +58,7 @@ bool Login::doConnect()
         return false;
     }
     else{
-        main = new MainFrame(NULL,socket);
+        main = new MainFrame(NULL, socket);
         connect(main, &MainFrame::showLogin, this, &Login::show);
         main->show();
         main->setWindowTitle("Guest@" + host + ":" + QString::number(port));
@@ -128,20 +139,20 @@ void Login::on_channelList_itemClicked(QListWidgetItem *item)
     ui->channelList->editItem(item);
 }
 
-QList<QString>* Login::convertChannelList(QListWidget *channels)
+QStringList Login::convertChannelList(QListWidget *channels)
 {
-    QList<QString> *channelsToJoin = new QList<QString>;
+    QStringList channelsToJoin;
     for(int i = 0; i < channels->count(); i++)
-        channelsToJoin->append(channels->item(i)->text());
+        channelsToJoin.append(channels->item(i)->text());
     return channelsToJoin;
 }
 
 void Login::joinChannels(QListWidget *channels)
 {
-    QList<QString>* channelsToJoin = convertChannelList(channels);
-    for(int i = 0; i < channelsToJoin->size() ; i++)
+    QStringList channelsToJoin = convertChannelList(channels);
+    for(int i = 0; i < channelsToJoin.size() ; i++)
     {
-        QString chan = channelsToJoin->at(i);
+        QString chan = channelsToJoin.at(i);
         chan.append('\n');
         chan.prepend("JOIN ");
         socket->write(chan.toUtf8());

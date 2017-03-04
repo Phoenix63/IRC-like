@@ -5,7 +5,7 @@
 #include <QString>
 #include <QStringList>
 #include <QFile>
-#include <QDebug>
+#include <QTextStream>
 
 #include "config_in.h"
 

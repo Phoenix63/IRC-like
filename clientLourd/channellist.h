@@ -22,12 +22,13 @@ public:
     //Ui update functions
     void addRow(QString channel);
     void clear();
-private slots:
 
+private slots:
     void on_tableWidget_doubleClicked(const QModelIndex &index);
+    
 private:
-    QTcpSocket *socket;
     Ui::Channellist *ui;
+    QTcpSocket *socket;
     QTableWidget *table;
 };
 

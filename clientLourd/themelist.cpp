@@ -1,18 +1,33 @@
 #include "themelist.h"
 #include "theme_in.h"
 
+ThemeList *ThemeList::aInstance = nullptr;
+
+ThemeList * ThemeList::instance()
+{
+    if (!aInstance)
+        aInstance = new ThemeList();
+    return aInstance;
+}
+
+void ThemeList::deleteInstance()
+{
+    delete aInstance;
+    aInstance = nullptr;
+}
+
 ThemeList::ThemeList()
 {
     themes.append(Theme());
     themes.append(Theme());
-    aCurrentIndex = 1;
-    name("Dark");
-    background("rgb(54, 57, 62);");
-    hour("rgb(255, 255, 255);");
-    nick("rgb(255, 255, 255);");
-    self("rgb(255, 255, 255);");
-    text("rgb(255, 255, 255);");
-    change(0);
+    change(1);
+    name(IRC::COLOR::DARK::NAME);
+    background(IRC::COLOR::DARK::BACKGROUND);
+    hour(IRC::COLOR::DARK::HOUR);
+    nick(IRC::COLOR::DARK::NICK);
+    self(IRC::COLOR::DARK::SELF);
+    text(IRC::COLOR::DARK::TEXT);
+    loadTheme();
 }
 
 
@@ -29,7 +44,7 @@ void ThemeList::addTheme()
 
 void ThemeList::loadTheme()
 {
-    while(themes.size() > 1){
+    while(themes.size() > 2){
         themes.removeLast();
     }
     QFile themeFile("theme.cfg");
@@ -42,6 +57,10 @@ void ThemeList::loadTheme()
 /*
  * Setters for current Theme
  */
+void ThemeList::currentIndex(int newIndex)
+{
+    aCurrentIndex = newIndex;
+}
 
 void ThemeList::name(QString newName)
 {
@@ -60,7 +79,7 @@ void ThemeList::hour(QString newHour)
 
 void ThemeList::nick(QString newNick)
 {
-    themes[aCurrentIndex].name(newNick);
+    themes[aCurrentIndex].nick(newNick);
 }
 
 void ThemeList::self(QString newSelf)
@@ -72,6 +91,9 @@ void ThemeList::text(QString newText)
 {
     themes[aCurrentIndex].text(newText);
 }
+/*
+ * Getters for current theme
+ */
 
 QStringList ThemeList::names()
 {
@@ -133,6 +155,8 @@ void ThemeList::readTheme(QFile *themefile)
                 self(lineSplit[1].section("\"", 1, 1));
             } else if (lineSplit[0].contains(IRC::CFG::TEXT)) {
                 text(lineSplit[1].section("\"", 1, 1));
+            } else if (lineSplit[0].contains(IRC::CFG::CURRENT)){
+                currentIndex(lineSplit[1].section("\"", 1, 1).toInt());
             }
         }
     }

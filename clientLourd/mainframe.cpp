@@ -6,7 +6,6 @@
 #include <QScrollBar>
 #include <QStandardPaths>
 #include <QFileDialog>
-#include <QDebug>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QHBoxLayout>
@@ -21,54 +20,43 @@
 MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
     QMainWindow(parent),
     ui(new Ui::MainFrame),
-    socket(socket)
+    socket(socket),
+    StringCompleter(nullptr)
 {
-    ui->setupUi(this);
-    //this->setStyleSheet("background-color : " + IRC::COLOR::LIGHT::BACKGROUND + " color : " + IRC::COLOR::LIGHT::TEXT);
-    ui->actionDark->setCheckable(true);
-    ui->actionLight->setCheckable(true);
-    connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
+    initUiConf();
+    initConnect();
+    initUIStyle();
+    initCompletion();
     parser.initialize(&channel, socket, "Guest");
     msgList.setMsgSender(ui->messageSender);
-    ui->messageSender->installEventFilter(this);
-    connect(ui->scrollArea->verticalScrollBar(), SIGNAL(rangeChanged(int, int)), this, SLOT(moveScrollBarToBottom(int, int)));
-    ui->pushButton_emojis->setIcon(QPixmap("img/smile.png"));
-    ui->pushButton_upload->setIcon(QPixmap("img/upload.png"));
-    ui->pushButton_emojis->setContextMenuPolicy(Qt::CustomContextMenu);
-    ui->messageSender->setFocus();
-    QStringList CompletionList;
-    CompletionList << "/clean " << "/debug " << "/nick " << "/user " << "/join " << "/names "
-                   << "/pass " << "/part " << "/list " << "/topic " << "/kick " << "/who "
-                   << "/whois " << "/mode " << "/msg " << "/quit";
-    StringCompleter = new QCompleter(CompletionList,this);
-    StringCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    StringCompleter->popup()->setTabKeyNavigation(true);
-    ui->messageSender->setCompleter(StringCompleter);
-    connect(&parser, &Parser::channelModifiedSignal, this, &MainFrame::channelModified);
-    connect(&parser, &Parser::userModifiedSignal, this, &MainFrame::userModified);
-    connect(&parser, &Parser::chatModifiedSignal, this, &MainFrame::chatModified);
-    connect(&parser, &Parser::cleanSignal, this, &MainFrame::needClean);
-    connect(&parser, &Parser::changeChannelSignal, this, &MainFrame::changeChannel);
-    connect(&parser, &Parser::topicModifiedSignal, this, &MainFrame::topicModified);
     channelModified();
 }
 
 MainFrame::~MainFrame()
 {
     delete ui;
-    delete socket;
+    delete StringCompleter;
 }
+
+/*
+ * Initialisation functons
+ */
+
 
 void MainFrame::printMsgLine(Message chatMsgLine)
 {
     QHBoxLayout *pseudoBox = new QHBoxLayout;
     pseudoBox->setSpacing(2);
     QLabel *LHeure = new QLabel(chatMsgLine.date());
-    //LHeure->setStyleSheet("color : " + IRC::COLOR::LIGHT::HOUR);
+    LHeure->setStyleSheet("color : " + theme->hour());
     pseudoBox->addWidget(LHeure);
     parserEmoji.parse(chatMsgLine.message());
     QLabel *lPseudo= new QLabel(chatMsgLine.sender());
-    //lPseudo->setStyleSheet("color : " + IRC::COLOR::LIGHT::NAME);
+    if (!chatMsgLine.sender().compare(parser.getNickname())) {
+        lPseudo->setStyleSheet("color : " + theme->self());
+    } else {
+        lPseudo->setStyleSheet("color : " + theme->nick());
+    }
     pseudoBox->addWidget(lPseudo);
     ui->nickBox->addLayout(pseudoBox);
     ui->chatBox->addLayout(parserEmoji.parse(chatMsgLine.message()));
@@ -168,6 +156,7 @@ void MainFrame::closeEvent (QCloseEvent *event)
     emit showLogin();
     if(parser.out("/quit"))
     {
+        clean();
         event->accept();
     }
 }
@@ -188,7 +177,7 @@ void MainFrame::on_pushButton_emojis_clicked()
     }
     contextMenu.addActions(listAction);
     contextMenu.setMinimumSize(50, 80);
-    QAction * action = contextMenu.exec(ui->MessageBox->mapToGlobal(QCursor::pos()));
+    QAction * action = contextMenu.exec(QCursor::pos());
     QString emotes;
     if (action)
         emotes = action->text();
@@ -247,14 +236,6 @@ void MainFrame::on_messageSender_returnPressed()
     ui->messageSender->setPlaceholderText("Message "+channel.channelName());
 }
 
-void MainFrame::on_pushButton_send_customContextMenuRequested(const QPoint &pos)
-{
-	QMenu contextMenu(tr("Context menu"), this);
-    QAction action1("Remove Data Point", this);
-    contextMenu.addAction(&action1);
-    contextMenu.exec(ui->pushButton_emojis->mapToGlobal(pos));
-}
-
 void MainFrame::on_pushButton_upload_clicked()
 {
     QStringList homePath = QStandardPaths::standardLocations(QStandardPaths::HomeLocation);
@@ -276,16 +257,65 @@ void MainFrame::on_actionDisconnect_triggered()
     }
 }
 
-
-
 void MainFrame::on_actionDark_toggled(bool arg1)
 {
     ui->actionLight->setChecked(!arg1);
-    //this->setStyleSheet("background-color : " + IRC::COLOR::DARK::BACKGROUND + "color : " + IRC::COLOR::DARK::TEXT);
+    theme->change(1);
+    this->setStyleSheet("background-color : " + theme->background() + "color : " + theme->text());
+    chatModified();
 }
 
 void MainFrame::on_actionLight_toggled(bool arg1)
 {
     ui->actionDark->setChecked(!arg1);
-    //this->setStyleSheet("background-color : " + IRC::COLOR::LIGHT::BACKGROUND + "color : " + IRC::COLOR::LIGHT::TEXT);
+    theme->change(0);
+    this->setStyleSheet("background-color : " + theme->background() + "color : " + theme->text());
+    chatModified();
+}
+
+void MainFrame::initUiConf()
+{
+    ui->setupUi(this);
+    ui->actionDark->setCheckable(true);
+    ui->actionLight->setCheckable(true);
+    ui->messageSender->installEventFilter(this);
+    ui->pushButton_emojis->setIcon(QPixmap("img/smile.png"));
+    ui->pushButton_upload->setIcon(QPixmap("img/upload.png"));
+    ui->pushButton_emojis->setContextMenuPolicy(Qt::CustomContextMenu);
+    ui->messageSender->setFocus();
+}
+
+void MainFrame::initUIStyle()
+{
+    theme = ThemeList::instance();
+    this->setStyleSheet("background-color : " + theme->background() + " color : " + theme->text());
+}
+
+void MainFrame::initConnect()
+{
+    // Socket related connects
+    connect(socket, &QTcpSocket::readyRead,this, &MainFrame::readyRead);
+
+    // Ui related connects
+    connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, this, &MainFrame::moveScrollBarToBottom);
+
+    // Parser related connects
+    connect(&parser, &Parser::channelModifiedSignal, this, &MainFrame::channelModified);
+    connect(&parser, &Parser::userModifiedSignal, this, &MainFrame::userModified);
+    connect(&parser, &Parser::chatModifiedSignal, this, &MainFrame::chatModified);
+    connect(&parser, &Parser::cleanSignal, this, &MainFrame::needClean);
+    connect(&parser, &Parser::changeChannelSignal, this, &MainFrame::changeChannel);
+    connect(&parser, &Parser::topicModifiedSignal, this, &MainFrame::topicModified);
+}
+
+void MainFrame::initCompletion()
+{
+    QStringList CompletionList;
+    CompletionList << "/clean " << "/debug " << "/nick " << "/user " << "/join " << "/names "
+                   << "/pass " << "/part " << "/list " << "/topic " << "/kick " << "/who "
+                   << "/whois " << "/mode " << "/msg " << "/quit";
+    StringCompleter = new QCompleter(CompletionList,this);
+    StringCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    StringCompleter->popup()->setTabKeyNavigation(true);
+    ui->messageSender->setCompleter(StringCompleter);
 }

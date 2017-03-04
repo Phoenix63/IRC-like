@@ -2,6 +2,9 @@
 #define LOGIN_H
 
 
+#include "configlist.h"
+#include "themelist.h"
+
 #include <QDialog>
 #include <QObject>
 #include <QTcpSocket>
@@ -10,7 +13,7 @@ class MainFrame;
 class QListWidgetItem;
 class QFile;
 class QListWidget;
-#include "configlist.h"
+class QStringList;
 
 namespace Ui {
 class Login;
@@ -19,10 +22,11 @@ class Login;
 class Login : public QDialog
 {
     Q_OBJECT
-    
+
 public:
     //Constructor and destructor
     explicit Login(QWidget *parent = 0);
+    void initUIStyle();
     ~Login();
     void closeEvent (QCloseEvent *event);
     //Connection to server
@@ -31,7 +35,7 @@ public:
 
     //Connection to channels
     void joinChannels(QListWidget *list);
-    QList<QString>* convertChannelList(QListWidget *list);
+    QStringList convertChannelList(QListWidget *list);
 
     //Preset functions
     void loadPreset();
@@ -55,11 +59,11 @@ private slots:
     void on_presetList_activated(const QString &arg1);
 
 private:
+    Ui::Login *ui;
     MainFrame *main;
     QTcpSocket *socket;
-    Ui::Login *ui;
-    QList<QString>* channelsToJoin;
     ConfigList config;
+    ThemeList *theme;
 };
 
 #endif // LOGIN_H

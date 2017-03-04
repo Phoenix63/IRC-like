@@ -7,13 +7,14 @@
 
 class ThemeList {
 public:
-    ThemeList();
-
+    static ThemeList * instance();
+    static void deleteInstance();
     void change(int newIndex);
     void addTheme();
     void loadTheme();
 
     //Setters for current theme
+    void currentIndex(int newIndex);
     void name(QString newName);
     void background(QString newBackground);
     void hour(QString newHour);
@@ -32,6 +33,9 @@ public:
     QString text();
 
 private:
+    ThemeList();
+    static ThemeList *aInstance;
+
     int aCurrentIndex;
     QVector<Theme> themes;
 

@@ -1,12 +1,13 @@
 #include "theme.h"
+#include "theme_in.h"
 
 Theme::Theme():
-    aName("Light"),
-    aBackground("rgb(255, 255, 255);"),
-    aHour("rgb(115, 115, 115);"),
-    aNick("rgb(0, 150, 250);"),
-    aSelf("rgb(180, 15, 15);"),
-    aText("rgb(32, 32, 32);")
+    aName(IRC::COLOR::LIGHT::NAME),
+    aBackground(IRC::COLOR::LIGHT::BACKGROUND),
+    aHour(IRC::COLOR::LIGHT::HOUR),
+    aNick(IRC::COLOR::LIGHT::NICK),
+    aSelf(IRC::COLOR::LIGHT::SELF),
+    aText(IRC::COLOR::LIGHT::TEXT)
 {
 }
 

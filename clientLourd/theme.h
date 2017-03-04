@@ -31,4 +31,5 @@ private:
     QString aSelf;
     QString aText;
 };
+
 #endif // THEME_H
