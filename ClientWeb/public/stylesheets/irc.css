@@ -1,82 +1,166 @@
-#channels {
-    position: absolute;
-    top:0;
-    bottom: 0;
-    left: 0;
-    width : 200px;
-    background-color: #8b564b;
-    text-align: center;
+body, html {
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    overflow: hidden;
 }
-
+h1,h2,h3 {
+    margin: 0px;
+    padding: 0px;
+    text-align: center;
+    display: block;
+    padding: 15px 15px 0px 15px;
+    color: rgba(255,255,255,0.9);
+}
+h3::after {
+    content: '';
+    display: block;
+    margin: 10px 30px 0px 30px;
+    height: 2px;
+    background-color: rgba(255,255,255,0.3);
+}
 #messages {
-	overflow-y: auto;
-	overflow-x: hidden;
-	word-wrap:break-word;
-    position: absolute;
-    top:100px;
-    left: 200px;
-    right:200px;
-    bottom:50px;
-    background-color: #25608b;
+    background-color: #ffffff;
+    display: block;
+    margin-left: 270px;
+    padding: 40px 20px 0px 250px;
+	height:80%;
+    #min-height: 100%;
+    overflow: scroll;
 }
-
+#messages h3 {
+    position: fixed;
+    top: 0px;
+    left: 270px;
+    color: rgba(255,255,255,0.8);
+    background-color: #2f343f;
+    padding-bottom: 10px;
+    margin: 0px;
+    width: 100%;
+}
+#messages h3::after {
+    display: none;
+}
+.view.ng-scope, .view.ng-scope div:nth-child(1) {
+    height: 100%;
+}
+#channels {
+    background-color: #6ba4e7;
+    display: block;
+	text-align:center;
+    width: 270px;
+    height: 100%;
+    -webkit-box-shadow: 0 0 7px 0 rgba(0,0,0,0.5);
+    box-shadow: 0 0 7px 0 rgba(0,0,0,0.5);
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    z-index: 900;
+}
 #users {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    right: 0;
-    width: 200px;
-    background-color: #8b564b;
-    text-align: center;
-}
-#topic {
-    position: absolute;
-    top:0;
-    right:200px;
-    left:200px;
-    height:100px;
-    background-color: chocolate;
-}
-#divSendMessage {
-     position: absolute;
-     bottom: 0;
-     right: 300px;
-     left: 200px;
-     height:50px;
-     background-color: #3e348b;
- }
-#divSubmit {
-    position: absolute;
-    bottom: 0;
-    right: 200px;
-    width: 100px;
-    height:50px;
-    background-color: #718b3e;
+    background-color: #2e343e;
+    display: block;
+    width: 230px;
+    height: 100%;
+	text-align:center;
+    -webkit-box-shadow: 0 0 7px 0 rgba(0,0,0,0.5);
+    box-shadow: 0 0 7px 0 rgba(0,0,0,0.5);
+    position: fixed;
+    left: 270px;
+    top: 0px;
+    z-index:500;
 }
 
+#messages::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+}
+#messages::-webkit-scrollbar-button {
+    width: 0px;
+    height: 0px;
+}
+#messages::-webkit-scrollbar-thumb {
+    background: #6ba4e7;
+    border: 0px none #ffffff;
+    border-radius: 50px;
+}
+#messages::-webkit-scrollbar-thumb:hover {
+    background: #6ba4e7;
+}
+#messages::-webkit-scrollbar-thumb:active {
+    background: #6ba4e7;
+}
+#messages::-webkit-scrollbar-track {
+    background: transparent;
+    border: 0px none #ffffff;
+    border-radius: 27px;
+}
+#messages::-webkit-scrollbar-track:hover {
+    background: transparent;
+}
+#messages::-webkit-scrollbar-track:active {
+    background: transparent;
+}
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
 
 #inputSendMessage {
     position: absolute;
-    bottom:0;
-    height:44px;
-    width:100%;
+	display:inline-block;
+    #top: 100%;
+    #margin-top:-150px;
+	bottom:0;
+    height: 8%;
+    left: 600px;
+    resize: none;
+    background: #FAFAFA;
+    padding: 15px;
+    width: 700px;
+    border: 1px solid #2196F3;
+    border-radius: 10px;
+    outline: none;
 }
 
-#submitSendMessage {
-    position: absolute;
-    bottom:0;
-    height:50px;
-    width:100%;
+#divSubmit {
+	display:inline-block;
 }
 
 .notif-messageOn {
+	font-weight:bold;
 	color:red;
 }
 
 .notif-messageOff {
+	font-weight:normal;
 	color:black;
 }
 
+.admin-color {
+	color:#A52A2A;
+	font-weight:bold;
+}
+.user-color {
+	font-weight:bold;
+}
+.default-color {
+	color:black;
+}
+
+
+.messInBox {
+	border-bottom:0.1px grey groove;
+	margin-left:10px;
+	margin-right:10px;
+}
+.date {
+	display:inline-block;
+	font-size:80%;
+}
+.users {
+	display:inline-block;
+	font-size:120%;
+}
 .contextM {
 	background:white;
 	border:1px black groove;
@@ -84,8 +168,22 @@
 	margin:5px;
 	padding:5px;
 	text-align:center;
+	border-radius:5px;
 }
 
+.contextM > li > a {
+	color:black;
+}
+
+.buttonChUs {
+	border:none;
+	padding:6px 0 6px 0;
+	border-radius:2px;
+	margin-top:5px;
+	box-shadow:1px 1px 3px #aaa;
+	background:#fff;
+	font:bold 13px Arial;
+}
 
 
 

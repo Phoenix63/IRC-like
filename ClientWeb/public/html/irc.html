@@ -3,34 +3,33 @@
     <div id="channels">
         <h3>Channels list</h3>
         <div ng-repeat="channel in channels">
-            <button ng-click="joinChannel(channel)" ng-class="channel.notif == 1 ? 'notif-messageOn' : 'notif-messageOff'" ng-context-menu="menuOptions(channel)">{{channel.chan}}</button>
+            <button class="buttonChUs" ng-click="joinChannel(channel)" ng-class="channel.notif === 1 ? 'notif-messageOn' : 'notif-messageOff'" ng-context-menu="menuOptions(channel)">{{channel.chan}}</button>
         </div>
     </div>
-
-    <div id="messages" scroll-bottom="currentChannel.messages">
-        <h3>Channel messages</h3>
-        <div ng-repeat="message in currentChannel.messages track by $index">
-            <p>{{message}}</p>
-        </div>
-    </div>
-
-    <div id="users">
+	<div id="users">
         <h3>Users list</h3>
         <div ng-repeat="user in currentChannel.listU">
-            <button ng-context-menu="menuOptionsUser(user)">{{user}}</button>
+            <button class="buttonChUs" ng-context-menu="menuOptionsUser(user)" ng-class="user.right === 1 ? 'admin-color' : 'default-color'">{{user.nick}}</button>
         </div>
     </div>
-    <div id="topic">
-        <h1>{{topicChannel}}</h1>
+	
+    <div id="messages" scroll-bottom="currentChannel.messages">
+        <h3>{{topicChannel}}</h3>
+        <div ng-repeat="message in currentChannel.messages track by $index">
+            <div class="messInBox">
+				<p class="users" ng-class="message[0].right === 1 ? 'admin-color' : (message[0].right === 2 ? 'user-color' : 'default-color')">{{message[0].nick}}</p>
+				<p class="date">{{message[1]}}</p>
+				<p>{{message[2]}}</p>
+			</div>
+        </div>
     </div>
 
-        <form ng-submit="sendMessage()">
-            <div id="divSendMessage">
-                <input id="inputSendMessage" ng-model="newMessage" placeholder="message"></input>
-            </div>
-            <div id="divSubmit">
-                <button type="submit" id="submitSendMessage">Envoyer</button>
-            </div>
-        </form>
-
+	<form ng-submit="sendMessage()">
+		<div id="divSendMessage">
+			<input id="inputSendMessage" ng-model="newMessage" placeholder="message"></input>
+		</div>
+		<div id="divSubmit">
+			<button type="submit" id="submitSendMessage">Envoyer</button>
+		</div>
+	</form>
 </div>
