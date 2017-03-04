@@ -24,7 +24,7 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
     socket(socket)
 {
     ui->setupUi(this);
-    this->setStyleSheet("background-color : " + IRC::COLOR::LIGHT::BACKGROUND + " color : " + IRC::COLOR::LIGHT::TEXT);
+    //this->setStyleSheet("background-color : " + IRC::COLOR::LIGHT::BACKGROUND + " color : " + IRC::COLOR::LIGHT::TEXT);
     ui->actionDark->setCheckable(true);
     ui->actionLight->setCheckable(true);
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
@@ -64,11 +64,11 @@ void MainFrame::printMsgLine(Message chatMsgLine)
     QHBoxLayout *pseudoBox = new QHBoxLayout;
     pseudoBox->setSpacing(2);
     QLabel *LHeure = new QLabel(chatMsgLine.date());
-    LHeure->setStyleSheet("color : " + IRC::COLOR::LIGHT::HOUR);
+    //LHeure->setStyleSheet("color : " + IRC::COLOR::LIGHT::HOUR);
     pseudoBox->addWidget(LHeure);
     parserEmoji.parse(chatMsgLine.message());
     QLabel *lPseudo= new QLabel(chatMsgLine.sender());
-    lPseudo->setStyleSheet("color : " + IRC::COLOR::LIGHT::NAME);
+    //lPseudo->setStyleSheet("color : " + IRC::COLOR::LIGHT::NAME);
     pseudoBox->addWidget(lPseudo);
     ui->nickBox->addLayout(pseudoBox);
     ui->chatBox->addLayout(parserEmoji.parse(chatMsgLine.message()));
@@ -281,11 +281,11 @@ void MainFrame::on_actionDisconnect_triggered()
 void MainFrame::on_actionDark_toggled(bool arg1)
 {
     ui->actionLight->setChecked(!arg1);
-    this->setStyleSheet("background-color : " + IRC::COLOR::DARK::BACKGROUND + "color : " + IRC::COLOR::DARK::TEXT);
+    //this->setStyleSheet("background-color : " + IRC::COLOR::DARK::BACKGROUND + "color : " + IRC::COLOR::DARK::TEXT);
 }
 
 void MainFrame::on_actionLight_toggled(bool arg1)
 {
     ui->actionDark->setChecked(!arg1);
-    this->setStyleSheet("background-color : " + IRC::COLOR::LIGHT::BACKGROUND + "color : " + IRC::COLOR::LIGHT::TEXT);
+    //this->setStyleSheet("background-color : " + IRC::COLOR::LIGHT::BACKGROUND + "color : " + IRC::COLOR::LIGHT::TEXT);
 }

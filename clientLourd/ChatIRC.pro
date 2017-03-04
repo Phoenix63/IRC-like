@@ -25,7 +25,9 @@ SOURCES += main.cpp\
     channellist.cpp \
     config.cpp \
     configlist.cpp \
-    message.cpp
+    message.cpp \
+    theme.cpp \
+    themelist.cpp
 
 HEADERS  += \
     login.h \
@@ -42,7 +44,9 @@ HEADERS  += \
     config.h \
     configlist.h \
     config_in.h \
-    message.h
+    message.h \
+    themelist.h \
+    theme_in.h
 
 FORMS    += \
     login.ui \

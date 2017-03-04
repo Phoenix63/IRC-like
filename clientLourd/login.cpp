@@ -154,13 +154,13 @@ void Login::joinChannels(QListWidget *channels)
 
 void Login::loadPreset()
 {
-		ui->presetList->setCurrentIndex(config.getCurrentIndex());
-		ui->lineEdit_username->setText(config.getPseudo());
-		ui->lineEdit_pass->setText(config.getPassword());
-		ui->lineEdit_host->setText(config.getHost());
-		ui->lineEdit_port->setText(config.getPort());
+        ui->presetList->setCurrentIndex(config.currentIndex());
+        ui->lineEdit_username->setText(config.pseudo());
+        ui->lineEdit_pass->setText(config.password());
+        ui->lineEdit_host->setText(config.host());
+        ui->lineEdit_port->setText(config.port());
 		ui->channelList->clear();
-		for (auto i:config.getChannels()) {
+        for (auto i:config.channels()) {
 			ui->channelList->addItem(i);
 		}
 }
@@ -169,7 +169,7 @@ void Login::loadPresetList()
 {
 
 	ui->presetList->clear();
-   for (auto i:config.getNames()) {
+   for (auto i:config.names()) {
 		   ui->presetList->addItem(i);
    }
    loadPreset();
@@ -191,16 +191,16 @@ void Login::on_presetList_activated(const QString &arg1)
 
 void Login::on_pushButton_savePreset_clicked()
 {
-        config.setName(ui->lineEdit_username->text() + "-" + ui->lineEdit_host->text() + ":" + ui->lineEdit_port->text());
-		config.setPseudo(ui->lineEdit_username->text());
-		config.setPassword(ui->lineEdit_pass->text());
-		config.setHost(ui->lineEdit_host->text());
-		config.setPort(ui->lineEdit_port->text());
+        config.name(ui->lineEdit_username->text() + "-" + ui->lineEdit_host->text() + ":" + ui->lineEdit_port->text());
+        config.pseudo(ui->lineEdit_username->text());
+        config.password(ui->lineEdit_pass->text());
+        config.host(ui->lineEdit_host->text());
+        config.port(ui->lineEdit_port->text());
 		QStringList chanList;
         for (int i = 0; i < ui->channelList->count(); i++) {
                 chanList.append(ui->channelList->item(i)->text());
 	}
-	config.setChannels(chanList);
+    config.channels(chanList);
         config.saveConfig();
 	loadPresetList();
 }
