@@ -11,6 +11,7 @@ class QSpacerItem;
 class QRegularExpression;
 template <typename,typename>
 class QHash;
+template <typename> class QList;
 class QDir;
 
 class ParserEmoji
@@ -18,8 +19,10 @@ class ParserEmoji
 
 public:
     ParserEmoji();
-    QList<QHBoxLayout *> parse(QString heure,QString pseudo,QString string);
+    QHBoxLayout * parse(QString string);
     QHash<QString, QPixmap> * getHashMap();
+    QList<QString> keys();
+    QPixmap value(QString key);
 
 private:
     QHash<QString,QPixmap> emotes;

@@ -20,21 +20,13 @@ ParserEmoji::ParserEmoji()
     }
 }
 
-QList<QHBoxLayout *> ParserEmoji::parse(QString heure, QString pseudo, QString string)
+QHBoxLayout * ParserEmoji::parse(QString string)
 {
-    QHBoxLayout *pseudoBox = new QHBoxLayout;
+    string.remove(string.length() - 1, 1);
     QHBoxLayout *message = new QHBoxLayout;
-    pseudoBox->setSpacing(2);
     message->setSpacing(2);
     auto count = string.count(QRegularExpression(":\\S+:"));
     auto index = 0;
-    QLabel *LHeure = new QLabel(heure);
-    LHeure->setStyleSheet("color : "+IRC::COLOR::LIGHT::HOUR);
-    pseudoBox->addWidget(LHeure);
-    QLabel *lPseudo= new QLabel(pseudo);
-    lPseudo->setStyleSheet("color : "+IRC::COLOR::LIGHT::NAME);
-    pseudoBox->addWidget(lPseudo);
-
     for (auto i = 0; i < count; i++ )
     {
         bool modified = false;
@@ -64,14 +56,15 @@ QList<QHBoxLayout *> ParserEmoji::parse(QString heure, QString pseudo, QString s
     textLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
     message->addWidget(textLabel);
     message->addStretch(0);
-    pseudoBox->setAlignment(Qt::AlignLeft);
-    QList<QHBoxLayout *> ret;
-    ret << pseudoBox << message;
-    return ret;
+    return message;
 }
 
-QHash<QString, QPixmap> * ParserEmoji::getHashMap()
+QList<QString> ParserEmoji::keys()
 {
-    return &emotes;
+    return emotes.keys();
 }
 
+QPixmap ParserEmoji::value(QString key)
+{
+    return emotes[key];
+}

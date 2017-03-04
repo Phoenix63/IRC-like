@@ -21,6 +21,11 @@ void Parser::setNickname(QString nick)
     nickname = nick;
 }
 
+QString Parser::getNickname()
+{
+	return nickname;
+}
+
 /*
  * Parse::Out: Parse client request
  */
@@ -76,8 +81,10 @@ void Parser::in(QString string)
     if (!in_isListMesg(string))
     if (!in_isSetTopic(string))
     if (!in_isKickMesg(string))
-    if (!in_isPing(string))
+    if (!in_isPing(string)) {
         channel->appendChannel(string+'\n', "\"Debug\"", "");
+        emit chatModifiedSignal();
+    }
 }
 
 /*
@@ -88,8 +95,7 @@ bool Parser::out_isCleanMsg(QString string)
 {
     if(!string.startsWith("/clean"))
         return false;
-    channel->clearContent();
-    channel->refreshText();
+        emit cleanSignal();
     return true;
 }
 
@@ -137,6 +143,7 @@ bool Parser::out_isNamesMsg(QString string)
     string.prepend("NAMES");
     sendToServer(socket, string);
     channel->change("\"Debug\"");
+    emit changeChannelSignal();
     return true;
 }
 
@@ -163,6 +170,7 @@ bool Parser::out_isPartMsg(QString string)
         channel->leave(string.split(' ').at(1).left(string.split(' ').at(1).length()-1));
     }
     sendToServer(socket, string);
+    emit channelModifiedSignal();
     return true;
 }
 
@@ -209,6 +217,7 @@ bool Parser::out_isWhoMsg(QString string)
         string = QString("WHO " + (channel->channelName()) + '\n');
     sendToServer(socket, string);
     channel->change("\"Debug\"");
+    emit changeChannelSignal();
     return true;
 }
 
@@ -220,6 +229,7 @@ bool Parser::out_isWhoisMsg(QString string)
     string.prepend("WHOIS");
     sendToServer(socket, string);
     channel->change("\"Debug\"");
+    emit changeChannelSignal();
     return true;
 }
 
@@ -240,9 +250,11 @@ bool Parser::out_isMsgMsg(QString string)
     string.replace(QString("/msg"), QString("PRIVMSG"));
     channel->joinWhisper(string.split(' ').at(1));
     channel->change(string.split(' ').at(1));
+    emit changeChannelSignal();
     sendToServer(socket, string);
     int j = string.indexOf(QRegularExpression(":.+$"));
     channel->appendCurrent(string.right(string.length() - j - 1) + '\n');
+    emit chatModifiedSignal();
     return true;
 }
 
@@ -251,6 +263,7 @@ bool Parser::out_isPrivMsg(QString string)
     channel->appendCurrent(string);
     string.prepend("PRIVMSG " + channel->channelName() + " :");
     sendToServer(socket, string);
+    emit chatModifiedSignal();
         return true;
 }
 
@@ -282,6 +295,7 @@ bool Parser::in_isChanList(QString string)
     if (!string.contains(QRegularExpression("^.+\\s(331|332)\\sJOIN")))
         return false;
     channel->join(string.split(' ').at(3), string.right(string.length() - i - 1));
+    emit channelModifiedSignal();
     return true;
 }
 
@@ -293,6 +307,8 @@ bool Parser::in_isNameList(QString string)
     for (auto i = 5; i < string.split(QRegularExpression("\\s:?")).length(); i++) {
          channel->addUser(string.split(QRegularExpression("\\s:?"))[i],string.split(QRegularExpression("\\s:?"))[4]);
     }
+    emit chatModifiedSignal();
+    emit userModifiedSignal();
     return true;
 }
 
@@ -309,6 +325,8 @@ bool Parser::in_isJoinNote(QString string)
         channel->addUser(nick, chan);
         channel->appendChannel(nick + " joined " + chan + '\n', chan, "");
     }
+    emit userModifiedSignal();
+    emit chatModifiedSignal();
     return true;
 }
 
@@ -325,6 +343,8 @@ bool Parser::in_isPartNote(QString string)
         channel->delUser(user, chan);
         channel->delUser("@"+ user, chan);
     }
+    emit userModifiedSignal();
+    emit chatModifiedSignal();
     return true;
 }
 
@@ -334,6 +354,7 @@ bool Parser::in_isPrivMesg(QString string)
         return false;
     int j = string.indexOf(QRegularExpression(":.+$"));
     channel->appendChannel(string.right(string.length() - j - 1)+'\n', string.split(' ').at(2),string.split(' ').at(0));
+    emit chatModifiedSignal();
     return true;
 }
 
@@ -345,6 +366,8 @@ bool Parser::in_isWhisMesg(QString string)
     QString sender = string.split(' ').at(0);
     channel->joinWhisper(sender);
     channel->appendChannel(string.right(string.length()- j) + '\n', string.split(' ').at(0), sender);
+    emit channelModifiedSignal();
+    emit chatModifiedSignal();
     return true;
 }
 
@@ -358,6 +381,8 @@ bool Parser::in_isNickEdit(QString string)
         setNickname(newNick);
     channel->changeNick(nick, newNick);
     channel->appendChannel(nick + " changed his nickname to " + newNick + '\n', "\"Debug\"", "");
+    emit userModifiedSignal();
+    emit chatModifiedSignal();
     return true;
 }
 
@@ -375,6 +400,8 @@ bool Parser::in_isKickMesg(QString string)
     else{
         channel->appendChannel(kicked + " was kicked from " + chan + " by " + admin, "\"Debug\"", "");
     }
+    emit chatModifiedSignal();
+    emit channelModifiedSignal();
     return true;
 }
 
@@ -406,5 +433,6 @@ bool Parser::in_isSetTopic(QString string)
         return false;
     int j = string.indexOf(QRegularExpression(":.+$"));
     channel->setTopic(string.right(string.length() - j - 1),string.split(' ').at(3));
+    emit topicModifiedSignal();
     return true;
 }

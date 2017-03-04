@@ -24,7 +24,8 @@ SOURCES += main.cpp\
     parseremoji.cpp \
     channellist.cpp \
     config.cpp \
-    configlist.cpp
+    configlist.cpp \
+    message.cpp
 
 HEADERS  += \
     login.h \
@@ -40,7 +41,8 @@ HEADERS  += \
     theme.h \
     config.h \
     configlist.h \
-    config_in.h
+    config_in.h \
+    message.h
 
 FORMS    += \
     login.ui \

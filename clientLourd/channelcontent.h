@@ -4,12 +4,11 @@
 #include <QList>
 #include <QString>
 
+#include "message.h"
+
 class ChannelContent
 {
 public:
-    //Constructor
-    ChannelContent();
-
     //User functions
     void addUser(QString newUser);
     void removeUser(QString userName);
@@ -17,9 +16,9 @@ public:
     QList<QString> getUsers();
 
     //Chat functions
-    void appendChat(QString heure,QString pseudo,QString message);
+    void appendChat(QString heure, QString pseudo, QString message);
     void clearContent();
-    QList<QList<QString>> getChatContent();
+    QList<Message> getChatContent();
 
     //Topic functions
     void setTopic(QString newTopic);
@@ -28,7 +27,7 @@ public:
 private:
     QString topic;
     QList<QString> users;
-    QList<QList<QString>> chatContent;
+    QList<Message> chatContent;
 };
 
 #endif // CHANNELCONTENT_H

@@ -1,14 +1,6 @@
 #include "channelcontent.h"
 
 /*
- * Constructor
- */
-ChannelContent::ChannelContent()
-{
-
-}
-
-/*
  * User functions
  */
 
@@ -40,11 +32,9 @@ QList<QString> ChannelContent::getUsers()
  * Chat functions
  */
 
-void ChannelContent::appendChat(QString heure, QString pseudo,QString message)
+void ChannelContent::appendChat(QString heure, QString pseudo, QString message)
 {
-    QList<QString> list;
-    list << heure << pseudo << message.left(message.length()-1);
-    chatContent.append(list);
+    chatContent.append(Message(pseudo, heure, message));
 }
 
 void ChannelContent::clearContent()
@@ -54,7 +44,7 @@ void ChannelContent::clearContent()
     }
 }
 
-QList<QList<QString>> ChannelContent::getChatContent()
+QList<Message> ChannelContent::getChatContent()
 {
     return chatContent;
 }
@@ -72,5 +62,3 @@ QString ChannelContent::getTopic()
 {
     return topic;
 }
-
-

@@ -9,6 +9,11 @@
 #include <QDebug>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QHBoxLayout>
+#include <QLabel>
+
+#include "message.h"
+#include "theme.h"
 /*
  * Mainframe: constructor and destructor
  */
@@ -23,7 +28,6 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
     ui->actionDark->setCheckable(true);
     ui->actionLight->setCheckable(true);
     connect(socket, SIGNAL(readyRead()),this, SLOT(readyRead()));
-    channel.setUi(ui->channelList, ui->chatBox,ui->userList,ui->topicDisplay,ui->messageSender, ui->nickBox);
     parser.initialize(&channel, socket, "Guest");
     msgList.setMsgSender(ui->messageSender);
     ui->messageSender->installEventFilter(this);
@@ -38,14 +42,113 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
                    << "/whois " << "/mode " << "/msg " << "/quit";
     StringCompleter = new QCompleter(CompletionList,this);
     StringCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    StringCompleter->popup()->setTabKeyNavigation(true);
     ui->messageSender->setCompleter(StringCompleter);
-    emoji = channel.getHashMap();
+    connect(&parser, &Parser::channelModifiedSignal, this, &MainFrame::channelModified);
+    connect(&parser, &Parser::userModifiedSignal, this, &MainFrame::userModified);
+    connect(&parser, &Parser::chatModifiedSignal, this, &MainFrame::chatModified);
+    connect(&parser, &Parser::cleanSignal, this, &MainFrame::needClean);
+    connect(&parser, &Parser::changeChannelSignal, this, &MainFrame::changeChannel);
+    connect(&parser, &Parser::topicModifiedSignal, this, &MainFrame::topicModified);
+    channelModified();
 }
 
 MainFrame::~MainFrame()
 {
     delete ui;
     delete socket;
+}
+
+void MainFrame::printMsgLine(Message chatMsgLine)
+{
+    QHBoxLayout *pseudoBox = new QHBoxLayout;
+    pseudoBox->setSpacing(2);
+    QLabel *LHeure = new QLabel(chatMsgLine.date());
+    LHeure->setStyleSheet("color : " + IRC::COLOR::LIGHT::HOUR);
+    pseudoBox->addWidget(LHeure);
+    parserEmoji.parse(chatMsgLine.message());
+    QLabel *lPseudo= new QLabel(chatMsgLine.sender());
+    lPseudo->setStyleSheet("color : " + IRC::COLOR::LIGHT::NAME);
+    pseudoBox->addWidget(lPseudo);
+    ui->nickBox->addLayout(pseudoBox);
+    ui->chatBox->addLayout(parserEmoji.parse(chatMsgLine.message()));
+}
+
+void MainFrame::PrintMsg(QList<Message> chatMsgList)
+{
+    clean();
+    for (auto i:chatMsgList) {
+        printMsgLine(i);
+    }
+}
+
+
+void MainFrame::clearLayout(QLayout *layout)
+{
+    QLayoutItem *item;
+    while((item = layout->takeAt(0))) {
+        if (item->layout()) {
+            clearLayout(item->layout());
+            delete item->layout();
+        }
+        if (item->widget()) {
+            delete item->widget();
+        }
+        delete item;
+    }
+}
+
+void MainFrame::clean()
+{
+    QLayoutItem *item;
+    while ((item = ui->chatBox->takeAt(0))) {
+        clearLayout(item->layout());
+    }
+    while ((item = ui->nickBox->takeAt(0))) {
+        clearLayout(item->layout());
+    }
+}
+
+/*
+ *  Parser related slots
+ */
+
+void MainFrame::channelModified()
+{
+    ui->channelList->clear();
+    for (auto i:channel.channelNames()) {
+        ui->channelList->addItem(i);
+    }
+}
+
+void MainFrame::userModified()
+{
+    ui->userList->clear();
+    for (auto i:channel.getUsers()) {
+        ui->userList->addItem(i);
+    }
+}
+
+void MainFrame::chatModified()
+{
+    PrintMsg(channel.getChatContent());
+}
+
+void MainFrame::needClean()
+{
+    clean();
+}
+
+void MainFrame::changeChannel()
+{
+    chatModified();
+    userModified();
+    topicModified();
+}
+
+void MainFrame::topicModified()
+{
+    ui->topicDisplay->setText(channel.getTopic());
 }
 
 /*
@@ -76,12 +179,12 @@ void MainFrame::on_pushButton_emojis_clicked()
 {
     QMenu contextMenu(tr("Context menu"), this);
     QList<QAction* > listAction;
-    QStringList emojis = emoji->keys();
+    QStringList emojis(parserEmoji.keys());
     emojis.sort(Qt::CaseInsensitive);
     for (auto i : emojis)
     {
         listAction.append(new QAction(i, this));
-        listAction.last()->setIcon(QPixmap(emoji->value(i)));
+        listAction.last()->setIcon(QPixmap(parserEmoji.value(i)));
     }
     contextMenu.addActions(listAction);
     contextMenu.setMinimumSize(50, 80);
@@ -103,6 +206,7 @@ void MainFrame::on_channelList_itemSelectionChanged()
 {
     channel.change(ui->channelList->currentItem()->text());
     ui->messageSender->setFocus();
+    changeChannel();
 }
 
 
