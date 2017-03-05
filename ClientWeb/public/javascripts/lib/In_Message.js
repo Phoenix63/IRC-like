@@ -11,9 +11,7 @@
 		var msSplit = msg.split(' ');
 		var listUsers = [];
 		var chann = msSplit[4];
-		//alert("1");
 		for(var i = 5; i<msSplit.length; i++) {
-			//alert("2");
 			msSplit[i] = msSplit[i].replace(":","");
 			if(msSplit[i].includes("@")) {
 				msSplit[i] = msSplit[i].replace("@","");

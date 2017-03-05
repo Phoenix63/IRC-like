@@ -1,8 +1,10 @@
 myApp.controller("ircCtrl",function($scope) {
 	var user = new User();
-	var defaultMess = new User(); // if there is no user in the sender message
+	var defaultMess = new User("Server response"); // if there is no user in the sender message
+	defaultMess.setRight(2);
 	var boolNames = undefined;
 	var countNick = 0;
+	var admin = [];
     socket.emit("message","USER Gil6300 0 * : " + user.realName);
 	$scope.currentChannel = new Channel("@accueil");
     $scope.channels = [];
@@ -83,6 +85,26 @@ myApp.controller("ircCtrl",function($scope) {
 				$scope.channels.push($scope.currentChannel);
 				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(),  "You talk with " + userL.nick]);
 			}
+		}],
+		["WhoIs", function ($itemScope) {
+			socket.emit("message","WHOIS " + userL.nick);
+		}],
+		["Mute", function ($itemScope) {
+			if(userL.nick !== user.nick) {
+				$scope.currentChannel.mute.push(userL.nick);
+			}
+			else {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(),  "You cannot mute yourself"]);
+			}
+		}],
+		["DeMute", function ($itemScope) {
+			$scope.currentChannel.removeMuteList(userL.nick);
+		}],
+		["Kick", function ($itemScope) {
+			//only if admin
+		}],
+		["Bann", function ($itemScope) {
+			//only if admin
 		}]
 	];};
 	
@@ -322,23 +344,28 @@ myApp.controller("ircCtrl",function($scope) {
 			var regxMsg = regxMess[3];
 			if($scope.currentChannel.chan !== regxChannel) {
 				for(var i = 0; i<$scope.channels.length; i++) {
-					if($scope.channels[i].chan === regxChannel) {
-						regxUser = isAdmin(regxUser, $scope.channels[i]);
-						$scope.channels[i].messages.push([regxUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
-						if($scope.channels[i].notif !== 2) {
-							$scope.channels[i].setNotifOn();
+					if(regxChannel === $scope.channels[i].chan) {
+						if($scope.channels[i].mute.includes(regxUser.nick) === false) {
+							regxUser = isAdmin(regxUser, $scope.channels[i]);
+							$scope.channels[i].messages.push([regxUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
+							if($scope.channels[i].notif !== 2) {
+								$scope.channels[i].setNotifOn();
+							}
 						}
 					}
 				}
 			}
 			else {
-				regxUser = isAdmin(regxUser, $scope.currentChannel);
-				$scope.currentChannel.messages.push([regxUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
+				if($scope.currentChannel.mute.includes(regxUser.nick) === false) {
+					regxUser = isAdmin(regxUser, $scope.currentChannel);
+					$scope.currentChannel.messages.push([regxUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
+				}
 			}
 			
         }
 		else if(msg.match(/^[:][a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]PRIVMSG[ ][\w\W]+[ ][:][ ][a-zA-Z0-9 \W]+$/)) {
 			var bool = false;
+			var boolMute = false;
 			var regxMess = (/^[:]([a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+)[ ]PRIVMSG[ ]([\w\W]+)[ ][:][ ]([a-zA-Z0-9 \W]+)$/).exec(msg);
 			var regxUser = new User(regxMess[1]);
 			var regxUser2 = regxMess[2];
@@ -360,28 +387,36 @@ myApp.controller("ircCtrl",function($scope) {
 					bool = true;
 					var count = i;
 				}
-			}
-			if(bool === false) {
-				whispToAdd.messages.push([userToAdd, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "talks to you"]);
-				whispToAdd.setTopic(userToAdd.nick);
-				whispToAdd.messages.push([userToAdd, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
-				whispToAdd.listU.push(user);
-				whispToAdd.listU.push(userToAdd);
-				whispToAdd.setNotifOn();
-				$scope.channels.push(whispToAdd);
-				
-			} 
-			else {
-				if($scope.currentChannel.chan === regxUser.nick) {
-					$scope.currentChannel.messages.push([regxUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
+				if($scope.channels[i].mute.includes(userToAdd.nick)) {
+					boolMute = true;
 				}
+			}
+			if(boolMute !== true) {
+				if(bool === false) {
+					whispToAdd.messages.push([userToAdd, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "talks to you"]);
+					whispToAdd.setTopic(userToAdd.nick);
+					whispToAdd.messages.push([userToAdd, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
+					whispToAdd.listU.push(user);
+					whispToAdd.listU.push(userToAdd);
+					whispToAdd.setNotifOn();
+					$scope.channels.push(whispToAdd);
+				} 
 				else {
-					$scope.channels[count].messages.push([regxUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
-					if($scope.channels[count].notif !== 2) {
-						$scope.channels[count].setNotifOn();
+					if($scope.currentChannel.chan === regxUser.nick) {
+						$scope.currentChannel.messages.push([regxUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
+					}
+					else {
+						$scope.channels[count].messages.push([regxUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
+						if($scope.channels[count].notif !== 2) {
+							$scope.channels[count].setNotifOn();
+						}
 					}
 				}
 			}
+			else {
+				socket.emit("message","PRIVMSG " + userToAdd.nick + " : You have been mute by this user");
+			}
+			
 		}
         else if(msg.match(/^:[a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]NICK[ ][a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+$/)) {
             var msgToPush = in_isNickname(msg);
@@ -453,13 +488,19 @@ myApp.controller("ircCtrl",function($scope) {
 			}
            
         }
-        else if(msg.match(/^:[a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]JOIN[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?%£*\-*\/+]+$/)) {
+        else if(msg.match(/^:[\w\S]+[ ]JOIN[ ][#][\w\S]+$/)) {
+			var rspJoin = (/^:([\w\S]+)[ ]JOIN[ ]([#][\w\S]+)$/).exec(msg);
 			var bool = false;
 			boolNames = false;
-            var chann = in_isChannel(msg);
-			var chanToAdd = new Channel(chann[1]);
-			var newUser = new User(chann[0]);
+			var chanToAdd = new Channel(rspJoin[2]);
+			var newUser = new User(rspJoin[1]);
 			// update
+			if(newUser.nick.includes("@")) {
+				var newNick = newUser.nick;
+				newNick = newNick.replace("@","");
+				newUser.setNick(newNick);
+				admin.push(newUser.nick);
+			}
 			if($scope.currentChannel.chan !== "@accueil") {
 				for(var i = 0; i<$scope.channels.length; i++) {
 					if($scope.channels[i].chan === $scope.currentChannel.chan) {
@@ -469,7 +510,7 @@ myApp.controller("ircCtrl",function($scope) {
 			}
 			
 			for(var i = 0; i<$scope.channels.length; i++) {
-				if($scope.channels[i].chan === chann[1]) {
+				if($scope.channels[i].chan === chanToAdd.chan) {
 					bool = true;
 					var count = i;
 				}
@@ -477,7 +518,7 @@ myApp.controller("ircCtrl",function($scope) {
 			
 			if(bool === false) {
 				$scope.currentChannel = chanToAdd;
-				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You have joined the channel " + chann[1]]);
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You have joined the channel " + chanToAdd.chan]);
 				boolNames = false;
 				socket.emit("message","NAMES " + $scope.currentChannel.chan);
 				//$scope.currentChannel.listU.push(newUser);
@@ -485,9 +526,9 @@ myApp.controller("ircCtrl",function($scope) {
 			}
 			else {
 				
-				if(user.nick !== chann[0]) {
-					if($scope.currentChannel.chan !== chann[1]) {
-						$scope.channels[count].messages.push([newUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "has joined the channel " + chann[1]]);
+				if(user.nick !== newUser.nick) {
+					if($scope.currentChannel.chan !== chanToAdd.chan) {
+						$scope.channels[count].messages.push([newUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "has joined the channel " + chanToAdd.chan]);
 						if($scope.channels[count].notif !== 2){
 							$scope.channels[count].setNotifOn();
 						}
@@ -496,14 +537,13 @@ myApp.controller("ircCtrl",function($scope) {
 						//$scope.channels[count].listU.push(newUser);
 					}
 					else {
-						$scope.currentChannel.messages.push([newUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), " has joined the channel " + chann[1]]);
+						$scope.currentChannel.messages.push([newUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), " has joined the channel " + chanToAdd.chan]);
 						boolNames = false;
 						socket.emit("message","NAMES " + $scope.currentChannel.chan);
 						//$scope.currentChannel.listU.push(newUser);
 					}
 				}
 			}
-			
         }
 		else if(msg.match(/^:[a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]PART[ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?%£*\-*\/+]+[ ][:][\w\W ]+$/)) {
 			var chann = in_isChannel(msg);
@@ -551,37 +591,67 @@ myApp.controller("ircCtrl",function($scope) {
 			}
 			
 		}
-		else if(msg.match(/^:[a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]QUIT[ ][:][Gone]$/)) {
+		else if(msg.match(/^:[a-zA-Z0-9_\-é"'ëäïöüâêîôûç`è]+[ ]QUIT[ ][:][\S\w]+$/)) {
 			//quit
 			alert("dans quit");
 		}
 		else if(msg.includes("PING")===true) {
 			socket.emit("message", "PONG");
 		}
-		else if(msg.match(/^:[0-9.a-z:]+[ ][3][5][3][ ][a-zA-Z]+[ ][\w | \W][ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?%£*\-*\/+]+[ ][:][@a-zA-Z0-9 ]+$/)) {
+		else if(msg.match(/^:[0-9.a-z:]+[ ][3][5][2][ ][\w\S]+[ ][#][\w\S]+[ ][\w\S]+[ ][\w\W]+[ ][\w\S]+[ ][\w\S]+[ ][\w\S]+[ ][\w\S]+[ ][\w\S]+$/)) {
+			var rspWho = (/^:[0-9.a-z:]+[ ][3][5][2][ ][\w\S]+[ ]([#][\w\S]+)[ ][\w\S]+[ ][\w\W]+[ ][\w\S]+[ ]([\w\S]+)[ ]([\w\S]+)[ ][\w\S]+[ ]([\w\S]+)$/).exec(msg);
+			var rspChan = rspWho[1];
+			var rspUserId = rspWho[2];
+			var rspUserRight = rspWho[3];
+			var rspUserRealN = rspWho[4];
+			if(rspUserRight.includes("H@")) {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), ""]);
+			}
+			else if(rspUserRight.includes("H+")) {
+				$scope.currenChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), ""]);
+			}
+			else if(rspUserRight.includes("H")) {
+				$scope.currenChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), ""]);
+			}
+			else if(rspUserRight.includes("G@")) {
+				$scope.currenChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), ""]);
+			}
+			else if(rspUserRight.includes("G+")) {
+				$scope.currenChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), ""]);
+			}
+			else if(rspUserRight.includes("G")) {
+				$scope.currenChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), ""]);
+			}
+			
+		}
+		else if(msg.match(/^:[0-9.a-z:]+[ ][3][5][3][ ][a-zA-Z]+[ ][\S\w][ ][#][\w#&é"'\(è_çà@€^$:!ù;¨?%£*\-*\/+]+[ ][:][@a-zA-Z0-9 ]+$/)) {
 			var isNames = in_isNames(msg);
 			var usersN = isNames[1];
 			var mNames = "";
 			var channelName = isNames[0];
-			if(boolNames === false) {
-				/*for(var i = 0;i<usersN.length; i++) {
-					if($scope.currentChannel.isInChannel(usersN[i].nick) === false) {*/
+			if(boolNames === false) { // refresh users list in every channels
 				for(var i = 0; i<$scope.channels.length; i++) {
 					if($scope.channels[i].chan === channelName) {
 						$scope.channels[i].listU = usersN;
 					}
 				}
-				$scope.currentChannel.listU = usersN;
-					/*}
-				}*/
+				if($scope.currentChannel.chan === channelName) {
+					$scope.currentChannel.listU = usersN;
+				}
+				for(var i = 0; i<$scope.currentChannel.listU.length; i++) {
+					if(admin.includes($scope.currentChannel.listU[i])) {
+						$scope.currentChannel.listU[i].setRight(3);
+					}
+				}
+				$scope.channels = isAdmin1(admin, $scope.channels);
 			}
 			else {
 				for(var i = 0; i<usersN.length; i++) {
 					if(usersN[i].right === 1) {
-						mNames = "(Admin) " + usersN[i].nick + ", " + mNames;
+						mNames = "(Operateur) " + usersN[i].nick + ", " + mNames;
 					}
-					else {
-						mNames = usersN[i].nick + ", " + mNames;
+					else if(usersN[i].right === 2) {
+						mNames = "(Admin) " + usersN[i].nick + ", " + mNames;
 					}
 					
 				}

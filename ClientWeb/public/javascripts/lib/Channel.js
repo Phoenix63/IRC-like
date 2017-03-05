@@ -24,6 +24,13 @@
 				}
 			}
 		}
+		Channel.prototype.removeMuteList = function(user) {
+			for(var i = 0; i<this.mute.length; i++) {
+				if(this.mute[i] === user) {
+					this.mute.splice(i,1);
+				}
+			}
+		}
 		Channel.prototype.isInChannel = function(user) {
 			for(var i = 0; i<this.listU.length; i++) {
 				if(this.listU[i].nick === user) {

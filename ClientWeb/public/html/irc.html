@@ -9,7 +9,7 @@
 	<div id="users">
         <h3>Users list</h3>
         <div ng-repeat="user in currentChannel.listU">
-            <button class="buttonChUs" ng-context-menu="menuOptionsUser(user)" ng-class="user.right === 1 ? 'admin-color' : 'default-color'">{{user.nick}}</button>
+            <button class="buttonChUs" ng-context-menu="menuOptionsUser(user)" ng-class="user.right === 3 ? 'admin-color' : ( user.right === 1 ? 'operator-color' : 'default-color')">{{user.nick}}</button>
         </div>
     </div>
 	
@@ -17,7 +17,7 @@
         <h3>{{topicChannel}}</h3>
         <div ng-repeat="message in currentChannel.messages track by $index">
             <div class="messInBox">
-				<p class="users" ng-class="message[0].right === 1 ? 'admin-color' : (message[0].right === 2 ? 'user-color' : 'default-color')">{{message[0].nick}}</p>
+				<p class="users" ng-class="message[0].right === 3 ? 'admin-color' : (message[0].right === 1 ? 'operator-color' : ( message[0].right === 2 ? 'user-color' : 'default-color'))">{{message[0].nick}}</p>
 				<p class="date">{{message[1]}}</p>
 				<p>{{message[2]}}</p>
 			</div>
