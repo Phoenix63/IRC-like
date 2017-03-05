@@ -250,6 +250,31 @@ void MainFrame::on_pushButton_upload_clicked()
 {
     QStringList homePath = QStandardPaths::standardLocations(QStandardPaths::HomeLocation);
     QStringList files = QFileDialog::getOpenFileNames(this,"Select one or more files to open", homePath.first());
+    for (auto i:files){
+        QByteArray read;
+        QFile inputFile = i;
+        int size = inputFile.size();
+        QString fileName = i.split('/').last();
+        QString toSend = "FILE " + channel.channelName() + " " + QString::number(size, 10) + " " + fileName + '\n';
+        socket->write(toSend.toUtf8());
+        inputFile.open(QIODevice::ReadOnly);
+        while(1)
+        {
+            read.clear();
+            read = inputFile.read(1); // Black magic
+            if (read.size() == 0) {
+                socket->write(read);
+                socket->waitForBytesWritten();
+                read.clear();
+                break;
+            }
+            socket->write(read);
+            socket->waitForBytesWritten();
+            read.clear();
+        }
+        socket->write("\n");
+        inputFile.close();
+    }
 }
 
 void MainFrame::on_actionConnect_triggered()
