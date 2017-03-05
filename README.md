@@ -32,7 +32,7 @@ make deps
 Now with make you can run the server in different environments:
 - ```make dev``` -> run in dev env
 - ```make prod``` -> run in prod env
-- ```make test``` -> run tests
+- ```make unit``` -> run tests
 
 ####1.2.2 Windows
 

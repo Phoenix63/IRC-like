@@ -4,6 +4,16 @@ var config = require('./core/config.json');
 
 describe("command KICK:", () => {
     var client, client1, client2;
+    it('should say not registered', (done) => {
+        client = new Client(config.port, config.ip);
+        client.on('connect', () => {
+            client.send('KICK #test test');
+        });
+        client.on('err_notregistered', () => {
+            client.close();
+            done();
+        });
+    });
     it('should kick user', (done) => {
         client1 = new Client(config.port, config.ip);
         client2 = new Client(config.port, config.ip);
@@ -31,16 +41,6 @@ describe("command KICK:", () => {
         client1.on('kick', () => {
             client1.close();
             client2.close();
-            done();
-        });
-    });
-    it('should say not registered', (done) => {
-        client = new Client(config.port, config.ip);
-        client.on('connect', () => {
-            client.send('KICK #test test');
-        });
-        client.on('err_notregistered', () => {
-            client.close();
             done();
         });
     });

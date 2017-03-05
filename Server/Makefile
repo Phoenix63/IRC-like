@@ -32,7 +32,7 @@ help:
 	echo -e "            \033[0;32mprod\e[0m - Run the server in prod environment"
 	echo
 	echo -e "            ------- Testing commands -------"
-	echo -e "            \033[0;32mtest\e[0m - Run the server in test environment"
+	echo -e "            \033[0;32munit\e[0m - Run the server in test environment"
 	echo
 	echo -e "            ------- Building commands -------"
 	echo -e "            \033[0;32mbuild\e[0m - Build  image  used   for  node"
@@ -46,6 +46,7 @@ build:
 	make head
 	docker pull bitnami/node:7
 	docker build -f docker/runtest.Dockerfile -t pandirc/runtest .
+	docker build -f docker/dev.Dockerfile -t pandirc/dev .
 
 deps:
 	make head
@@ -59,7 +60,8 @@ dev:
 	make head
 	docker-compose -f ./docker/dev.yml up
 
-test:
+unit:
+	make head
 	docker-compose -f ./docker/test.yml up
 
 clean:

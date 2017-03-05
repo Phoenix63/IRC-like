@@ -176,7 +176,7 @@ class Client {
                         RPLSender.RPL_MOTD(this.socket);
                         RPLSender.RPL_ENDOFMOTD(this.socket);
 
-                        if(process.argv[2] === 'TEST') {
+                        if(process.env.parent === 'TEST') {
                             this._socket.logger._CLIENT_IS_NOW_ADMIN();
                             this._addFlag('o');
                         } else {

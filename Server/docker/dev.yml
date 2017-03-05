@@ -1,7 +1,7 @@
 
 node:
-  image: bitnami/node:7
-  command: sh -c 'npm run build && node dist/server.js DEV'
+  image: pandirc/dev
+  command: sh -c 'nodemon --exec babel-node ./src/server.js DEV'
   hostname: node
   volumes:
    - ./..:/app
