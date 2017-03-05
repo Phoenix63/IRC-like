@@ -60,6 +60,10 @@ dev:
 	make head
 	docker-compose -f ./docker/dev.yml up
 
+file:
+	make head
+	docker-compose -f ./docker/fileserver.yml up
+
 unit:
 	make head
 	docker-compose -f ./docker/test.yml up
@@ -69,3 +73,4 @@ clean:
 	docker-compose -f ./docker/test.yml rm -f
 	docker-compose -f ./docker/prod.yml rm -f
 	docker-compose -f ./docker/dev.yml rm -f
+	docker-compose -f ./docker/fileserver.yml rm -f

@@ -49,6 +49,7 @@ function quitHandle(e, callback=function(){}) {
 
 if(cluster.isMaster) {
     process.title = 'MasterServer';
+
     console.log('Cluster Master');
     dbLoader(() => {
         console.log('Database loaded!');

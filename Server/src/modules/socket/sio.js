@@ -15,9 +15,14 @@ function createServer(callback) {
         };
 
         socket.on('message', (msg) => {
-            if (!(msg.length > 510)) {
-                socket.manager.emit('message', msg);
+            if(socket.manager._mode === 'file') {
+                socket.manager.emit('data', msg);
+            } else {
+                if (!(msg.length > 510)) {
+                    socket.manager.emit('message', msg);
+                }
             }
+
         });
 
         socket.on('error', () => {

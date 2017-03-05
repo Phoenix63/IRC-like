@@ -17,7 +17,6 @@ function log(txt) {
     }
 }
 
-
 class Logger {
 
     constructor(client) {

@@ -39,6 +39,7 @@ Now with make you can run the server in different environments:
 ```
 docker pull bitnami/node:7
 docker build -f docker/runtest.Dockerfile -t pandirc/runtest .
+docker build -f docker/dev.Dockerfile -t pandirc/dev .
 docker-compose -f ./docker/deps.yml up
 ```
 

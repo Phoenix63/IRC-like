@@ -1,14 +1,17 @@
 {
   "ip": "node",
   "tcp_server": {
-    "port": "8088"
+    "port": 8088
   },
   "sio_server": {
-    "port": "8089"
+    "port": 8089
   },
   "image_server": {
-    "port": "3010"
+    "ip": "fileserver",
+    "outip": "25.36.22.132",
+    "port": 3001,
+    "tcpport": 8090
   },
-  "imageSizeLimit": 2097152,
+  "fileSizeLimit": 2097152,
   "timeout": 0
 }
