@@ -1,0 +1,33 @@
+{
+  "name": "irc-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "dev": "nodemon --exec babel-node ./src/app.js DEV",
+    "watch": "babel --watch src --out-dir dist --source-maps inline --copy-files",
+    "build": "babel src --out-dir dist --source-maps inline --copy-files",
+    "start": "npm run build && node dist/app.js PROD",
+    "stest": "npm run build && node dist/app.js TEST",
+    "test": "mocha"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "crypto": "0.0.3",
+    "express": "^4.14.1",
+    "mongodb": "^2.2.23",
+    "redis": "^2.6.5",
+    "shortid": "^2.2.6",
+    "socket.io": "^1.7.2"
+  },
+  "devDependencies": {
+    "assert": "^1.4.1",
+    "babel-cli": "^6.22.2",
+    "babel-preset-es2015": "^6.22.0",
+    "nodemon": "^1.11.0",
+    "should": "^11.2.0",
+    "sinon": "^1.17.7"
+  }
+}
