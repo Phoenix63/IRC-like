@@ -43,11 +43,6 @@ idea/*.xml
 out/
 node_modules/
 
-Server/
-
-out/
-node_modules/
-
 *.pro.user
 *.pro.user.*
 *.o
