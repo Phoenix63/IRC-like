@@ -73,7 +73,7 @@ void ConfigList::saveConfig()
             for (auto j:i.channels()) {
                 		out << "\"" + j +"\" ";
 			}
-            out << "\n";
+            out << '\n';
 		}
 	}
 }

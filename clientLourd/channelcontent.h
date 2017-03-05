@@ -24,10 +24,14 @@ public:
     void setTopic(QString newTopic);
     QString getTopic();
 
+    //Notifications functions
+    bool notif();
+    void togleNotif();
 private:
     QString topic;
     QList<QString> users;
     QList<Message> chatContent;
+    bool aNotif = false;
 };
 
 #endif // CHANNELCONTENT_H

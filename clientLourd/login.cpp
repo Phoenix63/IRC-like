@@ -28,7 +28,7 @@ Login::Login(QWidget *parent) :
 void Login::initUIStyle()
 {
     theme = ThemeList::instance();
-    this->setStyleSheet("background-color : " + theme->background() + " color : " + theme->text());
+    this->setStyleSheet("background-color : " + theme->background() + ';' + " color : " + theme->text() + ';');
 }
 
 Login::~Login()
@@ -101,7 +101,7 @@ void Login::on_pushButton_connect_clicked()
                 socket->write(password.toUtf8());
             }
             sendInfos();
-            while (!socket->waitForReadyRead(-1));
+            while (socket->waitForReadyRead(0));
             joinChannels(ui->channelList);
         }
     }

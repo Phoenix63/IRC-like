@@ -48,15 +48,17 @@ void MainFrame::printMsgLine(Message chatMsgLine)
     QHBoxLayout *pseudoBox = new QHBoxLayout;
     pseudoBox->setSpacing(2);
     QLabel *LHeure = new QLabel(chatMsgLine.date());
-    LHeure->setStyleSheet("color : " + theme->hour());
+    LHeure->setStyleSheet("color : " + theme->hour() + ';');
+    LHeure->setFixedHeight(20);
     pseudoBox->addWidget(LHeure);
     parserEmoji.parse(chatMsgLine.message());
     QLabel *lPseudo= new QLabel(chatMsgLine.sender());
     if (!chatMsgLine.sender().compare(parser.getNickname())) {
-        lPseudo->setStyleSheet("color : " + theme->self());
+        lPseudo->setStyleSheet("color : " + theme->self() + ';');
     } else {
-        lPseudo->setStyleSheet("color : " + theme->nick());
+        lPseudo->setStyleSheet("color : " + theme->nick() + ';');
     }
+    lPseudo->setFixedHeight(20);
     pseudoBox->addWidget(lPseudo);
     ui->nickBox->addLayout(pseudoBox);
     ui->chatBox->addLayout(parserEmoji.parse(chatMsgLine.message()));
@@ -106,6 +108,8 @@ void MainFrame::channelModified()
     ui->channelList->clear();
     for (auto i:channel.channelNames()) {
         ui->channelList->addItem(i);
+        if (channel.notif(i))
+            ui->channelList->findItems(i,Qt::MatchExactly)[0]->setForeground(QColor("red"));
     }
 }
 
@@ -125,6 +129,7 @@ void MainFrame::chatModified()
 void MainFrame::needClean()
 {
     clean();
+    channel.clean();
 }
 
 void MainFrame::changeChannel()
@@ -132,6 +137,7 @@ void MainFrame::changeChannel()
     chatModified();
     userModified();
     topicModified();
+    ui->messageSender->setPlaceholderText("Message " + channel.channelName());
 }
 
 void MainFrame::topicModified()
@@ -194,6 +200,10 @@ void MainFrame::moveScrollBarToBottom(int min, int max)
 void MainFrame::on_channelList_itemSelectionChanged()
 {
     channel.change(ui->channelList->currentItem()->text());
+    if (channel.notif(channel.channelName())) {
+        channel.togleNotif(ui->channelList->currentItem()->text());
+        channelModified();
+    }
     ui->messageSender->setFocus();
     changeChannel();
 }
@@ -233,7 +243,7 @@ void MainFrame::on_messageSender_returnPressed()
         this->close();
     msgList.scrollReset();
     ui->messageSender->setText("");
-    ui->messageSender->setPlaceholderText("Message "+channel.channelName());
+    ui->messageSender->setPlaceholderText("Message " + channel.channelName());
 }
 
 void MainFrame::on_pushButton_upload_clicked()
@@ -261,7 +271,7 @@ void MainFrame::on_actionDark_toggled(bool arg1)
 {
     ui->actionLight->setChecked(!arg1);
     theme->change(1);
-    this->setStyleSheet("background-color : " + theme->background() + "color : " + theme->text());
+    initUIStyle();
     chatModified();
 }
 
@@ -269,7 +279,7 @@ void MainFrame::on_actionLight_toggled(bool arg1)
 {
     ui->actionDark->setChecked(!arg1);
     theme->change(0);
-    this->setStyleSheet("background-color : " + theme->background() + "color : " + theme->text());
+    initUIStyle();
     chatModified();
 }
 
@@ -288,7 +298,18 @@ void MainFrame::initUiConf()
 void MainFrame::initUIStyle()
 {
     theme = ThemeList::instance();
-    this->setStyleSheet("background-color : " + theme->background() + " color : " + theme->text());
+    this->setStyleSheet("background-color : " + theme->background() + ';' + " color : " + theme->text() + ';');
+    ui->channelList->setStyleSheet(
+        "QListWidget::item { height : 35px; } \
+        QListWidget::item:selected {background : qlineargradient(x1:0, y1:1, x2:1, y2:1, \
+            stop:0 " + theme->gradStart() + ", stop:0.6 " + theme->gradEnd() + "); } \
+        QListWidget::item:selected { border-left: 2px solid rgb(114, 137, 218); }"
+    );
+    ui->userList->setStyleSheet(
+        "QListWidget::item { height : 35px; } \
+        QListWidget::item:hover { background-color : rgb(46, 49, 54); }\
+        QListWidget::item:selected { background-color : rgb(46, 49, 54); }"
+    );
 }
 
 void MainFrame::initConnect()
@@ -311,11 +332,22 @@ void MainFrame::initConnect()
 void MainFrame::initCompletion()
 {
     QStringList CompletionList;
-    CompletionList << "/clean " << "/debug " << "/nick " << "/user " << "/join " << "/names "
-                   << "/pass " << "/part " << "/list " << "/topic " << "/kick " << "/who "
-                   << "/whois " << "/mode " << "/msg " << "/quit";
+    CompletionList << "/clean" << "/debug" << "/nick" << "/user" << "/join" << "/names"
+                   << "/pass" << "/part" << "/list" << "/topic" << "/kick" << "/who"
+                   << "/whois" << "/mode" << "/msg" << "/quit";
     StringCompleter = new QCompleter(CompletionList,this);
     StringCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     StringCompleter->popup()->setTabKeyNavigation(true);
     ui->messageSender->setCompleter(StringCompleter);
+}
+
+void MainFrame::on_userList_doubleClicked(const QModelIndex &index)
+{
+    QString user = ui->userList->item(index.row())->text();
+    if(user[0] == '@')
+        user.remove(0,1);
+    channel.joinWhisper(user);
+    channelModified();
+    channel.change(user);
+    changeChannel();
 }

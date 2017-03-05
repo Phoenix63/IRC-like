@@ -77,6 +77,8 @@ private slots:
 	void on_actionDark_toggled(bool arg1);
 	void on_actionLight_toggled(bool arg1);
 
+    void on_userList_doubleClicked(const QModelIndex &index);
+
 private:
 	// Initialisation functions
 	void initUiConf();

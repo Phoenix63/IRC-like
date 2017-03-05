@@ -17,23 +17,27 @@ const QRegularExpression SELF("Self");
 const QRegularExpression TEXT("Text");
 }
 namespace COLOR{
-	
+
 namespace DARK{
 const QString NAME ("DARK");
-const QString BACKGROUND ("rgb(54, 57, 62);");
-const QString HOUR ("rgb(150, 150, 150);");
-const QString NICK ("rgb(0, 130, 170);");
-const QString SELF ("rgb(160, 60, 60);");
-const QString TEXT ("rgb(235, 235, 235);");
+const QString BACKGROUND ("rgb(54, 57, 62)");
+const QString HOUR ("rgb(150, 150, 150)");
+const QString NICK ("rgb(0, 130, 170)");
+const QString SELF ("rgb(160, 60, 60)");
+const QString TEXT ("rgb(235, 235, 235)");
+const QString GRADSTART ("rgb(40, 43, 48)");
+const QString GRADEND ("rgb(46, 49, 54)");
 }
 
 namespace LIGHT{
 const QString NAME ("LIGHT");
-const QString BACKGROUND ("rgb(255, 255, 255);");
-const QString HOUR ("rgb(115, 115, 115);");
-const QString NICK ("rgb(0, 130, 170);");
-const QString SELF ("rgb(160, 60, 60);");
-const QString TEXT ("rgb(32, 32, 32);");
+const QString BACKGROUND ("rgb(255, 255, 255)");
+const QString HOUR ("rgb(115, 115, 115)");
+const QString NICK ("rgb(0, 130, 170)");
+const QString SELF ("rgb(160, 60, 60)");
+const QString TEXT ("rgb(32, 32, 32)");
+const QString GRADSTART ("rgb(235, 235, 235)");
+const QString GRADEND ("rgb(225, 225, 225)");
 }
 
 }

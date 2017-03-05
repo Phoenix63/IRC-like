@@ -22,7 +22,6 @@ ParserEmoji::ParserEmoji()
 
 QHBoxLayout * ParserEmoji::parse(QString string)
 {
-    string.remove(string.length() - 1, 1);
     QHBoxLayout *message = new QHBoxLayout;
     message->setSpacing(2);
     auto count = string.count(QRegularExpression(":\\S+:"));
@@ -39,6 +38,7 @@ QHBoxLayout * ParserEmoji::parse(QString string)
                 tmp = string.left(index);
                 QLabel *textLabel = new QLabel(string.left(index));
                 textLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
+                textLabel->setFixedHeight(20);
                 message->addWidget(textLabel);
                 index += i.length();
                 string = string.right(string.length() - index);

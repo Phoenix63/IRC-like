@@ -27,6 +27,8 @@ ThemeList::ThemeList()
     nick(IRC::COLOR::DARK::NICK);
     self(IRC::COLOR::DARK::SELF);
     text(IRC::COLOR::DARK::TEXT);
+    gradStart(IRC::COLOR::DARK::GRADSTART);
+    gradEnd(IRC::COLOR::DARK::GRADEND);
     loadTheme();
 }
 
@@ -91,6 +93,16 @@ void ThemeList::text(QString newText)
 {
     themes[aCurrentIndex].text(newText);
 }
+
+void ThemeList::gradStart(QString newGrad)
+{
+    themes[aCurrentIndex].gradStart(newGrad);
+}
+
+void ThemeList::gradEnd(QString newGrad)
+{
+    themes[aCurrentIndex].gradEnd(newGrad);
+}
 /*
  * Getters for current theme
  */
@@ -134,6 +146,15 @@ QString ThemeList::text()
     return themes[aCurrentIndex].text();
 }
 
+QString ThemeList::gradStart()
+{
+    return themes[aCurrentIndex].gradStart();
+}
+
+QString ThemeList::gradEnd()
+{
+    return themes[aCurrentIndex].gradEnd();
+}
 //Private functions
 
 void ThemeList::readTheme(QFile *themefile)

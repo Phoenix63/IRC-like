@@ -14,6 +14,13 @@ Channellist::Channellist(QWidget *parent, QTcpSocket *socket):
     ui->tableWidget->setColumnCount(4);
     ui->tableWidget->verticalHeader()->setVisible(false);
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+}
+
+void Channellist::initUIStyle()
+{
+    theme = ThemeList::instance();
+    this->setStyleSheet("background-color : " + theme->background() + ';' + " color : " + theme->text() + ';');
+    ui->tableWidget->horizontalHeader()->setStyleSheet("background-color : " + theme->background() + ';' + " color : " + theme->text() + ';');
     ui->tableWidget->setColumnWidth(0, 50);
     ui->tableWidget->setColumnWidth(1, 100);
     ui->tableWidget->setColumnWidth(2, 50);

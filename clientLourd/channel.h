@@ -35,6 +35,7 @@ public:
     // Text adding function
     void appendChannel(QString string, QString channel, QString send);
     void appendCurrent(QString string, QString pseudo);
+    void clean();
 
     // Current channel change function
     void change(QString newChannel);
@@ -53,6 +54,9 @@ public:
     void setTopic(QString topic, QString channel);
     QString getTopic();
 
+    //Notifications
+    bool notif(QString chan);
+    void togleNotif(QString chan);
 private:
     // Current channel name
     QString currentChannel;

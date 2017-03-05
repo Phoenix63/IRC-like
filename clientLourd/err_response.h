@@ -6,7 +6,7 @@
 namespace IRC {
 
 namespace ERR {
-
+const QRegularExpression NOSUCHNICK           ("^\\S+\\s401\\s");
 const QRegularExpression NOSUCHCHANNEL        ("^\\S+\\s403\\s");
 const QRegularExpression CANNOTSENDTOCHAN     ("^\\S+\\s404\\s");
 const QRegularExpression NORECIPIENT          ("^\\S+\\s411\\s");
@@ -23,7 +23,7 @@ const QRegularExpression PASSWDMISMATCH       ("^\\S+\\s464\\s");
 const QRegularExpression INVITEONLYCHAN       ("^\\S+\\s473\\s");
 const QRegularExpression BANNEDFROMCHAN       ("^\\S+\\s474\\s");
 const QRegularExpression BADCHANNELKEY        ("^\\S+\\s475\\s");
-
+const QRegularExpression FILESIZE             ("^\\S+\\s601\\s");
 }
 
 }

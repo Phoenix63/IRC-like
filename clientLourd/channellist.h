@@ -1,6 +1,7 @@
 #ifndef CHANNELLIST_H
 #define CHANNELLIST_H
 
+#include "themelist.h"
 #include <QDialog>
 #include <QString>
 #include <QTableWidget>
@@ -17,6 +18,7 @@ class Channellist : public QDialog
 public:
     //Constructor and destructor
     explicit Channellist(QWidget *parent = 0,QTcpSocket *socket = NULL);
+    void initUIStyle();
     ~Channellist();
 
     //Ui update functions
@@ -30,6 +32,7 @@ private:
     Ui::Channellist *ui;
     QTcpSocket *socket;
     QTableWidget *table;
+    ThemeList *theme;
 };
 
 #endif // CHANNELLIST_H

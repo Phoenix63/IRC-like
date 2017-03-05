@@ -7,7 +7,9 @@ Theme::Theme():
     aHour(IRC::COLOR::LIGHT::HOUR),
     aNick(IRC::COLOR::LIGHT::NICK),
     aSelf(IRC::COLOR::LIGHT::SELF),
-    aText(IRC::COLOR::LIGHT::TEXT)
+    aText(IRC::COLOR::LIGHT::TEXT),
+    aGradStart(IRC::COLOR::LIGHT::GRADSTART),
+    aGradEnd(IRC::COLOR::LIGHT::GRADEND)
 {
 }
 
@@ -44,6 +46,15 @@ void Theme::text(QString newText)
     aText = newText;
 }
 
+void Theme::gradStart(QString newGrad)
+{
+    aGradStart = newGrad;
+}
+
+void Theme::gradEnd(QString newGrad)
+{
+    aGradEnd = newGrad;
+}
 /*
  * Getters
  */
@@ -76,4 +87,14 @@ QString Theme::self()
 QString Theme::text()
 {
     return aText;
+}
+
+QString Theme::gradStart()
+{
+    return aGradStart;
+}
+
+QString Theme::gradEnd()
+{
+    return aGradEnd;
 }

@@ -62,3 +62,16 @@ QString ChannelContent::getTopic()
 {
     return topic;
 }
+/*
+ * Notifications handling
+ */
+
+bool ChannelContent::notif()
+{
+    return aNotif;
+}
+
+void ChannelContent::togleNotif()
+{
+    aNotif = !aNotif;
+}

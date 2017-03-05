@@ -8,7 +8,6 @@
 #include <QLabel>
 #include <QTime>
 #include <QList>
-
 /*
  * Channel: Constructor
  */
@@ -52,9 +51,9 @@ void Channel::joinWhisper(QString dest){
  */
 
 void Channel::leave(QString chan){
-    if(channels.contains(chan)) {
-        channels.remove(chan);
+    if(channels.contains(chan) && chan.compare("\"Debug\"") != 0) {
         change("\"Debug\"");
+        channels.remove(chan);
     }
 }
 
@@ -64,14 +63,20 @@ void Channel::leave(QString chan){
 
 void Channel::appendCurrent(QString string, QString pseudo)
 {
-    QString time = '['+QTime::currentTime().toString() + ']';
-    channels[currentChannel].appendChat(time + "    ", pseudo , " : " + string);
+    QString time = '[' + QTime::currentTime().toString() + ']';
+    if (channels.contains(currentChannel))
+        channels[currentChannel].appendChat(time + "    ", pseudo , " : " + string);
 }
 
 void Channel::appendChannel(QString string, QString channel, QString send)
 {
     QString time = '[' + QTime::currentTime().toString() + ']';
-    channels[channel].appendChat(time + "    ", send," : " + string);
+    if (channels.contains(channel))
+        channels[channel].appendChat(time + "    ", send," : " + string);
+}
+
+void Channel::clean(){
+    channels[currentChannel].clearContent();
 }
 
 /*
@@ -104,12 +109,14 @@ QList<QString> Channel::channelNames()
 
 void Channel::addUser(QString user, QString channel)
 {
-    channels[channel].addUser(user);
+    if (channels.contains(channel))
+        channels[channel].addUser(user);
 }
 
 void Channel::delUser(QString user, QString channel)
 {
-    channels[channel].removeUser(user);
+    if (channels.contains(channel))
+        channels[channel].removeUser(user);
 }
 
 QList<QString> Channel::getUsers()
@@ -130,10 +137,24 @@ void Channel::changeNick(QString nick, QString newNick)
 
 void Channel::setTopic(QString topic, QString channel)
 {
-    channels[channel].setTopic(topic);
+    if (channels.contains(channel))
+        channels[channel].setTopic(topic);
 }
 
 QString Channel::getTopic()
 {
     return channels[currentChannel].getTopic();
+}
+
+bool Channel::notif(QString chan)
+{
+    if (channels.contains(chan))
+        return channels[chan].notif();
+    else return false;
+}
+
+void Channel::togleNotif(QString chan)
+{
+    if (channels.contains(chan))
+        channels[chan].togleNotif();
 }

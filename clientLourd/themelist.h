@@ -21,6 +21,8 @@ public:
     void nick(QString newName);
     void self(QString newSelf);
     void text(QString newText);
+    void gradStart(QString newGrad);
+    void gradEnd(QString newGrad);
 
     //Getters for current theme
     QStringList names();
@@ -31,6 +33,8 @@ public:
     QString nick();
     QString self();
     QString text();
+    QString gradStart();
+    QString gradEnd();
 
 private:
     ThemeList();

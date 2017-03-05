@@ -70,6 +70,8 @@ private:
 	bool in_isSetTopic(QString string);
 	bool in_isPing(QString string);
 	bool in_isListMesg(QString string);
+    bool in_isNoNick(QString string);
+    bool in_isNoChan(QString string);
 
 private:
 	// Pointer to the channel and socket created in mainframe
