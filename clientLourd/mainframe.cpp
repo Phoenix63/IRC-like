@@ -28,7 +28,7 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
     initUIStyle();
     initCompletion();
     parser.initialize(&channel, socket, "Guest");
-    msgList.setMsgSender(ui->messageSender);
+    msgList.msgSender(ui->messageSender);
     channelModified();
 }
 
@@ -53,7 +53,7 @@ void MainFrame::printMsgLine(Message chatMsgLine)
     pseudoBox->addWidget(LHeure);
     parserEmoji.parse(chatMsgLine.message());
     QLabel *lPseudo= new QLabel(chatMsgLine.sender());
-    if (!chatMsgLine.sender().compare(parser.getNickname())) {
+    if (!chatMsgLine.sender().compare(parser.nickname())) {
         lPseudo->setStyleSheet("color : " + theme->self() + ';');
     } else {
         lPseudo->setStyleSheet("color : " + theme->nick() + ';');
@@ -116,14 +116,14 @@ void MainFrame::channelModified()
 void MainFrame::userModified()
 {
     ui->userList->clear();
-    for (auto i:channel.getUsers()) {
+    for (auto i:channel.users()) {
         ui->userList->addItem(i);
     }
 }
 
 void MainFrame::chatModified()
 {
-    PrintMsg(channel.getChatContent());
+    PrintMsg(channel.chatContent());
 }
 
 void MainFrame::needClean()
@@ -142,7 +142,7 @@ void MainFrame::changeChannel()
 
 void MainFrame::topicModified()
 {
-    ui->topicDisplay->setText(channel.getTopic());
+    ui->topicDisplay->setText(channel.topic());
 }
 
 /*

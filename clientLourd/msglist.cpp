@@ -14,27 +14,27 @@ void MsgList::addMsg(QString string)
     msg.prepend("");
 }
 
-void MsgList::setMsgSender(QLineEdit *sender)
+void MsgList::msgSender(QLineEdit *sender)
 {
-    msgSender = sender;
+    aMsgSender = sender;
 }
 
 void MsgList::scrollUp()
 {
     if (index < msg.size() - 1)
         index++;
-    msgSender->setText(msg[index]);
+    aMsgSender->setText(msg[index]);
 }
 
 void MsgList::scrollDown()
 {
     if (index > 0)
         index--;
-    msgSender->setText(msg[index]);
+    aMsgSender->setText(msg[index]);
 }
 
 void MsgList::scrollReset()
 {
-    msgSender->setText("");
+    aMsgSender->setText("");
     index = 0;
 }

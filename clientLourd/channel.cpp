@@ -17,16 +17,16 @@ Channel::Channel()
     currentChannel = QString("\"Debug\"");
     channels[currentChannel] = ChannelContent();
     channels[currentChannel].addUser("The godly dev");
-    channels[currentChannel].setTopic("Here we see debug command.");
+    channels[currentChannel].topic("Here we see debug command.");
 }
 
 /*
  * Getters
  */
 
- QList<Message> Channel::getChatContent()
+ QList<Message> Channel::chatContent()
  {
-     return channels[currentChannel].getChatContent();
+     return channels[currentChannel].chatContent();
  }
 
 /*
@@ -37,7 +37,7 @@ void Channel::join(QString chan, QString topic)
 {
     if (!channels.contains(chan)) {
         channels[chan] = ChannelContent();
-        channels[chan].setTopic(topic);
+        channels[chan].topic(topic);
     }
 }
 
@@ -119,9 +119,9 @@ void Channel::delUser(QString user, QString channel)
         channels[channel].removeUser(user);
 }
 
-QList<QString> Channel::getUsers()
+QList<QString> Channel::users()
 {
-    return channels[currentChannel].getUsers();
+    return channels[currentChannel].users();
 }
 
 void Channel::changeNick(QString nick, QString newNick)
@@ -135,15 +135,15 @@ void Channel::changeNick(QString nick, QString newNick)
     }
 }
 
-void Channel::setTopic(QString topic, QString channel)
+void Channel::topic(QString topic, QString channel)
 {
     if (channels.contains(channel))
-        channels[channel].setTopic(topic);
+        channels[channel].topic(topic);
 }
 
-QString Channel::getTopic()
+QString Channel::topic()
 {
-    return channels[currentChannel].getTopic();
+    return channels[currentChannel].topic();
 }
 
 bool Channel::notif(QString chan)

@@ -19,8 +19,8 @@ public:
 
 	// Initialisation functions
 	void initialize(Channel *channel, QTcpSocket *socket, QString nickname);
-	void setNickname(QString nick);
-	QString getNickname();
+    void nickname(QString nick);
+    QString nickname();
 	void sendToServer(QTcpSocket *socket, QString string);
 
 	// Parsing functions
@@ -77,7 +77,7 @@ private:
 	// Pointer to the channel and socket created in mainframe
 	Channel *channel;
 	QTcpSocket *socket;
-	QString nickname;
+    QString aNickname;
 	Channellist *listOfChannels;
 };
 

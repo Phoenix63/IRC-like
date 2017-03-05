@@ -23,7 +23,7 @@ public:
     Channel();
 
     // Getters
-    QList<Message> getChatContent();
+    QList<Message> chatContent();
 
     // Channel creation functions
     void join(QString chan, QString topic);
@@ -48,11 +48,11 @@ public:
     void addUser(QString user, QString channel);
     void delUser(QString user, QString channel);
     void changeNick(QString nick, QString newNick);
-    QList<QString> getUsers();
+    QList<QString> users();
 
     // Topic
-    void setTopic(QString topic, QString channel);
-    QString getTopic();
+    void topic(QString topic, QString channel);
+    QString topic();
 
     //Notifications
     bool notif(QString chan);

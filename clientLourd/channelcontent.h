@@ -13,24 +13,24 @@ public:
     void addUser(QString newUser);
     void removeUser(QString userName);
     void replaceUser(QString oldNick, QString newNick);
-    QList<QString> getUsers();
+    QList<QString> users();
 
     //Chat functions
     void appendChat(QString heure, QString pseudo, QString message);
     void clearContent();
-    QList<Message> getChatContent();
+    QList<Message> chatContent();
 
     //Topic functions
-    void setTopic(QString newTopic);
-    QString getTopic();
+    void topic(QString newTopic);
+    QString topic();
 
     //Notifications functions
     bool notif();
     void togleNotif();
 private:
-    QString topic;
-    QList<QString> users;
-    QList<Message> chatContent;
+    QString aTopic;
+    QList<QString> aUsers;
+    QList<Message> aChatContent;
     bool aNotif = false;
 };
 

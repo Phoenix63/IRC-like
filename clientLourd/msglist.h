@@ -14,11 +14,11 @@ public:
     void scrollReset();
     void scrollUp();
     void scrollDown();
-    void setMsgSender(QLineEdit *sender);
+    void msgSender(QLineEdit *sender);
 
 private:
     QList<QString> msg;
-    QLineEdit *msgSender;
+    QLineEdit *aMsgSender;
     int index;
 };
 

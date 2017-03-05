@@ -6,26 +6,26 @@
 
 void ChannelContent::addUser(QString newUser)
 {
-    if (!users.contains(newUser))
-        users.append(newUser);
+    if (!aUsers.contains(newUser))
+        aUsers.append(newUser);
 }
 
 void ChannelContent::removeUser(QString userName)
 {
-    users.removeAll(userName);
+    aUsers.removeAll(userName);
 }
 
 void ChannelContent::replaceUser(QString oldNick, QString newNick)
 {
-    if (users.contains("@" + oldNick))
-        users[users.indexOf("@" + oldNick)].replace(oldNick, newNick);
-    else if (users.contains(oldNick))
-        users[users.indexOf(oldNick)].replace(oldNick, newNick);
+    if (aUsers.contains("@" + oldNick))
+        aUsers[aUsers.indexOf("@" + oldNick)].replace(oldNick, newNick);
+    else if (aUsers.contains(oldNick))
+        aUsers[aUsers.indexOf(oldNick)].replace(oldNick, newNick);
 }
 
-QList<QString> ChannelContent::getUsers()
+QList<QString> ChannelContent::users()
 {
-    return users;
+    return aUsers;
 }
 
 /*
@@ -34,33 +34,33 @@ QList<QString> ChannelContent::getUsers()
 
 void ChannelContent::appendChat(QString heure, QString pseudo, QString message)
 {
-    chatContent.append(Message(pseudo, heure, message));
+    aChatContent.append(Message(pseudo, heure, message));
 }
 
 void ChannelContent::clearContent()
 {
-    while(!chatContent.isEmpty()){
-        chatContent.pop_back();
+    while(!aChatContent.isEmpty()){
+        aChatContent.pop_back();
     }
 }
 
-QList<Message> ChannelContent::getChatContent()
+QList<Message> ChannelContent::chatContent()
 {
-    return chatContent;
+    return aChatContent;
 }
 
 /*
  * Topic functions
  */
 
-void ChannelContent::setTopic(QString newTopic)
+void ChannelContent::topic(QString newTopic)
 {
-    topic = newTopic;
+    aTopic = newTopic;
 }
 
-QString ChannelContent::getTopic()
+QString ChannelContent::topic()
 {
-    return topic;
+    return aTopic;
 }
 /*
  * Notifications handling

@@ -12,18 +12,18 @@ void Parser::initialize(Channel *chan, QTcpSocket *sock, QString nick)
 {
     channel = chan;
     socket = sock;
-    nickname = nick;
+    aNickname = nick;
     listOfChannels = new Channellist(NULL, sock);
 }
 
-void Parser::setNickname(QString nick)
+void Parser::nickname(QString nick)
 {
-    nickname = nick;
+    aNickname = nick;
 }
 
-QString Parser::getNickname()
+QString Parser::nickname()
 {
-	return nickname;
+    return aNickname;
 }
 
 /*
@@ -252,7 +252,7 @@ bool Parser::out_isMsgMsg(QString string)
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString message = string.right(string.length() - j - 1);
     message.remove(message.length() - 1, 1);
-    channel->appendCurrent(message, nickname);
+    channel->appendCurrent(message, aNickname);
     emit changeChannelSignal();
     emit chatModifiedSignal();
     emit channelModifiedSignal();
@@ -262,7 +262,7 @@ bool Parser::out_isMsgMsg(QString string)
 bool Parser::out_isPrivMsg(QString string)
 {
     QString message = string.left(string.length() - 1);
-    channel->appendCurrent(message, nickname);
+    channel->appendCurrent(message, aNickname);
     string.prepend("PRIVMSG " + channel->channelName() + " :");
     sendToServer(socket, string);
     emit chatModifiedSignal();
@@ -287,7 +287,7 @@ bool Parser::in_isInitMesg(QString string)
         return false;
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString nick = string.right(string.length() - j - 5);
-    setNickname(nick);
+    nickname(nick);
     return true;
 }
 
@@ -325,7 +325,7 @@ bool Parser::in_isJoinNote(QString string)
     if(nick.startsWith('@'))
         nick.remove(0,1);
     QString chan = string.split(' ').at(2);
-    if(nick.compare(nickname)) {
+    if(nick.compare(aNickname)) {
         channel->addUser(nick, chan);
         channel->appendChannel(nick + " joined " + chan, chan, "");
     }
@@ -342,7 +342,7 @@ bool Parser::in_isPartNote(QString string)
     QString chan = string.split(' ').at(2);
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString message = string.right(string.length() - j);
-    if (user.compare(nickname)) {
+    if (user.compare(aNickname)) {
         channel->appendChannel(user + " left " + chan + ' ' + message, chan, "");
         channel->delUser(user, chan);
         channel->delUser("@" + user, chan);
@@ -392,8 +392,8 @@ bool Parser::in_isNickEdit(QString string)
         return false;
     QString nick = string.split(' ').at(0);
     QString newNick = string.split(' ').at(2);
-    if (!nick.compare(nickname))
-        setNickname(newNick);
+    if (!nick.compare(aNickname))
+        nickname(newNick);
     channel->changeNick(nick, newNick);
     channel->appendChannel(nick + " changed his nickname to " + newNick, "\"Debug\"", "");
     emit userModifiedSignal();
@@ -408,7 +408,7 @@ bool Parser::in_isKickMesg(QString string)
     QString admin = string.split(' ').at(0);
     QString chan = string.split(' ').at(2);
     QString kicked = string.split(' ').at(3);
-    if(!kicked.compare(nickname)){
+    if(!kicked.compare(aNickname)){
         channel->appendChannel("You were kicked from " + chan + " by " + admin, "\"Debug\"", "");
         channel->leave(chan);
     }
@@ -449,7 +449,7 @@ bool Parser::in_isSetTopic(QString string)
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString topic = string.right(string.length() - j - 1);
     QString chan = string.split(' ').at(3);
-    channel->setTopic(topic, chan);
+    channel->topic(topic, chan);
     emit topicModifiedSignal();
     return true;
 }
