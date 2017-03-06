@@ -1,12 +1,10 @@
 	var Channel = (function() {
 		function Channel(chanName) {
 			this.chan = chanName;
-			this.admi = undefined;
 			this.notif = 0;
 			this.status = 0;
 			this.right = 0;
 			this.listU = [];
-			this.admin = [];
 			this.mute = [];
 			this.topic = "";
 			this.messages = [];

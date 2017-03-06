@@ -323,9 +323,15 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 				var cmd = $scope.newMessage.split(" ");
 				console.log(cmd);
 				if(cmd[1].include("#")) {
+					for(let i=0; $scope.Channels.length; i++) {
+						if(cmd[1] === $scope.Channels[i]) {
+							if(userInfo.right === 1 || userInfo.right === 3) {
 
+							}
+						}
+					}
 				} else {
-					for(i=0; $scope.currentChannel.listU.length; i++) {
+					for(let i=0; $scope.currentChannel.listU.length; i++) {
 						if(cmd[1] === $scope.currentChannel.listU[i]) {
 							//faut voir si les options mises sont valide
 							userInfo.socket.emit("message", "MODE ");

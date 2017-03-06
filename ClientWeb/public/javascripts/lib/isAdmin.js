@@ -1,5 +1,4 @@
 //operator
-
 var isAdmin = function (user, channel) {
 	for(var i = 0; i<channel.listU.length; i++) {
 		if(channel.listU[i].nick === user.nick) {
