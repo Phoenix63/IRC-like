@@ -1,7 +1,7 @@
 
-node_prod:
+node:
   image: bitnami/node:7
-  command: sh -c 'npm run build && node dist/app.js PROD'
+  command: sh -c 'npm run build && node ./dist/app.js PROD'
   hostname: node
   volumes:
    - ./..:/app
@@ -11,6 +11,18 @@ node_prod:
    - "3001:3001"
   links:
    - mongo_prod:mongo
+   - redis_prod:redis
+   - fileserver:fileserver
+
+fileserver:
+  image: bitnami/node:7
+  command: sh -c 'npm run build && node ./dist/modules/file/server.js PROD'
+  hostname: fileserver
+  volumes:
+   - ./..:/app
+  ports:
+   - "8090:8090"
+  links:
    - redis_prod:redis
 
 mongo_prod:

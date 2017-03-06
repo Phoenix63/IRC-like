@@ -1,11 +1,19 @@
 .SILENT:
 
 all:
-	make help
+	echo ""
+
+	@while [ -z "$$CONTINUE" ]; do \
+		read -r -p "Build project and install dependencies [y/N]: " CONTINUE; \
+	done ; \
+	[ $$CONTINUE = "y" ] || [ $$CONTINUE = "Y" ] || (make help; exit 1)
+	make build
+	make deps
+	make unit
 
 head:
 	echo
-	echo -e "\033[0;32m "
+	echo "\033[0;32m "
 	echo -e "__________                    .__/\.______________________  "
 	echo -e "\______   \_____    ____    __| _)/|   \______   \_   ___ \ "
 	echo -e " |     ___/\__  \  /    \  / __ |  |   ||       _/    \  \/ "
@@ -27,9 +35,10 @@ help:
 	echo
 	echo "            help - Show this message"
 	echo
-	echo "            ------- Running commands -------"
+	echo -e "            ------- Running commands -------"
 	echo -e "            \033[0;32mdev\e[0m  - Run the server in  dev environment"
 	echo -e "            \033[0;32mprod\e[0m - Run the server in prod environment"
+	echo -e "            \033[0;32mprod-deamon\e[0m - Run the server in prod environment is deamon mode"
 	echo
 	echo -e "            ------- Testing commands -------"
 	echo -e "            \033[0;32munit\e[0m - Run the server in test environment"
@@ -54,6 +63,12 @@ deps:
 
 prod:
 	make head
+	make clean
+	docker-compose -f ./docker/prod.yml up
+
+prod-deamon:
+	make head
+	make clean
 	docker-compose -f ./docker/prod.yml up -d
 
 dev:

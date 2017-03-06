@@ -1,14 +1,16 @@
 import FileManager from './../http/FileManager';
 import config from './../../../config.json';
+import shortid from 'shortid';
 
 class FileReceiver {
-    constructor(name, size, socket) {
+    constructor(name, size, socket, callback = function(){}) {
         console.log('New file arrive');
         this._size = size;
         this._data = [];
         this._currentSize = 0;
-        this._name = name;
+        this._name = shortid.generate() + '.'+name;
         this._socket = socket;
+        this._full = callback
     }
 
     _success() {
@@ -18,16 +20,20 @@ class FileReceiver {
         let data = Buffer.concat(this._data);
         FileManager.instance.addFile(this._name, data, (url) => {
             this._socket.write(':'+config.ip+' FILE :'+url+'\n');
+            console.log('file up at :'+url);
             this._socket.resume();
         });
     }
 
     push(data) {
-        //console.log(data.indexOf(new Buffer('\n')));
-        this._data.push(data);
         this._currentSize += data.length;
-        console.log(this.done+' ('+this.percent+'%)');
+        this._data.push(data);
+        if(process.env.ENV === 'DEV') {
+            console.log('FILE TRANSFERT:'+this._currentSize+'/'+this._size);
+        }
+
         if(this._currentSize >= this._size) {
+            this._full();
             this._success();
         }
     }

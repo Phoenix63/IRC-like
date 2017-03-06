@@ -8,27 +8,6 @@ class BufferManager {
         if(!(buf2 instanceof Buffer)) {
             buf2 = new Buffer(buf2);
         }
-
-        /*let bufs = [];
-        let index = buf1.indexOf(buf2)+buf2.length;
-        while(index >= 0) {
-            if(!buf1.equals(new Buffer(0))) {
-                let push = buf1.slice(0, index);
-                console.log(push, index, buf2.length);
-                console.log(buf1);
-                if(index > 0 && !push.equals(new Buffer(0))) {
-                    bufs.push(buf1.slice(0, index));
-                } else {
-                    bufs.push(null);
-                }
-                buf1 = buf1.slice(index, buf1.length-index);
-                index = buf1.indexOf(buf2)+buf2.length;
-            }
-
-        }
-        bufs.push(buf1);
-        return bufs;*/
-
         let index = buf1.indexOf(buf2);
         let bufs = [];
         while(index >= 0) {
@@ -40,8 +19,8 @@ class BufferManager {
             } else {
                 index = buf1.indexOf(buf2)+buf2.length;
             }
-
         }
+        bufs.push(buf1);
 
         return bufs;
     }

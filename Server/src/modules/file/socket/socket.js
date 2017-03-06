@@ -6,6 +6,9 @@ import bufferManager from './../modules/bufferSpliter';
 let server = net.createServer((socket) => {
     socket.buffer = '';
     socket.filereceiver = null;
+
+    console.log('new connection from '+socket.remoteAddress);
+
     socket.r = function() {
         if(socket.filereceiver) {
             return ' socket.receiver is set ';
@@ -14,10 +17,10 @@ let server = net.createServer((socket) => {
         }
     }
     socket.setTimeout(0);
+    socket.buffer = new Buffer(0);
 
     socket.on('data', (data) => {
         let splited = bufferManager.split(data, '\n');
-        socket.pause();
         for(let key in splited) {
             let line = splited[key];
             if(line) {
@@ -30,13 +33,9 @@ let server = net.createServer((socket) => {
                     splited = splited.slice(1,splited.length);
                 } else if(socket.filereceiver) {
                     socket.filereceiver.push(line);
-                } else {
-                    console.log('err: '+line);
                 }
             }
         }
-        socket.resume();
-
     });
     socket.on('close', () => {
         console.log('close');
