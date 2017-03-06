@@ -3,6 +3,7 @@
 # Project created by QtCreator 2017-01-31T23:43:32
 #
 #-------------------------------------------------
+MAKEFILE += chatIRC.make
 
 QT       += core gui
 QT       += network

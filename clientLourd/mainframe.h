@@ -34,7 +34,7 @@ class MainFrame : public QMainWindow
 
 public:
 	//Constructor and Destructor
-	explicit MainFrame(QWidget *parent = 0, QTcpSocket *socket=NULL);
+    explicit MainFrame(QWidget *parent = 0, QTcpSocket *socket=NULL, QString host = "localhost");
 	~MainFrame();
 
 	void printMsgLine(Message chatMsgLine);
@@ -53,6 +53,7 @@ public slots:
 	void needClean();
 	void changeChannel();
 	void topicModified();
+	void lineAdded();
 
 	//Socket slots
 	void readyRead();
@@ -93,6 +94,7 @@ private:
 
 	//Tcp pointer from login
 	QTcpSocket *socket;
+    QString host;
 
 	//Parser and channel for message handling
 	Parser parser;

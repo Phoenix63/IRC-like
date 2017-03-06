@@ -17,10 +17,12 @@
  * Mainframe: constructor and destructor
  */
 
-MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
+MainFrame::MainFrame(QWidget *parent, QTcpSocket *socket, QString host) :
     QMainWindow(parent),
     ui(new Ui::MainFrame),
     socket(socket),
+    host(host),
+    channel(&parserEmoji),
     StringCompleter(nullptr)
 {
     initUiConf();
@@ -46,12 +48,15 @@ MainFrame::~MainFrame()
 void MainFrame::printMsgLine(Message chatMsgLine)
 {
     QHBoxLayout *pseudoBox = new QHBoxLayout;
+    QHBoxLayout *chatLine = new QHBoxLayout;
     pseudoBox->setSpacing(2);
+    chatLine->setSpacing(2);
+
     QLabel *LHeure = new QLabel(chatMsgLine.date());
     LHeure->setStyleSheet("color : " + theme->hour() + ';');
     LHeure->setFixedHeight(20);
     pseudoBox->addWidget(LHeure);
-    parserEmoji.parse(chatMsgLine.message());
+
     QLabel *lPseudo= new QLabel(chatMsgLine.sender());
     if (!chatMsgLine.sender().compare(parser.nickname())) {
         lPseudo->setStyleSheet("color : " + theme->self() + ';');
@@ -61,7 +66,12 @@ void MainFrame::printMsgLine(Message chatMsgLine)
     lPseudo->setFixedHeight(20);
     pseudoBox->addWidget(lPseudo);
     ui->nickBox->addLayout(pseudoBox);
-    ui->chatBox->addLayout(parserEmoji.parse(chatMsgLine.message()));
+
+    QLabel *lMessage = new QLabel(chatMsgLine.message());
+    lMessage->setFixedHeight(20);
+    chatLine->addWidget(lMessage);
+    chatLine->addStretch(0);
+    ui->chatBox->addLayout(chatLine);
 }
 
 void MainFrame::PrintMsg(QList<Message> chatMsgList)
@@ -140,6 +150,11 @@ void MainFrame::changeChannel()
     ui->messageSender->setPlaceholderText("Message " + channel.channelName());
 }
 
+void MainFrame::lineAdded()
+{
+    printMsgLine(channel.getLast());
+}
+
 void MainFrame::topicModified()
 {
     ui->topicDisplay->setText(channel.topic());
@@ -201,7 +216,7 @@ void MainFrame::on_channelList_itemSelectionChanged()
 {
     channel.change(ui->channelList->currentItem()->text());
     if (channel.notif(channel.channelName())) {
-        channel.togleNotif(ui->channelList->currentItem()->text());
+        channel.togleNotif(channel.channelName(), false);
         channelModified();
     }
     ui->messageSender->setFocus();
@@ -248,32 +263,36 @@ void MainFrame::on_messageSender_returnPressed()
 
 void MainFrame::on_pushButton_upload_clicked()
 {
-    QStringList homePath = QStandardPaths::standardLocations(QStandardPaths::HomeLocation);
-    QStringList files = QFileDialog::getOpenFileNames(this,"Select one or more files to open", homePath.first());
-    for (auto i:files){
-        QByteArray read;
-        QFile inputFile = i;
-        int size = inputFile.size();
-        QString fileName = i.split('/').last();
-        QString toSend = "FILE " + channel.channelName() + " " + QString::number(size, 10) + " " + fileName + '\n';
-        socket->write(toSend.toUtf8());
-        inputFile.open(QIODevice::ReadOnly);
-        while(1)
-        {
-            read.clear();
-            read = inputFile.read(1); // Black magic
-            if (read.size() == 0) {
-                socket->write(read);
-                socket->waitForBytesWritten();
+    QTcpSocket *tmp = new QTcpSocket(this);
+    tmp->connectToHost(host, 8090);
+    if(!tmp->waitForConnected(5000)){
+        QMessageBox::information(this, "Error", "Host not found");
+    } else {
+        QStringList homePath = QStandardPaths::standardLocations(QStandardPaths::HomeLocation);
+        QStringList files = QFileDialog::getOpenFileNames(this,"Select one or more files to open", homePath.first());
+        for (auto i:files){
+            QByteArray read;
+            QFile inputFile = i;
+            int size = inputFile.size();
+            QString fileName = i.split('/').last();
+            QString toSend = "FILE " + QString::number(size, 10) + " " + fileName + '\n';
+            tmp->write(toSend.toLatin1());
+            tmp->waitForReadyRead(1000);
+            inputFile.open(QIODevice::ReadOnly);
+            while(1)
+            {
+                read = inputFile.read(300);
+                if (read.size() == 0) {
+                    break;
+                }
+                tmp->write(read);
+                tmp->waitForBytesWritten();
+                tmp->waitForReadyRead(100);
                 read.clear();
-                break;
             }
-            socket->write(read);
-            socket->waitForBytesWritten();
-            read.clear();
+            tmp->write("\n");
+            inputFile.close();
         }
-        socket->write("\n");
-        inputFile.close();
     }
 }
 
@@ -352,6 +371,7 @@ void MainFrame::initConnect()
     connect(&parser, &Parser::cleanSignal, this, &MainFrame::needClean);
     connect(&parser, &Parser::changeChannelSignal, this, &MainFrame::changeChannel);
     connect(&parser, &Parser::topicModifiedSignal, this, &MainFrame::topicModified);
+    connect(&parser, &Parser::lineAddedSignal, this, &MainFrame::lineAdded);
 }
 
 void MainFrame::initCompletion()

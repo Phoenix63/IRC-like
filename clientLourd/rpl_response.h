@@ -6,7 +6,6 @@
 namespace IRC {
 
 namespace RPL {
-
 const QRegularExpression NAMEREPLY    ("^\\S+\\s353\\s");
 const QRegularExpression WHOREPLY     ("^\\S+\\s352\\s");
 const QRegularExpression ENDOFWHO     ("^\\S+\\s315\\s");

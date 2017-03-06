@@ -12,7 +12,8 @@
  * Channel: Constructor
  */
 
-Channel::Channel()
+Channel::Channel(ParserEmoji *emoji):
+    emoji(emoji)
 {
     currentChannel = QString("\"Debug\"");
     channels[currentChannel] = ChannelContent();
@@ -65,14 +66,14 @@ void Channel::appendCurrent(QString string, QString pseudo)
 {
     QString time = '[' + QTime::currentTime().toString() + ']';
     if (channels.contains(currentChannel))
-        channels[currentChannel].appendChat(time + "    ", pseudo , " : " + string);
+        channels[currentChannel].appendChat(time + "    ", pseudo , " : " + emoji->parse(string));
 }
 
 void Channel::appendChannel(QString string, QString channel, QString send)
 {
     QString time = '[' + QTime::currentTime().toString() + ']';
     if (channels.contains(channel))
-        channels[channel].appendChat(time + "    ", send," : " + string);
+        channels[channel].appendChat(time + "    ", send," : " + emoji->parse(string));
 }
 
 void Channel::clean(){
@@ -153,8 +154,13 @@ bool Channel::notif(QString chan)
     else return false;
 }
 
-void Channel::togleNotif(QString chan)
+void Channel::togleNotif(QString chan, bool newValue)
 {
     if (channels.contains(chan))
-        channels[chan].togleNotif();
+            channels[chan].togleNotif(newValue);
+}
+
+Message Channel::getLast()
+{
+    return channels[currentChannel].getLast();
 }

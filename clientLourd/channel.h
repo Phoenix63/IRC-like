@@ -6,6 +6,7 @@
 
 #include "parseremoji.h"
 #include "channelcontent.h"
+#include "message.h"
 
 template<typename> class QList;
 class QListWidget;
@@ -20,7 +21,7 @@ class Channel
 {
 public:
     // Constructor
-    Channel();
+    Channel(ParserEmoji *emoji);
 
     // Getters
     QList<Message> chatContent();
@@ -56,8 +57,10 @@ public:
 
     //Notifications
     bool notif(QString chan);
-    void togleNotif(QString chan);
+    void togleNotif(QString chan, bool newValue);
+    Message getLast();
 private:
+    ParserEmoji * emoji;
     // Current channel name
     QString currentChannel;
     // Qhash wich contain message: key = channel name, content = message list

@@ -36,6 +36,7 @@ signals:
 	void topicModifiedSignal();
 	void cleanSignal();
 	void changeChannelSignal();
+    void lineAddedSignal();
 
 private:
 	// Out functions
