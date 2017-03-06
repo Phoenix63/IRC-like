@@ -16,7 +16,6 @@ Channel::Channel()
 {
     currentChannel = QString("\"Debug\"");
     channels[currentChannel] = ChannelContent();
-    channels[currentChannel].addUser("The godly dev");
     channels[currentChannel].topic("Here we see debug command.");
 }
 
@@ -61,19 +60,33 @@ void Channel::leave(QString chan){
  * Channel: Text adding functions
  */
 
-void Channel::appendCurrent(QString string, QString pseudo)
-{
-    QString time = '[' + QTime::currentTime().toString() + ']';
-    if (channels.contains(currentChannel))
-        channels[currentChannel].appendChat(time + "    ", pseudo , " : " + string);
-}
+ void Channel::appendCurrent(QString string, QString pseudo)
+ {
+     QString time = '[' + QTime::currentTime().toString() + ']';
+     if (channels.contains(currentChannel))
+         channels[currentChannel].appendChat(time + "    ", channels[currentChannel].findUser(pseudo) , " : " + string);
+ }
 
-void Channel::appendChannel(QString string, QString channel, QString send)
-{
-    QString time = '[' + QTime::currentTime().toString() + ']';
-    if (channels.contains(channel))
-        channels[channel].appendChat(time + "    ", send," : " + string);
-}
+ void Channel::appendChannel(QString string, QString channel, QString send)
+ {
+     QString time = '[' + QTime::currentTime().toString() + ']';
+     if (channels.contains(channel))
+         channels[channel].appendChat(time + "    ", channels[channel].findUser(send)," : " + string);
+ }
+
+ void Channel::appendCurrent(QString string, User *pseudo)
+ {
+     QString time = '[' + QTime::currentTime().toString() + ']';
+     if (channels.contains(currentChannel))
+         channels[currentChannel].appendChat(time + "    ", pseudo , " : " + string);
+ }
+
+ void Channel::appendChannel(QString string, QString channel, User *send)
+ {
+     QString time = '[' + QTime::currentTime().toString() + ']';
+     if (channels.contains(channel))
+         channels[channel].appendChat(time + "    ", send," : " + string);
+ }
 
 void Channel::clean(){
     channels[currentChannel].clearContent();
@@ -109,8 +122,14 @@ QList<QString> Channel::channelNames()
 
 void Channel::addUser(QString user, QString channel)
 {
-    if (channels.contains(channel))
-        channels[channel].addUser(user);
+    if (channels.contains(channel)) {
+        channels[channel].addUser(userList.addUser(user));
+    }
+}
+
+void Channel::addUser(User *user)
+{
+    userList.addUser(user);
 }
 
 void Channel::delUser(QString user, QString channel)
@@ -119,7 +138,7 @@ void Channel::delUser(QString user, QString channel)
         channels[channel].removeUser(user);
 }
 
-QList<QString> Channel::users()
+QList<User *> Channel::users()
 {
     return channels[currentChannel].users();
 }
@@ -127,7 +146,7 @@ QList<QString> Channel::users()
 void Channel::changeNick(QString nick, QString newNick)
 {
     for (auto i:channels.keys()) {
-        channels[i].replaceUser(nick, newNick);
+        channels[i].renameUser(nick, newNick);
     }
     if (channels.keys().contains(nick)) {
         channels[newNick] = channels[nick];
