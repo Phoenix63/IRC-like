@@ -39,6 +39,10 @@ module.exports = function (socket, command) {
             error = false;
         } else if (channels[r]) {
             if (channels[r].users.indexOf(socket.client) >= 0) {
+                if(channels[r].isModerated && !channels[r].isUserVoice(socket.client)){
+                    ERRSender.ERR_CANNOTSENDTOCHAN(socket.client,channels[r].name);
+                    return;
+                }
                 channels[r].broadcast(':' + socket.client.name + ' PRIVMSG ' + r + ' :' + message, socket.client);
                 error = false;
             } else {

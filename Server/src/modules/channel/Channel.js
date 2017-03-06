@@ -133,6 +133,10 @@ class Channel {
         return (this._flags.indexOf('i') >= 0);
     }
 
+    get isModerated() {
+        return (this._flags.indexOf('m') >= 0);
+    }
+
 
 
     /**
@@ -296,6 +300,7 @@ class Channel {
         }
         return false;
     }
+
 
     /**
      * return true if the client is voice

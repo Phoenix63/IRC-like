@@ -6,6 +6,10 @@ import ERRSender from './../responses/ERRSender';
 import RPLSender from './../responses/RPLSender';
 
 module.exports = function (socket, command) {
+    if (!socket.client.isRegistered) {
+        ERRSender.ERR_NOTREGISTERED(socket.client, 'MODE');
+        return;
+    }
     let channelModeRegex = /^(#[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15}) ([+|-])([opsitnmlbvk]{1,11})(?: ([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15})$|$)/.exec(command[1]);
     let userModeRegex = /^([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15}) ([+|-])([iswo]{1,11})$/.exec(command[1]);
 
@@ -97,6 +101,10 @@ module.exports = function (socket, command) {
         if(flags.indexOf('n') > -1){
             //no messages to channel from clients on the outside;
             channel.changeChannelFlag(sign,'n');
+        }
+        if(flags.indexOf('m') > -1){
+            //moderate channel, only user with v flag can speak
+            channel.changeChannelFlag(sign,'m');
         }
     }else if(userModeRegex){
         let nameUser = userModeRegex[1];

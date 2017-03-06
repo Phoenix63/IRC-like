@@ -6,6 +6,10 @@ import ERRSender from './../responses/ERRSender';
 import RPLSender from './../responses/RPLSender';
 
 module.exports = function (socket, command) {
+    if (!socket.client.isRegistered) {
+        ERRSender.ERR_NOTREGISTERED(socket.client, 'INVITE');
+        return;
+    }
     let inviteRegex = /^([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15}) (#[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15})[ ]*/.exec(command[1]);
     if(inviteRegex){
         let nameOfTheGuest = inviteRegex[1];
