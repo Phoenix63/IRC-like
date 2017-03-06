@@ -3,10 +3,14 @@
 # Project created by QtCreator 2017-01-31T23:43:32
 #
 #-------------------------------------------------
+MAKEFILE += chatIRC.make
+MOC_DIR += mocs
+OBJECTS_DIR += objects
 
 QT       += core gui
 QT       += network
 RC_FILE = myapp.rc
+
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -27,7 +31,11 @@ SOURCES += main.cpp\
     configlist.cpp \
     message.cpp \
     theme.cpp \
-    themelist.cpp
+    themelist.cpp \
+    user.cpp \
+    mode.cpp \
+    parsermode.cpp \
+    userlist.cpp
 
 HEADERS  += \
     login.h \
@@ -46,7 +54,11 @@ HEADERS  += \
     config_in.h \
     message.h \
     themelist.h \
-    theme_in.h
+    theme_in.h \
+    user.h \
+    mode.h \
+    parsermode.h \
+    userlist.h
 
 FORMS    += \
     login.ui \

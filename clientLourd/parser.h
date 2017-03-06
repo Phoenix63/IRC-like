@@ -3,6 +3,7 @@
 
 #include "rpl_response.h"
 #include "err_response.h"
+#include "parsermode.h"
 
 #include <QString>
 #include <QObject>
@@ -16,9 +17,9 @@ class Parser : public QObject{
 	Q_OBJECT
 
 public:
-
+	Parser();
 	// Initialisation functions
-	void initialize(Channel *channel, QTcpSocket *socket, QString nickname);
+    void initialize(Channel *channel, QTcpSocket *socket, User user);
     void nickname(QString nick);
     QString nickname();
 	void sendToServer(QTcpSocket *socket, QString string);
@@ -72,12 +73,15 @@ private:
 	bool in_isListMesg(QString string);
     bool in_isNoNick(QString string);
     bool in_isNoChan(QString string);
+    bool in_isUserMode(QString string);
+    bool in_isChanMode(QString string);
 
 private:
 	// Pointer to the channel and socket created in mainframe
+	User self;
 	Channel *channel;
+    ParserMode *modeParser;
 	QTcpSocket *socket;
-    QString aNickname;
 	Channellist *listOfChannels;
 };
 

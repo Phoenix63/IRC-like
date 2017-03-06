@@ -27,7 +27,7 @@ MainFrame::MainFrame(QWidget *parent,QTcpSocket *socket) :
     initConnect();
     initUIStyle();
     initCompletion();
-    parser.initialize(&channel, socket, "Guest");
+    parser.initialize(&channel, socket, User("Guest"));
     msgList.msgSender(ui->messageSender);
     channelModified();
 }
@@ -58,6 +58,7 @@ void MainFrame::printMsgLine(Message chatMsgLine)
     } else {
         lPseudo->setStyleSheet("color : " + theme->nick() + ';');
     }
+
     lPseudo->setFixedHeight(20);
     pseudoBox->addWidget(lPseudo);
     ui->nickBox->addLayout(pseudoBox);
@@ -105,6 +106,7 @@ void MainFrame::clean()
 
 void MainFrame::channelModified()
 {
+
     ui->channelList->clear();
     for (auto i:channel.channelNames()) {
         ui->channelList->addItem(i);
@@ -117,7 +119,7 @@ void MainFrame::userModified()
 {
     ui->userList->clear();
     for (auto i:channel.users()) {
-        ui->userList->addItem(i);
+        ui->userList->addItem(i->name());
     }
 }
 
@@ -252,7 +254,7 @@ void MainFrame::on_pushButton_upload_clicked()
     QStringList files = QFileDialog::getOpenFileNames(this,"Select one or more files to open", homePath.first());
     for (auto i:files){
         QByteArray read;
-        QFile inputFile = i;
+        QFile inputFile(i);
         int size = inputFile.size();
         QString fileName = i.split('/').last();
         QString toSend = "FILE " + channel.channelName() + " " + QString::number(size, 10) + " " + fileName + '\n';
