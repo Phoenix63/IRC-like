@@ -1,9 +1,10 @@
 fileserver:
   image: pandirc/dev
-  command: sh -c 'nodemon --watch src/modules/file --exec babel-node ./src/modules/file/server.js DEV'
+  command: sh -c 'nodemon --watch src/modules/file --exec babel-node --inspect ./src/modules/file/server.js DEV'
   hostname: fileserver
   volumes:
    - ./..:/app
   ports:
   - "3001:3001"
   - "8090:8090"
+  - "9229:9229"

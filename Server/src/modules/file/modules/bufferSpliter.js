@@ -1,13 +1,77 @@
-module.exports = exports = (buf1, buf2) => {
-    let bufs = [];
-    let index = buf1.indexOf(buf2);
-    while(index >= 0) {
-        console.log(index);
-        bufs.push(buf1.slice(0, index));
-        buf1 = buf1.slice(index+buf2.length, buf1.length);
-        console.log(buf1);
-        index = buf1.indexOf(buf2);
+class BufferManager {
+    static splitAt(buf, index) {
+        return [buf.slice(0,index), buf.slice(index,buf.length)];
     }
-    bufs.push(buf1);
-    return bufs;
+
+    static split(buf1, buf2) {
+
+        if(!(buf2 instanceof Buffer)) {
+            buf2 = new Buffer(buf2);
+        }
+
+        /*let bufs = [];
+        let index = buf1.indexOf(buf2)+buf2.length;
+        while(index >= 0) {
+            if(!buf1.equals(new Buffer(0))) {
+                let push = buf1.slice(0, index);
+                console.log(push, index, buf2.length);
+                console.log(buf1);
+                if(index > 0 && !push.equals(new Buffer(0))) {
+                    bufs.push(buf1.slice(0, index));
+                } else {
+                    bufs.push(null);
+                }
+                buf1 = buf1.slice(index, buf1.length-index);
+                index = buf1.indexOf(buf2)+buf2.length;
+            }
+
+        }
+        bufs.push(buf1);
+        return bufs;*/
+
+        let index = buf1.indexOf(buf2);
+        let bufs = [];
+        while(index >= 0) {
+            let split = BufferManager.splitAt(buf1, index);
+            if(!split[0].equals(new Buffer(0))) {
+                bufs.push(split[0]);
+                buf1 = split[1];
+                index = buf1.indexOf(buf2);
+            } else {
+                index = buf1.indexOf(buf2)+buf2.length;
+            }
+
+        }
+
+        return bufs;
+    }
+
+    static join(arrayBuff, delimiter) {
+
+        if(!(delimiter instanceof Buffer)) {
+            delimiter = new Buffer(delimiter);
+        }
+
+        let buff = new Buffer(0);
+        arrayBuff.forEach((buffer) => {
+            if(buffer.length > 1) {
+                buff = Buffer.concat([buff, buffer], buff.length+buffer.length+delimiter.length);
+            }
+        });
+        return buff;
+    }
+
+    static contains(buffer, delimiter) {
+        if(!(delimiter instanceof Buffer)) {
+            delimiter = new Buffer(delimiter);
+        }
+
+        if(buffer.indexOf(delimiter) > -1) {
+            return true;
+        }
+        return false;
+    }
+
 }
+
+export default BufferManager

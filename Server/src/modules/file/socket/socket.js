@@ -1,7 +1,7 @@
 import net from 'net';
 import config from './../../../config.json';
 import FileReceiver from './FileReceiver';
-import bs from './../modules/bufferSpliter';
+import bufferManager from './../modules/bufferSpliter';
 
 let server = net.createServer((socket) => {
     socket.buffer = '';
@@ -16,29 +16,27 @@ let server = net.createServer((socket) => {
     socket.setTimeout(0);
 
     socket.on('data', (data) => {
-        console.log('------- data --------');
-        let splited = bs(data, new Buffer('\n'));
-        splited.splice(splited.length-1,1);
-        console.log(splited);
-        splited.forEach((info) => {
-            info = Buffer.concat([info, new Buffer('\n')]);
-            let cmd = (info.toString().match(/FILE [0-9]+ .*/) || [null])[0];
-            if(cmd) {
-                let argv = info.toString().split(' ');
-                let name = argv[2];
-                let size = parseInt(argv[1]);
-                if(!isNaN(size)) {
+        let splited = bufferManager.split(data, '\n');
+        socket.pause();
+        for(let key in splited) {
+            let line = splited[key];
+            if(line) {
+                let cmd = (line.toString().match(/FILE [0-9]+ .*/) || [null])[0];
+                if(cmd) {
+                    let argv = line.toString().split(' ');
+                    let name = argv[2];
+                    let size = parseInt(argv[1]);
                     socket.filereceiver = new FileReceiver(name, size, socket);
+                    splited = splited.slice(1,splited.length);
+                } else if(socket.filereceiver) {
+                    socket.filereceiver.push(line);
                 } else {
-                    console.log('Size error');
+                    console.log('err: '+line);
                 }
-            } else if (socket.filereceiver) {
-                socket.emit('file', info);
             }
-        });
-    });
-    socket.on('file', (buff) => {
-        socket.filereceiver.push(buff);
+        }
+        socket.resume();
+
     });
     socket.on('close', () => {
         console.log('close');

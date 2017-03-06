@@ -54,7 +54,7 @@ deps:
 
 prod:
 	make head
-	docker-compose -f ./docker/prod.yml up
+	docker-compose -f ./docker/prod.yml up -d
 
 dev:
 	make head

@@ -6,12 +6,12 @@ node_prod:
   volumes:
    - ./..:/app
   ports:
-   - "8088:4001"
-   - "8089:4000"
-   - "3001:3999"
+   - "8088:8088"
+   - "8089:8089"
+   - "3001:3001"
   links:
-   - mongo_prod:mongo_prod
-   - redis_prod:redis_prod
+   - mongo_prod:mongo
+   - redis_prod:redis
 
 mongo_prod:
   image: mongo

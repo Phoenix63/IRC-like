@@ -23,6 +23,7 @@ class FileReceiver {
     }
 
     push(data) {
+        //console.log(data.indexOf(new Buffer('\n')));
         this._data.push(data);
         this._currentSize += data.length;
         console.log(this.done+' ('+this.percent+'%)');

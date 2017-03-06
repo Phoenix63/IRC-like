@@ -1,6 +1,6 @@
 import httpServer from './http/app';
 import tcpServer from './socket/socket';
-import redisLib from 'redis';
+/*import redisLib from 'redis';
 import conf from './../../ENV.json';
 import redisCode from './modules/RedisCode';
 
@@ -13,4 +13,4 @@ redis.on('message', (chan, message) => {
     if(chan === 'fileserver') {
         let obj = redisCode.redisDecode(message);
     }
-});
+});*/
