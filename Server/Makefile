@@ -58,6 +58,7 @@ prod:
 
 dev:
 	make head
+	make clean
 	docker-compose -f ./docker/dev.yml up
 
 file:

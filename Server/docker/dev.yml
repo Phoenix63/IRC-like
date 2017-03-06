@@ -1,6 +1,6 @@
 node:
   image: pandirc/dev
-  command: sh -c 'nodemon --debug --ignore ./src/modules/file --exec babel-node ./src/server.js DEV'
+  command: sh -c 'nodemon --ignore ./src/modules/file --ignore ./__uploaded_files__ --exec babel-node ./src/server.js DEV'
   hostname: node
   volumes:
    - ./..:/app
@@ -14,7 +14,7 @@ node:
 
 fileserver:
   image: pandirc/dev
-  command: sh -c 'nodemon --debug --watch ./src/modules/file/* --exec babel-node ./src/modules/file/server.js DEV'
+  command: sh -c 'nodemon --watch ./src/modules/file --ignore ./__uploaded_files__ --exec babel-node ./src/modules/file/server.js DEV'
   hostname: fileserver
   volumes:
    - ./..:/app

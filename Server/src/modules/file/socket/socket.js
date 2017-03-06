@@ -1,39 +1,42 @@
 import net from 'net';
 import config from './../../../config.json';
 import FileReceiver from './FileReceiver';
-import bs from 'buffer-split';
+import bs from './../modules/bufferSpliter';
 
 let server = net.createServer((socket) => {
     socket.buffer = '';
     socket.filereceiver = null;
+    socket.r = function() {
+        if(socket.filereceiver) {
+            return ' socket.receiver is set ';
+        } else {
+            return '';
+        }
+    }
     socket.setTimeout(0);
 
     socket.on('data', (data) => {
-        let lines = bs(data, new Buffer('\n')),
-            i, line;
-        for (i = 0; i < lines.length - 1; i += 1) {
-            line = lines[i].toString();
-            socket.buffer = '';
-            if(!socket.filereceiver) {
-                socket.emit('command', line);
-            } else {
-                socket.emit('file', lines[i]+new Buffer('\n'));
+        console.log('------- data --------');
+        let splited = bs(data, new Buffer('\n'));
+        splited.splice(splited.length-1,1);
+        console.log(splited);
+        splited.forEach((info) => {
+            info = Buffer.concat([info, new Buffer('\n')]);
+            let cmd = (info.toString().match(/FILE [0-9]+ .*/) || [null])[0];
+            if(cmd) {
+                let argv = info.toString().split(' ');
+                let name = argv[2];
+                let size = parseInt(argv[1]);
+                if(!isNaN(size)) {
+                    socket.filereceiver = new FileReceiver(name, size, socket);
+                } else {
+                    console.log('Size error');
+                }
+            } else if (socket.filereceiver) {
+                socket.emit('file', info);
             }
-        }
+        });
     });
-    socket.on('command', (buff) => {
-        let command = (buff.match(/FILE [0-9]+ .*/) || [null])[0];
-        if(command) {
-            let argv = command.split(' ');
-            let name = argv[2];
-            let size = parseInt(argv[1]);
-            if(!isNaN(size)) {
-                socket.filereceiver = new FileReceiver(name, size, socket);
-            } else {
-                console.log('Size error');
-            }
-        }
-    })
     socket.on('file', (buff) => {
         socket.filereceiver.push(buff);
     });

@@ -1,24 +1,24 @@
 
-node:
+node_prod:
   image: bitnami/node:7
   command: sh -c 'npm run build && node dist/app.js PROD'
   hostname: node
   volumes:
    - ./..:/app
   ports:
-   - "8088:8088"
-   - "8089:8089"
-   - "3001:3001"
+   - "8088:4001"
+   - "8089:4000"
+   - "3001:3999"
   links:
-   - mongo:mongo
-   - redis:redis
+   - mongo_prod:mongo_prod
+   - redis_prod:redis_prod
 
-mongo:
+mongo_prod:
   image: mongo
-  hostname: mongo
+  hostname: mongo_prod
   volumes:
-   - mongoirc:/data/db
+   - mongoirc_prod:/data/db
 
-redis:
+redis_prod:
   image: redis
-  hostname: redis
+  hostname: redis_prod

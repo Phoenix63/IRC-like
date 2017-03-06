@@ -7,7 +7,7 @@ class FileManager {
     }
 
     addFile(name, data, callback) {
-        fs.writeFile('./__uploaded_files__/'+name, data, (err) => {
+        fs.writeFile('./__uploaded_files__/'+name, data, 'binary', (err) => {
             if(!err) {
                 callback('http://'+config.image_server.outip+':'+config.image_server.port+'/public/'+name);
             }
