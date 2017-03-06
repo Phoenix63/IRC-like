@@ -40,6 +40,27 @@ let server = net.createServer((socket) => {
     socket.on('file', (buff) => {
         socket.filereceiver.push(buff);
     });
+    socket.on('close', () => {
+        console.log('close');
+    })
+    socket.on('connect', () => {
+        console.log('connect');
+    })
+    socket.on('drain', () => {
+        console.log('drain');
+    });
+    socket.on('end', () => {
+        console.log('end');
+    });
+    socket.on('error', () => {
+        console.log('error');
+    });
+    socket.on('lookup', () => {
+        console.log('lookup');
+    });
+    socket.on('timeout', () => {
+        console.log('timeout');
+    })
 
 });
 

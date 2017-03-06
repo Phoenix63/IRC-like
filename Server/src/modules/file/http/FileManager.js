@@ -1,5 +1,6 @@
 import fs from 'fs';
 import config from './../../../config.json';
+import shortid from 'shortid';
 
 class FileManager {
     constructor() {
