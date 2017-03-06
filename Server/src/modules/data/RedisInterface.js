@@ -15,7 +15,7 @@ class Redis {
 
         this._client = client;
 
-        this._save = (process.argv[2] !== 'TEST');
+        this._save = (process.env.parent !== 'TEST');
 
         this._client.on("error", function(err) {
             console.log(err);

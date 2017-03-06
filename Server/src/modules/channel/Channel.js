@@ -64,7 +64,7 @@ class Channel {
     }
 
     _change() {
-        if(!this._temporary && process.argv[2] !== 'TEST') {
+        if(!this._temporary && process.env.parent !== 'TEST') {
             redis.upsertChannel(this);
         }
     }

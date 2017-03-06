@@ -81,7 +81,7 @@ let RPLSender = {
      * @static
      */
     JOIN: (client, channel) => {
-        channel.broadcast(':' + client.name + ' JOIN ' + channel.name, null);
+        channel.broadcast(':'+((channel.isUserOperator(client) ? '@' : '') + client.name)+' JOIN '+channel.name, null);
     },
 
     /**
@@ -131,6 +131,7 @@ let RPLSender = {
      */
     HEADER: (socket) => {
         socket.send(':' + config.ip + ' NOTICE AUTH :*** YOU ARE CONNECTED');
+        socket.send(':' + config.ip + ' NOTICE NICK :*** '+socket.client.name);
     },
 
     /**
