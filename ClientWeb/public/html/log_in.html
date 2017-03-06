@@ -9,6 +9,13 @@
                         Pseudo
                     </label>
                     <input id="connexion_pseudo" type="text" ng-model="nickname" value="test"/>
+                    <p>{{alreadyUsedNIck}}</p>
+                </span>
+                <span>
+                    <label for="connexion_id">
+                        Id
+                    </label>
+                    <input id="connexion_pseudo" type="text" ng-model="id" value="Obligatoire"/>
                 </span>
                 <span>
                     <label for="connexion_password">
@@ -30,7 +37,7 @@
                     </label>
                     <input id="connexion_port" type="text" ng-model="port" value="8089"/>
                 </span>
-                <button ng-click="loadChat()" class="btn-solid btn-connect">Se connecter</button>
+                <button ng-click="logIn()" class="btn-solid btn-connect">Se connecter</button>
             </div>
         </form>
 

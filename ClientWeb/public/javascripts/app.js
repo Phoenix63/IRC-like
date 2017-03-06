@@ -24,3 +24,38 @@ myApp.config(function ($locationProvider, $routeProvider) {
             redirectTo: '/'
         });
 });
+
+myApp.factory("userInfo", function() {
+    return {
+      "userN": uniqid,
+      "nick": uniqid,
+      "realName": uniqid,
+      "right": 0,
+      "server": "http://localhost",
+      "port": 8089,
+      "socket": "",
+      "setNick": function(newUserNick) {
+        this.nick = newUserNick;
+      },
+      "setRight": function(newRight) {
+        this.right = newRight;
+      },
+      "setUser": function(newUserName, newUserRealName) {
+        this.userN = newUserName;
+        this.nick = newUserName;
+        this.realName = newUserRealName;
+      },
+      "setServer": function(newServer, newPort) {
+        this.server = newServer;
+        this.port = newPort;
+      },
+      "connect": function() {
+        this.socket = io(this.server+":"+this.port);
+      },
+      "afterConnection": function() {
+        this.userN = "Guest_" + this.userN;
+      }
+    }
+});
+
+var uniqid = (new Date().getTime() + Math.floor((Math.random()*10000)+1)).toString(16);
