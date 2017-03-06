@@ -164,6 +164,19 @@ h3::after {
 	display:inline-block;
 	font-size:120%;
 }
+
+.common-channel {
+	color:grey;
+}
+
+.secret-channel {
+	color:red;
+}
+
+.private-channel {
+	color:green;
+}
+
 .contextM {
 	background:white;
 	border:1px black groove;

@@ -4,6 +4,7 @@
 			this.admi = undefined;
 			this.notif = 0;
 			this.status = 0;
+			this.right = 0;
 			this.listU = [];
 			this.admin = [];
 			this.mute = [];
@@ -13,6 +14,9 @@
 		}
 		Channel.prototype.setAdmin = function(newAdmin) {
 			this.admi = newAdmin;
+		}
+		Channel.prototype.setRight = function(newRight) {
+			this.right = newRight;
 		}
 		Channel.prototype.addUser = function(newUser) {
 			this.listU.push(newUser);

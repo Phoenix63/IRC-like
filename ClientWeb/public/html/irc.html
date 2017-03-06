@@ -3,7 +3,7 @@
     <div id="channels">
         <h3>Channels list</h3>
         <div ng-repeat="channel in channels">
-            <button class="buttonChUs" ng-click="joinChannel(channel)" ng-class="channel.notif === 1 ? 'notif-messageOn' : 'notif-messageOff'" ng-context-menu="menuOptions(channel)">{{channel.chan}}</button>
+            <button class="buttonChUs" ng-click="joinChannel(channel)" ng-class="channel.status === 0 ? (channel.right === 0 ? 'common-channel' : (channel.right === 1 ? 'secret-channel' : 'private-channel'))" ng-class="channel.notif === 1 ? 'notif-messageOn' : 'notif-messageOff'" ng-context-menu="menuOptions(channel)">{{channel.chan}}</button>
         </div>
     </div>
 	<div id="users">

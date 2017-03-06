@@ -1,1 +1,1 @@
-var socket = io('http://localhost:8089');
+var socket = io('http://25.78.187.120:8089');
