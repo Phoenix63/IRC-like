@@ -115,7 +115,7 @@ module.exports = function (socket, command) {
         if(!user){
             ERRSender.ERR_NOSUCHNICK(socket.client, nameUser);
         }
-        if(user == socket.client){
+        if(user === socket.client){
             if(flags.indexOf('i') > -1){
                 user.changeFlag(sign,'i');
             }
@@ -125,10 +125,9 @@ module.exports = function (socket, command) {
             if(flags.indexOf('w') > -1){
                 user.changeFlag(sign,'w');
             }
-            if(flags.indexOf('o') > -1 && operator == '-' && !socket.client.isSuperAdmin()){
+            if(flags.indexOf('o') > -1 && sign === '-' && !socket.client.isSuperAdmin()){
                 user.changeFlag(sign,'o');
             }
-
         }else if (user != socket.client && socket.client.isSuperAdmin()){
             if(flags.indexOf('o') > -1){
                 user.changeFlag(sign,'o');

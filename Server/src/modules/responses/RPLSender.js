@@ -1,5 +1,6 @@
 import Channel from './../channel/Channel';
 import config from './../../config.json';
+import Client from './../client/client';
 
 let RPLSender = {
 
@@ -19,6 +20,9 @@ let RPLSender = {
         let ret = ':' + config.ip + ' 353 ' + client.name + ' ' + sep + ' ' + channel.name;
         let us = '';
         channel.users.forEach((user) => {
+            if(user.isInvisible()){
+                return;
+            }
             let delimiter = '';
             if (channel.isUserOperator(user)) {
                 delimiter = '@';
@@ -200,16 +204,25 @@ let RPLSender = {
     RPL_UMODEIS: (client, cmd)=> {
         client.socket.send(':'+config.ip+' 221 MODE '+cmd);
     },
-
     /**
      *
-     * @param {Client} client
-     * @param {string} kicked+-
-     * @param {Channel} channel
-     * @static
+     * @param cmd
+     * @constructor
+     */
+    RPL_UMODEIS_BROADCAST_ALL: (cmd)=> {
+        Client.list().forEach((client)=>{
+            client.socket.send(':'+config.ip+' 221 MODE '+cmd);
+        });
+    },
+    /**
+     *
+     * @param client
+     * @param kicked
+     * @param channel
+     * @constructor
      */
     KICK: (client, kicked, channel) => {
-        channel.broadcast(':'+client.name+' KICK '+kicked);
+        channel.broadcast(':'+client.name+' KICK '+channel.name+' '+kicked);
     },
     /**
      *

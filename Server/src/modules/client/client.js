@@ -277,7 +277,17 @@ class Client {
         arrayFlags.forEach((flag) => {
             if(this._flags.indexOf(flag)===-1){
                 this._flags += flag;
-                RPLSender.RPL_UMODEIS(this,this.name+' +'+flag);
+                if(flag==='i' || flag==='o'){
+                    if(flag ==='o'){
+                        this._channels.forEach((channel)=> {
+                           channel.changeClientFlag('+','o', this);
+                        });
+                    }
+                    RPLSender.RPL_UMODEIS_BROADCAST_ALL(this.name+' +'+flag);
+                }else{
+                    RPLSender.RPL_UMODEIS(this,this.name+' +'+flag);
+                }
+
             }
         });
     }
@@ -293,7 +303,11 @@ class Client {
             let tmp = this._flags.length;
             this._flags = this._flags.replace(flag,'');
             if(tmp-1 === this._flags.length){
-                RPLSender.RPL_UMODEIS(this,this.name+' -'+flag);
+                if(flag==='i' || flag==='o'){
+                    RPLSender.RPL_UMODEIS_BROADCAST_ALL(this.name+' -'+flag);
+                }else{
+                    RPLSender.RPL_UMODEIS(this,this.name+' -'+flag);
+                }
             }
         });
     }
@@ -325,6 +339,10 @@ class Client {
      */
     isAdmin() {
         return this._flags.indexOf('o')>=0;
+    }
+
+    isInvisible() {
+        return this._flags.indexOf('i')>-1;
     }
 
     /**
