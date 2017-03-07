@@ -31,7 +31,7 @@ myApp.factory("userInfo", function() {
       "nick": uniqid,
       "realName": uniqid,
       "right": 0,
-      "server": "http://localhost",
+      "server": "http://25.36.22.132",
       "port": 8089,
       "socket": "",
       "setNick": function(newUserNick) {
