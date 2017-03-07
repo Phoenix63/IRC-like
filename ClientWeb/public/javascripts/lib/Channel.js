@@ -1,11 +1,10 @@
 	var Channel = (function() {
 		function Channel(chanName) {
 			this.chan = chanName;
-			this.admi = undefined;
 			this.notif = 0;
 			this.status = 0;
+			this.right = 0;
 			this.listU = [];
-			this.admin = [];
 			this.mute = [];
 			this.topic = "";
 			this.messages = [];
@@ -14,6 +13,9 @@
 		Channel.prototype.setAdmin = function(newAdmin) {
 			this.admi = newAdmin;
 		}
+		Channel.prototype.setRight = function(newRight) {
+			this.right = newRight;
+		}
 		Channel.prototype.addUser = function(newUser) {
 			this.listU.push(newUser);
 		}
@@ -21,6 +23,13 @@
 			for(var i = 0; i<this.listU.length; i++) {
 				if(this.listU[i].nick === u) {
 					this.listU.splice(i,1);
+				}
+			}
+		}
+		Channel.prototype.removeMuteList = function(user) {
+			for(var i = 0; i<this.mute.length; i++) {
+				if(this.mute[i] === user) {
+					this.mute.splice(i,1);
 				}
 			}
 		}

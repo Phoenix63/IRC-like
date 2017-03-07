@@ -10,10 +10,9 @@
 	function in_isNames(msg) {
 		var msSplit = msg.split(' ');
 		var listUsers = [];
+		var channSet = msSplit[3];
 		var chann = msSplit[4];
-		//alert("1");
 		for(var i = 5; i<msSplit.length; i++) {
-			//alert("2");
 			msSplit[i] = msSplit[i].replace(":","");
 			if(msSplit[i].includes("@")) {
 				msSplit[i] = msSplit[i].replace("@","");
@@ -26,7 +25,7 @@
 				listUsers.push(newUser);
 			}
 		}
-		return [chann, listUsers];
+		return [chann, listUsers, channSet];
 	}
 	
 	function in_isChannel(msg) {

@@ -128,16 +128,19 @@ h3::after {
 
 .notif-messageOn {
 	font-weight:bold;
-	color:red;
 }
 
 .notif-messageOff {
 	font-weight:normal;
-	color:black;
 }
 
 .admin-color {
 	color:#A52A2A;
+	font-weight:bold;
+}
+
+.operator-color {
+	color:#9932CC;
 	font-weight:bold;
 }
 .user-color {
@@ -161,6 +164,19 @@ h3::after {
 	display:inline-block;
 	font-size:120%;
 }
+
+.common-channel {
+	color:grey;
+}
+
+.secret-channel {
+	color:red;
+}
+
+.private-channel {
+	color:green;
+}
+
 .contextM {
 	background:white;
 	border:1px black groove;
