@@ -12,7 +12,8 @@
  * Channel: Constructor
  */
 
-Channel::Channel()
+Channel::Channel(ParserEmoji *emoji):
+    emoji(emoji)
 {
     currentChannel = QString("\"Debug\"");
     channels[currentChannel] = ChannelContent();
@@ -172,8 +173,13 @@ bool Channel::notif(QString chan)
     else return false;
 }
 
-void Channel::togleNotif(QString chan)
+void Channel::togleNotif(QString chan, bool newValue)
 {
     if (channels.contains(chan))
-        channels[chan].togleNotif();
+            channels[chan].togleNotif(newValue);
+}
+
+Message Channel::getLast()
+{
+    return channels[currentChannel].getLast();
 }

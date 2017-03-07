@@ -83,7 +83,12 @@ bool ChannelContent::notif()
     return aNotif;
 }
 
-void ChannelContent::togleNotif()
+void ChannelContent::togleNotif(bool newValue)
 {
-    aNotif = !aNotif;
+    aNotif = newValue;
+}
+
+Message ChannelContent::getLast()
+{
+    return aChatContent.back();
 }

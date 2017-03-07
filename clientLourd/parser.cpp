@@ -275,7 +275,7 @@ bool Parser::out_isPrivMsg(QString string)
     channel->appendCurrent(message, &self);
     string.prepend("PRIVMSG " + channel->channelName() + " :");
     sendToServer(socket, string);
-    emit chatModifiedSignal();
+    emit lineAddedSignal();
         return true;
 }
 
@@ -374,7 +374,7 @@ bool Parser::in_isPrivMesg(QString string)
     QString sender = string.split(' ').at(0);
     channel->appendChannel(message, chan, sender);
     if (chan != channel->channelName())
-        channel->togleNotif(chan);
+        channel->togleNotif(chan, true);
     emit chatModifiedSignal();
     emit channelModifiedSignal();
     return true;
@@ -390,7 +390,7 @@ bool Parser::in_isWhisMesg(QString string)
     channel->joinWhisper(sender);
     channel->appendChannel(message, sender, sender);
     if (sender != channel->channelName())
-            channel->togleNotif(sender);
+            channel->togleNotif(sender, true);
     emit channelModifiedSignal();
     emit chatModifiedSignal();
     return true;
@@ -425,8 +425,8 @@ bool Parser::in_isKickMesg(QString string)
     else{
         channel->appendChannel(kicked + " was kicked from " + chan + " by " + admin, "\"Debug\"", "");
     }
-    emit chatModifiedSignal();
     emit channelModifiedSignal();
+    emit changeChannelSignal();
     return true;
 }
 
