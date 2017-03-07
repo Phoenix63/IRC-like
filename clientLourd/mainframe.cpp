@@ -63,11 +63,9 @@ void MainFrame::printMsgLine(Message chatMsgLine)
     } else {
         lPseudo->setStyleSheet("color : " + theme->nick() + ';');
     }
-
     lPseudo->setFixedHeight(20);
     pseudoBox->addWidget(lPseudo);
     ui->nickBox->addLayout(pseudoBox);
-
     QLabel *lMessage = new QLabel(chatMsgLine.message());
     lMessage->setFixedHeight(20);
     chatLine->addWidget(lMessage);
@@ -274,7 +272,7 @@ void MainFrame::on_pushButton_upload_clicked()
         QStringList files = QFileDialog::getOpenFileNames(this,"Select one or more files to open", homePath.first());
         for (auto i:files){
             QByteArray read;
-            QFile inputFile = i;
+            QFile inputFile(i);
             int size = inputFile.size();
             QString fileName = i.split('/').last();
             QString toSend = "FILE " + QString::number(size, 10) + " " + fileName + '\n';

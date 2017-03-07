@@ -65,28 +65,28 @@ void Channel::leave(QString chan){
  {
      QString time = '[' + QTime::currentTime().toString() + ']';
      if (channels.contains(currentChannel))
-         channels[currentChannel].appendChat(time + "    ", channels[currentChannel].findUser(pseudo) , " : " + string);
+         channels[currentChannel].appendChat(time + "    ", channels[currentChannel].findUser(pseudo) , " : " + emoji->parse(string));
  }
 
  void Channel::appendChannel(QString string, QString channel, QString send)
  {
      QString time = '[' + QTime::currentTime().toString() + ']';
      if (channels.contains(channel))
-         channels[channel].appendChat(time + "    ", channels[channel].findUser(send)," : " + string);
+         channels[channel].appendChat(time + "    ", channels[channel].findUser(send)," : " + emoji->parse(string));
  }
 
  void Channel::appendCurrent(QString string, User *pseudo)
  {
      QString time = '[' + QTime::currentTime().toString() + ']';
      if (channels.contains(currentChannel))
-         channels[currentChannel].appendChat(time + "    ", pseudo , " : " + string);
+         channels[currentChannel].appendChat(time + "    ", pseudo , " : " + emoji->parse(string));
  }
 
  void Channel::appendChannel(QString string, QString channel, User *send)
  {
      QString time = '[' + QTime::currentTime().toString() + ']';
      if (channels.contains(channel))
-         channels[channel].appendChat(time + "    ", send," : " + string);
+         channels[channel].appendChat(time + "    ", send," : " + emoji->parse(string));
  }
 
 void Channel::clean(){

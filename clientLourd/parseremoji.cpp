@@ -16,7 +16,7 @@ ParserEmoji::ParserEmoji()
             continue;
         QPixmap j("img/emojis/" + i);
         i = i.left(i.length() - 4);
-        emotes[":"+i+":"] = j.scaledToHeight(20, Qt::SmoothTransformation);
+        emotes[":" + i + ":"] = j.scaledToHeight(20, Qt::SmoothTransformation);
     }
 }
 
@@ -26,7 +26,7 @@ QString ParserEmoji::parse(QString string)
         QByteArray* byteArray = new QByteArray();
         QBuffer buffer(byteArray);
         emotes[i].save(&buffer, "PNG");
-        string.replace(i, "<img src=\"data:image/png;base64," + byteArray->toBase64()+".png\" height=\"20\" />");
+        string.replace(i, "<img src=\"data:image/png;base64," + byteArray->toBase64() + ".png\" height=\"20\" />");
     }
     return string;
 }
