@@ -61,6 +61,7 @@ private:
 	bool out_isPrivMsg(QString string);
 	bool out_isAwayMsg(QString string);
 	bool out_isInvMsg(QString string);
+	bool out_isListFile(QString string);
 
 	// In functions
 	bool in_isInitMesg(QString string);
@@ -83,7 +84,7 @@ private:
 	bool in_isAwayPrivMsg(QString string);
 	bool in_isInvMsg(QString string);
 	bool in_isConfirmInv(QString string);
-
+	bool in_isListFile(QString string);
 private:
 	// Pointer to the channel and socket created in mainframe
 	User self;

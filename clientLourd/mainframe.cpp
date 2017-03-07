@@ -386,7 +386,8 @@ void MainFrame::initCompletion()
     QStringList CompletionList;
     CompletionList << "/clean" << "/debug" << "/nick" << "/user" << "/join" << "/names"
                    << "/pass" << "/part" << "/list" << "/topic" << "/kick" << "/who"
-                   << "/whois" << "/mode" << "/msg" << "/quit" << "/away" << "/back";
+                   << "/whois" << "/mode" << "/msg" << "/quit" << "/away" << "/back"
+				   << "/invite" << "/files";
     StringCompleter = new QCompleter(CompletionList,this);
     StringCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     StringCompleter->popup()->setTabKeyNavigation(true);

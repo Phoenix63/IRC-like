@@ -25,6 +25,7 @@ const QRegularExpression NICK         ("^\\S+\\sNICK\\s");
 const QRegularExpression NOTICE       ("^\\S+\\sNOTICE\\sNICK");
 const QRegularExpression PRIVMSG      ("^\\S+\\sPRIVMSG\\s#\\S+");
 const QRegularExpression WHISPER      ("^\\S+\\sPRIVMSG\\s\\S+");
+const QRegularExpression FILELIST	  ("^\\S+\\sLISTFILES\\s\\S+");
 const QRegularExpression INVITING     ("^\\S+\\s341\\s");
 const QRegularExpression MOTDSTART    ("^\\S+\\s375\\s");
 const QRegularExpression MOTD         ("^\\S+\\s372\\s");

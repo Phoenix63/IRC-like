@@ -61,6 +61,7 @@ bool Parser::out(QString string)
     if (!out_isPassMsg(string))
     if (!out_isPartMsg(string))
     if (!out_isListMsg(string))
+    if (!out_isListFile(string))
     if (!out_isCleanMsg(string))
     if (!out_isDebugMsg(string))
     if (!out_isModeMsg(string))
@@ -95,6 +96,7 @@ void Parser::in(QString string)
     if (!in_isWhisMesg(string))
     if (!in_isNickEdit(string))
     if (!in_isListMesg(string))
+    if (!in_isListFile(string))
     if (!in_isSetTopic(string))
     if (!in_isKickMesg(string))
     if (!in_isNoNick(string))
@@ -202,6 +204,18 @@ bool Parser::out_isListMsg(QString string)
     listOfChannels->show();
     listOfChannels->initUIStyle();
     listOfChannels->clear();
+    return true;
+}
+
+bool Parser::out_isListFile(QString string)
+{
+    if(!string.startsWith("/files"))
+        return false;
+    string = string.right(string.length() - 6);
+    string.prepend("LISTFILES");
+    if (string.contains(QRegularExpression("^LISTFILES\\s*$")))
+        string = "LISTFILES " + channel->channelName() + '\n';
+    sendToServer(socket, string);
     return true;
 }
 
@@ -489,6 +503,21 @@ bool Parser::in_isListMesg(QString string)
     return true;
 }
 
+bool Parser::in_isListFile(QString string)
+{
+    qDebug() << string;
+    if(!string.contains(IRC::RPL::FILELIST))
+        return false;
+    QString chan = string.split(' ').at(2);
+    qDebug() << chan;
+    int j = string.indexOf(QRegularExpression(":.+$"));
+    QString url = string.right(string.length() - j - 1);
+    qDebug() << chan;
+    channel->appendChannel(url, chan, "");
+    emit chatModifiedSignal();
+    return true;
+}
+
 bool Parser::in_isSetTopic(QString string)
 {
     if (!string.contains(QRegularExpression("^.+\\s(331|332)\\sTOPIC")))
@@ -522,6 +551,7 @@ bool Parser::in_isConfirmInv(QString string)
     QString user = string.split(' ').at(2);
     channel->appendChannel("You invited " + user + " to " + chan, chan, "");
     emit chatModifiedSignal();
+    return true;
 }
 
 bool Parser::in_isAwayStatus(QString string)
