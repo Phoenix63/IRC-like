@@ -73,7 +73,7 @@ module.exports = function (socket, command) {
                     return;
                 }else{
                     channel.setPass(arg4);
-                    RPLSender.RPL_CHANNELMODEIS(channel,nameChannel+' +k');
+                    RPLSender.RPL_CHANNELMODEIS(channel,nameChannel+' +k '+arg4);
                 }
             }
         }

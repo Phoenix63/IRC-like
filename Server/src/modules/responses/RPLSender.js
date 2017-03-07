@@ -243,7 +243,17 @@ let RPLSender = {
      */
     RPL_YOU_HAVE_BEEN_INVITED: (socket, guest, chan)=>{
         guest.socket.send(':YOU_HAVE_BEEN_INVITED '+socket.client.name+' '+chan.name);
-    }
+    },
+    RPL_AWAY: (socket, nick, msg) => {
+        socket.send(':'+config.ip+' 301 '+nick+' :'+msg);
+    },
+    RPL_UNAWAY: (socket) => {
+        socket.send(':'+config.ip+' 305 :You are no longer marked as being away');
+    },
+    RPL_NOWAWAY: (socket) => {
+        socket.send(':'+config.ip+' 306 :You have been marked as being away');
+    },
+
 
 };
 export default RPLSender

@@ -3,6 +3,7 @@
 import Channel from './../channel/Channel';
 import Client from './../client/client';
 import ERRSender from './../responses/ERRSender';
+import RPLSender from './../responses/RPLSender';
 
 module.exports = function (socket, command) {
 
@@ -39,6 +40,9 @@ module.exports = function (socket, command) {
     receivers.forEach((r) => {
         if (clients[r]) {
             clients[r].socket.send(':' + socket.client.name + ' PRIVMSG ' + r + ' :' + message);
+            if(clients[r].away){
+                RPLSender.RPL_AWAY(socket, clients[r].name, clients[r].away);
+            }
         } else if (channels[r]) {
             if (channels[r].users.indexOf(socket.client) >= 0) {
                 if(channels[r].isModerated && !channels[r].isUserVoice(socket.client)){

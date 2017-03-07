@@ -60,6 +60,14 @@ class Client {
         this._pass = crypto.createHash('sha256').update(val).digest('base64');
     }
 
+    set away(val) {
+        this._away = val;
+    }
+
+    get away() {
+        return this._away;
+    }
+
     /**
      * get user id
      * @returns {string}
