@@ -1113,6 +1113,86 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 			var welcome = (/^:[0-9.a-z:]+[ ][3][7][2][ ][:][-][ ][a-zA-Z]+[ ]([\w\W]+)$/).exec(msg);
 			user.setNick(welcome[1]);
 		}
+		else if(msg.match(/^:[0-9.a-z:]+[ ]324[ ]MODE[ ][#][\S\w]+[ ][\w\S]+$/)) {
+			var rspMode = (/^:[0-9.a-z:]+[ ]324[ ]MODE[ ]([#][\S\w]+)[ ]([\w\S]+)$/).exec(msg);
+			var rspModeCh = rspMode[1];
+			var rspModeFlag = rspMode[2];
+			if(rspModeFlag === "+k") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " have a password"]);
+			}
+			else if(rspModeFlag === "-k") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " don't have a password anymore"]);
+			}
+			else if(rspModeFlag === "+p") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " is now private"]);
+			}
+			else if(rspModeFlag === "-p") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " is not private"]);
+			}
+			else if(rspModeFlag === "+s") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " is now secret"]);
+			}
+			else if(rspModeFlag === "-s") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " is not secret anymore"]);
+			}
+			else if(rspModeFlag === "+i") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " is in invite-mode"]);
+			}
+			else if(rspModeFlag === "-i") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " is not in invite mode anymore"]);
+			}
+			else if(rspModeFlag === "+t") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Thetopic of the channel " + rspModeCh + " is now available in modification only by operators"]);
+			}
+			else if(rspModeFlag === "-t") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Everyone could modify the topic of the channel " + rspModeCh]);
+			}
+			else if(rspModeFlag === "+n") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " could not receive message from away"]);
+			}
+			else if(rspModeFlag === "-n") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " could receive messsage from away"]);
+			}
+			else if(rspModeFlag === "+m") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " is now moderate"]);
+			}
+			else if(rspModeFlag === "-m") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " is not moderate"]);
+			}
+			else if(rspModeFlag === "+b") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " "]);
+			}
+			else if(rspModeFlag === "-b") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " "]);
+			}
+		}
+		else if(msg.match(/^:[0-9.a-z:]+[ ]324[ ]MODE[ ][#][\S\w]+[ ][\w\S][ ][\w\S]+$/)) {
+			var rspMode = (/^:[0-9.a-z:]+[ ]324[ ]MODE[ ]([#][\S\w]+)[ ]([\w\S]+)[ ]([\w\S]+)$/).exec(msg);
+			var rspModeCh = rspMode[1];
+			var rspModeFlag = rspMode[2];
+			var rspModeUser = rspMode[3];
+			if(rspModeFlag === "+o") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The user " + rspModeUser + " is now operator in " + rspModeCh]);
+			}
+			else if(rspModeFlag === "-o") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The user " + rspModeUser + " is now simple user in " + rspModeCh]);
+			}
+			else if(rspModeFlag === "+v") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The user " + rspModeUser + " coundn't talk in the channel " + rspModeCh]);
+			}
+			else if(rspModeFlag === "-v") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The user " + rspModeUser + " could talk in the channel " + rspModeCh]);
+			}
+			else if(rspModeFlag === "+l") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The limit of users is  " + rspModeUser + " on " + rspModeCh]);
+			}
+			else if(rspModeFlag === "-l") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The limit of users is  " + rspModeUser + " on " + rspModeCh]);
+			}
+		}
+		else if(msg.match(/^:[0-9.a-z:]+[ ]467[\w\W]+$/)) {
+			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The key is already set"]);
+		}
 		else if(msg.match(/^:[0-9.a-z:]+[ ][3][3][1][ ]JOIN[ ][#][\w\S]+[ ][:][\w\S ]+$/)) {
 			var topic = in_isTopic(msg);
 			$scope.currentChannel.setTopic(topic[0] + " :" + topic[1]);
