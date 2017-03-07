@@ -209,7 +209,7 @@ let RPLSender = {
      * @static
      */
     KICK: (client, kicked, channel) => {
-        channel.broadcast(':'+client.name+' KICK '+kicked);
+        channel.broadcast(':'+client.name+' KICK '+kicked, null);
     },
     /**
      *
@@ -245,6 +245,17 @@ let RPLSender = {
             socket.send(':'+config.ip+' LISTFILES '+chan.name+' '+key+' '+files[key].name+' '+files[key].client.name);
         }
         socket.send(':'+config.ip+' LISTFILES '+chan.name+' :/list end');
+    },
+
+    /**
+     *
+     * @param {Socket} socket
+     * @param {Channel} chan
+     * @param {string} file
+     * @constructor
+     */
+    RMFILE: (socket, chan, file) => {
+        chan.broadcast(':'+socket.client.name+' RMFILE :'+file, null);
     }
 
 };
