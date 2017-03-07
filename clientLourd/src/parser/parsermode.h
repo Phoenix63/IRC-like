@@ -19,17 +19,17 @@ public:
 
     //Channel Mode
     void parseChan(QString string);
-    bool isIChanMode(QString mode);
-    bool isOChanMode(QString mode, QString string);
-    bool isPMode(QString mode);
-    bool isSMode(QString mode);
-    bool isTMode(QString mode);
-    bool isNMode(QString mode);
-    bool isMMode(QString mode);
-    bool isLMode(QString mode, QString string);
-    bool isBMode(QString mode, QString string);
-    bool isVMode(QString mode, QString string);
-    bool isKMode(QString mode, QString string);
+    bool isIChanMode(QString mode, QString channel);
+    bool isOChanMode(QString mode, QString channel, QString arg);
+    bool isPMode(QString mode, QString channel);
+    bool isSMode(QString mode, QString channel);
+    bool isTMode(QString mode, QString channel);
+    bool isNMode(QString mode, QString channel);
+    bool isMMode(QString mode, QString channel);
+    bool isLMode(QString mode, QString channel, QString arg);
+    bool isBMode(QString mode, QString channel, QString arg);
+    bool isVMode(QString mode, QString channel, QString arg);
+    bool isKMode(QString mode, QString channel, QString arg);
 private:
     Channel *channel;
     UserList userList;
