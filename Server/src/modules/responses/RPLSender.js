@@ -271,6 +271,31 @@ let RPLSender = {
         socket.send(':'+config.ip+' 306 :You have been marked as being away');
     },
 
+    /**
+     *
+     * @param {Socket} socket
+     * @param {Channel} chan
+     * @constructor
+     */
+    LISTFILES: (socket, chan) => {
+        socket.send(':'+config.ip+' LISTFILES '+chan.name+' :/list start');
+        let files = chan.getFiles();
+        for(var key in files) {
+            socket.send(':'+config.ip+' LISTFILES '+chan.name+' '+key+' '+files[key].name+' '+files[key].client.name);
+        }
+        socket.send(':'+config.ip+' LISTFILES '+chan.name+' :/list end');
+    },
+
+    /**
+     *
+     * @param {Socket} socket
+     * @param {Channel} chan
+     * @param {string} file
+     * @constructor
+     */
+    RMFILE: (socket, chan, file) => {
+        chan.broadcast(':'+socket.client.name+' RMFILE :'+file, null);
+    }
 
 };
 export default RPLSender

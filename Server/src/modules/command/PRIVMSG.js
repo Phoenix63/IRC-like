@@ -4,6 +4,7 @@ import Channel from './../channel/Channel';
 import Client from './../client/client';
 import ERRSender from './../responses/ERRSender';
 import RPLSender from './../responses/RPLSender';
+import config from './../../config.json';
 
 module.exports = function (socket, command) {
 
@@ -24,6 +25,15 @@ module.exports = function (socket, command) {
         return;
     }
     message = message.slice(1, message.length);
+
+    let files = [];
+    message.replace(/\[FILE=[^\]]/g, '');
+    let regex = new RegExp('http(s)?://'+config.image_server.outip+':'+config.image_server.port+'/public/[^ ]+', 'g');
+    if(message.match(regex)) {
+        files = message.match(regex);
+    }
+
+    let error = true;
     if(receivers.indexOf('@global') >= 0 && socket.client.isAdmin()) {
         socket.broadcast(':@[ADMIN]'+socket.client.name+' PRIVMSG @global :'+message);
     }
@@ -49,6 +59,10 @@ module.exports = function (socket, command) {
                     ERRSender.ERR_CANNOTSENDTOCHAN(socket.client,channels[r].name);
                     return;
                 }
+                files.forEach((url) => {
+                    channels[r].addFile(socket.client, url);
+                    message.replace(url, '[FILE='+url+']');
+                });
                 channels[r].broadcast(':' + socket.client.name + ' PRIVMSG ' + r + ' :' + message, socket.client);
             } else {
                 ERRSender.ERR_CANNOTSENDTOCHAN(socket.client, r);

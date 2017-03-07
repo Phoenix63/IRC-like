@@ -4,7 +4,6 @@ import Channel from './../channel/Channel';
 import ERRSender from './../responses/ERRSender';
 
 module.exports = function (socket, command) {
-    socket.send('test');
     if (!socket.client.isRegistered) {
         ERRSender.ERR_NOTREGISTERED(socket.client, 'PART');
         return;
@@ -25,7 +24,6 @@ module.exports = function (socket, command) {
             channels.splice(channels.indexOf(chan.name),1);
         }
     });
-    socket.send(channels);
     channels.forEach((errname) => {
         ERRSender.ERR_NOSUCHCHANNEL(socket.client, errname);
     });

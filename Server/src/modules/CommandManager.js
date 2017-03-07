@@ -21,7 +21,9 @@ let allowedCommand = {
     'RESTART': require('./command/RESTART'),
     'KICK': require('./command/KICK'),
     'INVITE': require('./command/INVITE'),
-    'AWAY': require('./command/AWAY')
+    'AWAY': require('./command/AWAY'),
+    'LISTFILES': require('./command/LISTFILES'),
+    'RMFILE': require('./command/RMFILE')
 };
 
 class CommandManager {

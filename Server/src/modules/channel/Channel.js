@@ -47,6 +47,8 @@ class Channel {
         this._temporary = true;
         this._topic = topic;
 
+        this._files = {};
+
 
         // not loaded from db
         if(creator instanceof Client) {
@@ -77,10 +79,9 @@ class Channel {
         return this._name;
     }
 
-
     /**
      *
-     * @returns {*}
+     * @returns {string|NULL}
      */
     get topic() {
         if(this._topic !== '') {
@@ -202,7 +203,7 @@ class Channel {
 
     /**
      *
-     * @param newTopic
+     * @param {string|NULL} newTopic
      */
     set topic(newTopic){
         this._topic = newTopic;
@@ -242,6 +243,35 @@ class Channel {
             }
         });
         this._change();
+    }
+
+    /**
+     *
+     * @param {Client} client
+     * @param {string} url
+     */
+    addFile(client, url) {
+        let split = url.split('/');
+        this._files[url] = {
+            name: split[split.length-1],
+            client: client
+        };
+    }
+
+    /**
+     *
+     * @returns {Array<Client, string>}
+     */
+    getFiles() {
+        return this._files;
+    }
+
+    removeFile(url) {
+        delete this._files[url];
+    }
+
+    deleteFiles() {
+        this._files = {};
     }
 
     /**
@@ -328,9 +358,10 @@ class Channel {
         return false;
     }
 
+
     /**
      *
-     * @param flags
+     * @param {string} flags
      */
     setUserFlags(flags) {
         this._usersFlags = flags;
@@ -416,7 +447,7 @@ class Channel {
 
     /**
      *
-     * @param size
+     * @param {string} size
      */
     setSize(size) {
         this._size = size;
@@ -424,7 +455,7 @@ class Channel {
 
     /**
      *
-     * @param pass
+     * @param {string} pass
      */
     setPass(pass) {
         this._pass = pass;
@@ -444,8 +475,8 @@ class Channel {
 
     /**
      *
-     * @param socket
-     * @param client
+     * @param {Socket} socket
+     * @param {Client} client
      */
     invite(socket, client){
         if(this._invitations.indexOf(client)===-1){

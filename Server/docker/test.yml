@@ -12,6 +12,19 @@ node:
   links:
    - mongo:mongo
    - redis:redis
+   - fileserver:fileserver
+
+fileserver:
+  image: bitnami/node:7
+  command: sh -c 'npm run build && node ./dist/modules/file/server.js PROD'
+  hostname: fileserver
+  volumes:
+   - ./..:/app
+  ports:
+   - "8090:8090"
+   - "8091:8091"
+  links:
+   - redis:redis
 
 mongo:
   image: mongo
