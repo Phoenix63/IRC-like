@@ -4,6 +4,7 @@
 #include <QString>
 #include <QHash>
 
+#include "userlist.h"
 #include "parseremoji.h"
 #include "channelcontent.h"
 #include "message.h"
@@ -36,6 +37,8 @@ public:
     // Text adding function
     void appendChannel(QString string, QString channel, QString send);
     void appendCurrent(QString string, QString pseudo);
+    void appendChannel(QString string, QString channel, User *send);
+    void appendCurrent(QString string, User * pseudo);
     void clean();
 
     // Current channel change function
@@ -47,9 +50,10 @@ public:
 
     // User functions
     void addUser(QString user, QString channel);
+    void addUser(User *user);
     void delUser(QString user, QString channel);
-    void changeNick(QString nick, QString newNick);
-    QList<QString> users();
+    void changeNick(QString user, QString nick);
+    QList<User *> users();
 
     // Topic
     void topic(QString topic, QString channel);
@@ -61,11 +65,11 @@ public:
     Message getLast();
 private:
     ParserEmoji * emoji;
+    UserList userList;
     // Current channel name
     QString currentChannel;
     // Qhash wich contain message: key = channel name, content = message list
     QHash<QString, ChannelContent> channels;
-
 };
 
 #endif // CHANNEL_H

@@ -3,11 +3,13 @@
 
 #include <QString>
 
+#include "user.h"
+
 class Message
 {
 public:
     // Constructor
-    Message(QString sender, QString date, QString message);
+    Message(User *sender, QString date, QString message);
 
     // Getters
     QString sender();
@@ -15,7 +17,7 @@ public:
     QString message();
 
 private:
-    QString aSender;
+    User* aSender;
     QString aDate;
     QString aMessage;
 };

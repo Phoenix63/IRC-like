@@ -29,7 +29,7 @@ MainFrame::MainFrame(QWidget *parent, QTcpSocket *socket, QString host) :
     initConnect();
     initUIStyle();
     initCompletion();
-    parser.initialize(&channel, socket, "Guest");
+    parser.initialize(&channel, socket, User("Guest"));
     msgList.msgSender(ui->messageSender);
     channelModified();
 }
@@ -63,6 +63,7 @@ void MainFrame::printMsgLine(Message chatMsgLine)
     } else {
         lPseudo->setStyleSheet("color : " + theme->nick() + ';');
     }
+
     lPseudo->setFixedHeight(20);
     pseudoBox->addWidget(lPseudo);
     ui->nickBox->addLayout(pseudoBox);
@@ -115,6 +116,7 @@ void MainFrame::clean()
 
 void MainFrame::channelModified()
 {
+
     ui->channelList->clear();
     for (auto i:channel.channelNames()) {
         ui->channelList->addItem(i);
@@ -127,7 +129,7 @@ void MainFrame::userModified()
 {
     ui->userList->clear();
     for (auto i:channel.users()) {
-        ui->userList->addItem(i);
+        ui->userList->addItem(i->name());
     }
 }
 

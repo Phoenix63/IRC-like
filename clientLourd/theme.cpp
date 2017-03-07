@@ -1,7 +1,7 @@
 #include "theme.h"
 #include "theme_in.h"
 
-Theme::Theme():
+Theme::Theme() :
     aName(IRC::COLOR::LIGHT::NAME),
     aBackground(IRC::COLOR::LIGHT::BACKGROUND),
     aHour(IRC::COLOR::LIGHT::HOUR),

@@ -1,6 +1,6 @@
 #include "message.h"
 
-Message::Message(QString sender, QString date, QString message):
+Message::Message(User *sender, QString date, QString message):
     aSender(sender),
     aDate(date),
     aMessage(message)
@@ -10,7 +10,10 @@ Message::Message(QString sender, QString date, QString message):
 
 QString Message::sender()
 {
-    return aSender;
+    if (aSender)
+        return aSender->name();
+    else
+        return "";
 }
 
 QString Message::date()

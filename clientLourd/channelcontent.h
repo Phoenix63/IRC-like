@@ -5,18 +5,21 @@
 #include <QString>
 
 #include "message.h"
+#include "user.h"
+#include "mode.h"
 
 class ChannelContent
 {
 public:
     //User functions
-    void addUser(QString newUser);
+    void addUser(User *newUser);
     void removeUser(QString userName);
-    void replaceUser(QString oldNick, QString newNick);
-    QList<QString> users();
+    void renameUser(QString oldNick, QString newNick);
+    QList<User *> users();
+    User* findUser(QString nick);
 
     //Chat functions
-    void appendChat(QString heure, QString pseudo, QString message);
+    void appendChat(QString heure, User *pseudo, QString message);
     void clearContent();
     QList<Message> chatContent();
 
@@ -27,11 +30,11 @@ public:
     //Notifications functions
     bool notif();
     void togleNotif(bool newValue);
-
     Message getLast();
+    
 private:
     QString aTopic;
-    QList<QString> aUsers;
+    QHash<User *, Mode> aUsers;
     QList<Message> aChatContent;
     bool aNotif = false;
 };
