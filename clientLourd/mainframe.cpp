@@ -279,19 +279,26 @@ void MainFrame::on_pushButton_upload_clicked()
             tmp->write(toSend.toLatin1());
             tmp->waitForReadyRead(1000);
             inputFile.open(QIODevice::ReadOnly);
-            while(1)
+            read = inputFile.read(100);
+            while (read.size() > 0)
             {
-                read = inputFile.read(300);
-                if (read.size() == 0) {
-                    break;
-                }
                 tmp->write(read);
                 tmp->waitForBytesWritten();
-                tmp->waitForReadyRead(100);
                 read.clear();
+                read = inputFile.read(100);
             }
-            tmp->write("\n");
             inputFile.close();
+            tmp->waitForReadyRead(-1);
+            QString url = tmp->readLine();
+            url.remove(0, 1);
+            int j = url.indexOf(QRegularExpression(":.+$"));
+            url = url.right(url.length() - j - 1);
+            QString privUrl = url;
+            url.prepend("PRIVMSG " + channel.channelName() + " :");
+            parser.sendToServer(socket, url);
+            privUrl.remove(privUrl.length() - 1, 1);
+            channel.appendCurrent(privUrl, parser.nickname());
+            chatModified();
         }
     }
 }
