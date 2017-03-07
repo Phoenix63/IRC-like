@@ -297,7 +297,7 @@ void MainFrame::on_pushButton_upload_clicked()
             url.prepend("PRIVMSG " + channel.channelName() + " :");
             parser.sendToServer(socket, url);
             privUrl.remove(privUrl.length() - 1, 1);
-            channel.appendCurrent(privUrl, parser.nickname());
+            channel.appendCurrent(privUrl, parser.userNick());
             chatModified();
         }
     }
@@ -386,7 +386,7 @@ void MainFrame::initCompletion()
     QStringList CompletionList;
     CompletionList << "/clean" << "/debug" << "/nick" << "/user" << "/join" << "/names"
                    << "/pass" << "/part" << "/list" << "/topic" << "/kick" << "/who"
-                   << "/whois" << "/mode" << "/msg" << "/quit";
+                   << "/whois" << "/mode" << "/msg" << "/quit" << "/away" << "/back";
     StringCompleter = new QCompleter(CompletionList,this);
     StringCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     StringCompleter->popup()->setTabKeyNavigation(true);

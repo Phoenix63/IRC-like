@@ -22,6 +22,7 @@ public:
     void initialize(Channel *channel, QTcpSocket *socket, User user);
     void nickname(QString nick);
     QString nickname();
+	User * userNick();
 	void sendToServer(QTcpSocket *socket, QString string);
 
 	// Parsing functions
@@ -58,6 +59,7 @@ private:
 	bool out_isWhoisMsg(QString string);
 	bool out_isMsgMsg(QString string);
 	bool out_isPrivMsg(QString string);
+	bool out_isAwayMsg(QString string);
 
 	// In functions
 	bool in_isInitMesg(QString string);
@@ -76,6 +78,8 @@ private:
     bool in_isNoChan(QString string);
     bool in_isUserMode(QString string);
     bool in_isChanMode(QString string);
+	bool in_isAwayStatus(QString string);
+	bool in_isAwayPrivMsg(QString string);
 
 private:
 	// Pointer to the channel and socket created in mainframe

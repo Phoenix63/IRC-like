@@ -29,6 +29,11 @@ void Parser::nickname(QString nick)
     self.name(nick);
 }
 
+User * Parser::userNick()
+{
+    return &self;
+}
+
 QString Parser::nickname()
 {
     return self.name();
@@ -63,6 +68,7 @@ bool Parser::out(QString string)
     if (!out_isWhoisMsg(string))
     if (!out_isWhoMsg(string))
     if (!out_isMsgMsg(string))
+	if (!out_isAwayMsg(string))
     if (!out_isPrivMsg(string))
         return false;
     return true;
@@ -93,6 +99,8 @@ void Parser::in(QString string)
     if (!in_isNoChan(string))
     if (!in_isUserMode(string))
     if (!in_isChanMode(string))
+	if (!in_isAwayStatus(string))
+	if (!in_isAwayPrivMsg(string))
     if (!in_isPing(string)) {
         channel->appendChannel(string, "\"Debug\"", nullptr);
         emit chatModifiedSignal();
@@ -264,7 +272,6 @@ bool Parser::out_isMsgMsg(QString string)
     message.remove(message.length() - 1, 1);
     channel->appendCurrent(message, &self);
     emit changeChannelSignal();
-    emit chatModifiedSignal();
     emit channelModifiedSignal();
     return true;
 }
@@ -275,8 +282,20 @@ bool Parser::out_isPrivMsg(QString string)
     channel->appendCurrent(message, &self);
     string.prepend("PRIVMSG " + channel->channelName() + " :");
     sendToServer(socket, string);
-    emit lineAddedSignal();
+    emit channelModifiedSignal();
         return true;
+}
+
+bool Parser::out_isAwayMsg(QString string)
+{
+    if (!(string.startsWith("/away") || string.startsWith("/back")))
+        return false;
+    string = string.right(string.length() - 5);
+    string.prepend("AWAY");
+    sendToServer(socket, string);
+    channel->change("\"Debug\"");
+    emit changeChannelSignal();
+    return true;
 }
 
 bool Parser::out_isQuitMsg(QString string)
@@ -317,10 +336,12 @@ bool Parser::in_isNameList(QString string)
 {
     if (!string.contains(QRegularExpression("^.+\\s353")))
         return false;
+    channel->change("\"Debug\"");
     channel->appendChannel(string, "\"Debug\"", nullptr);
     for (auto i = 5; i < string.split(QRegularExpression("\\s:?")).length(); i++) {
          channel->addUser(string.split(QRegularExpression("\\s:?"))[i],string.split(QRegularExpression("\\s:?"))[4]);
     }
+    emit changeChannelSignal();
     emit chatModifiedSignal();
     emit userModifiedSignal();
     return true;
@@ -372,6 +393,7 @@ bool Parser::in_isPrivMesg(QString string)
     QString message = string.right(string.length() - j - 1);
     QString chan = string.split(' ').at(2);
     QString sender = string.split(' ').at(0);
+    channel->addUser(sender, chan);
     channel->appendChannel(message, chan, sender);
     if (chan != channel->channelName())
         channel->togleNotif(chan, true);
@@ -388,6 +410,7 @@ bool Parser::in_isWhisMesg(QString string)
     QString sender = string.split(' ').at(0);
     QString message = string.right(string.length() - j - 1);
     channel->joinWhisper(sender);
+    channel->addUser(sender, sender);
     channel->appendChannel(message, sender, sender);
     if (sender != channel->channelName())
             channel->togleNotif(sender, true);
@@ -464,6 +487,33 @@ bool Parser::in_isSetTopic(QString string)
     return true;
 }
 
+bool Parser::in_isAwayStatus(QString string)
+{
+    if(! (string.contains(IRC::RPL::SETAWAY) || string.contains(IRC::RPL::SETBACK) ))
+        return false;
+    int j = string.indexOf(QRegularExpression(":.+$"));
+    QString message = string.right(string.length() - j - 1);
+    channel->appendChannel(message, "\"Debug\"", "");
+    if (string.contains(IRC::RPL::SETAWAY))
+        channel->appendChannel("/back to unset", "\"Debug\"", "");
+    emit chatModifiedSignal();
+    return true;
+}
+
+bool Parser::in_isAwayPrivMsg(QString string)
+{
+    if (!string.contains(IRC::RPL::ISAWAY))
+        return false;
+    QString nick = string.split(' ').at(2);
+    int j = string.indexOf(QRegularExpression(":.+$"));
+    QString message = string.right(string.length() - j - 1);
+    channel->appendChannel(nick + " is away : " + message, nick, "");
+    emit changeChannelSignal();
+    emit channelModifiedSignal();
+
+    return true;
+}
+
 bool Parser::in_isNoNick(QString string)
 {
     if (!string.contains(IRC::ERR::NOSUCHNICK))
@@ -505,7 +555,6 @@ bool Parser::in_isUserMode(QString string)
         return false;
     modeParser->parseUser(string);
     emit changeChannelSignal();
-    emit userModifiedSignal();
     emit channelModifiedSignal();
     return true;
 }

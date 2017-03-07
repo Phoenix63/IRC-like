@@ -79,7 +79,7 @@ void Channel::leave(QString chan){
  {
      QString time = '[' + QTime::currentTime().toString() + ']';
      if (channels.contains(currentChannel))
-         channels[currentChannel].appendChat(time + "    ", pseudo , " : " + emoji->parse(string));
+         channels[currentChannel].appendChat(time + "    ", pseudo, " : " + emoji->parse(string));
  }
 
  void Channel::appendChannel(QString string, QString channel, User *send)

@@ -7,6 +7,9 @@ namespace IRC {
 
 namespace RPL {
 const QRegularExpression MODEUSER     ("^\\S+\\s221\\s");
+const QRegularExpression ISAWAY       ("^\\S+\\s301\\s");
+const QRegularExpression SETBACK      ("^\\S+\\s305\\s");
+const QRegularExpression SETAWAY      ("^\\S+\\s306\\s");
 const QRegularExpression MODECHAN     ("^\\S+\\s324\\s");
 const QRegularExpression NAMEREPLY    ("^\\S+\\s353\\s");
 const QRegularExpression WHOREPLY     ("^\\S+\\s352\\s");
