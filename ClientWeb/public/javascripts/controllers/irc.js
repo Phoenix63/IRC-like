@@ -1,6 +1,6 @@
 myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 	var user = userInfo;
-	var defaultMess = new User("Server response"); // if there is no user in the sender message
+	var defaultMess = new User("Response"); // if there is no user in the sender message
 	defaultMess.setRight(2);
 	var boolNames = undefined;
 	var countNick = 0;
@@ -112,10 +112,12 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 		var cmdPart = $scope.newMessage.match(/^\/part[ ][\w\W]+$/);
 		var cmdTopic = $scope.newMessage.match(/^\/topic[ ][#][a-zA-Z0-9]+[ ][\w\W]+$/);
 		var cmdTopic1 = $scope.newMessage.match(/^\/topic[ ][#][a-zA-Z0-9]+$/);
+		var cmdKick = $scope.newMessage.match(/^\/kick[ ][#][a-zA-Z0-9]+$/);
 		var cmdUser = $scope.newMessage.match(/^\/[a-z]+[ ][\w\S]+$/);
 		var cmdMess = $scope.newMessage.match(/^\/[a-z]+[ ][\w\S]+[ ][\w\W]+$/);
 		var cmdNoParam = $scope.newMessage.match(/^\/[a-z]+$/);
 		var cmdMode = $scope.newMessage.match(/^\/mode[ ][\w\W]+$/);
+		var cmdUpOrDown = $scope.newMessage.match(/^(\/superman|\/krypto)[ ][\w\S]+$/);
 		if($scope.newMessage.match(/^\/[a-z]+/g)) {
 			if(cmdJoin != null) {
 				var command = (/^(\/[a-z]+)[ ]([\w\S]+)$/).exec($scope.newMessage);
@@ -318,27 +320,409 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 					default:
 				}
 			}
-
-			if(cmdMode !== null) {
+			
+			if(cmdKick !== null) {
 				var cmd = $scope.newMessage.split(" ");
-				console.log(cmd);
-				if(cmd[1].include("#")) {
-					for(let i=0; $scope.Channels.length; i++) {
-						if(cmd[1] === $scope.Channels[i]) {
-							if(userInfo.right === 1 || userInfo.right === 3) {
-
+				if(cmd[1].includes("#")) {
+					for(var i = 0; i<$scope.channels.length; i++) {
+						if(cmd[1] === $scope.channels[i].chan) {
+							for(var j = 2; j<cmd.length; j++) {
+								userInfo.socket.emit("message", "KICK " + cmd[1] + " " + cmd[j]);
 							}
 						}
-					}
-				} else {
-					for(let i=0; $scope.currentChannel.listU.length; i++) {
-						if(cmd[1] === $scope.currentChannel.listU[i]) {
-							//faut voir si les options mises sont valide
-							userInfo.socket.emit("message", "MODE ");
+						else {
+							$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You're not subscribe on that channel"]);
 						}
 					}
 				}
+				else {
+					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The second argument must be a channel"]);
+				}
 			}
+			
+			if(cmdUpOrDown !== null) {
+				var cmd = $scope.newMessage.split(" ");
+				console.log(cmd);
+				if(cmd[1].includes("#")) {
+					for(var i = 0; i<$scope.channels.length; i++) {
+						if(cmd[1] === $scope.channels[i].chan) {
+							if(cmd[0] === "/superman") {
+								for(var j = 2; j<cmd.length; j++) {
+									userInfo.socket.emit("message", "MODE " + cmd[1] + " +o " + cmd[j]);
+								}
+								boolNames = false;
+								userInfo.socket.emit("message", "NAMES " + cmd[1]);
+							}
+							else if(cmd[0] === "/krypto") {
+								for(var j = 2; j<cmd.length; j++) {
+									userInfo.socket.emit("message", "MODE " + cmd[1] + " -o " + cmd[j]);
+								}
+								boolNames = false;
+								userInfo.socket.emit("message", "NAMES " + cmd[1]);
+							}
+						}
+						else {
+							$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You're not subscribe on that channel"]);
+						}
+					}
+				} 
+				else {
+					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "This is not a channel"]);
+				}
+			}
+			
+			if(cmdMode !== null) {
+				
+				
+				var modeL = [[false, "+"], [false, "-"], [false, "o"], [false, "p"], [false, "s"], [false, "i"], [false, "t"], [false, "n"], [false, "m"], [false, "l"], [false, "b"], [false, "v"], [false, "k"], [false, "w"]];
+				var boolIsCh = true;
+				var cmd = $scope.newMessage.split(" ");
+				if(cmd[1].includes("#")) {
+					for(var i = 0; i<$scope.channels.length; i++) {
+						if(cmd[1] === $scope.channels[i].chan) {
+							if(cmd[2].includes("o") && cmd[2][0] === "+" && (cmd[2].includes("l") === false) && (cmd[2].includes("b") === false) && (cmd[2].includes("v") === false) && (cmd[2].includes("k") === false)) {
+								if(cmd[3] !== undefined  && cmd[3] !== "") {
+									modeL[0][0] = true;
+									modeL[2][0] = true;
+									if(cmd[2].includes("p")) {
+										modeL[3][0] =  true;
+									}
+									if(cmd[2].includes("s")) {
+										modeL[4][0] = true;
+									}
+									if(cmd[2].includes("i")) {
+										modeL[5][0] = true;
+									}
+									if(cmd[2].includes("t")) {
+										modeL[6][0] = true;
+									}
+									if(cmd[2].includes("n")) {
+										modeL[7][0] = true;
+									}
+									if(cmd[2].includes("m")) {
+										modeL[8][0] = true;
+									}
+								}
+								else {
+									$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You must put an user"]);
+								}
+							}
+							else if(cmd[2].includes("o") && cmd[2][0] === "-" && (cmd[2].includes("l") === false) && (cmd[2].includes("b") === false) && (cmd[2].includes("v") === false) && (cmd[2].includes("k") === false)) {
+								if(cmd[3] !== undefined  && cmd[3] !== "") {
+									modeL[1][0] = true;
+									modeL[2][0] = true;
+									if(cmd[2].includes("p") ) {
+										modeL[3][0] = true;
+									}
+									if(cmd[2].includes("s")) {
+										modeL[4][0] = true;
+									}
+									if(cmd[2].includes("i")) {
+										modeL[5][0] = true;
+									}
+									if(cmd[2].includes("t")) {
+										modeL[6][0] = true;
+									}
+									if(cmd[2].includes("n")) {
+										modeL[7][0] = true;
+									}
+									if(cmd[2].includes("m")) {
+										modeL[8][0] = true;
+									}
+								}
+								else {
+									$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You must put an user"]);
+								}
+							}
+							else if(cmd[2].includes("l") && cmd[2][0] === "+" && (cmd[2].includes("o") === false) && (cmd[2].includes("b") === false) && (cmd[2].includes("v") === false) && (cmd[2].includes("k") === false)) {
+								if(cmd[3] !== undefined  && cmd[3] !== "") {
+									modeL[9][0] = true;
+									modeL[0][0] = true;
+									if(cmd[2].includes("p") ) {
+										modeL[3][0] = true;
+									}
+									if(cmd[2].includes("s")) {
+										modeL[4][0] = true;
+									}
+									if(cmd[2].includes("i")) {
+										modeL[5][0] = true;
+									}
+									if(cmd[2].includes("t")) {
+										modeL[6][0] = true;
+									}
+									if(cmd[2].includes("n")) {
+										modeL[7][0] = true;
+									}
+									if(cmd[2].includes("m")) {
+										modeL[8][0] = true;
+									}
+								}
+								else {
+									$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You must put an user"]);
+								}
+							}
+							else if(cmd[2].includes("l") && cmd[2][0] === "-" && (cmd[2].includes("o") === false) && (cmd[2].includes("b") === false) && (cmd[2].includes("v") === false) && (cmd[2].includes("k") === false)) {
+								if(cmd[3] !== undefined  && cmd[3] !== "") {
+									modeL[9][0] = true;
+									modeL[1][0] = true;
+									if(cmd[2].includes("p") ) {
+										modeL[3][0] = true;
+									}
+									if(cmd[2].includes("s")) {
+										modeL[4][0] = true;
+									}
+									if(cmd[2].includes("i")) {
+										modeL[5][0] = true;
+									}
+									if(cmd[2].includes("t")) {
+										modeL[6][0] = true;
+									}
+									if(cmd[2].includes("n")) {
+										modeL[7][0] = true;
+									}
+									if(cmd[2].includes("m")) {
+										modeL[8][0] = true;
+									}
+								}
+								else {
+									$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You must put an user"]);
+								}
+							}
+							else if(cmd[2].includes("b") && cmd[2][0] === "-" && (cmd[2].includes("o") === false) && (cmd[2].includes("l") === false) && (cmd[2].includes("v") === false) && (cmd[2].includes("k") === false)) {
+								if(cmd[3] !== undefined  && cmd[3] !== "") {
+									modeL[10][0] = true;
+									modeL[0][0] = true;
+									if(cmd[2].includes("p") ) {
+										modeL[3][0] = true;
+									}
+									if(cmd[2].includes("s")) {
+										modeL[4][0] = true;
+									}
+									if(cmd[2].includes("i")) {
+										modeL[5][0] = true;
+									}
+									if(cmd[2].includes("t")) {
+										modeL[6][0] = true;
+									}
+									if(cmd[2].includes("n")) {
+										modeL[7][0] = true;
+									}
+									if(cmd[2].includes("m")) {
+										modeL[8][0] = true;
+									}
+								}
+								else {
+									$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You must put an user"]);
+								}
+							}
+							else if(cmd[2].includes("b") && cmd[2][0] === "-" && (cmd[2].includes("o") === false) && (cmd[2].includes("l") === false) && (cmd[2].includes("v") === false) && (cmd[2].includes("k") === false)) {
+								if(cmd[3] !== undefined  && cmd[3] !== "") {
+									modeL[10][0] = true;
+									modeL[1][0] = true;
+									if(cmd[2].includes("p") ) {
+										modeL[3][0] = true;
+									}
+									if(cmd[2].includes("s")) {
+										modeL[4][0] = true;
+									}
+									if(cmd[2].includes("i")) {
+										modeL[5][0] = true;
+									}
+									if(cmd[2].includes("t")) {
+										modeL[6][0] = true;
+									}
+									if(cmd[2].includes("n")) {
+										modeL[7][0] = true;
+									}
+									if(cmd[2].includes("m")) {
+										modeL[8][0] = true;
+									}
+								}
+								else {
+									$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You must put an user"]);
+								}
+							}
+							else if(cmd[2].includes("v") && cmd[2][0] === "+" && (cmd[2].includes("o") === false) && (cmd[2].includes("b") === false) && (cmd[2].includes("l") === false) && (cmd[2].includes("k") === false)) {
+								if(cmd[3] !== undefined  && cmd[3] !== "") {
+									modeL[11][0] = true;
+									modeL[0][0] = true;
+									if(cmd[2].includes("p") ) {
+										modeL[3][0] = true;
+									}
+									if(cmd[2].includes("s")) {
+										modeL[4][0] = true;
+									}
+									if(cmd[2].includes("i")) {
+										modeL[5][0] = true;
+									}
+									if(cmd[2].includes("t")) {
+										modeL[6][0] = true;
+									}
+									if(cmd[2].includes("n")) {
+										modeL[7][0] = true;
+									}
+									if(cmd[2].includes("m")) {
+										modeL[8][0] = true;
+									}
+								}
+								else {
+									$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You must put an user"]);
+								}
+							}
+							else if(cmd[2].includes("v") && cmd[2][0] === "-" && (cmd[2].includes("o") === false) && (cmd[2].includes("b") === false) && (cmd[2].includes("l") === false) && (cmd[2].includes("k") === false)) {
+								if(cmd[3] !== undefined  && cmd[3] !== "") {
+									modeL[11][0] = true;
+									modeL[1][0] = true;
+									if(cmd[2].includes("p") ) {
+										modeL[3][0] = true;
+									}
+									if(cmd[2].includes("s")) {
+										modeL[4][0] = true;
+									}
+									if(cmd[2].includes("i")) {
+										modeL[5][0] = true;
+									}
+									if(cmd[2].includes("t")) {
+										modeL[6][0] = true;
+									}
+									if(cmd[2].includes("n")) {
+										modeL[7][0] = true;
+									}
+									if(cmd[2].includes("m")) {
+										modeL[8][0] = true;
+									}
+								}
+								else {
+									$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You must put an user"]);
+								}
+							}
+							else if(cmd[2].includes("k") && cmd[2][0] === "+" && (cmd[2].includes("o") === false) && (cmd[2].includes("b") === false) && (cmd[2].includes("l") === false) && (cmd[2].includes("v") === false)) {
+								if(cmd[3] !== undefined  && cmd[3] !== "") {
+									modeL[12][0] = true;
+									modeL[0][0] = true;
+									if(cmd[2].includes("p") ) {
+										modeL[3][0] = true;
+									}
+									if(cmd[2].includes("s")) {
+										modeL[4][0] = true;
+									}
+									if(cmd[2].includes("i")) {
+										modeL[5][0] = true;
+									}
+									if(cmd[2].includes("t")) {
+										modeL[6][0] = true;
+									}
+									if(cmd[2].includes("n")) {
+										modeL[7][0] = true;
+									}
+									if(cmd[2].includes("m")) {
+										modeL[8][0] = true;
+									}
+								}
+								else {
+									$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You must put an user"]);
+								}
+							}
+							else {
+								if(cmd[3] === undefined) {
+									if(cmd[2].includes("p") ) {
+										modeL[3][0] = true;
+									}
+									if(cmd[2].includes("s")) {
+										modeL[4][0] = true;
+									}
+									if(cmd[2].includes("i")) {
+										modeL[5][0] = true;
+									}
+									if(cmd[2].includes("t")) {
+										modeL[6][0] = true;
+									}
+									if(cmd[2].includes("n")) {
+										modeL[7][0] = true;
+									}
+									if(cmd[2].includes("m")) {
+										modeL[8][0] = true;
+									}
+								}
+								else {
+									$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Check if your flag is compatible and if you have too much argument"]);
+								}
+							}
+							var flag = "";
+							for(var i = 0; i<modeL.length; i++) {
+								if(modeL[i][0] === true) {
+									flag = flag + model[i][1];
+								}
+							}
+							if(cmd[3] === undefined){
+								userInfo.socket.emit("message", "MODE " + cmd[1] + " " + flag);
+							}
+							else {
+								userInfo.socket.emit("message", "MODE " + cmd[1] + " " + flag + " " + cmd[3]);
+							}
+						}
+						else {
+							$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You're not subscribe on that channel"]);
+						}
+					}
+				}
+				else {
+					boolIsCh = false;
+					if(cmd[1] !== undefined && cmd[1] !== "") {
+						if(cmd[2] !== undefined && cmd[2] !== "") {
+							if(cmd[2][0] === "+") {
+								modeL[0][0] = true;
+								if(cmd[2].includes("i")) {
+									modeL[5][0] = true;
+								}
+								if(cmd[2].includes("s")) {
+									modeL[4][0] = true;
+								}
+								if(cmd[2].includes("w")) {
+									modeL[13][0] = true;
+								}
+								if(cmd[2].includes("o")) {
+									modeL[2][0] = true;
+								}
+							}
+							else if(cmd[2][0] === "-") {
+								modeL[1][0] = true;
+								if(cmd[2].includes("i")) {
+									modeL[5][0] = true;
+								}
+								if(cmd[2].includes("s")) {
+									modeL[4][0] = true;
+								}
+								if(cmd[2].includes("w")) {
+									modeL[13][0] = true;
+								}
+								if(cmd[2].includes("o")) {
+									modeL[2][0] = true;
+								}
+							}
+							var flag = "";
+							for(var i = 0; i<modeL.length; i++) {
+								if(modeL[i][0] === true) {
+									flag = flag + model[i][1];
+								}
+							}
+							if(flag === "") {
+								$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "This is not available flag"]);
+							}
+							else {
+								userInfo.socket.emit("message", "MODE " + cmd[1] + " " + flag);
+							}
+						}
+						else {
+							$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You must have flag"]);
+						}
+					}
+					else {
+						$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You must put an user"]);
+					}
+				}
+			}
+			
 			
 			$scope.newMessage = undefined;
 			
