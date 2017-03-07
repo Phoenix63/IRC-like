@@ -5,6 +5,7 @@
 #include <QHBoxLayout>
 #include <QHash>
 #include <QPixmap>
+#include <QBuffer>
 
 class QLabel;
 class QSpacerItem;
@@ -19,7 +20,7 @@ class ParserEmoji
 
 public:
     ParserEmoji();
-    QHBoxLayout * parse(QString string);
+    QString parse(QString string);
     QHash<QString, QPixmap> * getHashMap();
     QList<QString> keys();
     QPixmap value(QString key);

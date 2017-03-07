@@ -4,9 +4,9 @@
 #
 #-------------------------------------------------
 MAKEFILE += chatIRC.make
+
 MOC_DIR += mocs
 OBJECTS_DIR += objects
-
 QT       += core gui
 QT       += network
 RC_FILE = myapp.rc

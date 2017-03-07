@@ -29,7 +29,8 @@ public:
 
     //Notifications functions
     bool notif();
-    void togleNotif();
+    void togleNotif(bool newValue);
+    Message getLast();
     
 private:
     QString aTopic;
