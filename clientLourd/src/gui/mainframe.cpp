@@ -1,18 +1,19 @@
 #include "mainframe.h"
-#include "ui_mainframe.h"
-#include "channellist.h"
 
-#include <QTcpSocket>
-#include <QScrollBar>
-#include <QStandardPaths>
+#include <QCompleter>
 #include <QFileDialog>
-#include <QMessageBox>
-#include <QPushButton>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMessageBox>
+#include <QScrollBar>
+#include <QStandardPaths>
+#include <QTcpSocket>
 
-#include "message.h"
-#include "theme.h"
+#include "channellist.h"
+#include "ui_mainframe.h"
+#include "../channel/message.h"
+#include "../config/theme.h"
+
 /*
  * Mainframe: constructor and destructor
  */
@@ -340,8 +341,8 @@ void MainFrame::initUiConf()
     ui->actionDark->setCheckable(true);
     ui->actionLight->setCheckable(true);
     ui->messageSender->installEventFilter(this);
-    ui->pushButton_emojis->setIcon(QPixmap("img/smile.png"));
-    ui->pushButton_upload->setIcon(QPixmap("img/upload.png"));
+    ui->pushButton_emojis->setIcon(QPixmap("ressources/img/smile.png"));
+    ui->pushButton_upload->setIcon(QPixmap("ressources/img/upload.png"));
     ui->pushButton_emojis->setContextMenuPolicy(Qt::CustomContextMenu);
     ui->messageSender->setFocus();
 }

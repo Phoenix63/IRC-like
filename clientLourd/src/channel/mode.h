@@ -1,5 +1,5 @@
-#ifndef MODE_H
-#define MODE_H
+#ifndef CHANNEL_MODE_H
+#define CHANNEL_MODE_H
 
 
 class Mode

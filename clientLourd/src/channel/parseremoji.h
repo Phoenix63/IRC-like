@@ -1,11 +1,11 @@
-#ifndef PARSEUREMOJI_H
-#define PARSEUREMOJI_H
+#ifndef CHANNEL_PARSEUREMOJI_H
+#define CHANNEL_PARSEUREMOJI_H
 
 #include <QString>
-#include <QHBoxLayout>
 #include <QHash>
 #include <QPixmap>
-#include <QBuffer>
+
+template <typename> class QList;
 
 class QLabel;
 class QSpacerItem;

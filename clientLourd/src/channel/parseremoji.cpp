@@ -1,20 +1,22 @@
 #include "parseremoji.h"
-#include "theme.h"
 
+#include <QBuffer>
 #include <QDir>
-#include <QStringList>
-#include <QRegularExpression>
 #include <QLabel>
+#include <QRegularExpression>
+#include <QStringList>
+
+#include "../config/theme.h"
 
 ParserEmoji::ParserEmoji()
 {
-    QDir emojis("img/emojis/");
+    QDir emojis("ressources/img/emojis/");
     QStringList emojisList = emojis.entryList();
     for(auto i:emojisList)
     {
         if (i == "." || i == "..")
             continue;
-        QPixmap j("img/emojis/" + i);
+        QPixmap j("ressources/img/emojis/" + i);
         i = i.left(i.length() - 4);
         emotes[":" + i + ":"] = j.scaledToHeight(20, Qt::SmoothTransformation);
     }
@@ -26,7 +28,7 @@ QString ParserEmoji::parse(QString string)
         QByteArray* byteArray = new QByteArray();
         QBuffer buffer(byteArray);
         emotes[i].save(&buffer, "PNG");
-        string.replace(i, "<img src=\"data:image/png;base64," + byteArray->toBase64() + ".png\" height=\"20\" />");
+        string.replace(i, "<img src=\"data:ressources/image/png;base64," + byteArray->toBase64() + ".png\" height=\"20\" />");
     }
     return string;
 }

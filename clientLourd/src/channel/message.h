@@ -1,9 +1,9 @@
-#ifndef MESSAGE_H
-#define MESSAGE_H
+#ifndef CHANNEL_MESSAGE_H
+#define CHANNEL_MESSAGE_H
 
 #include <QString>
 
-#include "user.h"
+#include "../user/user.h"
 
 class Message
 {

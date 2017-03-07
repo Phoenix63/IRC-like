@@ -1,7 +1,6 @@
-#ifndef USER_H
-#define USER_H
+#ifndef USER_USER_H
+#define USER_USER_H
 
-#include <QList>
 #include <QString>
 
 class User

@@ -1,7 +1,9 @@
-#ifndef USERLIST_H
-#define USERLIST_H
+#ifndef USER_USERLIST_H
+#define USER_USERLIST_H
 
-#include "user.h"
+#include <QList>
+
+class User;
 
 class UserList
 {

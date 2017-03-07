@@ -1,11 +1,10 @@
 #include "configlist.h"
 
 #include <QFile>
-#include <QVector>
 #include <QString>
 #include <QStringList>
-#include <QFile>
 #include <QTextStream>
+#include <QVector>
 
 #include "config_in.h"
 
@@ -49,7 +48,7 @@ void ConfigList::loadConfig()
 	while (configs.size() > 1) {
 		configs.removeLast();
 	}
-	QFile configFile("config.cfg");
+	QFile configFile("ressources/config.cfg");
 	if (configFile.exists()) {
 		configFile.open(QIODevice::ReadOnly);
 		readConfig(&configFile);
@@ -58,7 +57,7 @@ void ConfigList::loadConfig()
 
 void ConfigList::saveConfig()
 {
-	QFile configFile("config.cfg");
+	QFile configFile("ressources/config.cfg");
 	if (configFile.exists()) {
 		configFile.open(QIODevice::WriteOnly | QIODevice::Truncate );
 		configFile.resize(0);
@@ -189,7 +188,7 @@ void ConfigList::readConfig(QFile *configFile)
 				}
                 channels(chanList);
 			}
-				
+
 		}
 
 	}

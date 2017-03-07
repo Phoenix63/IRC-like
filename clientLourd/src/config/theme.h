@@ -1,7 +1,6 @@
-#ifndef THEME_H
-#define THEME_H
+#ifndef CONFIG_THEME_H
+#define CONFIG_THEME_H
 
-#include <QRegularExpression>
 #include <QString>
 
 class Theme {

@@ -1,28 +1,21 @@
-#ifndef MAINFRAME_H
-#define MAINFRAME_H
+#ifndef GUI_MAINFRAME_H
+#define GUI_MAINFRAME_H
 
 #include <QMainWindow>
-#include <QCompleter>
 
-#include "channel.h"
-#include "parser.h"
 #include "msglist.h"
-#include "themelist.h"
 
-class QPixmap;
+#include "../channel/channel.h"
+#include "../config/themelist.h"
+#include "../parser/parser.h"
+
+class QCompleter;
 class QTcpSocket;
-class QScrollBar;
-class QPoint;
-class QStringList;
-class QFileDialog;
-class QStandardPaths;
-class Channellist;
+
 class Message;
 
 template <typename>
 class Qlist;
-template <typename, typename>
-class QHash;
 
 namespace Ui {
 class MainFrame;

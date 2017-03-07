@@ -1,5 +1,5 @@
-#ifndef CONFIG_IN_H
-#define CONFIG_IN_H
+#ifndef CONFIG_CONFIG_IN_H
+#define CONFIG_CONFIG_IN_H
 
 #include <QRegularExpression>
 

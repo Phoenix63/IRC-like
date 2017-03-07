@@ -1,12 +1,14 @@
-#ifndef CHANNELCONTENT_H
-#define CHANNELCONTENT_H
+#ifndef CHANNEL_CHANNELCONTENT_H
+#define CHANNEL_CHANNELCONTENT_H
 
+#include <QHash>
 #include <QList>
-#include <QString>
 
 #include "message.h"
-#include "user.h"
 #include "mode.h"
+#include "../user/user.h"
+
+class QString;
 
 class ChannelContent
 {
@@ -31,7 +33,7 @@ public:
     bool notif();
     void togleNotif(bool newValue);
     Message getLast();
-    
+
 private:
     QString aTopic;
     QHash<User *, Mode> aUsers;

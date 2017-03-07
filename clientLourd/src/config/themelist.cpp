@@ -1,4 +1,7 @@
 #include "themelist.h"
+
+#include <QFile>
+
 #include "theme_in.h"
 
 ThemeList *ThemeList::aInstance = nullptr;
@@ -49,7 +52,7 @@ void ThemeList::loadTheme()
     while(themes.size() > 2){
         themes.removeLast();
     }
-    QFile themeFile("theme.cfg");
+    QFile themeFile("ressources/theme.cfg");
     if (themeFile.exists()) {
         themeFile.open(QIODevice::ReadOnly);
         readTheme(&themeFile);

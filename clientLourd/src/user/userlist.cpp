@@ -1,5 +1,7 @@
 #include "userlist.h"
 
+#include "user.h"
+
 UserList::UserList()
 {
 }

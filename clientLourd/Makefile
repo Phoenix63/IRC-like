@@ -33,5 +33,5 @@ clean:
 	make head
 	echo -e "> cleaning object and moc files ..."
 	make -f chatIRC.make clean
-	rm mocs objects *.make -r
+	rm mocs objects uis *.qrc *.make -r
 	echo -e "> done"

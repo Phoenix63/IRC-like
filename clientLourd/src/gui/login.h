@@ -1,19 +1,17 @@
-#ifndef LOGIN_H
-#define LOGIN_H
-
-
-#include "configlist.h"
-#include "themelist.h"
+#ifndef GUI_LOGIN_H
+#define GUI_LOGIN_H
 
 #include <QDialog>
-#include <QObject>
-#include <QTcpSocket>
+
+#include "../config/configlist.h"
 
 class MainFrame;
-class QListWidgetItem;
-class QFile;
 class QListWidget;
+class QListWidgetItem;
 class QStringList;
+class QTcpSocket;
+
+class ThemeList;
 
 namespace Ui {
 class Login;

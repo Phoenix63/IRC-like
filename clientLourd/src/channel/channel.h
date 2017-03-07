@@ -1,22 +1,19 @@
-#ifndef CHANNEL_H
-#define CHANNEL_H
+#ifndef CHANNEL_CHANNEL_H
+#define CHANNEL_CHANNEL_H
 
-#include <QString>
 #include <QHash>
+#include <QString>
 
-#include "userlist.h"
-#include "parseremoji.h"
 #include "channelcontent.h"
 #include "message.h"
+#include "parseremoji.h"
+#include "../user/userlist.h"
+
+class QColor;
+class QLabel;
+class QLineEdit;
 
 template<typename> class QList;
-class QListWidget;
-class QTextBrowser;
-class QLineEdit;
-class QColor;
-class QVBoxLayout;
-class QLabel;
-class QTime;
 
 class Channel
 {

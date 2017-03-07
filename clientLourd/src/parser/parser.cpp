@@ -1,11 +1,12 @@
 #include "parser.h"
-#include "channel.h"
-#include "channellist.h"
 
-#include <QRegularExpression>
-#include <QTcpSocket>
-#include <QDebug>
 #include <QMessageBox>
+#include <QRegularExpression>
+#include <QString>
+#include <QTcpSocket>
+
+#include "../channel/channel.h"
+#include "../gui/channellist.h"
 
 Parser::Parser()
 {
@@ -326,7 +327,7 @@ bool Parser::out_isPrivMsg(QString string)
     channel->appendCurrent(message, &self);
     string.prepend("PRIVMSG " + channel->channelName() + " :");
     sendToServer(socket, string);
-    emit channelModifiedSignal();
+    emit lineAddedSignal();
         return true;
 }
 

@@ -1,5 +1,9 @@
 #include "parsermode.h"
 
+#include <QString>
+
+#include "../channel/channel.h"
+
 ParserMode::ParserMode(Channel *chan) :
     channel(chan)
 {
@@ -19,9 +23,9 @@ void ParserMode::parseChan(QString string)
 {
     QString chan = string.split(' ').at(3);
     QString mode = string.split(' ').at(4);
-    if(!isIChanMode(mode))
+    if(!isIChanMode(string))
     if(!isOChanMode(mode, string))
-    if(!isPMode(mode))
+    if(!isPMode(string))
     if(!isSMode(mode))
     if(!isTMode(mode))
     if(!isNMode(mode))
@@ -69,7 +73,8 @@ bool ParserMode::isWMode(QString mode, QString user)
     return true;
 }
 
-bool ParserMode::isIChanMode(QString mode){
+bool ParserMode::isIChanMode(QString string){
+	QString mode = string.split(' ').at(4);
     if (!mode.contains('i'))
         return false;
     if (mode[0] == '+')

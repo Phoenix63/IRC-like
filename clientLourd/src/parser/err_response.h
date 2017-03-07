@@ -1,5 +1,5 @@
-#ifndef ERR_RESPONSE_H
-#define ERR_RESPONSE_H
+#ifndef PARSER_ERR_RESPONSE_H
+#define PARSER_ERR_RESPONSE_H
 
 #include <QRegularExpression>
 

@@ -1,9 +1,11 @@
-#ifndef THEMELIST_H
-#define THEMELIST_H
+#ifndef CONFIG_THEMELIST_H
+#define CONFIG_THEMELIST_H
 
 #include <QVector>
-#include <QFile>
+
 #include "theme.h"
+
+class QFile;
 
 class ThemeList {
 public:

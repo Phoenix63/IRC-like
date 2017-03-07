@@ -7,9 +7,10 @@ MAKEFILE += chatIRC.make
 
 MOC_DIR += mocs
 OBJECTS_DIR += objects
+UI_DIR += uis
 QT       += core gui
 QT       += network
-RC_FILE = myapp.rc
+RC_FILE = src/gui/myapp.rc
 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -18,51 +19,54 @@ TARGET = chatIRC
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-    login.cpp \
-    mainframe.cpp \
-    parser.cpp \
-    channel.cpp \
-    msglist.cpp \
-    channelcontent.cpp \
-    parseremoji.cpp \
-    channellist.cpp \
-    config.cpp \
-    configlist.cpp \
-    message.cpp \
-    theme.cpp \
-    themelist.cpp \
-    user.cpp \
-    mode.cpp \
-    parsermode.cpp \
-    userlist.cpp
+SOURCES += \
+    src/main.cpp \
+    src/channel/channel.cpp \
+    src/channel/channelcontent.cpp \
+    src/channel/message.cpp \
+    src/channel/mode.cpp \
+    src/channel/parseremoji.cpp \
+    src/config/config.cpp \
+    src/config/configlist.cpp \
+    src/config/theme.cpp \
+    src/config/themelist.cpp \
+    src/gui/channellist.cpp \
+    src/gui/login.cpp \
+    src/gui/mainframe.cpp \
+    src/gui/msglist.cpp \
+    src/parser/parser.cpp \
+    src/parser/parsermode.cpp \
+    src/user/user.cpp \
+    src/user/userlist.cpp
+
 
 HEADERS  += \
-    login.h \
-    mainframe.h \
-    channel.h \
-    parser.h \
-    msglist.h \
-    err_response.h \
-    rpl_response.h \
-    channelcontent.h \
-    parseremoji.h \
-    channellist.h \
-    theme.h \
-    config.h \
-    configlist.h \
-    config_in.h \
-    message.h \
-    themelist.h \
-    theme_in.h \
-    user.h \
-    mode.h \
-    parsermode.h \
-    userlist.h
+    src/channel/channel.h \
+    src/channel/channelcontent.h \
+    src/channel/message.h \
+    src/channel/mode.h \
+    src/channel/parseremoji.h \
+    src/config/config_in.h \
+    src/config/config.h \
+    src/config/configlist.h \
+    src/config/theme_in.h \
+    src/config/theme.h \
+    src/config/themelist.h \
+    src/gui/channellist.h \
+    src/gui/login.h \
+    src/gui/mainframe.h \
+    src/gui/msglist.h \
+    src/parser/err_response.h \
+    src/parser/parser.h \
+    src/parser/parsermode.h \
+    src/parser/rpl_response.h \
+    src/user/user.h \
+    src/user/userlist.h
 
 FORMS    += \
-    login.ui \
-    mainframe.ui \
-    channellist.ui
+    src/gui/login.ui \
+    src/gui/mainframe.ui \
+    src/gui/channellist.ui
 
-RESOURCES +=
+RESOURCES += \
+    src/gui/myapp.rc

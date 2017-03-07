@@ -1,5 +1,5 @@
-#ifndef THEME_IN_H
-#define THEME_IN_H
+#ifndef CONFIG_THEME_IN_H
+#define CONFIG_THEME_IN_H
 
 #include <QRegularExpression>
 

@@ -1,11 +1,13 @@
-#ifndef CHANNELLIST_H
-#define CHANNELLIST_H
+#ifndef GUI_CHANNELLIST_H
+#define GUI_CHANNELLIST_H
 
-#include "themelist.h"
 #include <QDialog>
-#include <QString>
-#include <QTableWidget>
-#include <QTcpSocket>
+
+class QString;
+class QTableWidget;
+class QTcpSocket;
+
+class ThemeList;
 
 namespace Ui {
 class Channellist;
@@ -27,7 +29,7 @@ public:
 
 private slots:
     void on_tableWidget_doubleClicked(const QModelIndex &index);
-    
+
 private:
     Ui::Channellist *ui;
     QTcpSocket *socket;

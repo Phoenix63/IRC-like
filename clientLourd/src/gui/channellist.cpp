@@ -1,5 +1,11 @@
 #include "channellist.h"
+
+#include <QString>
+#include <QTableWidget>
+#include <QTcpSocket>
+
 #include "ui_channellist.h"
+#include "../config/themelist.h"
 
 /*
  * Constructor and destructor

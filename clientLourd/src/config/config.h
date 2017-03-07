@@ -1,5 +1,5 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef CONFIG_CONFIG_H
+#define CONFIG_CONFIG_H
 
 #include <QString>
 #include <QStringList>

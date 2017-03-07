@@ -1,5 +1,5 @@
-#ifndef MSGLIST_H
-#define MSGLIST_H
+#ifndef GUI_MSGLIST_H
+#define GUI_MSGLIST_H
 
 #include <QList>
 #include <QString>

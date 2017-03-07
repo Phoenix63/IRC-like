@@ -1,12 +1,13 @@
-#ifndef CONFIGLIST_H
-#define CONFIGLIST_H
+#ifndef CONFIG_CONFIGLIST_H
+#define CONFIG_CONFIGLIST_H
 
 #include <QVector>
+
 #include "config.h"
 
+class QFile;
 class QString;
 class QStringList;
-class QFile;
 
 class ConfigList {
 public:

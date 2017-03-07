@@ -1,16 +1,18 @@
-#ifndef PARSEUR_H
-#define PARSEUR_H
+#ifndef PARSEUR_PARSEUR_H
+#define PARSEUR_PARSEUR_H
 
-#include "rpl_response.h"
-#include "err_response.h"
-#include "parsermode.h"
-
-#include <QString>
 #include <QObject>
 
-class QTcpSocket;
+#include "err_response.h"
+#include "parsermode.h"
+#include "rpl_response.h"
+#include "../user/user.h"
+
+
 class Channel;
 class Channellist;
+class QString;
+class QTcpSocket;
 
 class Parser : public QObject{
 

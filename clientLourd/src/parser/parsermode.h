@@ -1,10 +1,11 @@
-#ifndef PARSERMODE_H
-#define PARSERMODE_H
+#ifndef PARSER_PARSERMODE_H
+#define PARSER_PARSERMODE_H
 
-#include "channel.h"
-#include "userlist.h"
+#include "../user/userlist.h"
 
-#include <QString>
+class QString;
+
+class Channel;
 
 class ParserMode
 {
