@@ -6,7 +6,7 @@ import RPLSender from './../responses/RPLSender';
 
 module.exports = function (socket, command) {
     if (!socket.client.isRegistered) {
-        ERRSender.ERR_NOTREGISTERED(socket.client, 'PART');
+        ERRSender.ERR_NOTREGISTERED(socket.client, 'LISTFILES');
         return;
     }
 

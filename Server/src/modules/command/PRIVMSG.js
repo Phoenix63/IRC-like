@@ -27,7 +27,7 @@ module.exports = function (socket, command) {
 
     let files = [];
     message.replace(/\[FILE=[^\]]/g, '');
-    let regex = new RegExp('http(s)?://'+config.image_server.outip+'/public/[^ ]+', 'g');
+    let regex = new RegExp('http(s)?://'+config.image_server.outip+':'+config.image_server.port+'/public/[^ ]+', 'g');
     if(message.match(regex)) {
         files = message.match(regex);
     }

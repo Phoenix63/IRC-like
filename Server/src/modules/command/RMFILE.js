@@ -5,6 +5,11 @@ import Channel from './../channel/Channel';
 
 module.exports = (socket, command) => {
 
+    if (!socket.client.isRegistered) {
+        ERRSender.ERR_NOTREGISTERED(socket.client, 'RMFILE');
+        return;
+    }
+
     let argv = /^(#[^, ]+) ([^ ]+)/g.exec(command[1]);
 
     if(!argv) {
