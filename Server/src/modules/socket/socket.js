@@ -4,6 +4,7 @@ import tcp from './tcp';
 import sio from './sio';
 import shortid from 'shortid';
 import config from './../../config.json';
+import FileReceiver from '../file/socket/FileReceiver';
 
 let sockets = [];
 
@@ -138,8 +139,10 @@ class Socket {
      */
     emit(event, data) {
         this._life = 1;
-        if (this._onSignal[event])
+
+        if (this._onSignal[event]) {
             this._onSignal[event](data);
+        }
     }
 
     /**

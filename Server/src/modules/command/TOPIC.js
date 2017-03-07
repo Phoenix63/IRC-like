@@ -24,13 +24,15 @@ module.exports = function(socket,command) {
 
     Channel.list().forEach((c) =>{
         if(c.name === chan){
-            if (! c.isUserOperator(socket.client)){
-                ERRSender.ERR_CHANOPRIVSNEEDED(socket.client, c.name);
-            } else if(newTopic === null || newTopic === '') {
+            if(newTopic === null || newTopic === '') {
                 RPLSender.RPL_TOPIC('TOPIC', socket.client, c);
             } else {
-                c.topic = newTopic;
-                RPLSender.RPL_TOPIC('TOPIC', socket.client, c);
+                if((c.channelFlags.indexOf('t')>-1 && c.isUserOperator(socket.client)) || (c.channelFlags.indexOf('t') === -1)) {
+                    c.topic = newTopic;
+                    RPLSender.RPL_TOPIC('TOPIC', socket.client, c);
+                } else {
+                    ERRSender.ERR_CHANOPRIVSNEEDED(socket.client, c.name);
+                }
             }
         }
     });

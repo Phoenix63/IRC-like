@@ -6,6 +6,10 @@ import ERRSender from './../responses/ERRSender';
 import RPLSender from './../responses/RPLSender';
 
 module.exports = function (socket, command) {
+    if (!socket.client.isRegistered) {
+        ERRSender.ERR_NOTREGISTERED(socket.client, 'MODE');
+        return;
+    }
     let channelModeRegex = /^(#[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15}) ([+|-])([opsitnmlbvk]{1,11})(?: ([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15})$|$)/.exec(command[1]);
     let userModeRegex = /^([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15}) ([+|-])([iswo]{1,11})$/.exec(command[1]);
 
@@ -58,18 +62,18 @@ module.exports = function (socket, command) {
             if(flags.indexOf('v') > -1){
                 channel.changeClientFlag(sign,'v',user);
             }
-        }else if(arg4 && flags.indexOf('k') > -1){
+        }else if(flags.indexOf('k') > -1){
             //set a channel key (password).
             if(sign==='-'){
                 channel.setPass('');
                 RPLSender.RPL_CHANNELMODEIS(channel,nameChannel+' -k');
-            }else if(arg4){
+            }else if(arg4 && sign==='+'){
                 if(!(channel.pass === '')){
                     ERRSender.ERR_KEYSET(socket.client,channel.name);
                     return;
                 }else{
                     channel.setPass(arg4);
-                    RPLSender.RPL_CHANNELMODEIS(channel,nameChannel+' +k');
+                    RPLSender.RPL_CHANNELMODEIS(channel,nameChannel+' +k '+arg4);
                 }
             }
         }
@@ -98,6 +102,10 @@ module.exports = function (socket, command) {
             //no messages to channel from clients on the outside;
             channel.changeChannelFlag(sign,'n');
         }
+        if(flags.indexOf('m') > -1){
+            //moderate channel, only user with v flag can speak
+            channel.changeChannelFlag(sign,'m');
+        }
     }else if(userModeRegex){
         let nameUser = userModeRegex[1];
         let sign = userModeRegex[2];
@@ -107,7 +115,7 @@ module.exports = function (socket, command) {
         if(!user){
             ERRSender.ERR_NOSUCHNICK(socket.client, nameUser);
         }
-        if(user == socket.client){
+        if(user === socket.client){
             if(flags.indexOf('i') > -1){
                 user.changeFlag(sign,'i');
             }
@@ -117,10 +125,9 @@ module.exports = function (socket, command) {
             if(flags.indexOf('w') > -1){
                 user.changeFlag(sign,'w');
             }
-            if(flags.indexOf('o') > -1 && operator == '-' && !socket.client.isSuperAdmin()){
+            if(flags.indexOf('o') > -1 && sign === '-' && !socket.client.isSuperAdmin()){
                 user.changeFlag(sign,'o');
             }
-
         }else if (user != socket.client && socket.client.isSuperAdmin()){
             if(flags.indexOf('o') > -1){
                 user.changeFlag(sign,'o');

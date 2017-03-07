@@ -1,7 +1,7 @@
 import child_process from 'child_process';
 
 const env = process.argv[2] || 'PROD';
-console.log(env);
+console.log('ENV: '+env);
 
 let childprocess = createChild();
 

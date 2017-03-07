@@ -12,11 +12,10 @@ function throwError(client, message) {
 }
 
 function log(txt) {
-    if(process.argv[2] === 'DEV') {
+    if(process.env.parent === 'DEV') {
         process.stdout.write(txt.replace('\n','')+'\n');
     }
 }
-
 
 class Logger {
 

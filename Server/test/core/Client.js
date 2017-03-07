@@ -87,6 +87,10 @@ var Client = (function() {
                 this.emit('err_nosuchnick', message);
             }else if(message.indexOf('443') > 0) {
                 this.emit('err_useronchannel',message);
+            } else if (message.indexOf('LISTFILE #test http')) {
+                this.emit('listfiles', message);
+            } else if (message.indexOf(' :/list end')) {
+                this.emit('listfilesend', message);
             }
 
             /*

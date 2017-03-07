@@ -1,0 +1,37 @@
+
+node:
+  image: pandirc/runtest
+  command: sh -c 'npm run build && node dist/server.js TEST'
+  hostname: node
+  volumes:
+   - ./..:/app
+  ports:
+   - "8088:8088"
+   - "8089:8089"
+   - "3001:3001"
+  links:
+   - mongo:mongo
+   - redis:redis
+   - fileserver:fileserver
+
+fileserver:
+  image: bitnami/node:7
+  command: sh -c 'npm run build && node ./dist/modules/file/server.js PROD'
+  hostname: fileserver
+  volumes:
+   - ./..:/app
+  ports:
+   - "8090:8090"
+   - "8091:8091"
+  links:
+   - redis:redis
+
+mongo:
+  image: mongo
+  hostname: mongo
+  volumes:
+   - mongoirc:/data/db
+
+redis:
+  image: redis
+  hostname: redis

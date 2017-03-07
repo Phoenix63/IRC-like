@@ -12,9 +12,8 @@ var url = 'mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.
 
 module.exports = function(callback) {
 
-    if(process.argv[2] !== 'TEST') {
+    if(process.env.parent !== 'TEST') {
         MongoClient.connect(url, (err, db) => {
-            console.log(err);
 
             let caller = new Caller(() => {
                 db.close();

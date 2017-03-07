@@ -1,10 +1,12 @@
 "use strict";
 
-console.log = function(arg) {
-    process.stdout.write(arg+'\n');
-};
+process.env.parent = process.argv[2] || 'PROD';
+console.log = (txt) => {
+    process.stdout.write(txt+'\n');
+}
 
 import dbSaver from './modules/data/dbSaver';
+import child_process from 'child_process';
 
 // globals
 import colors from 'colors';
@@ -47,7 +49,8 @@ function quitHandle(e, callback=function(){}) {
 
 if(cluster.isMaster) {
     process.title = 'MasterServer';
-    console.log('master');
+
+    console.log('Cluster Master');
     dbLoader(() => {
         console.log('Database loaded!');
         for(let i = 0 ; i<numCPUs; i++) {
@@ -60,9 +63,9 @@ if(cluster.isMaster) {
     process.on('SIGINT', quitHandle);
     process.on('SIGTERM', quitHandle);
 
-    if (!(process.argv[2] && (process.argv[2] === 'DEV' || process.argv[2] === 'TEST'))) {
+    if (!(process.env.parent === 'DEV' || process.env.parent === 'TEST')) {
         process.on('uncaughtException', (err) => {
-            console.log('\t\t' + colors.red(err));
+            console.log('ERROR: \t\t' + colors.red(err));
         });
     } else {
         process.on('uncaughtException', quitHandle);
@@ -78,14 +81,14 @@ if(cluster.isMaster) {
     });
     cluster.on('exit', (worker, code, signal) => {
 
-        if(signal !== 'SIGTERM' && signal !== 'SIGINT') {
+        if(signal !== 'SIGTERM' && signal !== 'SIGINT' && process.arv[2] !== 'TEST') {
             cluster.fork();
         }
     });
 
 }
 if(cluster.isWorker) {
-    console.log('worker');
+    console.log('Cluster Worker');
     process.title = 'server';
     socketManager.create((socket) => {
         let client = new Client(socket);
@@ -97,6 +100,18 @@ if(cluster.isWorker) {
             logger._CLIENT_CONNECTED();
         });
     });
+
+    if(process.env.parent === 'TEST') {
+        let child = child_process.spawn('mocha', []);
+        child.stdout.on('data', function (data) {
+            console.log('data: '+data.toString());
+        });
+
+        child.on('exit', function (code) {
+            console.log('Test process ' + code.toString());
+            quitHandle();
+        });
+    }
 }
 
 

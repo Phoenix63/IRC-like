@@ -60,6 +60,14 @@ class Client {
         this._pass = crypto.createHash('sha256').update(val).digest('base64');
     }
 
+    set away(val) {
+        this._away = val;
+    }
+
+    get away() {
+        return this._away;
+    }
+
     /**
      * get user id
      * @returns {string}
@@ -176,7 +184,7 @@ class Client {
                         RPLSender.RPL_MOTD(this.socket);
                         RPLSender.RPL_ENDOFMOTD(this.socket);
 
-                        if(process.argv[2] === 'TEST') {
+                        if(process.env.parent === 'TEST') {
                             this._socket.logger._CLIENT_IS_NOW_ADMIN();
                             this._addFlag('o');
                         } else {
@@ -277,7 +285,17 @@ class Client {
         arrayFlags.forEach((flag) => {
             if(this._flags.indexOf(flag)===-1){
                 this._flags += flag;
-                RPLSender.RPL_UMODEIS(this,this.name+' +'+flag);
+                if(flag==='i' || flag==='o'){
+                    if(flag ==='o'){
+                        this._channels.forEach((channel)=> {
+                           channel.changeClientFlag('+','o', this);
+                        });
+                    }
+                    RPLSender.RPL_UMODEIS_BROADCAST_ALL(this.name+' +'+flag);
+                }else{
+                    RPLSender.RPL_UMODEIS(this,this.name+' +'+flag);
+                }
+
             }
         });
     }
@@ -293,7 +311,11 @@ class Client {
             let tmp = this._flags.length;
             this._flags = this._flags.replace(flag,'');
             if(tmp-1 === this._flags.length){
-                RPLSender.RPL_UMODEIS(this,this.name+' -'+flag);
+                if(flag==='i' || flag==='o'){
+                    RPLSender.RPL_UMODEIS_BROADCAST_ALL(this.name+' -'+flag);
+                }else{
+                    RPLSender.RPL_UMODEIS(this,this.name+' -'+flag);
+                }
             }
         });
     }
@@ -325,6 +347,10 @@ class Client {
      */
     isAdmin() {
         return this._flags.indexOf('o')>=0;
+    }
+
+    isInvisible() {
+        return this._flags.indexOf('i')>-1;
     }
 
     /**

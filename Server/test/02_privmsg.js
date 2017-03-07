@@ -33,7 +33,7 @@ describe('command PRIVMSG:', () => {
             done();
         });
     });
-    it('should say no recipient', (done) => {
+    it('should say nosuchnick', (done) => {
         client = new Client(config.port, config.ip);
         client.on('connect', () => {
             client.send('USER test 0 * :test');
@@ -41,7 +41,20 @@ describe('command PRIVMSG:', () => {
         client.on('auth', () => {
             client.send('PRIVMSG test :test');
         });
-        client.on('err_norecipient', (message) => {
+        client.on('err_nosuchnick', (message) => {
+            client.close();
+            done();
+        });
+    });
+    it('should say nosuchchannel', (done) => {
+        client = new Client(config.port, config.ip);
+        client.on('connect', () => {
+            client.send('USER test 0 * :test');
+        });
+        client.on('auth', () => {
+            client.send('PRIVMSG #test :test');
+        });
+        client.on('err_nosuchchannel', (message) => {
             client.close();
             done();
         });

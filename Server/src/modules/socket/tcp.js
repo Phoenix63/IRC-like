@@ -2,6 +2,7 @@
 
 import net from 'net';
 import config from './../../config.json';
+import colors from 'colors';
 
 function createServer(callback) {
     let server = net.createServer((socket) => {
@@ -15,8 +16,6 @@ function createServer(callback) {
         });
 
         socket.on('data', (data) => {
-            socket.manager.emit('data', data);
-
             let lines = data.toString().split(/\n|\r/),
                 i, line;
 
@@ -29,8 +28,6 @@ function createServer(callback) {
             }
 
             socket.buffer += lines[lines.length - 1];
-
-
         });
 
         socket.on('error', () => {
