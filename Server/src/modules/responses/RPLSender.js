@@ -72,9 +72,9 @@ let RPLSender = {
      */
     RPL_TOPIC: (command, client, channel) => {
         if (channel.topic) {
-            client.socket.send(':' + config.ip + ' 332 '+command+' ' + channel.name + ' :' + channel.topic);
+            channel.broadcast(':' + config.ip + ' 332 '+command+' ' + channel.name + ' :' + channel.topic,null);
         } else {
-            client.socket.send(':' + config.ip + ' 331 '+command+' ' + channel.name + ' :No topic is set');
+            channel.broadcast(':' + config.ip + ' 331 '+command+' ' + channel.name + ' :No topic is set',null);
         }
     },
 

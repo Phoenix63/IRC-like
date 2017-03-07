@@ -78,7 +78,10 @@ class Channel {
     }
 
 
-
+    /**
+     *
+     * @returns {*}
+     */
     get topic() {
         if(this._topic !== '') {
             return this._topic;
@@ -133,6 +136,10 @@ class Channel {
         return (this._flags.indexOf('i') >= 0);
     }
 
+    /**
+     *
+     * @returns {boolean}
+     */
     get isModerated() {
         return (this._flags.indexOf('m') >= 0);
     }
@@ -169,6 +176,14 @@ class Channel {
      */
     get creator() {
         return this._creator;
+    }
+
+    /**
+     *
+     * @returns {string|*|string}
+     */
+    get channelFlags() {
+        return this._flags;
     }
 
     /**
@@ -313,7 +328,10 @@ class Channel {
         return false;
     }
 
-
+    /**
+     *
+     * @param flags
+     */
     setUserFlags(flags) {
         this._usersFlags = flags;
         this._change();
@@ -395,9 +413,19 @@ class Channel {
         }
 
     }
+
+    /**
+     *
+     * @param size
+     */
     setSize(size) {
         this._size = size;
     }
+
+    /**
+     *
+     * @param pass
+     */
     setPass(pass) {
         this._pass = pass;
     }
@@ -414,6 +442,11 @@ class Channel {
         });
     }
 
+    /**
+     *
+     * @param socket
+     * @param client
+     */
     invite(socket, client){
         if(this._invitations.indexOf(client)===-1){
             this._invitations.push(client);
@@ -421,6 +454,8 @@ class Channel {
             RPLSender.RPL_YOU_HAVE_BEEN_INVITED(socket, client, this);
         }
     }
+
+
 
     /**
      *
@@ -435,6 +470,10 @@ class Channel {
         return null;
     }
 
+    /**
+     *
+     * @returns {Array}
+     */
     static list() {
         return channels;
     }

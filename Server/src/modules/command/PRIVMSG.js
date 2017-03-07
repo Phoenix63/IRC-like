@@ -24,7 +24,6 @@ module.exports = function (socket, command) {
         return;
     }
     message = message.slice(1, message.length);
-    let error = true;
     if(receivers.indexOf('@global') >= 0 && socket.client.isAdmin()) {
         socket.broadcast(':@[ADMIN]'+socket.client.name+' PRIVMSG @global :'+message);
     }
@@ -45,7 +44,7 @@ module.exports = function (socket, command) {
                 clients[r].socket.send(':' + socket.client.name + ' PRIVMSG ' + r + ' :' + message);
             }
         } else if (channels[r]) {
-            if (channels[r].users.indexOf(socket.client) >= 0) {
+            if ((channels[r].channelFlags.indexOf('n')>-1 && channels[r].users.indexOf(socket.client) >= 0) || channels[r].channelFlags.indexOf('n') === -1) {
                 if(channels[r].isModerated && !channels[r].isUserVoice(socket.client)){
                     ERRSender.ERR_CANNOTSENDTOCHAN(socket.client,channels[r].name);
                     return;
