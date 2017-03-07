@@ -21,6 +21,7 @@ fileserver:
   ports:
   - "3001:3001"
   - "8090:8090"
+  - "8091:8091"
   links:
   - redis:redis
 

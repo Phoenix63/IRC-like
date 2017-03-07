@@ -1,8 +1,8 @@
-import config from './../../../config.json';
 import FileReceiver from './FileReceiver';
 import bufferManager from './../modules/bufferSpliter';
 import Tcp from './tcp';
 import Sio from './sio';
+import config from './../../../config.json';
 
 function manage(socket) {
     socket.buffer = '';
@@ -30,7 +30,14 @@ function manage(socket) {
                     let argv = line.toString().split(' ');
                     let name = argv[2];
                     let size = parseInt(argv[1]);
-                    socket.filereceiver = new FileReceiver(name, size, socket);
+                    if(!isNaN(size) && size > 0 && size <= config.fileSizeLimit) {
+                        socket.filereceiver = new FileReceiver(name, size, socket);
+                    } else {
+                        splited = [];
+                        socket.write('FILE LIMITATION ERROR: ('+name+') 0 < size < '+config.fileSizeLimit+'\n');
+                        socket.kill();
+                    }
+
                     splited = splited.slice(1,splited.length);
                 } else if(socket.filereceiver) {
                     socket.filereceiver.push(line);
@@ -46,6 +53,7 @@ Tcp.bind((socket) => {
 });
 
 Sio.bind((socket) => {
+    console.log('new SIO socket');
     socket.type = 'SIO';
     manage(socket);
 });

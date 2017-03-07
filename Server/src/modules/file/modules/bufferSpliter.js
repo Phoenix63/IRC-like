@@ -1,6 +1,9 @@
 class BufferManager {
     static splitAt(buf, index) {
-        return [buf.slice(0,index), buf.slice(index,buf.length)];
+        if(buf instanceof Buffer) {
+            return [buf.slice(0,index), buf.slice(index,buf.length)];
+        }
+
     }
 
     static split(buf1, buf2) {
