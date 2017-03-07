@@ -127,11 +127,11 @@ h3::after {
 }
 
 .notif-messageOn {
-	font-weight:bold;
+	color:red;
 }
 
 .notif-messageOff {
-	font-weight:normal;
+	color:black;
 }
 
 .admin-color {
