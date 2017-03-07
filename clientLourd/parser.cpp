@@ -5,6 +5,7 @@
 #include <QRegularExpression>
 #include <QTcpSocket>
 #include <QDebug>
+#include <QMessageBox>
 
 Parser::Parser()
 {
@@ -69,6 +70,7 @@ bool Parser::out(QString string)
     if (!out_isWhoMsg(string))
     if (!out_isMsgMsg(string))
 	if (!out_isAwayMsg(string))
+    if (!out_isInvMsg(string))
     if (!out_isPrivMsg(string))
         return false;
     return true;
@@ -101,6 +103,8 @@ void Parser::in(QString string)
     if (!in_isChanMode(string))
 	if (!in_isAwayStatus(string))
 	if (!in_isAwayPrivMsg(string))
+    if (!in_isInvMsg(string))
+    if (!in_isConfirmInv(string))
     if (!in_isPing(string)) {
         channel->appendChannel(string, "\"Debug\"", nullptr);
         emit chatModifiedSignal();
@@ -273,6 +277,16 @@ bool Parser::out_isMsgMsg(QString string)
     channel->appendCurrent(message, &self);
     emit changeChannelSignal();
     emit channelModifiedSignal();
+    return true;
+}
+
+bool Parser::out_isInvMsg(QString string)
+{
+    if(!string.startsWith("/invite"))
+        return false;
+    string = string.right(string.length() - 7);
+    string.prepend("INVITE");
+    sendToServer(socket, string);
     return true;
 }
 
@@ -485,6 +499,29 @@ bool Parser::in_isSetTopic(QString string)
     channel->topic(topic, chan);
     emit topicModifiedSignal();
     return true;
+}
+
+bool Parser::in_isInvMsg(QString string)
+{
+    if (!string.contains(QRegularExpression(IRC::RPL::INVITED)))
+        return false;
+    QString chan = string.split(' ').at(3);
+	QString tmp = "Do you want to join : " + chan + '?';
+    if (QMessageBox::Yes == QMessageBox(QMessageBox::Information, "Invitation", "Do you want to join : " + chan + '?', QMessageBox::Yes|QMessageBox::No).exec())
+    {
+        sendToServer(socket, "JOIN " + chan + '\n');
+    }
+    return true;
+}
+
+bool Parser::in_isConfirmInv(QString string)
+{
+    if (!string.contains(QRegularExpression(IRC::RPL::INVITING)))
+        return false;
+    QString chan = string.split(' ').at(3);
+    QString user = string.split(' ').at(2);
+    channel->appendChannel("You invited " + user + " to " + chan, chan, "");
+    emit chatModifiedSignal();
 }
 
 bool Parser::in_isAwayStatus(QString string)

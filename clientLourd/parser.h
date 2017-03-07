@@ -60,6 +60,7 @@ private:
 	bool out_isMsgMsg(QString string);
 	bool out_isPrivMsg(QString string);
 	bool out_isAwayMsg(QString string);
+	bool out_isInvMsg(QString string);
 
 	// In functions
 	bool in_isInitMesg(QString string);
@@ -80,6 +81,8 @@ private:
     bool in_isChanMode(QString string);
 	bool in_isAwayStatus(QString string);
 	bool in_isAwayPrivMsg(QString string);
+	bool in_isInvMsg(QString string);
+	bool in_isConfirmInv(QString string);
 
 private:
 	// Pointer to the channel and socket created in mainframe

@@ -25,9 +25,11 @@ const QRegularExpression NICK         ("^\\S+\\sNICK\\s");
 const QRegularExpression NOTICE       ("^\\S+\\sNOTICE\\sNICK");
 const QRegularExpression PRIVMSG      ("^\\S+\\sPRIVMSG\\s#\\S+");
 const QRegularExpression WHISPER      ("^\\S+\\sPRIVMSG\\s\\S+");
+const QRegularExpression INVITING     ("^\\S+\\s341\\s");
 const QRegularExpression MOTDSTART    ("^\\S+\\s375\\s");
 const QRegularExpression MOTD         ("^\\S+\\s372\\s");
 const QRegularExpression ENDOFMOTD    ("^\\S+\\s376\\s");
+const QRegularExpression INVITED      ("^\\S+\\s641\\s");
 const QRegularExpression PING         ("^\\S+\\sPING\\s");
 const QRegularExpression KICK         ("^\\S+\\sKICK\\s");
 }
