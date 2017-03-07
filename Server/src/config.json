@@ -10,7 +10,8 @@
     "ip": "fileserver",
     "outip": "25.36.22.132",
     "port": 3001,
-    "tcpport": 8090
+    "tcpport": 8090,
+    "sioport": 8091
   },
   "fileSizeLimit": 2097152,
   "timeout": 0

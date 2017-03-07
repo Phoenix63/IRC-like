@@ -1,13 +1,14 @@
-import net from 'net';
 import config from './../../../config.json';
 import FileReceiver from './FileReceiver';
 import bufferManager from './../modules/bufferSpliter';
+import Tcp from './tcp';
+import Sio from './sio';
 
-let server = net.createServer((socket) => {
+function manage(socket) {
     socket.buffer = '';
     socket.filereceiver = null;
 
-    console.log('new connection from '+socket.remoteAddress);
+    console.log('new connection from '+(socket.remoteAddress));
 
     socket.r = function() {
         if(socket.filereceiver) {
@@ -37,32 +38,14 @@ let server = net.createServer((socket) => {
             }
         }
     });
-    socket.on('close', () => {
-        console.log('close');
-    })
-    socket.on('connect', () => {
-        console.log('connect');
-    })
-    socket.on('drain', () => {
-        console.log('drain');
-    });
-    socket.on('end', () => {
-        console.log('end');
-    });
-    socket.on('error', () => {
-        console.log('error');
-    });
-    socket.on('lookup', () => {
-        console.log('lookup');
-    });
-    socket.on('timeout', () => {
-        console.log('timeout');
-    })
+}
 
+Tcp.bind((socket) => {
+    socket.type = 'TCP';
+    manage(socket);
 });
 
-server.on('error', (err) => {
-    throw err;
+Sio.bind((socket) => {
+    socket.type = 'SIO';
+    manage(socket);
 });
-
-server.listen(config.image_server.tcpport, config.image_server.ip);
