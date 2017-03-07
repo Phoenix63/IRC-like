@@ -230,6 +230,21 @@ let RPLSender = {
      */
     RPL_YOU_HAVE_BEEN_INVITED: (socket, guest, chan)=>{
         guest.socket.send(':YOU_HAVE_BEEN_INVITED '+socket.client.name+' '+chan.name);
+    },
+
+    /**
+     *
+     * @param {Socket} socket
+     * @param {Channel} chan
+     * @constructor
+     */
+    LISTFILES: (socket, chan) => {
+        socket.send(':'+config.ip+' LISTFILES '+chan.name+' :/list start');
+        let files = chan.getFiles();
+        for(var key in files) {
+            socket.send(':'+config.ip+' LISTFILES '+chan.name+' '+key+' '+files[key].name+' '+files[key].client.name);
+        }
+        socket.send(':'+config.ip+' LISTFILES '+chan.name+' :/list end');
     }
 
 };

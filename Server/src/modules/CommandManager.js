@@ -20,7 +20,8 @@ let allowedCommand = {
     'TOPIC': require('./command/TOPIC'),
     'RESTART': require('./command/RESTART'),
     'KICK': require('./command/KICK'),
-    'INVITE': require('./command/INVITE')
+    'INVITE': require('./command/INVITE'),
+    'LISTFILES': require('./command/LISTFILES')
 };
 
 class CommandManager {
