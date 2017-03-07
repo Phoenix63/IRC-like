@@ -62,12 +62,12 @@ module.exports = function (socket, command) {
             if(flags.indexOf('v') > -1){
                 channel.changeClientFlag(sign,'v',user);
             }
-        }else if(arg4 && flags.indexOf('k') > -1){
+        }else if(flags.indexOf('k') > -1){
             //set a channel key (password).
             if(sign==='-'){
                 channel.setPass('');
                 RPLSender.RPL_CHANNELMODEIS(channel,nameChannel+' -k');
-            }else if(arg4){
+            }else if(arg4 && sign==='+'){
                 if(!(channel.pass === '')){
                     ERRSender.ERR_KEYSET(socket.client,channel.name);
                     return;

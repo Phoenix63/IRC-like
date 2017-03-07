@@ -10,7 +10,7 @@ module.exports = function (socket, command) {
         ERRSender.ERR_NOTREGISTERED(socket.client, 'MODE');
         return;
     }
-    let awayRegex = /^([ a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,50})$/.exec(command[1]);
+    let awayRegex = /^:([ a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,50})$/.exec(command[1]);
 
     if(awayRegex){
         let messageAway = awayRegex[1];

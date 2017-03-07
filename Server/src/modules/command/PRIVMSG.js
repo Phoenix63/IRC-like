@@ -39,9 +39,10 @@ module.exports = function (socket, command) {
     let errReceive = [];
     receivers.forEach((r) => {
         if (clients[r]) {
-            clients[r].socket.send(':' + socket.client.name + ' PRIVMSG ' + r + ' :' + message);
             if(clients[r].away){
                 RPLSender.RPL_AWAY(socket, clients[r].name, clients[r].away);
+            }else {
+                clients[r].socket.send(':' + socket.client.name + ' PRIVMSG ' + r + ' :' + message);
             }
         } else if (channels[r]) {
             if (channels[r].users.indexOf(socket.client) >= 0) {
