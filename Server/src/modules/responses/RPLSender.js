@@ -72,9 +72,9 @@ let RPLSender = {
      */
     RPL_TOPIC: (command, client, channel) => {
         if (channel.topic) {
-            client.socket.send(':' + config.ip + ' 332 '+command+' ' + channel.name + ' :' + channel.topic);
+            channel.broadcast(':' + config.ip + ' 332 '+command+' ' + channel.name + ' :' + channel.topic,null);
         } else {
-            client.socket.send(':' + config.ip + ' 331 '+command+' ' + channel.name + ' :No topic is set');
+            channel.broadcast(':' + config.ip + ' 331 '+command+' ' + channel.name + ' :No topic is set',null);
         }
     },
 
@@ -232,7 +232,7 @@ let RPLSender = {
      * @constructor
      */
     RPL_SERVER_ACCEPT_THE_INVITATION: (socket, guest, chan)=>{
-        socket.send(':SERVER_ACCEPT_THE_INVITATION '+guest.name+' '+chan.name);
+        socket.send(':'+config.ip+' 341 '+guest.name+' '+chan.name);
     },
     /**
      *
@@ -242,18 +242,60 @@ let RPLSender = {
      * @constructor
      */
     RPL_YOU_HAVE_BEEN_INVITED: (socket, guest, chan)=>{
-        guest.socket.send(':YOU_HAVE_BEEN_INVITED '+socket.client.name+' '+chan.name);
+        guest.socket.send(':'+config.ip+' 641 '+socket.client.name+' '+chan.name);
     },
+    /**
+     *
+     * @param socket
+     * @param nick
+     * @param msg
+     * @constructor
+     */
     RPL_AWAY: (socket, nick, msg) => {
         socket.send(':'+config.ip+' 301 '+nick+' :'+msg);
     },
+    /**
+     *
+     * @param socket
+     * @constructor
+     */
     RPL_UNAWAY: (socket) => {
         socket.send(':'+config.ip+' 305 :You are no longer marked as being away');
     },
+    /**
+     *
+     * @param socket
+     * @constructor
+     */
     RPL_NOWAWAY: (socket) => {
         socket.send(':'+config.ip+' 306 :You have been marked as being away');
     },
 
+    /**
+     *
+     * @param {Socket} socket
+     * @param {Channel} chan
+     * @constructor
+     */
+    LISTFILES: (socket, chan) => {
+        socket.send(':'+config.ip+' LISTFILES '+chan.name+' :/list start');
+        let files = chan.getFiles();
+        for(var key in files) {
+            socket.send(':'+config.ip+' LISTFILES '+chan.name+' '+key+' '+files[key].name+' '+files[key].client.name);
+        }
+        socket.send(':'+config.ip+' LISTFILES '+chan.name+' :/list end');
+    },
+
+    /**
+     *
+     * @param {Socket} socket
+     * @param {Channel} chan
+     * @param {string} file
+     * @constructor
+     */
+    RMFILE: (socket, chan, file) => {
+        chan.broadcast(':'+socket.client.name+' RMFILE :'+file, null);
+    }
 
 };
 export default RPLSender

@@ -27,7 +27,7 @@ module.exports = function(socket,command) {
             if(newTopic === null || newTopic === '') {
                 RPLSender.RPL_TOPIC('TOPIC', socket.client, c);
             } else {
-                if(c.isUserOperator(socket.client)) {
+                if((c.channelFlags.indexOf('t')>-1 && c.isUserOperator(socket.client)) || (c.channelFlags.indexOf('t') === -1)) {
                     c.topic = newTopic;
                     RPLSender.RPL_TOPIC('TOPIC', socket.client, c);
                 } else {

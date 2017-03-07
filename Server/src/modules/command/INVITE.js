@@ -25,15 +25,19 @@ module.exports = function (socket, command) {
             return;
         }
         if (!channel.isInvitation){
+            ERRSender.ERR_NOSUCHCHANNEL(socket.client, nameChannel);
             return;
         }
         if(!channel.isUserOperator(socket.client)){
             ERRSender.ERR_CHANOPRIVSNEEDED(socket.client, nameChannel);
             return;
         }
-
         if (channel.getUser(guest.name)){
             ERRSender.ERR_USERONCHANNEL(socket, guest.name, channel.name);
+            return;
+        }
+        if(guest.away){
+            RPLSender.RPL_AWAY(socket,guest.name,guest.away);
             return;
         }
         channel.invite(socket, guest);

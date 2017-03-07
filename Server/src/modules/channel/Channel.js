@@ -47,6 +47,8 @@ class Channel {
         this._temporary = true;
         this._topic = topic;
 
+        this._files = {};
+
 
         // not loaded from db
         if(creator instanceof Client) {
@@ -77,8 +79,10 @@ class Channel {
         return this._name;
     }
 
-
-
+    /**
+     *
+     * @returns {string|NULL}
+     */
     get topic() {
         if(this._topic !== '') {
             return this._topic;
@@ -133,6 +137,10 @@ class Channel {
         return (this._flags.indexOf('i') >= 0);
     }
 
+    /**
+     *
+     * @returns {boolean}
+     */
     get isModerated() {
         return (this._flags.indexOf('m') >= 0);
     }
@@ -172,6 +180,14 @@ class Channel {
     }
 
     /**
+     *
+     * @returns {string|*|string}
+     */
+    get channelFlags() {
+        return this._flags;
+    }
+
+    /**
      * set channel persistent or not
      * @param {Boolean} bool
      */
@@ -187,7 +203,7 @@ class Channel {
 
     /**
      *
-     * @param newTopic
+     * @param {string|NULL} newTopic
      */
     set topic(newTopic){
         this._topic = newTopic;
@@ -227,6 +243,35 @@ class Channel {
             }
         });
         this._change();
+    }
+
+    /**
+     *
+     * @param {Client} client
+     * @param {string} url
+     */
+    addFile(client, url) {
+        let split = url.split('/');
+        this._files[url] = {
+            name: split[split.length-1],
+            client: client
+        };
+    }
+
+    /**
+     *
+     * @returns {Array<Client, string>}
+     */
+    getFiles() {
+        return this._files;
+    }
+
+    removeFile(url) {
+        delete this._files[url];
+    }
+
+    deleteFiles() {
+        this._files = {};
     }
 
     /**
@@ -314,6 +359,10 @@ class Channel {
     }
 
 
+    /**
+     *
+     * @param {string} flags
+     */
     setUserFlags(flags) {
         this._usersFlags = flags;
         this._change();
@@ -395,9 +444,19 @@ class Channel {
         }
 
     }
+
+    /**
+     *
+     * @param {string} size
+     */
     setSize(size) {
         this._size = size;
     }
+
+    /**
+     *
+     * @param {string} pass
+     */
     setPass(pass) {
         this._pass = pass;
     }
@@ -414,6 +473,11 @@ class Channel {
         });
     }
 
+    /**
+     *
+     * @param {Socket} socket
+     * @param {Client} client
+     */
     invite(socket, client){
         if(this._invitations.indexOf(client)===-1){
             this._invitations.push(client);
@@ -421,6 +485,8 @@ class Channel {
             RPLSender.RPL_YOU_HAVE_BEEN_INVITED(socket, client, this);
         }
     }
+
+
 
     /**
      *
@@ -435,6 +501,10 @@ class Channel {
         return null;
     }
 
+    /**
+     *
+     * @returns {Array}
+     */
     static list() {
         return channels;
     }
