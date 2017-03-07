@@ -598,7 +598,6 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 							}
 							else if(cmd[2].includes("k") && cmd[2][0] === "+" && (cmd[2].includes("o") === false) && (cmd[2].includes("b") === false) && (cmd[2].includes("l") === false) && (cmd[2].includes("v") === false)) {
 								if(cmd[3] !== undefined  && cmd[3] !== "") {
-									alert(cmd[3]);
 									modeL[12][0] = true;
 									modeL[0][0] = true;
 									if(cmd[2].includes("p") ) {
@@ -650,7 +649,6 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 								}
 							}
 							var flag = "";
-							alert("");
 							for(var j = 0; j<modeL.length; j++) {
 								if(modeL[j][0] === true) {
 									flag = flag + modeL[j][1];
