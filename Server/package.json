@@ -13,12 +13,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "buffer-split": "^1.0.0",
     "colors": "^1.1.2",
     "crypto": "0.0.3",
     "express": "^4.15.0",
     "mongodb": "^2.2.23",
     "redis": "^2.6.5",
+    "screenshot": "^0.1.0",
     "shortid": "^2.2.6",
     "socket.io": "^1.7.2"
   },
