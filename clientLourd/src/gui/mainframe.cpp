@@ -130,7 +130,8 @@ void MainFrame::userModified()
 {
     ui->userList->clear();
     for (auto i:channel.users()) {
-        ui->userList->addItem(i->name());
+        if (!i->modeI())
+            ui->userList->addItem((i->modeO() || channel.oper(i)) ? '@' + i->name() : i->name());
     }
 }
 

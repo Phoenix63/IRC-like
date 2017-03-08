@@ -5,8 +5,8 @@
 
 UploadWindow::UploadWindow(QWidget *parent, QTcpSocket *sock) :
     QDialog(parent),
-    socket(sock),
-    ui(new Ui::UploadWindow)
+    ui(new Ui::UploadWindow),
+    socket(sock)
 {
     ui->setupUi(this);
 	initUIStyle();
@@ -36,7 +36,8 @@ void UploadWindow::parse(QString string)
 {
     if(string.startsWith("^FILE\\sTRANSFERT"))
     {
-        QString progress = string.split(' ').at(2);
+        int j = string.indexOf(QRegularExpression(":.+$"));
+        QString progress = string.right(string.length() - j - 1);
         ui->progressBar->setMaximum(progress.split('/').at(1).toInt());
         ui->progressBar->setValue(progress.split('/').at(0).toInt());
     } else {

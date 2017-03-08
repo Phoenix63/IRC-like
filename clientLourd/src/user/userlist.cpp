@@ -6,6 +6,16 @@ UserList::UserList()
 {
 }
 
+
+QStringList UserList::getusers()
+{
+    QStringList tmp;
+    for(auto i:users) {
+            tmp.append(i->name());
+    }
+    return tmp;
+}
+
 void UserList::modeI(bool mode, QString user)
 {
     for(auto i:users) {
@@ -32,6 +42,11 @@ void UserList::modeW(bool mode, QString user)
 
 User * UserList::addUser(QString nick)
 {
+    for(auto i:users) {
+        if (nick == i->name()) {
+            return i;
+        }
+    }
     User *newUser = new User(nick);
     users.append(newUser);
     return newUser;
@@ -39,6 +54,11 @@ User * UserList::addUser(QString nick)
 
 void UserList::addUser(User *user)
 {
+    for(auto i:users) {
+        if (user->name() == i->name()) {
+            return;
+        }
+    }
     users.append(user);
 }
 

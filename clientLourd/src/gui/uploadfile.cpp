@@ -7,7 +7,6 @@
 #include <QString>
 #include <QTcpSocket>
 
-#include <QDebug>
 
 Upload::Upload(QWidget *parent, QString host, QStringList files, QTcpSocket *sock):
     QThread(parent),

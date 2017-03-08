@@ -10,6 +10,7 @@ class UserList
 public:
     UserList();
 
+    QStringList getusers();
     // Setters
     void modeI(bool mode, QString user);
     void modeO(bool mode, QString user);

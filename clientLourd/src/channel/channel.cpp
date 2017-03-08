@@ -8,6 +8,7 @@
 #include <QTextBrowser>
 #include <QTime>
 #include <QVBoxLayout>
+
 /*
  * Channel: Constructor
  */
@@ -123,12 +124,21 @@ QList<QString> Channel::channelNames()
 
 void Channel::addUser(QString user, QString channel)
 {
-    if (channels.contains(channel)) {
+    if(user.startsWith('@')) {
+        user.remove(0, 1);
+        channels[channel].addUser(userList.addUser(user));
+        channels[channel].oper(user, true);
+    } else {
         channels[channel].addUser(userList.addUser(user));
     }
 }
 
 void Channel::addUser(User *user)
+{
+    userList.addUser(user);
+}
+
+void Channel::addUser(QString user)
 {
     userList.addUser(user);
 }
@@ -154,6 +164,43 @@ void Channel::changeNick(QString nick, QString newNick)
         channels.remove(nick);
     }
 }
+/*
+ * Mode functions
+ */
+
+bool Channel::voice(User *user, QString chan)
+{
+    return channels[chan].voice(user);
+}
+
+bool Channel::oper(User *user, QString chan)
+{
+    return channels[chan].oper(user);
+}
+
+void Channel::voice(User *user, QString chan, bool value)
+{
+    channels[chan].voice(user, value);
+}
+
+void Channel::oper(User *user, QString chan, bool value)
+{
+    channels[chan].oper(user, value);
+}
+
+void Channel::voice(QString user, QString chan, bool value)
+{
+    channels[chan].voice(user,value);
+}
+
+void Channel::oper(QString user, QString chan, bool value)
+{
+    channels[chan].oper(user,value);
+}
+
+/*
+ * Topic functions
+ */
 
 void Channel::topic(QString topic, QString channel)
 {
@@ -182,4 +229,28 @@ void Channel::togleNotif(QString chan, bool newValue)
 Message Channel::getLast()
 {
     return channels[currentChannel].getLast();
+}
+
+/*
+ * Voice and operator getters
+ */
+
+bool Channel::oper(User *user)
+{
+    return channels[currentChannel].oper(user);
+}
+
+
+bool Channel::oper(QString user)
+{
+    return channels[currentChannel].oper(user);
+}
+bool Channel::voice(User *user)
+{
+    return channels[currentChannel].voice(user);
+}
+
+bool Channel::voice(QString user)
+{
+    return channels[currentChannel].voice(user);
 }

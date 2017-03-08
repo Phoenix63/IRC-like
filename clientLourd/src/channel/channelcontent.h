@@ -34,6 +34,15 @@ public:
     void togleNotif(bool newValue);
     Message getLast();
 
+	// Mode access
+    bool oper(User *user);
+    bool oper(QString string);
+    bool voice(User *user);
+    bool voice(QString string);
+    void voice(User *user, bool val);
+    void oper(User *user, bool val);
+    void voice(QString user, bool val);
+    void oper(QString user, bool val);
 private:
     QString aTopic;
     QHash<User *, Mode> aUsers;

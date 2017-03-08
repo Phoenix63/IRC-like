@@ -1,5 +1,5 @@
-#ifndef UPLOADWINDOW_H
-#define UPLOADWINDOW_H
+#ifndef GUI_UPLOADWINDOW_H
+#define GUI_UPLOADWINDOW_H
 
 #include <QDialog>
 #include <QTcpSocket>

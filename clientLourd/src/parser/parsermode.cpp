@@ -78,9 +78,9 @@ bool ParserMode::isIChanMode(QString mode, QString chan){
     if (!mode.contains('i'))
         return false;
     if (mode[0] == '+')
-        channel->appendChannel("This Channel is now accessible on invite only.", chan, "");
+        channel->appendChannel("This Channel is now accessible on invite only.", chan, nullptr);
     else
-        channel->appendChannel("This Channel is now open to everyone.", chan, "");
+        channel->appendChannel("This Channel is now open to everyone.", chan, nullptr);
     return true;
 }
 
@@ -88,10 +88,13 @@ bool ParserMode::isOChanMode(QString mode, QString chan, QString user)
 {
     if(!mode.contains('o'))
         return false;
-    if (mode[0] == '+')
-        channel->appendChannel(user + " is now channel operator.", chan, "");
-    else
-        channel->appendChannel(user + " is no longer channel operator.", chan, "");
+    if (mode[0] == '+') {
+        channel->appendChannel(user + " is now channel operator.", chan, nullptr);
+        channel->oper(user, chan, true);
+    } else {
+        channel->appendChannel(user + " is no longer channel operator.", chan, nullptr);
+        channel->oper(user, chan, false);
+    }
     return true;
 }
 
@@ -100,9 +103,9 @@ bool ParserMode::isPMode(QString mode, QString chan)
     if(!mode.contains('p'))
         return false;
     if (mode[0] == '+')
-        channel->appendChannel("This Channel is now private.", chan, "");
+        channel->appendChannel("This Channel is now private.", chan, nullptr);
     else
-        channel->appendChannel("This Channel is now public.", chan, "");
+        channel->appendChannel("This Channel is now public.", chan, nullptr);
     return true;
 }
 
@@ -111,20 +114,22 @@ bool ParserMode::isSMode(QString mode, QString chan)
     if(!mode.contains('s'))
         return false;
     if (mode[0] == '+')
-        channel->appendChannel("This Channel is now secret.", chan, "");
+        channel->appendChannel("This Channel is now secret.", chan, nullptr);
     else
-        channel->appendChannel("This Channel isn't secret anymore.", chan, "");
+        channel->appendChannel("This Channel isn't secret anymore.", chan, nullptr);
     return true;
 }
 
 bool ParserMode::isTMode(QString mode, QString chan)
 {
-    if(!mode.contains('t'))
+    if(!mode.contains('t')){
         return false;
-    if (mode[0] == '+')
-        channel->appendChannel("The topic of this channel can be modified by operators only.", chan, "");
+    }
+    if (mode[0] == '+') {
+        channel->appendChannel("The topic of this channel can be modified by operators only.", chan, nullptr);
+    }
     else
-        channel->appendChannel("Everyone can now change the topic of this channel.", chan, "");
+        channel->appendChannel("Everyone can now change the topic of this channel.", chan, nullptr);
     return true;
 }
 
@@ -132,10 +137,11 @@ bool ParserMode::isNMode(QString mode, QString chan)
 {
     if(!mode.contains('n'))
         return false;
-    if (mode[0] == '+')
-        channel->appendChannel("This channel doesn't accepts messages from outside.", chan, "");
+    if (mode[0] == '+'){
+        channel->appendChannel("This channel doesn't accepts messages from outside.", chan, nullptr);
+    }
     else
-        channel->appendChannel("This channel accepts messages from outside.", chan, "");
+        channel->appendChannel("This channel accepts messages from outside.", chan, nullptr);
     return true;
 }
 
@@ -144,9 +150,9 @@ bool ParserMode::isMMode(QString mode, QString chan)
     if(!mode.contains('m'))
         return false;
     if (mode[0] == '+')
-        channel->appendChannel("This channel is now moderated.", chan, "");
+        channel->appendChannel("This channel is now moderated.", chan, nullptr);
     else
-        channel->appendChannel("This channel isn't moderated anymore.", chan, "");
+        channel->appendChannel("This channel isn't moderated anymore.", chan, nullptr);
     return true;
 }
 
@@ -156,9 +162,9 @@ bool ParserMode::isLMode(QString mode, QString chan, QString arg)
     if(!mode.contains('n'))
         return false;
     if (mode[0] == '+')
-        channel->appendChannel("Limit of users in this channel set to : " + maxUsers, chan, "");
+        channel->appendChannel("Limit of users in this channel set to : " + maxUsers, chan, nullptr);
     else
-        channel->appendChannel("This channel isn't limited on users anymore.", chan, "");
+        channel->appendChannel("This channel isn't limited on users anymore.", chan, nullptr);
     return true;
 }
 
@@ -167,9 +173,9 @@ bool ParserMode::isBMode(QString mode, QString chan, QString user)
     if(!mode.contains('m'))
         return false;
     if (mode[0] == '+')
-        channel->appendChannel(user + " is now banned from this channel.", chan, "");
+        channel->appendChannel(user + " is now banned from this channel.", chan, nullptr);
     else
-        channel->appendChannel(user + " is no longer banned from this channel.", chan, "");
+        channel->appendChannel(user + " is no longer banned from this channel.", chan, nullptr);
     return true;
 }
 
@@ -177,10 +183,13 @@ bool ParserMode::isVMode(QString mode, QString chan, QString user)
 {
     if(!mode.contains('v'))
         return false;
-    if (mode[0] == '+')
-        channel->appendChannel(user + " can now talk in this moderated channel.", chan, "");
-    else
-        channel->appendChannel(user + " can no longer talk in this moderated channel", chan, "");
+    if (mode[0] == '+') {
+        channel->appendChannel(user + " can now talk in this moderated channel.", chan, nullptr);
+        channel->voice(user, chan, true);
+    } else {
+        channel->appendChannel(user + " can no longer talk in this moderated channel", chan, nullptr);
+        channel->voice(user, chan, false);
+    }
     return true;
 }
 
@@ -189,8 +198,8 @@ bool ParserMode::isKMode(QString mode, QString chan, QString password)
     if(!mode.contains('k'))
         return false;
     if (mode[0] == '+')
-        channel->appendChannel("The password of this channel is now set to : " + password, chan, "");
+        channel->appendChannel("The password of this channel is now set to : " + password, chan, nullptr);
     else
-        channel->appendChannel("This channel no longer have a password.", chan, "");
+        channel->appendChannel("This channel no longer have a password.", chan, nullptr);
     return true;
 }

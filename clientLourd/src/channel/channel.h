@@ -18,6 +18,8 @@ template<typename> class QList;
 class Channel
 {
 public:
+
+    UserList userList;
     // Constructor
     Channel(ParserEmoji *emoji);
 
@@ -48,9 +50,23 @@ public:
     // User functions
     void addUser(QString user, QString channel);
     void addUser(User *user);
+    void addUser(QString user);
     void delUser(QString user, QString channel);
     void changeNick(QString user, QString nick);
     QList<User *> users();
+
+    // User mode
+    bool oper(User *user, QString chan);
+    bool oper(User *user);
+    bool oper(QString string);
+    bool voice(User *user);
+    bool voice(User *user, QString chan);
+    bool voice(QString string);
+    void voice(User *user, QString chan, bool val);
+    void oper(User *user, QString chan, bool val);
+    void voice(QString user, QString chan, bool val);
+    void oper(QString user, QString chan, bool val);
+
 
     // Topic
     void topic(QString topic, QString channel);
@@ -62,7 +78,6 @@ public:
     Message getLast();
 private:
     ParserEmoji * emoji;
-    UserList userList;
     // Current channel name
     QString currentChannel;
     // Qhash wich contain message: key = channel name, content = message list

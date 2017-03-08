@@ -361,7 +361,8 @@ bool Parser::in_isInitMesg(QString string)
         return false;
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString nick = string.right(string.length() - j - 5);
-    nickname(nick);
+    self.name(nick);
+    channel->addUser(&self);
     return true;
 }
 
@@ -379,12 +380,15 @@ bool Parser::in_isChanList(QString string)
 
 bool Parser::in_isNameList(QString string)
 {
-    if (!string.contains(QRegularExpression("^.+\\s353")))
+    if (!string.contains(IRC::RPL::NAMEREPLY))
         return false;
     channel->change("\"Debug\"");
     channel->appendChannel(string, "\"Debug\"", nullptr);
-    for (auto i = 5; i < string.split(QRegularExpression("\\s:?")).length(); i++) {
-         channel->addUser(string.split(QRegularExpression("\\s:?"))[i],string.split(QRegularExpression("\\s:?"))[4]);
+    QString tmp = string.split(':').last();
+    QString chan = string.split(' ').at(4);
+    QStringList users = tmp.split(' ');
+    for (auto i:users){
+        channel->addUser(i,chan);
     }
     emit changeChannelSignal();
     emit chatModifiedSignal();
@@ -398,11 +402,12 @@ bool Parser::in_isJoinNote(QString string)
         return false;
     }
     QString nick = string.split(' ').at(0);
+    QString tmp = nick;
     if(nick.startsWith('@'))
         nick.remove(0,1);
     QString chan = string.split(' ').at(2);
     if(nick.compare(self.name())) {
-        channel->addUser(nick, chan);
+        channel->addUser(tmp, chan);
         channel->appendChannel(nick + " joined " + chan, chan, nullptr);
     }
     emit userModifiedSignal();
@@ -421,7 +426,6 @@ bool Parser::in_isPartNote(QString string)
     if (user.compare(self.name())) {
         channel->appendChannel(user + " left " + chan + ' ' + message, chan, nullptr);
         channel->delUser(user, chan);
-        channel->delUser("@" + user, chan);
     } else {
         channel->leave(chan);
         emit channelModifiedSignal();
@@ -438,7 +442,6 @@ bool Parser::in_isPrivMesg(QString string)
     QString message = string.right(string.length() - j - 1);
     QString chan = string.split(' ').at(2);
     QString sender = string.split(' ').at(0);
-    channel->addUser(sender, chan);
     channel->appendChannel(message, chan, sender);
     if (chan != channel->channelName())
         channel->togleNotif(chan, true);

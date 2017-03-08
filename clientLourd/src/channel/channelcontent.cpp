@@ -1,13 +1,17 @@
 #include "channelcontent.h"
 
+
 /*
  * User functions
  */
 
 void ChannelContent::addUser(User *newUser)
 {
-    if (!aUsers.keys().contains(newUser))
-        aUsers[newUser] = Mode();
+    for (auto i:aUsers.keys()) {
+        if( i == newUser)
+            return;
+    }
+    aUsers[newUser] = Mode();
 }
 
 void ChannelContent::removeUser(QString userName)
@@ -91,4 +95,59 @@ void ChannelContent::togleNotif(bool newValue)
 Message ChannelContent::getLast()
 {
     return aChatContent.back();
+}
+
+/*
+ * Mode functions
+ */
+
+bool ChannelContent::oper(User *user)
+{
+    return aUsers[user].chanOperator();
+}
+
+
+bool ChannelContent::oper(QString user)
+{
+    if (User *tmp = findUser(user))
+        return aUsers[tmp].chanOperator();
+    return false;
+}
+
+bool ChannelContent::voice(User *user)
+{
+    return aUsers[user].chanVoice();
+}
+
+bool ChannelContent::voice(QString user)
+{
+    if (User *tmp = findUser(user))
+        return aUsers[tmp].chanVoice();
+    return false;
+}
+
+/*
+ * Setters
+ */
+
+void ChannelContent::oper(User *user, bool value)
+{
+    aUsers[user].chanOperator(value);
+}
+
+void ChannelContent::oper(QString user, bool value)
+{
+    if (User *tmp = findUser(user))
+        aUsers[tmp].chanOperator(value);
+}
+
+void ChannelContent::voice(User *user, bool value)
+{
+    aUsers[user].chanVoice(value);
+}
+
+void ChannelContent::voice(QString user, bool value)
+{
+    if (User *tmp = findUser(user))
+        aUsers[tmp].chanVoice(value);
 }
