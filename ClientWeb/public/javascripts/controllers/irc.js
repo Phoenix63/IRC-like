@@ -671,6 +671,7 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 									flag = flag + modeL[j][1];
 								}
 							}
+							alert(flag);
 							if(cmd[3] === undefined) {
 								userInfo.socket.emit("message", "MODE " + cmd[1] + " " + flag);
 							}
@@ -762,7 +763,6 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
     userInfo.socket.on("message",function(msg) {
 		if(msg.match(/^:[\S]+[ ]433[ ][\S]+[ ][\W\w]+$/)) {
 			$location.path("/");
-
 		}
         else if(msg.match(/^[:][\w\S]+[ ]PRIVMSG[ ][#][\w\S]+[ ][:][ ][a-zA-Z0-9\W]+$/)) {
             var regxMess = (/^[:]([\w\S]+)[ ]PRIVMSG[ ]([#][\w\S]+)[ ][:][ ]([a-zA-Z0-9\W]+)$/).exec(msg);
@@ -1061,9 +1061,6 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 				}
 			}
 		}
-		else if(msg.includes("PING")===true) {
-			userInfo.socket.emit("message", "PONG");
-		}
 		else if(msg.match(/^[\w\S]+[ ]341[ ][\S\w]+[ ][\w\S]+$/)) {
 			var rspInvite = (/^[\w\S]+[ ]341[ ]([\S\w]+)[ ]([\w\S]+)$/).exec(msg);
 			var rspInviteChan = rspInvite[2];
@@ -1254,7 +1251,46 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 			}
 		}
 		else if(msg.match(/^:[\S]+[ ]221[ ]MODE[ ][\S]+[ ][\S]+$/)) {
-			
+			var rspModeUsers = (/^:[\S]+[ ]221[ ]MODE[ ]([\S]+)[ ]([\S]+)$/).exec(msg);
+			var rspModeFlag = rspModeUsers[1];
+			var rspModeUser = rspModeUsers[2];
+			if(rspModeFlag === "+o") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), rspModeUser + " is upgrade to admin in the server"]);
+				for(var i = 0; i<$scope.channels.length; i++) {
+					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), rspModeUser + " is upgrade to admin in the server"]);
+				}
+				boolNames = false;
+				userInfo.socket.emit("message", "NAMES");
+			}
+			else if(rspModeFlag === "-o") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), rspModeUser + " is downgrade to simple user in the server"]);
+				for(var i = 0; i<$scope.channels.length; i++) {
+					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), rspModeUser + " is downgrade to simple user in the server"]);
+				}
+				boolNames = false;
+				userInfo.socket.emit("message", "NAMES");
+			}
+			else if(rspModeFlag === "+w") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You received the WALLOPS"]);
+			}
+			else if(rspModeFlag === "-w") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You doesn't received WALLOPS"]);
+			}
+			else if(rspModeFlag === "+s") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You received the notification from server"]);
+			}
+			else if(rspModeFlag === "-s") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You doesnt received notification from server"]);
+			}
+			else if(rspModeFlag === "+i") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You are now invisible"]);
+				boolNames = false;
+				userInfo.socket.emit("message", "NAMES");
+			}
+			else if(rspModeFlag === "+i") {
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You are now not invisible"]);
+				userInfo.socket.emit("message", "NAMES");
+			}
 		}
 		else if(msg.match(/^[\S\w]+[ ]401[ ][\W\w]+$/)) {
 			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "This user isn't in the server or the channel doesn't exist"]);
@@ -1324,6 +1360,9 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 		}
 		else if(msg.match(/^[\w\S]+[ ]482[ ][#][\w\S]+[ ][\W\w]+$/)) {
 			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "you are not operator in this channel"]);
+		}
+		else if(msg.includes("PING")===true) {
+			userInfo.socket.emit("message", "PONG");
 		}
 		
 		$scope.currentChannel.messages.push([new User("debug"), new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), msg]);
