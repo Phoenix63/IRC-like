@@ -31,6 +31,10 @@ myApp.factory("userInfo", function() {
       "nick": uniqid(),
       "realName": uniqid(),
       "right": 0,
+	  "mute": [],
+	  "removeUserMute": function(user) {
+		  this.mute.splice(this.mute.indexOf(user), 1);
+	  },
       "setRight": function(newRight) {
         this.right = newRight;
       },

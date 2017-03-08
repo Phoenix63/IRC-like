@@ -6,6 +6,7 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 	var connect = undefined;
 	var boolNames = undefined;
 	var boolAskTopic = undefined;
+	var isCmdMute = false;
 	var countNick = 0;
 	var admin = [];
 	$scope.currentChannel = new Channel("@accueil");
@@ -92,15 +93,9 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 			userInfo.socket.emit("message","WHOIS " + userL.nick);
 		}],
 		["Mute", function ($itemScope) {
-			if(userL.nick !== user.nick) {
-				$scope.currentChannel.mute.push(userL.nick);
-			}
-			else {
-				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(),  "You cannot mute yourself"]);
-			}
+
 		}],
 		["DeMute", function ($itemScope) {
-			$scope.currentChannel.removeMuteList(userL.nick);
 		}],
 		["Kick", function ($itemScope) {
 			//only if admin
@@ -122,7 +117,9 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 		var cmdMode = $scope.newMessage.match(/^\/mode[ ][\w\W]+$/);
 		var cmdInvite = $scope.newMessage.match(/^\/invite[ ][\w\S]+[ ][\w\S]+$/);
 		var cmdAway = $scope.newMessage.match(/^\/away[ ][\w\W]+$/);
-		var cmdPrivMsg = $scope.newMessage.match(/^\/privmsg[ ][#][\w\S]+[ ][\W\s]+$/);
+		var cmdPrivMsg = $scope.newMessage.match(/^\/privmsg[ ][#][\w\S]+[ ][\W\w]+$/);
+		var cmdMute = $scope.newMessage.match(/^\/mute[ ][\S\w]+$/);
+		var cmdDeMute = $scope.newMessage.match(/^\/demute[ ][\S\w]+$/);
 		if($scope.newMessage.match(/^\/[a-z]+/g)) {
 			if(cmdJoin != null) {
 				var command = (/^(\/[a-z]+)[ ]([\w\S]+)$/).exec($scope.newMessage);
@@ -347,7 +344,7 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 			}
 			else if(cmdMode !== null) {
 				
-				var modeL = [[false, "+"], [false, "-"], [false, "o"], [false, "p"], [false, "s"], [false, "i"], [false, "t"], [false, "n"], [false, "m"], [false, "l"], [false, "b"], [false, "v"], [false, "k"], [false, "w"]];
+				var modeL = [[false, "+"], [false, "-"], [false, "o"], [false, "s"], [false, "i"], [false, "t"], [false, "n"], [false, "m"], [false, "l"], [false, "b"], [false, "v"], [false, "k"], [false, "w"]];
 				var boolIsCh = true;
 				var cmd = $scope.newMessage.split(" ");
 				if(cmd[1].includes("#")) {
@@ -357,23 +354,20 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 								if(cmd[3] !== undefined  && cmd[3] !== "") {
 									modeL[0][0] = true;
 									modeL[2][0] = true;
-									if(cmd[2].includes("p")) {
-										modeL[3][0] =  true;
-									}
 									if(cmd[2].includes("s")) {
-										modeL[4][0] = true;
+										modeL[3][0] = true;
 									}
 									if(cmd[2].includes("i")) {
-										modeL[5][0] = true;
+										modeL[4][0] = true;
 									}
 									if(cmd[2].includes("t")) {
-										modeL[6][0] = true;
+										modeL[5][0] = true;
 									}
 									if(cmd[2].includes("n")) {
-										modeL[7][0] = true;
+										modeL[6][0] = true;
 									}
 									if(cmd[2].includes("m")) {
-										modeL[8][0] = true;
+										modeL[7][0] = true;
 									}
 								}
 								else {
@@ -384,23 +378,20 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 								if(cmd[3] !== undefined  && cmd[3] !== "") {
 									modeL[1][0] = true;
 									modeL[2][0] = true;
-									if(cmd[2].includes("p") ) {
+									if(cmd[2].includes("s")) {
 										modeL[3][0] = true;
 									}
-									if(cmd[2].includes("s")) {
+									if(cmd[2].includes("i")) {
 										modeL[4][0] = true;
 									}
-									if(cmd[2].includes("i")) {
+									if(cmd[2].includes("t")) {
 										modeL[5][0] = true;
 									}
-									if(cmd[2].includes("t")) {
+									if(cmd[2].includes("n")) {
 										modeL[6][0] = true;
 									}
-									if(cmd[2].includes("n")) {
-										modeL[7][0] = true;
-									}
 									if(cmd[2].includes("m")) {
-										modeL[8][0] = true;
+										modeL[7][0] = true;
 									}
 								}
 								else {
@@ -409,25 +400,46 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 							}
 							else if(cmd[2].includes("l") && cmd[2][0] === "+" && (cmd[2].includes("o") === false) && (cmd[2].includes("b") === false) && (cmd[2].includes("v") === false) && (cmd[2].includes("k") === false)) {
 								if(cmd[3] !== undefined  && cmd[3] !== "") {
+									modeL[8][0] = true;
+									modeL[0][0] = true;
+									if(cmd[2].includes("s")) {
+										modeL[3][0] = true;
+									}
+									if(cmd[2].includes("i")) {
+										modeL[4][0] = true;
+									}
+									if(cmd[2].includes("t")) {
+										modeL[5][0] = true;
+									}
+									if(cmd[2].includes("n")) {
+										modeL[6][0] = true;
+									}
+									if(cmd[2].includes("m")) {
+										modeL[7][0] = true;
+									}
+								}
+								else {
+									$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You must put an user"]);
+								}
+							}
+							else if(cmd[2].includes("b") && cmd[2][0] === "-" && (cmd[2].includes("o") === false) && (cmd[2].includes("l") === false) && (cmd[2].includes("v") === false) && (cmd[2].includes("k") === false)) {
+								if(cmd[3] !== undefined  && cmd[3] !== "") {
 									modeL[9][0] = true;
 									modeL[0][0] = true;
-									if(cmd[2].includes("p") ) {
+									if(cmd[2].includes("s")) {
 										modeL[3][0] = true;
 									}
-									if(cmd[2].includes("s")) {
+									if(cmd[2].includes("i")) {
 										modeL[4][0] = true;
 									}
-									if(cmd[2].includes("i")) {
+									if(cmd[2].includes("t")) {
 										modeL[5][0] = true;
 									}
-									if(cmd[2].includes("t")) {
+									if(cmd[2].includes("n")) {
 										modeL[6][0] = true;
 									}
-									if(cmd[2].includes("n")) {
-										modeL[7][0] = true;
-									}
 									if(cmd[2].includes("m")) {
-										modeL[8][0] = true;
+										modeL[7][0] = true;
 									}
 								}
 								else {
@@ -436,52 +448,22 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 							}
 							else if(cmd[2].includes("b") && cmd[2][0] === "-" && (cmd[2].includes("o") === false) && (cmd[2].includes("l") === false) && (cmd[2].includes("v") === false) && (cmd[2].includes("k") === false)) {
 								if(cmd[3] !== undefined  && cmd[3] !== "") {
-									modeL[10][0] = true;
-									modeL[0][0] = true;
-									if(cmd[2].includes("p") ) {
-										modeL[3][0] = true;
-									}
-									if(cmd[2].includes("s")) {
-										modeL[4][0] = true;
-									}
-									if(cmd[2].includes("i")) {
-										modeL[5][0] = true;
-									}
-									if(cmd[2].includes("t")) {
-										modeL[6][0] = true;
-									}
-									if(cmd[2].includes("n")) {
-										modeL[7][0] = true;
-									}
-									if(cmd[2].includes("m")) {
-										modeL[8][0] = true;
-									}
-								}
-								else {
-									$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You must put an user"]);
-								}
-							}
-							else if(cmd[2].includes("b") && cmd[2][0] === "-" && (cmd[2].includes("o") === false) && (cmd[2].includes("l") === false) && (cmd[2].includes("v") === false) && (cmd[2].includes("k") === false)) {
-								if(cmd[3] !== undefined  && cmd[3] !== "") {
-									modeL[10][0] = true;
+									modeL[9][0] = true;
 									modeL[1][0] = true;
-									if(cmd[2].includes("p") ) {
+									if(cmd[2].includes("s")) {
 										modeL[3][0] = true;
 									}
-									if(cmd[2].includes("s")) {
+									if(cmd[2].includes("i")) {
 										modeL[4][0] = true;
 									}
-									if(cmd[2].includes("i")) {
+									if(cmd[2].includes("t")) {
 										modeL[5][0] = true;
 									}
-									if(cmd[2].includes("t")) {
+									if(cmd[2].includes("n")) {
 										modeL[6][0] = true;
 									}
-									if(cmd[2].includes("n")) {
-										modeL[7][0] = true;
-									}
 									if(cmd[2].includes("m")) {
-										modeL[8][0] = true;
+										modeL[7][0] = true;
 									}
 								}
 								else {
@@ -490,25 +472,22 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 							}
 							else if(cmd[2].includes("v") && cmd[2][0] === "+" && (cmd[2].includes("o") === false) && (cmd[2].includes("b") === false) && (cmd[2].includes("l") === false) && (cmd[2].includes("k") === false)) {
 								if(cmd[3] !== undefined  && cmd[3] !== "") {
-									modeL[11][0] = true;
+									modeL[10][0] = true;
 									modeL[0][0] = true;
-									if(cmd[2].includes("p") ) {
+									if(cmd[2].includes("s")) {
 										modeL[3][0] = true;
 									}
-									if(cmd[2].includes("s")) {
+									if(cmd[2].includes("i")) {
 										modeL[4][0] = true;
 									}
-									if(cmd[2].includes("i")) {
+									if(cmd[2].includes("t")) {
 										modeL[5][0] = true;
 									}
-									if(cmd[2].includes("t")) {
+									if(cmd[2].includes("n")) {
 										modeL[6][0] = true;
 									}
-									if(cmd[2].includes("n")) {
-										modeL[7][0] = true;
-									}
 									if(cmd[2].includes("m")) {
-										modeL[8][0] = true;
+										modeL[7][0] = true;
 									}
 								}
 								else {
@@ -517,25 +496,22 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 							}
 							else if(cmd[2].includes("v") && cmd[2][0] === "-" && (cmd[2].includes("o") === false) && (cmd[2].includes("b") === false) && (cmd[2].includes("l") === false) && (cmd[2].includes("k") === false)) {
 								if(cmd[3] !== undefined  && cmd[3] !== "") {
-									modeL[11][0] = true;
+									modeL[10][0] = true;
 									modeL[1][0] = true;
-									if(cmd[2].includes("p") ) {
+									if(cmd[2].includes("s")) {
 										modeL[3][0] = true;
 									}
-									if(cmd[2].includes("s")) {
+									if(cmd[2].includes("i")) {
 										modeL[4][0] = true;
 									}
-									if(cmd[2].includes("i")) {
+									if(cmd[2].includes("t")) {
 										modeL[5][0] = true;
 									}
-									if(cmd[2].includes("t")) {
+									if(cmd[2].includes("n")) {
 										modeL[6][0] = true;
 									}
-									if(cmd[2].includes("n")) {
-										modeL[7][0] = true;
-									}
 									if(cmd[2].includes("m")) {
-										modeL[8][0] = true;
+										modeL[7][0] = true;
 									}
 								}
 								else {
@@ -544,25 +520,22 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 							}
 							else if(cmd[2].includes("k") && cmd[2][0] === "+" && (cmd[2].includes("o") === false) && (cmd[2].includes("b") === false) && (cmd[2].includes("l") === false) && (cmd[2].includes("v") === false)) {
 								if(cmd[3] !== undefined  && cmd[3] !== "") {
-									modeL[12][0] = true;
+									modeL[11][0] = true;
 									modeL[0][0] = true;
-									if(cmd[2].includes("p") ) {
+									if(cmd[2].includes("s")) {
 										modeL[3][0] = true;
 									}
-									if(cmd[2].includes("s")) {
+									if(cmd[2].includes("i")) {
 										modeL[4][0] = true;
 									}
-									if(cmd[2].includes("i")) {
+									if(cmd[2].includes("t")) {
 										modeL[5][0] = true;
 									}
-									if(cmd[2].includes("t")) {
+									if(cmd[2].includes("n")) {
 										modeL[6][0] = true;
 									}
-									if(cmd[2].includes("n")) {
-										modeL[7][0] = true;
-									}
 									if(cmd[2].includes("m")) {
-										modeL[8][0] = true;
+										modeL[7][0] = true;
 									}
 								}
 								else {
@@ -571,25 +544,22 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 							}
 							else if(cmd[2].includes("k") && cmd[2][0] === "-" && (cmd[2].includes("o") === false) && (cmd[2].includes("b") === false) && (cmd[2].includes("l") === false) && (cmd[2].includes("v") === false)) {
 								if(cmd[3] === undefined) {
-									modeL[12][0] = true;
+									modeL[11][0] = true;
 									modeL[1][0] = true;
-									if(cmd[2].includes("p") ) {
+									if(cmd[2].includes("s")) {
 										modeL[3][0] = true;
 									}
-									if(cmd[2].includes("s")) {
+									if(cmd[2].includes("i")) {
 										modeL[4][0] = true;
 									}
-									if(cmd[2].includes("i")) {
+									if(cmd[2].includes("t")) {
 										modeL[5][0] = true;
 									}
-									if(cmd[2].includes("t")) {
+									if(cmd[2].includes("n")) {
 										modeL[6][0] = true;
 									}
-									if(cmd[2].includes("n")) {
-										modeL[7][0] = true;
-									}
 									if(cmd[2].includes("m")) {
-										modeL[8][0] = true;
+										modeL[7][0] = true;
 									}
 								}
 								else {
@@ -600,44 +570,38 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 								if(cmd[3] === undefined) {
 									if(cmd[2][0] === "+" && cmd[2][1] !== undefined) {
 										modeL[0][0] = true;
-										if(cmd[2].includes("p") ) {
+										if(cmd[2].includes("s")) {
 											modeL[3][0] = true;
 										}
-										if(cmd[2].includes("s")) {
+										if(cmd[2].includes("i")) {
 											modeL[4][0] = true;
 										}
-										if(cmd[2].includes("i")) {
+										if(cmd[2].includes("t")) {
 											modeL[5][0] = true;
 										}
-										if(cmd[2].includes("t")) {
+										if(cmd[2].includes("n")) {
 											modeL[6][0] = true;
 										}
-										if(cmd[2].includes("n")) {
-											modeL[7][0] = true;
-										}
 										if(cmd[2].includes("m")) {
-											modeL[8][0] = true;
+											modeL[7][0] = true;
 										}
 									}
 									else if(cmd[2][0] === "-" && cmd[2][1] !== undefined) {
 										modeL[1][0] = true;
-										if(cmd[2].includes("p") ) {
+										if(cmd[2].includes("s")) {
 											modeL[3][0] = true;
 										}
-										if(cmd[2].includes("s")) {
+										if(cmd[2].includes("i")) {
 											modeL[4][0] = true;
 										}
-										if(cmd[2].includes("i")) {
+										if(cmd[2].includes("t")) {
 											modeL[5][0] = true;
 										}
-										if(cmd[2].includes("t")) {
+										if(cmd[2].includes("n")) {
 											modeL[6][0] = true;
 										}
-										if(cmd[2].includes("n")) {
-											modeL[7][0] = true;
-										}
 										if(cmd[2].includes("m")) {
-											modeL[8][0] = true;
+											modeL[7][0] = true;
 										}
 									}
 									else {
@@ -723,6 +687,23 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 					}
 				}
 			}
+			else if(cmdMute !== null) {
+				var cmdM = (/^\/mute[ ]([\S\w]+)$/).exec(msg);
+				var cmdMUser = cmdM[1];
+				isCmdMute = true;
+				userInfo.socket.emit("message", "WHOIS " + cmdMUser);
+			}
+			else if(cmdDeMute !== null) {
+				var cmdM = (/^\/demute[ ]([\S\w]+)$/).exec(msg);
+				var cmdDeMuteUser = cmdM[1];
+				if(user.mute.includes(cmdDeMuteUser)) {
+					user.removeUserMute(cmdDeMuteUser);
+					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You have demuted " + cmdDeMuteUser]);
+				}
+				else {
+					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The user is not in your mute list"]);
+				}
+			}
 			else if(cmdUser != null) {
 				var command = (/^(\/[a-z]+)[ ]([\w\S]+)$/).exec($scope.newMessage);
 				var commandUser = command[1];
@@ -781,10 +762,10 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 			var regxUser = new User(regxMess[1]);
 			var regxChannel = regxMess[2];
 			var regxMsg = regxMess[3];
-			if($scope.currentChannel.chan !== regxChannel) {
-				for(var i = 0; i<$scope.channels.length; i++) {
-					if(regxChannel === $scope.channels[i].chan) {
-						if($scope.channels[i].mute.includes(regxUser.nick) === false) {
+			if(user.mute.includes(regxUser.nick) === false) {
+				if($scope.currentChannel.chan !== regxChannel) {
+					for(var i = 0; i<$scope.channels.length; i++) {
+						if(regxChannel === $scope.channels[i].chan) {
 							regxUser = isAdmin(regxUser, $scope.channels[i]);
 							$scope.channels[i].messages.push([regxUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
 							if($scope.channels[i].notif !== 2) {
@@ -793,18 +774,14 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 						}
 					}
 				}
-			}
-			else {
-				if($scope.currentChannel.mute.includes(regxUser.nick) === false) {
+				else {
 					regxUser = isAdmin(regxUser, $scope.currentChannel);
 					$scope.currentChannel.messages.push([regxUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
 				}
 			}
-			
         }
 		else if(msg.match(/^[:][\w\S]+[ ]PRIVMSG[ ][\w\S]+[ ][:][ ][a-zA-Z0-9\W]+$/)) {
 			var bool = false;
-			var boolMute = false;
 			var regxMess = (/^[:]([\w\S]+)[ ]PRIVMSG[ ]([\w\W]+)[ ][:][ ]([a-zA-Z0-9\W]+)$/).exec(msg);
 			var regxUser = regxMess[1];
 			var regxUser2 = regxMess[2];
@@ -820,17 +797,13 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 					}
 				}
 			}
-			
-			for(var i = 0; i<$scope.channels.length; i++) {
+			if(user.mute.includes(regxUser.nick) === false) {
+				for(var i = 0; i<$scope.channels.length; i++) {
 				if($scope.channels[i].chan === userToAdd.nick) {
 					bool = true;
 					var count = i;
 				}
-				if($scope.channels[i].mute.includes(userToAdd.nick)) {
-					boolMute = true;
 				}
-			}
-			if(boolMute !== true) {
 				if(bool === false) {
 					whispToAdd.messages.push([userToAdd, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "talks to you"]);
 					whispToAdd.setTopic(userToAdd.nick);
@@ -852,12 +825,9 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 					}
 				}
 			}
-			else {
-				userInfo.socket.emit("message","PRIVMSG " + userToAdd.nick + " : You have been mute by this user");
-			}
-			
 		}
         else if(msg.match(/^:[\w\S]+[ ]NICK[ ][\w\S]+$/)) {
+			
             var msgToPush = in_isNickname(msg);
             var oldname = msgToPush[0];
 			
@@ -873,7 +843,10 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 				$scope.currentChannel.setChan(msgToPush[1]);
 			}
 			
-			//
+			if(user.mute.includes(oldname)) {
+				user.mute[user.mute.indexOf(oldname)] = msgToPush[1];
+			}
+			
 			if(countNick === 0 ) {
 				user.nick = msgToPush[1];
 				if($scope.currentChannel.chan === "@accueil") {
@@ -1192,12 +1165,6 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 			if(rspModeFlag === "-k") {
 				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " don't have a password anymore"]);
 			}
-			else if(rspModeFlag === "+p") {
-				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " is now private"]);
-			}
-			else if(rspModeFlag === "-p") {
-				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " is not private"]);
-			}
 			else if(rspModeFlag === "+s") {
 				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " is now secret"]);
 			}
@@ -1334,7 +1301,7 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 			var messTopic = cmdTopic[2];
 			
 		}
-		else if(msg.match(/^:[0-9.a-z:]+[ ]332[ ][a-zA-Z]+[ ][#][\w\S]+[ ][:][\w\S ]+$/)) {
+		else if(msg.match(/^:[0-9.a-z:]+[ ]332[ ]TOPIC[ ][#][\w\S]+[ ][:][\w\S ]+$/)) {
 			var command = (/^:[0-9.a-z:]+[ ]332[ ]TOPIC[ ]([#][\w\S]+)[ ][:]([\w\S ]+)$/).exec(msg);
 			var commandChannel = command[1];
 			var commandMsg = command[2];
@@ -1362,18 +1329,24 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 		else if(msg.match(/^:[0-9.a-z:]+[ ][3][7][2][ ][:][-][ ][\w\S]+$/)) { 
             $scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Welcome " + user.realName]);
         }
-		else if(msg.match(/^:[0-9.a-z:]+[ ][3][1][1][ ][\S\w]+[ ][\S\w]+[ ][0-9.]+[ ][*][ ][:][ ][\w\W]+$/)) {
-			var regXpTab = (/^:[0-9.]+[ ][3][1][1][ ]([\S\w]+)[ ]([\w\S]+)[ ][0-9.]+[ ][*][ ][:][ ]([\w\S]+)$/).exec(msg);
-			if(regXpTab[2].includes("GUEST")===true) {
-				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Nickname : " + regXpTab[1] + " is a Guest"]);
+		else if(msg.match(/^:[0-9.a-z:]+[ ]311[ ][\S\w]+[ ][\S\w]+[ ][0-9.]+[ ][*][ ][:][ ][\w\W]+$/)) {
+			var regXpTab = (/^:[0-9.]+[ ]311[ ]([\S\w]+)[ ]([\w\S]+)[ ][0-9.]+[ ][*][ ][:][ ]([\w\S]+)$/).exec(msg);
+			if(isCmdMute === true) {
+				user.mute.push(regXpTab[1]);
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You have mute " + regXpTab[1]]);
 			}
 			else {
-				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Nickname : " + regXpTab[1] + " and his ID is " + regXpTab[2] + " - Realname : " + regXpTab[3]]);
+				if(regXpTab[2].includes("GUEST")===true) {
+					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Nickname : " + regXpTab[1] + " is a Guest"]);
+				}
+				else {
+					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Nickname : " + regXpTab[1] + " and his ID is " + regXpTab[2] + " - Realname : " + regXpTab[3]]);
+				}
 			}
 			
 		}
 		else if(msg.match(/^[\S]+[ ]431[ ][\w\W]+$/)) {
-			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "This nickname is not valid"]);
+			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "This nickname is not valid"]);		
 		}
 		else if(msg.match(/^[\S]+[ ]475[ ][\w\W]+\(\+k\)$/)) {
 			var rspKeyWord = (/^[\S\w]+[ ]475[ ]([\w\W]+)\(\+k\)$/).exec(msg);
@@ -1387,6 +1360,9 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 		}
 		else if(msg.match(/^[\w\S]+[ ]482[ ][#][\w\S]+[ ][\W\w]+$/)) {
 			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "you are not operator in this channel"]);
+		}
+		else if(msg.match(/^[\w\S]+[ ]502[ ][\W\w]+$/)) {
+			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "you must be admin or operator of the channel"]);
 		}
 		else if(msg.includes("PING")===true) {
 			userInfo.socket.emit("message", "PONG");
