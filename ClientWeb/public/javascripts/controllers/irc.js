@@ -763,6 +763,7 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
     userInfo.socket.on("message",function(msg) {
 		if(msg.match(/^:[\S]+[ ]433[ ][\S]+[ ][\W\w]+$/)) {
 			$location.path("/");
+			alert("Pseudo déjà utilisé sur le serveur.");
 		}
         else if(msg.match(/^[:][\w\S]+[ ]PRIVMSG[ ][#][\w\S]+[ ][:][ ][a-zA-Z0-9\W]+$/)) {
             var regxMess = (/^[:]([\w\S]+)[ ]PRIVMSG[ ]([#][\w\S]+)[ ][:][ ]([a-zA-Z0-9\W]+)$/).exec(msg);

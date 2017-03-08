@@ -1,6 +1,5 @@
 myApp.controller('log_in_controller', function ($scope, $location, userInfo) {
 	$scope.logIn = function() {
-		console.log($scope.nickname);
 		if($scope.nickname === undefined) {
 			userInfo.connect();
 			userInfo.socket.emit("message", "USER " + userInfo.userN + " 0 * : " + userInfo.realName);
@@ -24,7 +23,28 @@ myApp.controller('log_in_controller', function ($scope, $location, userInfo) {
 				userInfo.socket.emit("message", "USER " + userInfo.userN + " 0 * : " + userInfo.realName);
 				userInfo.socket.emit("message", "NICK " + userInfo.nick);
 				$location.path("/irc");
+			}
 		}
 	}
+	$scope.isSetId = function() {
+		if($scope.id === undefined) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	$scope.isSetServer = function() {
+		if($scope.server === undefined) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	$scope.valid = function() {
+		if($scope.id !== undefined && $scope.password === undefined) {
+			return false;
+		} else {
+			return true;
+		}
 	}
 });
