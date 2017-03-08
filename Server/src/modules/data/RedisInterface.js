@@ -57,9 +57,6 @@ class Redis {
         this._client.flushdb(callback);
     }
 
-    flush(callback=function(){}) {
-        this._client.flushdb(callback);
-    }
 
     /**
      * get admin if not error
@@ -143,6 +140,13 @@ class Redis {
             this._client.hdel("channels", channel.name);
         }
     }
+/*
+    showDBRedis() {
+        console.log("USERS :");
+        this._client.hgetall("PASS", (err, obj) => {
+            console.log(obj);
+        });
+    }*/
 }
 
 export default Redis;

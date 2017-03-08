@@ -39,18 +39,25 @@ module.exports = function (socket, command) {
         if(arg4 && flags.indexOf('k') === -1 && flags.indexOf('l') === -1){
             user = channel.getUser(arg4);
             if(!user){
+                console.log("-------1");
                 ERRSender.ERR_USERNOTINCHANNEL(socket.client,arg4,channel.name);
                 return;
             }
             if(!user.isUser()){
+                console.log("-------2");
                 ERRSender.ERR_USERSDONTMATCH(socket.client);
                 return;
             }
             if(channel.isUserOperator(user) && !(operator.isAdmin() || operator.isSuperAdmin())){
+                console.log("-------3");
+                console.log(channel.isUserOperator(user));
+                console.log(operator.isAdmin());
+                console.log(operator.isSuperAdmin());
                 ERRSender.ERR_USERSDONTMATCH(socket.client);
                 return;
             }
             if(user.isAdmin() && !operator.isSuperAdmin()){
+                console.log("-------4");
                 ERRSender.ERR_USERSDONTMATCH(socket.client);
                 return;
             }

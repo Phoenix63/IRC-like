@@ -40,7 +40,6 @@ class Client {
         this._pass = '';
         this._registeredWithPass = false;
         clients.push(this);
-
     }
 
 
