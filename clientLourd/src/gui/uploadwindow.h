@@ -20,7 +20,8 @@ public:
     void parse(QString string);
     void readyRead();
     ~UploadWindow();
-
+signals:
+    void resultReady(QString result);
 private:
     Ui::UploadWindow *ui;
 	QTcpSocket *socket;

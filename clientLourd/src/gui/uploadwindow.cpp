@@ -42,6 +42,6 @@ void UploadWindow::parse(QString string)
     } else {
         QLabel *result = new QLabel(string);
         ui->urlLayout->addWidget(result);
-        emit resultReady(url);
+        emit resultReady(string);
     }
 }

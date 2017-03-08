@@ -11,7 +11,7 @@ const QRegularExpression ISAWAY       ("^\\S+\\s301\\s");
 const QRegularExpression SETBACK      ("^\\S+\\s305\\s");
 const QRegularExpression SETAWAY      ("^\\S+\\s306\\s");
 const QRegularExpression ENDOFWHO     ("^\\S+\\s315\\s");
-const QRegularExpression LIST         ("^\\S+\\s(321|322|323)\\s");
+const QRegularExpression LIST         ("^\\S+\\s322\\s");
 const QRegularExpression MODECHAN     ("^\\S+\\s324\\s");
 const QRegularExpression CHAN         ("^\\S+\\s(331|332)\\sJOIN\\s");
 const QRegularExpression TOPIC        ("^\\S+\\s(331|332)\\sTOPIC\\s");
