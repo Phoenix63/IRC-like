@@ -31,29 +31,33 @@ myApp.factory("userInfo", function() {
       "nick": uniqid(),
       "realName": uniqid(),
       "right": 0,
+      "setRight": function(newRight) {
+        this.right = newRight;
+      },
       "server": "http://crismos.fr",
       "port": 8089,
       "socket": "",
       "setNick": function(newUserNick) {
         this.nick = newUserNick;
       },
-      "setRight": function(newRight) {
-        this.right = newRight;
-      },
-      "setUser": function(newUserName, newUserRealName) {
-        this.userN = newUserName;
-        this.nick = newUserName;
+      "setReal": function(newUserRealName) {
         this.realName = newUserRealName;
       },
-      "setServer": function(newServer, newPort) {
+      "setUser": function(newUserNick, newUserRealName) {
+        this.nick = newUserNick;
+        this.realName = newUserRealName;
+      },
+      "setServer": function(newServer) {
         this.server = newServer;
+      },
+      "setPort": function(newPort) {
         this.port = newPort;
       },
       "connect": function() {
         this.socket = io(this.server+":"+this.port);
       },
       "afterConnection": function() {
-        this.userN = this.userN;
+        this.userN = "Guest_"+this.userN;
       }
     }
 });

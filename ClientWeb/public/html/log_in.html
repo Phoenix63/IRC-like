@@ -14,7 +14,7 @@
                     <label for="connexion_id">
                         Id
                     </label>
-                    <input id="connexion_pseudo" type="text" ng-model="id" value="tata" placeholder="Optionnel"/>
+                    <input id="connexion_pseudo" type="text" ng-model="id" placeholder="Optionnel"/>
                 </span>
                 <span ng-show="isSetId()">
                     <label for="connexion_password">
@@ -28,13 +28,13 @@
                     <label for="connexion_server">
                         Server
                     </label>
-                    <input id="connexion_server" type="text" ng-model="server" value="127.0.0.1" placeholder="Optionnel"/>
+                    <input id="connexion_server" type="text" ng-model="server" placeholder="Optionnel"/>
                 </span>
                 <span  ng-show="isSetServer()">
                     <label for="connexion_port">
                         Port
                     </label>
-                    <input id="connexion_port" type="text" ng-model="port" value="8089" placeholder="Optionnel"/>
+                    <input id="connexion_port" type="text" ng-model="port" placeholder="Optionnel"/>
                 </span>
                 <button type="submit" class="btn-solid btn-connect">Se connecter</button>
             </div>
