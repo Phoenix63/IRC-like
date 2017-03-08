@@ -321,6 +321,7 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 					case "/quit":
 						//leave the server
 						userInfo.socket.emit("message","QUIT");
+						$location.path("/");
 						break;
 					default:
 						$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "This command is not valid"]);
@@ -1054,14 +1055,9 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 			var rspQuit = (/^:([\w\S]+)[ ]QUIT[ ][:][\S\w]+$/).exec(msg);
 			var rspQuitUser = rspQuit[1];
 			rspQuitUser = rspQuitUser.replace("@","");
-			if(rspQuitUser === user.nick) {
-				$location.path("/");
-			}
-			else {
-				for(var i = 0; i<$scope.channels.length; i++) {
-					if(rspQuitUser === $scope.channels[i].chan) {
-						$scope.channels.splice(i, 1);
-					}
+			for(var i = 0; i<$scope.channels.length; i++) {
+				if(rspQuitUser === $scope.channels[i].chan) {
+					$scope.channels.splice(i, 1);
 				}
 			}
 		}
@@ -1329,6 +1325,8 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 		else if(msg.match(/^[\w\S]+[ ]482[ ][#][\w\S]+[ ][\W\w]+$/)) {
 			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "you are not operator in this channel"]);
 		}
+		
+		
 		$scope.$apply();
     });
 
