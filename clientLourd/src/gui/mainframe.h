@@ -55,6 +55,7 @@ public slots:
 	//UI slots
 	void on_pushButton_emojis_clicked();
 	void moveScrollBarToBottom(int min, int max);
+	void handleResults(QString url);
 
 signals:
 	void showLogin();

@@ -10,6 +10,8 @@
 #include <QTcpSocket>
 
 #include "channellist.h"
+#include "uploadfile.h"
+#include "uploadwindow.h"
 #include "ui_mainframe.h"
 #include "../channel/message.h"
 #include "../config/theme.h"
@@ -264,44 +266,27 @@ void MainFrame::on_messageSender_returnPressed()
 
 void MainFrame::on_pushButton_upload_clicked()
 {
-    QTcpSocket *tmp = new QTcpSocket(this);
+    QTcpSocket *tmp = new QTcpSocket();
     tmp->connectToHost(host, 8090);
-    if(!tmp->waitForConnected(5000)){
+    if (!socket->waitForConnected(5000))
         QMessageBox::information(this, "Error", "Host not found");
-    } else {
-        QStringList homePath = QStandardPaths::standardLocations(QStandardPaths::HomeLocation);
-        QStringList files = QFileDialog::getOpenFileNames(this,"Select one or more files to open", homePath.first());
-        for (auto i:files){
-            QByteArray read;
-            QFile inputFile(i);
-            int size = inputFile.size();
-            QString fileName = i.split('/').last();
-            QString toSend = "FILE " + QString::number(size, 10) + " " + fileName + '\n';
-            tmp->write(toSend.toLatin1());
-            tmp->waitForReadyRead(1000);
-            inputFile.open(QIODevice::ReadOnly);
-            read = inputFile.read(100);
-            while (read.size() > 0)
-            {
-                tmp->write(read);
-                tmp->waitForBytesWritten();
-                read.clear();
-                read = inputFile.read(100);
-            }
-            inputFile.close();
-            tmp->waitForReadyRead(-1);
-            QString url = tmp->readLine();
-            url.remove(0, 1);
-            int j = url.indexOf(QRegularExpression(":.+$"));
-            url = url.right(url.length() - j - 1);
-            QString privUrl = url;
-            url.prepend("PRIVMSG " + channel.channelName() + " :");
-            parser.sendToServer(socket, url);
-            privUrl.remove(privUrl.length() - 1, 1);
-            channel.appendCurrent(privUrl, parser.userNick());
-            chatModified();
-        }
-    }
+    QStringList homePath = QStandardPaths::standardLocations(QStandardPaths::HomeLocation);
+    QStringList files = QFileDialog::getOpenFileNames(this, "Select one or more files to open", homePath.first());
+    Upload *up = new Upload(this, host, files, tmp);
+    connect(up, &Upload::finished, up, &QObject::deleteLater);
+    up->start();
+    UploadWindow *progress = new UploadWindow(this, tmp);
+    connect(progress, &UploadWindow::resultReady, this, &MainFrame::handleResults);
+    progress->show();
+}
+
+void MainFrame::handleResults(QString url)
+{
+    url.prepend("PRIVMSG " + channel.channelName() + " :");
+    parser.sendToServer(socket, url);
+    url.remove(url.length() - 1, 1);
+    channel.appendCurrent(url, parser.userNick());
+    chatModified();
 }
 
 void MainFrame::on_actionConnect_triggered()
@@ -367,7 +352,7 @@ void MainFrame::initUIStyle()
 void MainFrame::initConnect()
 {
     // Socket related connects
-    connect(socket, &QTcpSocket::readyRead,this, &MainFrame::readyRead);
+    connect(socket, &QTcpSocket::readyRead, this, &MainFrame::readyRead);
 
     // Ui related connects
     connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, this, &MainFrame::moveScrollBarToBottom);

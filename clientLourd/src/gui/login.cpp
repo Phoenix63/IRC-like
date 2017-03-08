@@ -1,5 +1,6 @@
 #include "login.h"
 
+#include <QCloseEvent>
 #include <QListWidget>
 #include <QListWidgetItem>
 #include <QMessageBox>
