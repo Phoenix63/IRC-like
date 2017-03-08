@@ -82,6 +82,7 @@ private slots:
 
     void on_userList_doubleClicked(const QModelIndex &index);
 
+
 private:
 	// Initialisation functions
 	void initUiConf();
@@ -121,7 +122,10 @@ private:
 
 
     //Actions
+    //QAction* m_pPaste;
+    QAction* m_pSendFile;
     QAction* m_pLogout;
+
 };
 
 #endif // MAINFRAME_H

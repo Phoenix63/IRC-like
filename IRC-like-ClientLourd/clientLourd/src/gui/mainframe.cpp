@@ -8,8 +8,10 @@
 #include <QScrollBar>
 #include <QStandardPaths>
 #include <QTcpSocket>
+
 #include <QMenu>
 #include <QMouseEvent>
+
 
 #include "channellist.h"
 #include "ui_mainframe.h"
@@ -38,6 +40,8 @@ MainFrame::MainFrame(QWidget *parent, QTcpSocket *socket, QString host) :
     msgList.msgSender(ui->messageSender);
     channelModified();
 
+
+
     /********************************* Right Click ************************************/
     m_pContextMenu = new QMenu(this);
 
@@ -49,19 +53,22 @@ MainFrame::MainFrame(QWidget *parent, QTcpSocket *socket, QString host) :
 
     //actions definitions :
     m_pLogout = m_pContextMenu->addAction("Se déconnecter");
+    m_pSendFile = m_pContextMenu->addAction("Envoi Fichier ...");
+    //m_pPaste = m_pContextMenu->addAction("Coller");
+
 
 
 
     //user
-    connect(m_pLogout,SIGNAL(triggered()),this,SLOT(on_actionDisconnect_triggered()));
 
+    connect(m_pSendFile,SIGNAL(triggered()),this,SLOT(on_pushButton_upload_clicked()));
+    //connect(m_pPaste,SIGNAL(triggered()),this,SLOT(paste()));
 
 
     //channel
+    connect(m_pLogout,SIGNAL(triggered()),this,SLOT(on_actionDisconnect_triggered()));
 
 
-
-    //chatbox
 
 }
 
@@ -435,5 +442,8 @@ void MainFrame::on_userList_doubleClicked(const QModelIndex &index)
     channel.change(user);
     changeChannel();
 }
+
+
+/****************************** Right Click ****************************************/
 
 
