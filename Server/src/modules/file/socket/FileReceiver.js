@@ -1,10 +1,11 @@
 import FileManager from './../http/FileManager';
 import config from './../../../config.json';
 import shortid from 'shortid';
+var debug = require('debug')('fileserver:filereceiver');
 
 class FileReceiver {
     constructor(name, size, socket, callback = function(){}) {
-        console.log('New file arrive');
+        debug('New file arrive');
         this._size = size;
         this._data = [];
         this._currentSize = 0;
@@ -16,11 +17,11 @@ class FileReceiver {
     _success() {
         this._socket.filereceiver = null;
         this._socket.pause();
-        console.log('success');
+        debug('success');
         let data = Buffer.concat(this._data);
         FileManager.instance.addFile(this._name, data, (url) => {
             this._socket.write(':'+config.ip+' FILE :'+url+'\n');
-            console.log('file up at :'+url);
+            debug('file up at :'+url);
             this._socket.resume();
         });
     }
@@ -29,7 +30,7 @@ class FileReceiver {
         this._currentSize += data.length;
         this._data.push(data);
         if(process.env.ENV === 'DEV') {
-            console.log('FILE TRANSFERT:'+this._currentSize+'/'+this._size);
+            debug('FILE TRANSFERT:'+this._currentSize+'/'+this._size);
         }
 
         if(this._currentSize >= this._size) {

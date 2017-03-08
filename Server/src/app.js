@@ -1,28 +1,42 @@
 import child_process from 'child_process';
+let debug = require('debug')('server:app');
 
 const env = process.argv[2] || 'PROD';
-console.log('ENV: '+env);
+debug('ENV: '+env);
 
 let childprocess = createChild();
 
-process.on('SIGINT', () => {
-    if(childprocess && childprocess.kill) {
-        createChild = null;
-        childprocess.kill(0);
-    }
+var signals = {
+    'SIGINT': 2,
+    'SIGTERM': 15
+};
+
+Object.keys(signals).forEach(function (signal) {
+    process.on(signal, function () {
+        debug(signal);
+        if(childprocess && childprocess.kill) {
+            createChild = null;
+            childprocess.kill('SIGTERM');
+        }
+    });
+
 });
 
 function createChild() {
     let child = child_process.spawn('node', ['./dist/server.js', env]);
     child.stdout.on('data', function (data) {
-        console.log(data.toString());
+        debug(data.toString());
     });
 
     child.on('exit', function (code) {
-        console.log('child process exited with code ' + code.toString());
+        debug('child process exited with code ' + code.toString());
         if(createChild) {
             child = createChild();
         }
+    });
+
+    child.on('message', (message) => {
+        debug(message);
     });
 
     return child;

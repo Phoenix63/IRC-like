@@ -2,7 +2,7 @@
 
 import net from 'net';
 import config from './../../config.json';
-import colors from 'colors';
+let debug = require('debug')('server:tcp');
 
 function createServer(callback) {
     let server = net.createServer((socket) => {
@@ -54,7 +54,7 @@ function createServer(callback) {
     });
 
     server.on('error', (err) => {
-        console.log('error:', err);
+        debug('error:', err);
     });
 
     server.listen(config.tcp_server.port, config.ip);

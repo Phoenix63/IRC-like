@@ -1,15 +1,15 @@
 "use strict";
 
+var debug = require('debug')('server:server');
+import getpid from 'getpid';
+
 process.env.parent = process.argv[2] || 'PROD';
-console.log = (txt) => {
-    process.stdout.write(txt+'\n');
-}
 
 import dbSaver from './modules/data/dbSaver';
 import child_process from 'child_process';
 
 // globals
-import colors from 'colors';
+import colors from './modules/util/Color';
 
 // socket
 import socketManager from './modules/socket/socket';
@@ -27,21 +27,48 @@ const numCPUs = 1;
 let quiting = false;
 function quitHandle(e, callback=function(){}) {
     if(e) {
-        console.log(e);
+        debug(e);
     }
     if(!quiting) {
         for(let key in cluster.workers) {
             cluster.workers[key].kill();
         }
         quiting = true;
-        console.log('saving database...');
+        debug('saving database...');
         dbSaver(true, () => {
-            console.log('database saved!');
+            debug('database saved!');
             for(let id in cluster.workers) {
                 cluster.workers[id].kill();
             }
-            callback();
-            process.exit(0);
+
+            if(process.env.parent === 'DEV') {
+                getpid('servernodemon', (err, pid) => {
+                    if(err) {
+                        debug(err);
+                    } else {
+                        if(Array.isArray(pid)) {
+                            pid.forEach((i) => {
+                                process.kill(i, 'SIGTERM');
+                            });
+                            callback();
+                            process.exit();
+                        } else {
+                            if(pid) {
+                                process.kill(pid, 'SIGTERM');
+                                callback();
+                                process.exit();
+                            } else {
+                                callback();
+                                process.exit();
+                            }
+                        }
+                    }
+                });
+            } else {
+                callback();
+                process.exit(0);
+            }
+
         });
     }
 }
@@ -50,45 +77,65 @@ function quitHandle(e, callback=function(){}) {
 if(cluster.isMaster) {
     process.title = 'MasterServer';
 
-    console.log('Cluster Master');
+    debug('Cluster Master');
     dbLoader(() => {
-        console.log('Database loaded!');
+        debug('Database loaded!');
         for(let i = 0 ; i<numCPUs; i++) {
             cluster.fork();
         }
     });
-
-    process.on('exit', quitHandle);
-
-    process.on('SIGINT', quitHandle);
-    process.on('SIGTERM', quitHandle);
-
-    if (!(process.env.parent === 'DEV' || process.env.parent === 'TEST')) {
-        process.on('uncaughtException', (err) => {
-            console.log('ERROR: \t\t' + colors.red(err));
+    process.on('SIGINT', () => {
+        quitHandle('SIGINT', () => {
+            process.exit();
         });
-    } else {
-        process.on('uncaughtException', quitHandle);
-    }
+    });
+    process.on('SIGTERM', () => {
+        quitHandle('SIGTERM', () => {
+            process.exit();
+        })
+    });
+    process.on('SIGUSR2', () => {
+        quitHandle('SIGUSR2', () => {
+            process.kill(process.pid, 'SIGUSR2');
+        })
+    });
+
+    process.on('message', (message) => {
+        if(message === 'SIGTERM') {
+            quitHandle(null, () => {
+                process.send('I am dead');
+                process.exit();
+            });
+        }
+    });
+
+    process.on('uncaughtException', (err) => {
+        debug(colors.red(err));
+        quitHandle('uncaughtException', () => {
+            process.exit();
+        });
+    });
 
     cluster.on('message', (worker, msg) => {
         if(msg && msg.quitmessage) {
-            console.log('restarting...');
+            debug('restarting...');
             quitHandle(null, ()=> {
-
+                process.exit();
             });
         }
     });
     cluster.on('exit', (worker, code, signal) => {
-
-        if(signal !== 'SIGTERM' && signal !== 'SIGINT' && process.arv[2] !== 'TEST') {
+        debug('kill '+signal);
+        if(signal !== 'SIGTERM' && signal !== 'SIGINT' && process.env.parent !== 'TEST') {
+            debug('restarting a worker');
             cluster.fork();
         }
     });
 
 }
 if(cluster.isWorker) {
-    console.log('Cluster Worker');
+    debug('Cluster Worker');
+    debug('Server listening...');
     process.title = 'server';
     socketManager.create((socket) => {
         let client = new Client(socket);
@@ -104,12 +151,26 @@ if(cluster.isWorker) {
     if(process.env.parent === 'TEST') {
         let child = child_process.spawn('mocha', []);
         child.stdout.on('data', function (data) {
-            console.log('data: '+data.toString());
+            console.log(data.toString());
         });
 
-        child.on('exit', function (code) {
-            console.log('Test process ' + code.toString());
-            quitHandle();
+        child.on('exit', function () {
+            getpid('MasterServer', (err, pid) => {
+                if(err) {
+                    debug(err);
+                } else {
+                    if(Array.isArray(pid)) {
+                        pid.forEach((i) => {
+                            process.kill(i, 'SIGTERM');
+                        });
+                    } else {
+                        if(pid) {
+                            process.kill(pid, 'SIGTERM');
+                        } else {
+                        }
+                    }
+                }
+            });
         });
     }
 }

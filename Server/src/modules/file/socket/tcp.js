@@ -1,10 +1,11 @@
 import config from './../../../config.json';
 import net from 'net';
+let debug = require('debug')('fileserver:tcp');
 
 class TcpCreator {
 
     static bind(callback) {
-        console.log(' --- tcp file transfert running');
+        debug(' --- tcp file transfert running');
         this._server = net.createServer((socket) => {
             socket.kill = function() {
                 socket.destroy();

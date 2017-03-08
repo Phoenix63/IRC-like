@@ -15,12 +15,14 @@ var url = 'mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.
  * @param callback
  */
 module.exports = function(bool, callback) {
-
     if(process.env.parent !== 'TEST') {
-
         MongoClient.connect(url, (err, db) => {
-            db.collection('channels').drop();
 
+            /*db.collection('channels', (err, collection) => {
+                if(!err) {
+                    collection.drop();
+                }
+            });*/
             let caller = new Caller(() => {
                 if(bool) {
                     redis.flush(() => {
@@ -31,24 +33,35 @@ module.exports = function(bool, callback) {
                     db.close();
                     callback();
                 }
-
             });
-
             redis.getUsers((users) => {
                 if(users) {
                     for(let i = 0; i<Object.keys(users).length; i++) {
-                        db.collection('users').findOneAndUpdate({identity: Object.keys(users)[i]}, {identity: Object.keys(users)[i], pass: users[Object.keys(users)[i]]}, {upsert:true}).then(() => {
-                            caller.incSaved();
-                        });
+                        db.collection('users', (err, uscollection) => {
+                            if(err) {
+                                db.createCollection('users');
+                                uscollection = db.connection('users');
+                            }
+                            uscollection.findOneAndUpdate({identity: Object.keys(users)[i]}, {identity: Object.keys(users)[i], pass: users[Object.keys(users)[i]]}, {upsert:true}).then(() => {
+                                caller.incSaved();
+                            });
+                        })
                     }
                 }
 
                 redis.getAdmin((admins) => {
                     if(admins) {
                         for(let j = 0; j<Object.keys(admins).length; j++) {
-                            db.collection('admin').findOneAndUpdate({name: Object.keys(admins)[j]},{name: Object.keys(admins)[j], role: admins[Object.keys(admins)[j]]},{upsert:true}).then(() => {
-                                caller.incSaved();
-                            });
+                            db.collection('admin', (err, adcollection) => {
+                                if(err) {
+                                    db.createCollection('admin');
+                                    adcollection = db.collection('admin');
+                                } else {
+                                    adcollection.findOneAndUpdate({name: Object.keys(admins)[j]},{name: Object.keys(admins)[j], role: admins[Object.keys(admins)[j]]},{upsert:true}).then(() => {
+                                        caller.incSaved();
+                                    });
+                                }
+                            })
                         }
                     }
 
@@ -56,9 +69,15 @@ module.exports = function(bool, callback) {
                         caller.toSave = (users?Object.keys(users).length:0) + (admins?Object.keys(admins).length:0) + (chans?Object.keys(chans).length:0);
                         if(chans) {
                             for(let k = 0; k<Object.keys(chans).length; k++) {
-                                db.collection('channels').findOneAndUpdate({name: Object.keys(chans)[k]}, {name: Object.keys(chans)[k], data:chans[Object.keys(chans)[k]]}, {upsert: true}).then(() => {
-                                    caller.incSaved();
-                                });
+                                db.collection('channels', (err, chancollection) => {
+                                    if(err) {
+                                        db.createCollection('channels');
+                                        chancollection = db.collection('channels');
+                                    }
+                                    chancollection.findOneAndUpdate({name: Object.keys(chans)[k]}, {name: Object.keys(chans)[k], data:chans[Object.keys(chans)[k]]}, {upsert: true}).then(() => {
+                                        caller.incSaved();
+                                    });
+                                })
                             }
                         }
 

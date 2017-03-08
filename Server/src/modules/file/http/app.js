@@ -2,6 +2,7 @@ let express = require('express');
 let config = require('./../../../config.json');
 let app = express();
 let path = require('path');
+let debug = require('debug')('fileserver:app');
 
 app.use('/public', express.static('./__uploaded_files__/'));
 
@@ -10,5 +11,5 @@ app.get('/', (req, res, next) => {
 });
 
 app.listen(config.image_server.port, () => {
-    console.log(' - File server running -');
+    debug(' - File server running -');
 });

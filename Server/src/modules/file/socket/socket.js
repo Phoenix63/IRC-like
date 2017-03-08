@@ -3,12 +3,13 @@ import bufferManager from './../modules/bufferSpliter';
 import Tcp from './tcp';
 import Sio from './sio';
 import config from './../../../config.json';
+let debug = require('debug')('fileserver:socket');
 
 function manage(socket) {
     socket.buffer = '';
     socket.filereceiver = null;
 
-    console.log('new connection from '+(socket.remoteAddress));
+    debug('new connection from '+(socket.remoteAddress));
 
     socket.r = function() {
         if(socket.filereceiver) {
@@ -53,7 +54,7 @@ Tcp.bind((socket) => {
 });
 
 Sio.bind((socket) => {
-    console.log('new SIO socket');
+    debug('new SIO socket');
     socket.type = 'SIO';
     manage(socket);
 });

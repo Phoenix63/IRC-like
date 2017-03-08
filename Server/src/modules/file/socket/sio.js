@@ -1,9 +1,10 @@
 import sio from 'socket.io';
 import config from './../../../config.json';
+let debug = require('debug')('fileserver:sio');
 
 class Sio {
     static bind(callback) {
-        console.log(' --- sio file transfert running');
+        debug(' --- sio file transfert running');
         let io = sio.listen(config.image_server.sioport);
         io.on('connection', (socket) => {
             socket.emit('connect', null);

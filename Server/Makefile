@@ -54,6 +54,8 @@ help:
 build:
 	make head
 	docker pull bitnami/node:7
+	docker pull redis:3.2
+	docker pull mongo:3.4
 	docker build -f docker/runtest.Dockerfile -t pandirc/runtest .
 	docker build -f docker/dev.Dockerfile -t pandirc/dev .
 
@@ -82,7 +84,7 @@ file:
 
 unit:
 	make head
-	docker-compose -f ./docker/test.yml up
+	docker-compose -f ./docker/test.yml up --abort-on-container-exit
 
 clean:
 	docker-compose -f ./docker/deps.yml rm -f
@@ -90,3 +92,6 @@ clean:
 	docker-compose -f ./docker/prod.yml rm -f
 	docker-compose -f ./docker/dev.yml rm -f
 	docker-compose -f ./docker/fileserver.yml rm -f
+
+a:
+	docker-compose -f ./docker/perso.yml up

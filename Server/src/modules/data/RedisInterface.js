@@ -1,6 +1,7 @@
 
 let redisLib = require('redis');
 let conf = require('./../../ENV.json');
+let debug = require('debug')('server:redis');
 
 let instance;
 
@@ -18,7 +19,7 @@ class Redis {
         this._save = (process.env.parent !== 'TEST');
 
         this._client.on("error", function(err) {
-            console.log(err);
+            debug(err);
         });
     }
 

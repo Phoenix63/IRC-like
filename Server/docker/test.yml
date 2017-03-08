@@ -16,7 +16,7 @@ node:
 
 fileserver:
   image: bitnami/node:7
-  command: sh -c 'npm run build && node ./dist/modules/file/server.js PROD'
+  command: sh -c 'npm run build && node ./dist/modules/file/server.js TEST'
   hostname: fileserver
   volumes:
    - ./..:/app
@@ -27,11 +27,11 @@ fileserver:
    - redis:redis
 
 mongo:
-  image: mongo
+  image: mongo:3.4
   hostname: mongo
   volumes:
    - mongoirc:/data/db
 
 redis:
-  image: redis
+  image: redis:3.2
   hostname: redis

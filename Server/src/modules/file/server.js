@@ -6,3 +6,7 @@ if(process.argv[2]) {
 } else {
     process.env.ENV = 'PROD';
 }
+
+process.on('SIGINT', () => {
+    process.exit(0);
+});
