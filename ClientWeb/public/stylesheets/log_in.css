@@ -16,6 +16,7 @@ body {
     height: 400px;
     display: block;
     font-weight: bold;
+	border-radius:5%;
 }
 #connexion .container label {
     text-align: right;

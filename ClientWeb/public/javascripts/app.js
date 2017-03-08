@@ -27,11 +27,11 @@ myApp.config(function ($locationProvider, $routeProvider) {
 
 myApp.factory("userInfo", function() {
     return {
-      "userN": uniqid,
-      "nick": uniqid,
-      "realName": uniqid,
+      "userN": uniqid(),
+      "nick": uniqid(),
+      "realName": uniqid(),
       "right": 0,
-      "server": "http://25.36.22.132",
+      "server": "http://crismos.fr",
       "port": 8089,
       "socket": "",
       "setNick": function(newUserNick) {
@@ -53,9 +53,19 @@ myApp.factory("userInfo", function() {
         this.socket = io(this.server+":"+this.port);
       },
       "afterConnection": function() {
-        this.userN = "Guest_" + this.userN;
+        this.userN = this.userN;
       }
     }
 });
 
-var uniqid = (new Date().getTime() + Math.floor((Math.random()*10000)+1)).toString(16);
+
+
+var uniqid = function() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < 6; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+}
