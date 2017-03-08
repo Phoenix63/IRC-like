@@ -12,7 +12,6 @@
             <button class="buttonChUs" ng-context-menu="menuOptionsUser(user)" ng-class="user.right === 3 ? 'admin-color' : ( user.right === 1 ? 'operator-color' : 'default-color')">{{user.nick}}</button>
         </div>
     </div>
-	
     <div id="messages" scroll-bottom="currentChannel.messages">
         <h3>{{topicChannel}}</h3>
         <div ng-repeat="message in currentChannel.messages track by $index">
