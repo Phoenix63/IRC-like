@@ -62,7 +62,7 @@ void UserList::addUser(User *user)
     users.append(user);
 }
 
-void UserList::delUser(QString nick)
+void UserList::deleteUser(QString nick)
 {
     for(auto i:users) {
         if (i->name() == nick)

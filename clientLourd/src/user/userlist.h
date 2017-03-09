@@ -19,7 +19,7 @@ public:
     //User functions
     User * addUser(QString nick);
     void addUser(User *user);
-    void delUser(QString nick);
+    void deleteUser(QString nick);
     void renameUser(QString oldNick, QString newNick);
 
 private:

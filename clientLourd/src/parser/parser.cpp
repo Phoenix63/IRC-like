@@ -94,6 +94,7 @@ void Parser::in(QString string)
     if (!in_isNameList(string))
     if (!in_isJoinNote(string))
     if (!in_isPartNote(string))
+	if (!in_isQuitNote(string))
     if (!in_isPrivMesg(string))
     if (!in_isWhisMesg(string))
     if (!in_isNickEdit(string))
@@ -425,12 +426,27 @@ bool Parser::in_isPartNote(QString string)
     QString message = string.right(string.length() - j);
     if (user.compare(self.name())) {
         channel->appendChannel(user + " left " + chan + ' ' + message, chan, nullptr);
-        channel->delUser(user, chan);
+        channel->removeUser(user, chan);
     } else {
         channel->leave(chan);
         emit channelModifiedSignal();
     }
     emit changeChannelSignal();
+    return true;
+}
+
+bool Parser::in_isQuitNote(QString string)
+{
+	if (!string.contains(IRC::RPL::QUIT))
+		return false;
+    QString user = string.split(' ').at(0);
+    for (auto i:channel->channelNames()) {
+        if (i == user) {
+			channel->appendChannel(user + " disconnected from server.", i, nullptr);
+            emit lineAddedSignal();
+        }
+    }
+    channel->deleteUser(user);
     return true;
 }
 

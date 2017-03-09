@@ -51,7 +51,8 @@ public:
     void addUser(QString user, QString channel);
     void addUser(User *user);
     void addUser(QString user);
-    void delUser(QString user, QString channel);
+	void deleteUser(QString user);
+    void removeUser(QString user, QString channel);
     void changeNick(QString user, QString nick);
     QList<User *> users();
 

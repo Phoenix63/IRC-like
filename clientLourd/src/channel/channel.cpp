@@ -143,7 +143,12 @@ void Channel::addUser(QString user)
     userList.addUser(user);
 }
 
-void Channel::delUser(QString user, QString channel)
+void Channel::deleteUser(QString user)
+{
+	userList.deleteUser(user);
+}
+
+void Channel::removeUser(QString user, QString channel)
 {
     if (channels.contains(channel))
         channels[channel].removeUser(user);

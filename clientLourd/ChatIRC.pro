@@ -34,10 +34,12 @@ SOURCES += \
     src/gui/login.cpp \
     src/gui/mainframe.cpp \
     src/gui/msglist.cpp \
+    src/gui/uploadfile.cpp \
     src/parser/parser.cpp \
     src/parser/parsermode.cpp \
     src/user/user.cpp \
-    src/user/userlist.cpp
+    src/user/userlist.cpp \
+    src/gui/uploadwindow.cpp
 
 
 HEADERS  += \
@@ -56,17 +58,20 @@ HEADERS  += \
     src/gui/login.h \
     src/gui/mainframe.h \
     src/gui/msglist.h \
+    src/gui/uploadfile.h \
     src/parser/err_response.h \
     src/parser/parser.h \
     src/parser/parsermode.h \
     src/parser/rpl_response.h \
     src/user/user.h \
-    src/user/userlist.h
+    src/user/userlist.h \
+    src/gui/uploadwindow.h
 
 FORMS    += \
     src/gui/login.ui \
     src/gui/mainframe.ui \
-    src/gui/channellist.ui
+    src/gui/channellist.ui \
+    src/gui/uploadwindow.ui
 
 RESOURCES += \
     src/gui/myapp.rc
