@@ -1,4 +1,5 @@
-myApp.controller("ircCtrl",function($scope, $location, userInfo) {
+
+myApp.controller("ircCtrl",function($scope, $location, $sce, userInfo) {
 	var user = userInfo;
 	user.setRight(2);
 	var defaultMess = new User("#Channel-Response");
@@ -10,7 +11,7 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 	var countNick = 0;
 	var admin = [];
 	$scope.currentChannel = new Channel("@accueil");
-    $scope.channels = [];
+	$scope.channels = [];
 	$scope.topicChannel = "PANDIRC";
 	$scope.joinChannel = function(ch) {
 		ch.setNotifOff();
@@ -747,7 +748,7 @@ myApp.controller("ircCtrl",function($scope, $location, userInfo) {
 		$scope.$apply();
     }
 	
-    userInfo.socket.on("message",function(msg) {
+    userInfo.socket.on("message", function(msg) {
 		if(msg.match(/^:[\S]+[ ]433[ ][\S]+[ ][\W\w]+$/)) {
 			if(connect !== true) {
 				alert("Pseudo déjà utilisé sur le serveur");

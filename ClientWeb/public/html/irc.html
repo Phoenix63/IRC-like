@@ -14,7 +14,7 @@
     </div>
     <div id="messages" scroll-bottom="currentChannel.messages">
         <h3>{{topicChannel}}</h3>
-        <div ng-repeat="message in currentChannel.messages track by $index">
+        <div ng-repeat="message in currentChannel.messages track by $index" ng-bind-html="message[0].right === 5 ? (message[2] | insertHtml) : message">
             <div class="messInBox">
 				<p class="users" ng-class="message[0].right === 3 ? 'admin-color' : (message[0].right === 1 ? 'operator-color' : ( message[0].right === 2 ? 'user-color' : 'default-color'))">{{message[0].nick}}</p>
 				<p class="date">{{message[1]}}</p>
@@ -22,12 +22,11 @@
 			</div>
         </div>
     </div>
-
+	
+    <input type="file" id="fileToSend" onchange = "selectedPhoto()"></input>
 	<form ng-submit="sendMessage()">
 		<div id="divSendMessage">
 			<input id="inputSendMessage" ng-model="newMessage" placeholder="message"></input>
-		</div>
-		<div id="divSubmit">
 			<button type="submit" id="submitSendMessage">Envoyer</button>
 		</div>
 	</form>
