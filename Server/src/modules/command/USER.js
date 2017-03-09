@@ -1,6 +1,5 @@
 "use strict";
 
-import config from './../../config.json';
 import ERRSender from './../responses/ERRSender';
 
 module.exports = function (socket, command) {

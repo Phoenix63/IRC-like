@@ -42,6 +42,7 @@ class Redis {
      * set a non guest client server admin
      * @param {Object<identity, role>} infos
      */
+    //need to rename addAdmin
     setAdmin(infos) {
         if(this._save) {
             if(infos.identity.indexOf("GUEST_") === 0) {

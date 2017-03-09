@@ -1,19 +1,16 @@
-"use strict"
+"use strict";
 
 import shortid from 'shortid';
 import Socket from './../socket/socket';
 import ERRSender from './../responses/ERRSender';
 import RPLSender from './../responses/RPLSender';
 import crypto from 'crypto';
-
 import Redis from '../data/RedisInterface';
 let redisClient = Redis.instance;
-
 
 let clients = [];
 
 class Client {
-
     /**
      * constructor
      * @param {Socket} socket
@@ -105,7 +102,6 @@ class Client {
      */
     get name() {
         return this._name || 'Guest_' + this._id;
-
     }
 
     /**
@@ -140,82 +136,73 @@ class Client {
      * @param {string} identity
      */
     setIdentity(identity, realname) {
-
         let error = false;
+        let regexIdentity = /^([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15})$/.exec(identity);
 
+        if (!regexIdentity ||  regexIdentity[1].indexOf('GUEST_') >= 0) {
+            ERRSender.ERR_NEEDMOREPARAMS(this, 'USER');
+            error = true;
+        }
         if(this._identity) {
             ERRSender.ERR_ALREADYREGISTRED(this);
             error = true;
         }
-
-        clients.forEach((c) => {
-            if ((this._pass && c.identity === identity)
-                || (!this._pass && c.identity === 'GUEST_'+identity)) {
+        for (let i=0; i<clients.length;i++){
+            if((this._pass && clients[i].identity === identity) || (!this._pass && clients[i].identity === 'GUEST_'+identity)){
                 ERRSender.ERR_ALREADYREGISTRED(this);
                 error = true;
             }
-        });
-
-        let match = identity.match(/[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]+/);
-        if (!match || (match && match[0] !== identity ) || identity === '' || identity.length > 15 || identity.indexOf('GUEST_') >= 0) {
-            ERRSender.ERR_NEEDMOREPARAMS(this, 'USER');
-            error = true;
+        }
+        if(error) {
+            return;
         }
 
-        if(!error) {
-            // command USER valid
-            if(this._pass) {
-                // user should not be a guest
-                redisClient.getPass(identity, (err, pass) => {
-                    if(!err && pass != this._pass) {
-                        ERRSender.ERR_PASSWDMISMATCH(this);
-                    }  else {
-                        if(err) {
-                            redisClient.addUser(identity, this._pass);
-                        }
-                        this._registeredWithPass = true;
-
-                        this._identity = identity;
-                        this._realname = realname;
-                        this._socket.logger._CLIENT_LOGGED();
-
-                        RPLSender.RPL_MOTDSTART(this.socket);
-                        RPLSender.RPL_MOTD(this.socket);
-                        RPLSender.RPL_ENDOFMOTD(this.socket);
-
-                        if(process.env.parent === 'TEST') {
-                            this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                            this._addFlag('o');
-                        } else {
-                            redisClient.getAdmin((reply) => {
-                                if (!reply) {
-                                    this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                                    this._addFlag('Oo');
-                                    redisClient.setAdmin({identity: this.identity, role: 'superadmin'});
-                                } else if (reply[identity] === 'admin') {
-                                    this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                                    this._addFlag('o');
-                                } else if (reply[identity] === 'superadmin') {
-                                    this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                                    this._addFlag('Oo');
-                                }
-                            });
-                        }
-
-
-                    }
-                });
-            } else {
-                this._identity = 'GUEST_' + identity;
+        if(this._pass) {
+            redisClient.getPass(identity, (err, pass) => {
+                if(!err && pass != this._pass) {
+                    ERRSender.ERR_PASSWDMISMATCH(this);
+                    return
+                }
+                if(err) {
+                    redisClient.addUser(identity, this._pass);
+                }
+                this._registeredWithPass = true;
+                this._identity = identity;
                 this._realname = realname;
+                this._socket.logger._CLIENT_LOGGED();
 
-                this._socket.logger._CLIENT_GUEST();
                 RPLSender.RPL_MOTDSTART(this.socket);
                 RPLSender.RPL_MOTD(this.socket);
                 RPLSender.RPL_ENDOFMOTD(this.socket);
-            }
-        }
 
+                if(process.env.parent === 'TEST') {
+                    this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                    this._addFlag('o');
+                    return;
+                }
+
+                redisClient.getAdmin((reply) => {
+                    if (!reply) {
+                        this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                        this._addFlag('O');
+                        redisClient.setAdmin({identity: this.identity, role: 'superadmin'});
+                    } else if (reply[identity] === 'admin') {
+                        this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                        this._addFlag('o');
+                    } else if (reply[identity] === 'superadmin') {
+                        this._socket.logger._CLIENT_IS_NOW_ADMIN();
+                        this._addFlag('O');
+                    }
+                });
+            });
+        } else {
+            this._identity = 'GUEST_' + identity;
+            this._realname = realname;
+            this._socket.logger._CLIENT_GUEST();
+            RPLSender.RPL_MOTDSTART(this.socket);
+            RPLSender.RPL_MOTD(this.socket);
+            RPLSender.RPL_ENDOFMOTD(this.socket);
+        }
     }
 
     /**
@@ -233,9 +220,6 @@ class Client {
             if (name[0] === ':') {
                 name = name.slice(1, name.length);
             }
-
-
-
             clients.forEach((c) => {
                 if (c.name === name) {
                     if(!c.isUser() && this.isUser()) {
@@ -246,7 +230,6 @@ class Client {
                     }
                 }
             });
-
             let match = name.match(/[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]+/);
             if (!match || (match && match[0] !== name) || name === '' || name.length > 15) {
                 ERRSender.ERR_NONICKNAMEGIVEN(this);
@@ -258,13 +241,7 @@ class Client {
                 this._name = name;
             }
         }
-
-
     }
-
-    /*
-     * methods
-     */
 
     del() {
         for(let i = 0; i<this._channels.length; i++) {
@@ -287,7 +264,7 @@ class Client {
                 if(flag==='i' || flag==='o'){
                     if(flag ==='o'){
                         this._channels.forEach((channel)=> {
-                           channel.changeClientFlag('+','o', this);
+                            channel.changeClientFlag('+','o', this);
                         });
                     }
                     RPLSender.RPL_UMODEIS_BROADCAST_ALL(this.name+' +'+flag);

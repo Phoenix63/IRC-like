@@ -13,7 +13,7 @@ import colors from 'colors';
 
 // socket
 import socketManager from './modules/socket/socket';
-import Client from './modules/client/client';
+import Client from './modules/client/Client';
 import Logger from './modules/Logger';
 import MessageManager from './modules/CommandManager';
 import RPLSender from './modules/responses/RPLSender';

@@ -1,7 +1,7 @@
 "use strict";
 
 import Channel from './../channel/Channel';
-import Client from './../client/client';
+import Client from '../client/Client';
 import ERRSender from './../responses/ERRSender';
 import RPLSender from './../responses/RPLSender';
 

@@ -1,6 +1,6 @@
 "use strict"
 
-import Client from './client/client';
+import Client from './client/Client';
 import colors from 'colors';
 
 
