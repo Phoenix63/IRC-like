@@ -14,7 +14,7 @@
    <enum>Qt::ClickFocus</enum>
   </property>
   <property name="contextMenuPolicy">
-   <enum>Qt::CustomContextMenu</enum>
+   <enum>Qt::NoContextMenu</enum>
   </property>
   <property name="windowTitle">
    <string>MainFrame</string>
@@ -35,6 +35,9 @@
         <height>16777215</height>
        </size>
       </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::CustomContextMenu</enum>
+      </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
       </property>
@@ -51,7 +54,7 @@
       <item>
        <widget class="QFrame" name="verticalFrame">
         <property name="contextMenuPolicy">
-         <enum>Qt::ActionsContextMenu</enum>
+         <enum>Qt::CustomContextMenu</enum>
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -92,8 +95,8 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>563</width>
-           <height>452</height>
+           <width>565</width>
+           <height>454</height>
           </rect>
          </property>
          <property name="mouseTracking">
@@ -104,6 +107,9 @@
          </property>
          <property name="contextMenuPolicy">
           <enum>Qt::DefaultContextMenu</enum>
+         </property>
+         <property name="acceptDrops">
+          <bool>true</bool>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
@@ -239,6 +245,9 @@
       <property name="mouseTracking">
        <bool>false</bool>
       </property>
+      <property name="contextMenuPolicy">
+       <enum>Qt::CustomContextMenu</enum>
+      </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
       </property>
@@ -269,6 +278,9 @@
     <addaction name="actionDisconnect"/>
    </widget>
    <widget class="QMenu" name="menuEdition">
+    <property name="contextMenuPolicy">
+     <enum>Qt::NoContextMenu</enum>
+    </property>
     <property name="title">
      <string>Edition</string>
     </property>
@@ -278,6 +290,9 @@
      <string>Fenetre</string>
     </property>
     <widget class="QMenu" name="menuTheme">
+     <property name="contextMenuPolicy">
+      <enum>Qt::NoContextMenu</enum>
+     </property>
      <property name="title">
       <string>Theme</string>
      </property>
@@ -288,6 +303,9 @@
     <addaction name="menuTheme"/>
    </widget>
    <widget class="QMenu" name="menuAide">
+    <property name="contextMenuPolicy">
+     <enum>Qt::NoContextMenu</enum>
+    </property>
     <property name="title">
      <string>Aide</string>
     </property>

@@ -49,6 +49,12 @@ MainFrame::MainFrame(QWidget *parent, QTcpSocket *socket, QString host) :
 
 
     /********************************* Right Click ************************************/
+    QLabel label;
+    QGraphicsTextItem txt;
+
+
+    txt.setTextInteractionFlags(Qt::TextSelectableByMouse);
+    label.setTextInteractionFlags(Qt::TextSelectableByMouse);
     m_pContextMenu = new QMenu(this);
 
     setContextMenuPolicy(Qt::CustomContextMenu);
@@ -483,6 +489,7 @@ void MainFrame::copy()
     QTableView *view = NULL;
     QModelIndexList selectedIndexes = view->selectionModel()->selectedIndexes();
 
+
     for (int i = 0; i < selectedIndexes.count(); ++i)
     {
         QModelIndex current = selectedIndexes[i];
@@ -511,3 +518,16 @@ void MainFrame::copy()
         QApplication::clipboard()->setText(clipboardString);
 
 }
+
+//Mouse Tracking -> Cursor -> Pos !
+bool MainFrame::event(QEvent* e)
+{
+if (e->type() == QEvent::Enter)
+qDebug() << "Enter";
+if (e->type()==QEvent::Leave)
+qDebug() << "Leave";
+
+return QWidget::event(e);
+}
+
+

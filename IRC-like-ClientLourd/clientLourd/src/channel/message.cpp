@@ -1,4 +1,5 @@
 #include "message.h"
+#include <QLabel>
 
 Message::Message(User *sender, QString date, QString message):
     aSender(sender),

@@ -137,6 +137,12 @@ private:
     //QAction* m_pBanUser;
     QAction* m_pLogout;
 
+
+protected:
+bool event(QEvent* e) override;
+
+
+
 };
 
 #endif // MAINFRAME_H
