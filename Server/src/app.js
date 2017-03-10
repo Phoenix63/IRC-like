@@ -1,29 +1,47 @@
-import child_process from 'child_process';
+"use strict";
+import RedisInterface from './modules/data/RedisInterface';
+import dbSaver from './modules/data/dbSaver';
+import dbLoader from './modules/data/dbLoader';
+import socketManager from './modules/socket/socket';
+import Client from './modules/client/Client';
+import Logger from './modules/Logger';
+import MessageManager from './modules/CommandManager';
+import RPLSender from './modules/responses/RPLSender';
+import colors from 'colors';
+import Redis from './modules/data/RedisInterface';
 
-const env = process.argv[2] || 'PROD';
-console.log('ENV: '+env);
+RedisInterface.init();
 
-let childprocess = createChild();
-
+//catches ctrl+c event
 process.on('SIGINT', () => {
-    if(childprocess && childprocess.kill) {
-        createChild = null;
-        childprocess.kill(0);
-    }
+    console.log('Saving database...');
+    //maybe we should close the sockets before save the DB
+    dbSaver(() => {
+        console.log('Database saved!');
+        console.log('Quit redis');
+        Redis.quit();
+        process.exit();
+    });
 });
-
-function createChild() {
-    let child = child_process.spawn('node', ['./dist/server.js', env]);
-    child.stdout.on('data', function (data) {
-        console.log(data.toString());
+//catches uncaught exceptions
+/*
+if(process.argv[2] === 'PROD'){
+    process.on('uncaughtException', (err) => {
+        console.log(colors.red(err));
     });
+}*/
 
-    child.on('exit', function (code) {
-        console.log('child process exited with code ' + code.toString());
-        if(createChild) {
-            child = createChild();
-        }
+
+dbLoader(() => {
+    console.log('Database loaded');
+    socketManager.create((socket) => {
+        let client = new Client(socket);
+        let logger = new Logger(client);
+        client.socket.logger = logger;
+        client.socket.messageManager = new MessageManager(client.socket);
+        socket.on('connect', () => {
+            RPLSender.HEADER(socket);
+            logger._CLIENT_CONNECTED();
+        });
     });
-
-    return child;
-}
+});

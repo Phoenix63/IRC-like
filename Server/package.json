@@ -5,6 +5,7 @@
   "main": "app.js",
   "scripts": {
     "dev": "docker-compose -f ./docker/dev.yml up",
+    "alex": "babel src --out-dir dist --source-maps inline --copy-files && nodemon --exec babel-node ./src/app.js DEV",
     "watch": "babel --watch src --out-dir dist --source-maps inline --copy-files",
     "build": "babel src --out-dir dist --source-maps inline --copy-files",
     "prod": "docker-compose -f ./docker/prod.yml up",

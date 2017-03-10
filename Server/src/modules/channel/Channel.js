@@ -4,7 +4,6 @@ import Client from '../client/Client';
 import ERRSender from './../responses/ERRSender';
 import RPLSender from './../responses/RPLSender';
 import Redis from './../data/RedisInterface';
-let redis = Redis.instance;
 
 let channels = [];
 
@@ -25,12 +24,12 @@ class Channel {
          *  s       canal secret; le canal est totalement invisible
          *  p       canal privé; le nom du canal est invisible
          *  n       les messages externes ne sont pas autorisés
-         *  m        canal modéré, seuls les utilisateurs en mode +v et les opérateurs peuvent envoyer un message
+         *  m       canal modéré, seuls les utilisateurs en mode +v et les opérateurs peuvent envoyer un message
          *  i       canal accessible uniquement sur invitation (commande /invite)
          *  t       sujet du canal uniquement modifiable par les opérateurs du canal
          *
-         *  o    @    nom de l'utilisateur concerné    Opérateur de canal : peut changer les modes du channel et expulser les autres utilisateurs
-         *  v    +    nom de l'utilisateur concerné    verbose ou voiced : autorise l'utilisateur à parler sur un canal modéré (mode +m)
+         *  o    +  nom de l'utilisateur concerné    Opérateur de canal : peut changer les modes du channel et expulser les autres utilisateurs
+         *  v    +  nom de l'utilisateur concerné    verbose ou voiced : autorise l'utilisateur à parler sur un canal modéré (mode +m)
          */
         this._flags = '';
         this._usersFlags = {};
@@ -187,6 +186,10 @@ class Channel {
         return this._flags;
     }
 
+    get bannedUsers() {
+        return this._bannedUsers;
+    }
+
     /**
      * set channel persistent or not
      * @param {Boolean} bool
@@ -194,15 +197,15 @@ class Channel {
     setPersistent(bool) {
         this._persistent = bool;
         if (bool) {
-            redis.upsertChannel(this);
+            Redis.setChannel(this);
         } else {
-            redis.deleteChannel(this);
+            Redis.deleteChannel(this);
         }
     }
 
     _mergeToRedis() {
-        if (this._persistent && process.env.parent !== 'TEST') {
-            redis.upsertChannel(this);
+        if (this._persistent) {
+            Redis.setChannel(this);
         }
     }
 
@@ -350,16 +353,22 @@ class Channel {
         return false;
     }
 
-
-    /**
-     *
-     * @param {string} flags
-     */
-    setUserFlags(flags) {
+    set userFlags(flags){
         this._usersFlags = flags;
         this._mergeToRedis();
     }
-
+    set flags(flags){
+        this._flags = flags;
+        this._mergeToRedis();
+    }
+    set invitations(invitations){
+        this._invitations = invitations;
+        this._mergeToRedis();
+    }
+    set bannedUsers(bannedUsers){
+        this._bannedUsers = bannedUsers;
+        this._mergeToRedis();
+    }
 
     /**
      * add user to the channel
@@ -440,6 +449,7 @@ class Channel {
      */
     setSize(size) {
         this._size = size;
+        this._mergeToRedis();
     }
 
     /**
@@ -448,6 +458,7 @@ class Channel {
      */
     setPass(pass) {
         this._pass = pass;
+        this._mergeToRedis();
     }
 
     /**
@@ -472,9 +483,26 @@ class Channel {
             this._invitations.push(client);
             RPLSender.RPL_SERVER_ACCEPT_THE_INVITATION(socket, client, this);
             RPLSender.RPL_YOU_HAVE_BEEN_INVITED(socket, client, this);
+            this._mergeToRedis();
         }
     }
 
+    getOnlyRegisteredUsersFlags(){
+        let registeredUsersFlags = {};
+        for(let key in this._usersFlags){
+            if(this._usersFlags.hasOwnProperty(key)){
+                let user = Client.getClient(key);
+                if(user && user.isRegisteredWithPass()){
+                    registeredUsersFlags[key] = this._usersFlags[key];
+                }
+            }
+        }
+        return registeredUsersFlags;
+    }
+
+    getOnlyRegisteredUsersInvitations(){
+
+    }
 
     /**
      *

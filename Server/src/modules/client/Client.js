@@ -6,7 +6,6 @@ import ERRSender from './../responses/ERRSender';
 import RPLSender from './../responses/RPLSender';
 import crypto from 'crypto';
 import Redis from '../data/RedisInterface';
-let redisClient = Redis.instance;
 
 let clients = [];
 
@@ -49,11 +48,15 @@ class Client {
     }
 
     /**
-     * set loggin password
-     * @param {string} val
+     *
+     * @param val
      */
     set pass(val) {
         this._pass = crypto.createHash('sha256').update(val).digest('base64');
+    }
+
+    get pass() {
+        return this._pass;
     }
 
     set away(val) {
@@ -62,6 +65,10 @@ class Client {
 
     get away() {
         return this._away;
+    }
+
+    get flags() {
+        return this._flags;
     }
 
     /**
@@ -117,7 +124,7 @@ class Client {
      * @param {string} val
      */
     set realname(val) {
-        if(val[0] === ':') {
+        if (val[0] === ':') {
             val = val.slice(1, val.length);
         }
         this._realname = val;
@@ -134,75 +141,55 @@ class Client {
     /**
      * change identity of user if its valid
      * @param {string} identity
+     * @param {string} realname
      */
     setIdentity(identity, realname) {
         let error = false;
         let regexIdentity = /^([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15})$/.exec(identity);
 
-        if (!regexIdentity ||  regexIdentity[1].indexOf('GUEST_') >= 0) {
+        if (!regexIdentity || regexIdentity[1].indexOf('GUEST_') >= 0) {
             ERRSender.ERR_NEEDMOREPARAMS(this, 'USER');
             error = true;
         }
-        if(this._identity) {
+        if (this._identity) {
             ERRSender.ERR_ALREADYREGISTRED(this);
             error = true;
         }
-        for (let i=0; i<clients.length;i++){
-            if((this._pass && clients[i].identity === identity) || (!this._pass && clients[i].identity === 'GUEST_'+identity)){
+        for (let i = 0; i < clients.length; i++) {
+            if ((this._pass && clients[i].identity === identity) || (!this._pass && clients[i].identity === 'GUEST_' + identity)) {
                 ERRSender.ERR_ALREADYREGISTRED(this);
                 error = true;
             }
         }
-        if(error) {
+        if (error) {
             return;
         }
 
-        if(this._pass) {
-            redisClient.getPass(identity, (err, pass) => {
-                if(!err && pass != this._pass) {
+        if (this._pass) {
+            let userFromMongo = Redis.getUser(identity);
+            if (userFromMongo) {
+                if (userFromMongo.pass != this._pass) {
                     ERRSender.ERR_PASSWDMISMATCH(this);
                     return
                 }
-                if(err) {
-                    redisClient.addUser(identity, this._pass);
-                }
-                this._registeredWithPass = true;
-                this._identity = identity;
-                this._realname = realname;
+                this._flags = userFromMongo.flags;
                 this._socket.logger._CLIENT_LOGGED();
-
-                RPLSender.RPL_MOTDSTART(this.socket);
-                RPLSender.RPL_MOTD(this.socket);
-                RPLSender.RPL_ENDOFMOTD(this.socket);
-
-                if(process.env.parent === 'TEST') {
-                    this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                    this._addFlag('o');
-                    return;
-                }
-
-                redisClient.getAdmin((reply) => {
-                    if (!reply) {
-                        this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                        this._addFlag('O');
-                        redisClient.setAdmin({identity: this.identity, role: 'superadmin'});
-                    } else if (reply[identity] === 'admin') {
-                        this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                        this._addFlag('o');
-                    } else if (reply[identity] === 'superadmin') {
-                        this._socket.logger._CLIENT_IS_NOW_ADMIN();
-                        this._addFlag('O');
-                    }
-                });
+            }
+            Redis.isFirstUser(()=>{
+                this._addFlag('O');
             });
+            this._identity = identity;
+            this._registeredWithPass = true;
         } else {
+            this._registeredWithPass = false;
             this._identity = 'GUEST_' + identity;
-            this._realname = realname;
             this._socket.logger._CLIENT_GUEST();
-            RPLSender.RPL_MOTDSTART(this.socket);
-            RPLSender.RPL_MOTD(this.socket);
-            RPLSender.RPL_ENDOFMOTD(this.socket);
         }
+        this._realname = realname;
+        this._mergeToRedis();
+        RPLSender.RPL_MOTDSTART(this.socket);
+        RPLSender.RPL_MOTD(this.socket);
+        RPLSender.RPL_ENDOFMOTD(this.socket);
     }
 
     /**
@@ -211,9 +198,9 @@ class Client {
      */
     set name(name) {
         let error = false;
-        if(name === null) {
-            this.socket.logger._USER_CHANGE_NICK('Guest_'+this._id);
-            RPLSender.NICK(this.name, 'Guest_'+this._id, this);
+        if (name === null) {
+            this.socket.logger._USER_CHANGE_NICK('Guest_' + this._id);
+            RPLSender.NICK(this.name, 'Guest_' + this._id, this);
             this._name = null;
             error = true;
         } else {
@@ -222,7 +209,7 @@ class Client {
             }
             clients.forEach((c) => {
                 if (c.name === name) {
-                    if(!c.isUser() && this.isUser()) {
+                    if (!c.isRegisteredWithPass() && this.isRegisteredWithPass()) {
                         c.name = null;
                     } else {
                         ERRSender.ERR_NICKNAMEINUSE(this);
@@ -244,7 +231,7 @@ class Client {
     }
 
     del() {
-        for(let i = 0; i<this._channels.length; i++) {
+        for (let i = 0; i < this._channels.length; i++) {
             this._channels[i].removeUser(this, 'Quit', true);
         }
         RPLSender.QUIT(this, 'Gone');
@@ -259,17 +246,18 @@ class Client {
     _addFlag(flags) {
         let arrayFlags = flags.split('');
         arrayFlags.forEach((flag) => {
-            if(this._flags.indexOf(flag)===-1){
+            if (this._flags.indexOf(flag) === -1) {
                 this._flags += flag;
-                if(flag==='i' || flag==='o'){
-                    if(flag ==='o'){
-                        this._channels.forEach((channel)=> {
-                            channel.changeClientFlag('+','o', this);
+                this._mergeToRedis();
+                if (flag === 'i' || flag === 'o') {
+                    if (flag === 'o') {
+                        this._channels.forEach((channel) => {
+                            channel.changeClientFlag('+', 'o', this);
                         });
                     }
-                    RPLSender.RPL_UMODEIS_BROADCAST_ALL(this.name+' +'+flag);
-                }else{
-                    RPLSender.RPL_UMODEIS(this,this.name+' +'+flag);
+                    RPLSender.RPL_UMODEIS_BROADCAST_ALL(this.name + ' +' + flag);
+                } else {
+                    RPLSender.RPL_UMODEIS(this, this.name + ' +' + flag);
                 }
 
             }
@@ -285,12 +273,13 @@ class Client {
         let arrayFlags = flags.split('');
         arrayFlags.forEach((flag) => {
             let tmp = this._flags.length;
-            this._flags = this._flags.replace(flag,'');
-            if(tmp-1 === this._flags.length){
-                if(flag==='i' || flag==='o'){
-                    RPLSender.RPL_UMODEIS_BROADCAST_ALL(this.name+' -'+flag);
-                }else{
-                    RPLSender.RPL_UMODEIS(this,this.name+' -'+flag);
+            this._flags = this._flags.replace(flag, '');
+            if (tmp - 1 === this._flags.length) {
+                this._mergeToRedis();
+                if (flag === 'i' || flag === 'o') {
+                    RPLSender.RPL_UMODEIS_BROADCAST_ALL(this.name + ' -' + flag);
+                } else {
+                    RPLSender.RPL_UMODEIS(this, this.name + ' -' + flag);
                 }
             }
         });
@@ -302,9 +291,9 @@ class Client {
      * @param {string} flag
      */
     changeFlag(operator, flag) {
-        if(operator==='+') {
+        if (operator === '+') {
             this._addFlag(flag);
-        }else {
+        } else {
             this._removeFlag(flag);
         }
     }
@@ -313,7 +302,7 @@ class Client {
      *
      * @returns {boolean}
      */
-    isUser() {
+    isRegisteredWithPass() {
         return this._registeredWithPass;
     }
 
@@ -322,19 +311,19 @@ class Client {
      * @returns {boolean}
      */
     isAdmin() {
-        return this._flags.indexOf('o')>=0;
+        return this._flags.indexOf('o') >= 0;
     }
 
     isInvisible() {
-        return this._flags.indexOf('i')>-1;
+        return this._flags.indexOf('i') > -1;
     }
 
     /**
      *
      * @returns {boolean}
      */
-    isSuperAdmin(){
-        return this._flags.indexOf('O')>=0;
+    isSuperAdmin() {
+        return this._flags.indexOf('O') >= 0;
     }
 
     /**
@@ -366,6 +355,12 @@ class Client {
             }
         }
         return null;
+    }
+
+    _mergeToRedis() {
+        if (this._registeredWithPass) {
+            Redis.setUser(this);
+        }
     }
 
     /**

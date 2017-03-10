@@ -1,153 +1,127 @@
-
-let redisLib = require('redis');
-let conf = require('./../../ENV.json');
-
-let instance;
+let redis = require('redis');
+let config = require('./../../ENV.json');
+let client;
 
 class Redis {
+    constructor() {
 
-    /**
-     *
-     * @param {Redis.client} client
-     * @constructor
-     */
-    constructor(client) {
+    }
 
-        this._client = client;
-
-        this._save = (process.env.parent !== 'TEST');
-
-        this._client.on("error", function(err) {
-            console.log(err);
+    static init() {
+        client = redis.createClient(6379, "localhost");
+        client.on("error", function (err) {
+            console.log("Error " + err);
         });
     }
 
-    /**
-     *
-     * @returns {Redis}
-     * @static
-     */
-    static get instance() {
-        if(!instance) {
-            instance = new Redis(redisLib.createClient({host: conf.redis.host, port:conf.redis.port}));
-        }
-        return instance;
-    }
-
-    get client() {
-        return this._client;
-    }
-
-    /**
-     * set a non guest client server admin
-     * @param {Object<identity, role>} infos
-     */
-    //need to rename addAdmin
-    setAdmin(infos) {
-        if(this._save) {
-            if(infos.identity.indexOf("GUEST_") === 0) {
-                throw "cannot set guest admin";
-            } else {
-                this._client.hmset("admin", infos.identity, infos.role);
-            }
-        }
-
-    }
-
-    flush(callback=function(){}) {
-        this._client.flushdb(callback);
-    }
-
-
-    /**
-     * get admin if not error
-     * @param {function(reply)} callback
-     */
-    getAdmin(callback=function(reply){}) {
-        this._client.hgetall("admin", (err,obj) => {
-            if(obj) {
-                callback(obj);
-            } else {
-                callback(null);
+    static flush() {
+        client.flushdb(function (err, succeeded) {
+            if(err){
+                throw err;
             }
         });
     }
 
-    /**
-     *
-     * @param {Client.identity} identity
-     * @param {function(err, reply)} callback
-     */
-    getPass(identity, callback=function(err, reply){}) {
-        this._client.hgetall("PASS",(err, obj) => {
-            if(obj && obj[identity]) {
-                callback(null, obj[identity]);
-            } else {
-                callback("no pass set", null);
-            }
+    static setChannel(channel) {
+        client.hmset(
+            "channels",
+            channel.name,
+            JSON.stringify({
+                name: channel.name,
+                creator: channel.creator,
+                flags: channel.channelFlags,
+                userflags: channel.getOnlyRegisteredUsersFlags(),
+                bannedUsers: channel.bannedUsers,
+                invitations: channel.getOnlyRegisteredUsersInvitations(),
+                pass: channel.pass,
+                size: channel.size,
+                topic: (channel.topic || '')
+            }));
+    }
+
+    static getChannels(callback) {
+        client.hgetall("channels", (err, obj) => {
+            callback(obj)
         });
     }
 
-    /**
-     *
-     * @param {Client.identity} identity
-     * @param {string} pass
-     */
-    addUser(identity, pass) {
-        if(this._save) {
-            this._client.hmset("PASS", identity, pass);
-        }
+    static deleteChannel(channel) {
+        client.hdel("channels", channel.name);
     }
 
-    getUsers(callback) {
-        this._client.hgetall("PASS", (err, obj) => {
-             callback(obj);
-        });
+    static setUser(user) {
+        client.hmset(
+            "users", user.id,
+            JSON.stringify({
+                id: user._id,
+                pass: user.pass,
+                flags: user.flags
+            }));
     }
 
-    /**
-     *
-     * @param {Channel} channel
-     */
-    upsertChannel(channel) {
-        if(this._save) {
-            this._client.hmset(
-                "channels",
-                channel.name,
-                JSON.stringify({
-                    name: channel.name,
-                    creator: channel.creator,
-                    flags: channel.flags,
-                    userflags: channel._usersFlags,
-                    pass: channel.pass,
-                    size: channel.size,
-                    topic: (channel.topic||'')
-                }));
-        }
-    }
-
-    getChannels(callback) {
-        this._client.hgetall("channels", (err, obj) => {
+    static getUsers(callback) {
+        client.hgetall("users", (err, obj) => {
             callback(obj);
         });
     }
 
-    /**
-     *
-     * @param {Channel} channel
-     */
-    deleteChannel(channel) {
-        if(this._save) {
-            this._client.hdel("channels", channel.name);
-        }
-    }
-/*
-    showDBRedis() {
-        console.log("USERS :");
-        this._client.hgetall("PASS", (err, obj) => {
-            console.log(obj);
+    static getUser(id) {
+        client.hgetall("users", (err, obj) => {
+            if (err) {
+            } else {
+                if (obj && obj[id]) {
+                    return JSON.parse(obj[i]);
+                }
+            }
+            return null;
         });
-    }*/
+    }
+
+    static isFirstUser(callback) {
+        client.hgetall("users", (err, obj) => {
+            if (!obj) {
+                callback();
+            }
+        });
+    }
+
+    static showDBRedis() {
+        client.hgetall("users", (err, obj) => {
+            console.log("----------------------------------------REDIS----------------------------------------");
+            console.log("USERS :");
+            for (let key in obj) {
+                let tmp = JSON.parse(obj[key]);
+                for (let key2 in tmp) {
+                    console.log("\t" + key2 + ":" + tmp[key2]);
+                }
+            }
+            console.log("\n");
+        });
+        client.hgetall("channels", (err, obj) => {
+            console.log("Channels :");
+            for (let key in obj) {
+                let args = JSON.parse(obj[key]);
+                for (let key2 in args) {
+                    if(key2 == "userflags"){
+                        console.log("\tUsers Flags :");
+                        console.log("\t" + key2 + ":" + args[key2]);
+                        for(let k in args[key2]){
+                            console.log("\t\t"+k+"/"+args[key2][k]);
+                        }
+                    }else{
+                        console.log("\t" + key2 + ":" + args[key2]);
+                    }
+
+                }
+            }
+            console.log("-------------------------------------------------------------------------------------");
+        });
+    }
+
+    static quit() {
+        Redis.flush();
+        client.quit();
+    }
 }
 
 export default Redis;

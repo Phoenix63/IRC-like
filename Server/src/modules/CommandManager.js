@@ -23,7 +23,8 @@ let allowedCommand = {
     'INVITE': require('./command/INVITE'),
     'AWAY': require('./command/AWAY'),
     'LISTFILES': require('./command/LISTFILES'),
-    'RMFILE': require('./command/RMFILE')
+    'RMFILE': require('./command/RMFILE'),
+    'DEBUG': require('./command/DEBUG')
 };
 
 class CommandManager {

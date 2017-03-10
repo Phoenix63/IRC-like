@@ -1,5 +1,5 @@
 {
-  "ip": "node",
+  "ip": "localhost",
   "tcp_server": {
     "port": 8088
   },

@@ -148,6 +148,7 @@ class Socket {
     /**
      * delete socket
      */
+    //onClose not close ...
     close() {
         clearInterval(this._interval);
         if (this._client) {
@@ -160,19 +161,28 @@ class Socket {
         delete this;
     }
 
+    closeTheSockets() {/*
+        if (this.isTcp) {
+            this._socket.
+        } else {
+            this._socket.emit('message', data);
+        }*/
+    }
+
+
 }
 
 function create(callback) {
+    sio.create(function (socket) {
+        let soc = new Socket('sio', socket);
+        socket.manager = soc;
+        callback(soc);
+    });
     tcp.create(function (socket) {
         let soc = new Socket('tcp', socket);
         socket.manager = soc;
         callback(soc);
     });
-    sio.create(function (socket) {
-        let soc = new Socket('sio', socket);
-        socket.manager = soc;
-        callback(soc);
-    })
 }
 
 export default {create: create};
