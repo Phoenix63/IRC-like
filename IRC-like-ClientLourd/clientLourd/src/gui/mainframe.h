@@ -13,6 +13,9 @@
 #include <QMenu>
 #include <QAction>
 #include <QTableView>
+#include "../parser/parsermode.h"
+#include <QKeyEvent>
+#include <QTableWidget>
 
 
 
@@ -116,14 +119,22 @@ private slots :
         m_pContextMenu->popup(mapToGlobal(point));
     }
 
+    void paste();
+
+    void copy();
+    //void keyPressEvent(QKeyEvent * event);
+    //void banUser();
+
 private:
     QMenu* m_pContextMenu;
 
 
 
     //Actions
+    QAction* m_pCopy;
     //QAction* m_pPaste;
     QAction* m_pSendFile;
+    //QAction* m_pBanUser;
     QAction* m_pLogout;
 
 };

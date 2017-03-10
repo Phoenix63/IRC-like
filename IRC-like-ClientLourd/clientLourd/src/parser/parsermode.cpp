@@ -194,3 +194,6 @@ bool ParserMode::isKMode(QString mode, QString chan, QString password)
         channel->appendChannel("This channel no longer have a password.", chan, "");
     return true;
 }
+
+
+/************************ Right Click *****************************/

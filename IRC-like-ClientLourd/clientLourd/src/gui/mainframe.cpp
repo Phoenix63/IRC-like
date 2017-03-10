@@ -11,7 +11,13 @@
 
 #include <QMenu>
 #include <QMouseEvent>
-
+#include <QGraphicsSceneMouseEvent>
+#include "../parser/parsermode.h"
+#include <QClipboard>
+#include <QMimeData>
+#include <QGraphicsScene>
+#include <QGraphicsItem>
+#include <QLabel>
 
 #include "channellist.h"
 #include "ui_mainframe.h"
@@ -52,17 +58,21 @@ MainFrame::MainFrame(QWidget *parent, QTcpSocket *socket, QString host) :
 
 
     //actions definitions :
-    m_pLogout = m_pContextMenu->addAction("Se déconnecter");
+    m_pCopy = m_pContextMenu->addAction("Copier");
+
     m_pSendFile = m_pContextMenu->addAction("Envoi Fichier ...");
-    //m_pPaste = m_pContextMenu->addAction("Coller");
+    //m_pBanUser = m_pContextMenu->addAction("bannir");
+    m_pLogout = m_pContextMenu->addAction("Se déconnecter");
+
+
+
 
 
 
 
     //user
-
+    connect(m_pCopy,SIGNAL(triggered()),this,SLOT(copy()));
     connect(m_pSendFile,SIGNAL(triggered()),this,SLOT(on_pushButton_upload_clicked()));
-    //connect(m_pPaste,SIGNAL(triggered()),this,SLOT(paste()));
 
 
     //channel
@@ -446,4 +456,58 @@ void MainFrame::on_userList_doubleClicked(const QModelIndex &index)
 
 /****************************** Right Click ****************************************/
 
+// clipboard management : copy paste cut
 
+
+void MainFrame::paste() //TO REMOVE ~~~~~~~~~~~~>
+{
+
+     const QClipboard *clipboard = QApplication::clipboard();
+     const QMimeData *mimeData = clipboard->mimeData();
+     QLabel label(mimeData->text());
+     if (mimeData->hasText()){
+         label.setText("");
+         label.setTextFormat(Qt::PlainText);
+
+
+      }
+      /*else {
+         data->setText(tr("Cannot display data"));
+      }*/
+}
+
+void MainFrame::copy()
+{
+
+    QString clipboardString;
+    QTableView *view = NULL;
+    QModelIndexList selectedIndexes = view->selectionModel()->selectedIndexes();
+
+    for (int i = 0; i < selectedIndexes.count(); ++i)
+    {
+        QModelIndex current = selectedIndexes[i];
+        QString displayText = current.data(Qt::DisplayRole).toString();
+
+            // If there exists another column beyond this one.
+        if (i + 1 < selectedIndexes.count())
+         {
+            QModelIndex next = selectedIndexes[i+1];
+
+                // If the column is on different row, the clipboard should take note.
+            if (next.row() != current.row())
+            {
+                displayText.append("\n");
+            }
+            else
+            {
+            // Otherwise append a column separator.
+                displayText.append(" | ");
+            }
+        }
+
+        clipboardString.append(displayText);
+      }
+
+        QApplication::clipboard()->setText(clipboardString);
+
+}

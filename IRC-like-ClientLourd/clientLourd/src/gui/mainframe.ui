@@ -10,6 +10,12 @@
     <height>583</height>
    </rect>
   </property>
+  <property name="focusPolicy">
+   <enum>Qt::ClickFocus</enum>
+  </property>
+  <property name="contextMenuPolicy">
+   <enum>Qt::CustomContextMenu</enum>
+  </property>
   <property name="windowTitle">
    <string>MainFrame</string>
   </property>
@@ -44,6 +50,9 @@
      <layout class="QVBoxLayout" name="chatLayout">
       <item>
        <widget class="QFrame" name="verticalFrame">
+        <property name="contextMenuPolicy">
+         <enum>Qt::ActionsContextMenu</enum>
+        </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
         </property>
@@ -83,9 +92,18 @@
           <rect>
            <x>0</x>
            <y>0</y>
-           <width>565</width>
-           <height>457</height>
+           <width>563</width>
+           <height>452</height>
           </rect>
+         </property>
+         <property name="mouseTracking">
+          <bool>true</bool>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::StrongFocus</enum>
+         </property>
+         <property name="contextMenuPolicy">
+          <enum>Qt::DefaultContextMenu</enum>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_2">
           <item>
@@ -131,6 +149,9 @@
           <width>16777215</width>
           <height>1677215</height>
          </size>
+        </property>
+        <property name="contextMenuPolicy">
+         <enum>Qt::CustomContextMenu</enum>
         </property>
         <property name="frameShape">
          <enum>QFrame::StyledPanel</enum>
@@ -215,6 +236,9 @@
         <height>16777215</height>
        </size>
       </property>
+      <property name="mouseTracking">
+       <bool>false</bool>
+      </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
       </property>
@@ -234,7 +258,7 @@
      <x>0</x>
      <y>0</y>
      <width>899</width>
-     <height>20</height>
+     <height>21</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFichier">
