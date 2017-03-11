@@ -353,7 +353,7 @@ class Channel {
         return false;
     }
 
-    set userFlags(flags){
+    set usersFlags(flags){
         this._usersFlags = flags;
         this._mergeToRedis();
     }

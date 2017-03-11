@@ -12,6 +12,7 @@ import Redis from './modules/data/RedisInterface';
 
 RedisInterface.init();
 
+process.env.parent = process.argv[2] || 'PROD';
 //catches ctrl+c event
 process.on('SIGINT', () => {
     console.log('Saving database...');
@@ -20,16 +21,19 @@ process.on('SIGINT', () => {
         console.log('Database saved!');
         console.log('Quit redis');
         Redis.quit();
-        process.exit();
     });
+    setTimeout(()=>{
+        process.exit();
+    },3000)
 });
 //catches uncaught exceptions
-/*
 if(process.argv[2] === 'PROD'){
     process.on('uncaughtException', (err) => {
-        console.log(colors.red(err));
+        if(err){
+            console.log(colors.red(err.stack));
+        }
     });
-}*/
+}
 
 
 dbLoader(() => {

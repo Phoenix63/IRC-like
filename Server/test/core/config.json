@@ -1,5 +1,5 @@
 {
-  "name": "node",
-  "ip": "node",
+  "name": "localhost",
+  "ip": "localhost",
   "port": 8088
 }

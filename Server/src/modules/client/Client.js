@@ -175,8 +175,11 @@ class Client {
                 this._flags = userFromMongo.flags;
                 this._socket.logger._CLIENT_LOGGED();
             }
-            Redis.isFirstUser(()=>{
-                this._addFlag('O');
+            //if first user
+            Redis.getUsers((users)=>{
+                if(!users){
+                    this._addFlag('O');
+                }
             });
             this._identity = identity;
             this._registeredWithPass = true;

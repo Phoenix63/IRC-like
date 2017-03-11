@@ -3,9 +3,6 @@ let config = require('./../../ENV.json');
 let client;
 
 class Redis {
-    constructor() {
-
-    }
 
     static init() {
         client = redis.createClient(6379, "localhost");
@@ -30,7 +27,7 @@ class Redis {
                 name: channel.name,
                 creator: channel.creator,
                 flags: channel.channelFlags,
-                userflags: channel.getOnlyRegisteredUsersFlags(),
+                usersFlags: channel.getOnlyRegisteredUsersFlags(),
                 bannedUsers: channel.bannedUsers,
                 invitations: channel.getOnlyRegisteredUsersInvitations(),
                 pass: channel.pass,
@@ -53,7 +50,7 @@ class Redis {
         client.hmset(
             "users", user.id,
             JSON.stringify({
-                id: user._id,
+                id: user.id,
                 pass: user.pass,
                 flags: user.flags
             }));
@@ -77,14 +74,6 @@ class Redis {
         });
     }
 
-    static isFirstUser(callback) {
-        client.hgetall("users", (err, obj) => {
-            if (!obj) {
-                callback();
-            }
-        });
-    }
-
     static showDBRedis() {
         client.hgetall("users", (err, obj) => {
             console.log("----------------------------------------REDIS----------------------------------------");
@@ -94,27 +83,25 @@ class Redis {
                 for (let key2 in tmp) {
                     console.log("\t" + key2 + ":" + tmp[key2]);
                 }
+                console.log("\n");
             }
-            console.log("\n");
         });
         client.hgetall("channels", (err, obj) => {
             console.log("Channels :");
             for (let key in obj) {
                 let args = JSON.parse(obj[key]);
                 for (let key2 in args) {
-                    if(key2 == "userflags"){
+                    if(key2 == "usersFlags"){
                         console.log("\tUsers Flags :");
-                        console.log("\t" + key2 + ":" + args[key2]);
                         for(let k in args[key2]){
-                            console.log("\t\t"+k+"/"+args[key2][k]);
+                            console.log("\t\t"+k+":"+args[key2][k]);
                         }
                     }else{
                         console.log("\t" + key2 + ":" + args[key2]);
                     }
-
                 }
+                console.log("\n");
             }
-            console.log("-------------------------------------------------------------------------------------");
         });
     }
 
