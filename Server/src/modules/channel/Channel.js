@@ -41,7 +41,7 @@ class Channel {
         this._creator = creator.identity;
         this._invitations = [];
         this._name = name;
-        this._persistent = true;
+        this._persistent = false;
         this._topic = topic;
         this._files = {};
 
@@ -165,8 +165,9 @@ class Channel {
      * @returns {boolean}
      */
     isUserVoice(client) {
-        if (this._usersFlags[client.identity] && this._usersFlags[client.identity].indexOf('v') >= 0)
+        if (this._usersFlags[client.identity] && this._usersFlags[client.identity].indexOf('v') >= 0){
             return true;
+        }
         return false;
     }
 
@@ -410,7 +411,6 @@ class Channel {
             if (user.isAdmin() || user.isSuperAdmin() || user.identity === this._creator) {
                 this._addClientFlag(user, 'o')
             }
-
             this._mergeToRedis();
             user.addChannel(this);
             RPLSender.JOIN(user, this);
@@ -492,7 +492,12 @@ class Channel {
         for(let key in this._usersFlags){
             if(this._usersFlags.hasOwnProperty(key)){
                 let user = Client.getClient(key);
+                //if someone connected match with in usersFlags
                 if(user && user.isRegisteredWithPass()){
+                    registeredUsersFlags[key] = this._usersFlags[key];
+                }
+                //keep flags load in DB
+                else if(!user){
                     registeredUsersFlags[key] = this._usersFlags[key];
                 }
             }

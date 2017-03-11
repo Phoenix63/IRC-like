@@ -152,7 +152,7 @@ class Socket {
     close() {
         clearInterval(this._interval);
         if (this._client) {
-            this._client.del();
+            this._client.remove();
         }
         if (this._logger) {
             this._logger._CLIENT_DISCONNECTED();

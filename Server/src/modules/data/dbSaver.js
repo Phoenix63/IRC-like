@@ -15,16 +15,18 @@ module.exports = function(callback) {
     MongoClient.connect(url, (err, db) => {
         Redis.getUsers((users) => {
             if(users){
-                for(let i = 0; i<Object.keys(users).length; i++) {
-                    db.collection('users').findOneAndUpdate({identity: Object.keys(users)[i]}, {identity: Object.keys(users)[i], data:users[Object.keys(users)[i]]}, {upsert:true});
+                for(let key in users){
+                    if(!users.hasOwnProperty(key)) continue;
+                    db.collection('users').findOneAndUpdate({identity: key}, {identity: key, data:users[key]}, {upsert:true});
                 }
             }
             Trigger.update();
         });
         Redis.getChannels((chans) => {
             if(chans){
-                for(let k = 0; k<Object.keys(chans).length; k++) {
-                    db.collection('channels').findOneAndUpdate({name: Object.keys(chans)[k]}, {name: Object.keys(chans)[k], data:chans[Object.keys(chans)[k]]}, {upsert: true});
+                for(let key in chans){
+                    if(!chans.hasOwnProperty(key)) continue;
+                    db.collection('channels').findOneAndUpdate({name: key}, {name: key, data:chans[key]}, {upsert:true});
                 }
             }
             Trigger.update();

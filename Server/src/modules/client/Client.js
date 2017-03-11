@@ -38,6 +38,105 @@ class Client {
         clients.push(this);
     }
 
+    /**
+     * change identity of user if its valid
+     * @param {string} identity
+     * @param {string} realname
+     */
+    setIdentity(identity, realname) {
+        let error = false;
+        let regexIdentity = /^([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15})$/.exec(identity);
+
+        if (!regexIdentity || regexIdentity[1].indexOf('GUEST_') >= 0) {
+            ERRSender.ERR_NEEDMOREPARAMS(this, 'USER');
+            error = true;
+        }
+        if (this._identity) {
+            ERRSender.ERR_ALREADYREGISTRED(this);
+            error = true;
+        }
+        for (let i = 0; i < clients.length; i++) {
+            if ((this._pass && clients[i].identity === identity) || (!this._pass && clients[i].identity === 'GUEST_' + identity)) {
+                ERRSender.ERR_ALREADYREGISTRED(this);
+                error = true;
+            }
+        }
+        if (error) {
+            return;
+        }
+
+        if (this._pass) {
+            Redis.getUsers((users)=>{
+                if(!users){
+                    this._addFlag('O');
+                }else{
+                    if(users[identity]){
+                        let userFromMongo = JSON.parse(users[identity]);
+                        if (userFromMongo.pass != this._pass) {
+                            ERRSender.ERR_PASSWDMISMATCH(this);
+                            return
+                        }
+                        this._flags = userFromMongo.flags;
+                    }
+                }
+                this._socket.logger._CLIENT_LOGGED();
+                this._identity = identity;
+                this._registeredWithPass = true;
+                this._realname = realname;
+                this._mergeToRedis();
+                RPLSender.RPL_MOTDSTART(this.socket);
+                RPLSender.RPL_MOTD(this.socket);
+                RPLSender.RPL_ENDOFMOTD(this.socket);
+            })
+        } else {
+            this._registeredWithPass = false;
+            this._identity = 'GUEST_' + identity;
+            this._socket.logger._CLIENT_GUEST();
+            this._realname = realname;
+            this._mergeToRedis();
+            RPLSender.RPL_MOTDSTART(this.socket);
+            RPLSender.RPL_MOTD(this.socket);
+            RPLSender.RPL_ENDOFMOTD(this.socket);
+        }
+    }
+
+    /**
+     * set the user name
+     * @param {string} name
+     */
+    set name(name) {
+        let error = false;
+        if (name === null) {
+            this.socket.logger._USER_CHANGE_NICK('Guest_' + this._id);
+            RPLSender.NICK(this.name, 'Guest_' + this._id, this);
+            this._name = null;
+            error = true;
+        } else {
+            if (name[0] === ':') {
+                name = name.slice(1, name.length);
+            }
+            clients.forEach((c) => {
+                if (c.name === name) {
+                    if (!c.isRegisteredWithPass() && this.isRegisteredWithPass()) {
+                        c.name = null;
+                    } else {
+                        ERRSender.ERR_NICKNAMEINUSE(this);
+                        error = true;
+                    }
+                }
+            });
+            let match = name.match(/[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]+/);
+            if (!match || (match && match[0] !== name) || name === '' || name.length > 15) {
+                ERRSender.ERR_NONICKNAMEGIVEN(this);
+                error = true;
+            }
+            if (!error) {
+                this.socket.logger._USER_CHANGE_NICK(name);
+                RPLSender.NICK(this.name, name, this);
+                this._name = name;
+            }
+        }
+    }
 
     /**
      * get user socket or null if its not defined
@@ -49,24 +148,40 @@ class Client {
 
     /**
      *
-     * @param val
+     * @param {string} pass
      */
-    set pass(val) {
-        this._pass = crypto.createHash('sha256').update(val).digest('base64');
+    set pass(pass) {
+        this._pass = crypto.createHash('sha256').update(pass).digest('base64');
     }
 
+    /**
+     *
+     * @returns {string} pass
+     */
     get pass() {
         return this._pass;
     }
 
-    set away(val) {
-        this._away = val;
+    /**
+     *
+     * @param {boolean} away
+     */
+    set away(away) {
+        this._away = away;
     }
 
+    /**
+     *
+     * @returns {boolean} away
+     */
     get away() {
         return this._away;
     }
 
+    /**
+     *
+     * @returns {string} flags
+     */
     get flags() {
         return this._flags;
     }
@@ -138,108 +253,32 @@ class Client {
         return this._identity !== null;
     }
 
-    /**
-     * change identity of user if its valid
-     * @param {string} identity
-     * @param {string} realname
-     */
-    setIdentity(identity, realname) {
-        let error = false;
-        let regexIdentity = /^([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15})$/.exec(identity);
 
-        if (!regexIdentity || regexIdentity[1].indexOf('GUEST_') >= 0) {
-            ERRSender.ERR_NEEDMOREPARAMS(this, 'USER');
-            error = true;
-        }
-        if (this._identity) {
-            ERRSender.ERR_ALREADYREGISTRED(this);
-            error = true;
-        }
-        for (let i = 0; i < clients.length; i++) {
-            if ((this._pass && clients[i].identity === identity) || (!this._pass && clients[i].identity === 'GUEST_' + identity)) {
-                ERRSender.ERR_ALREADYREGISTRED(this);
-                error = true;
-            }
-        }
-        if (error) {
-            return;
-        }
 
-        if (this._pass) {
-            let userFromMongo = Redis.getUser(identity);
-            if (userFromMongo) {
-                if (userFromMongo.pass != this._pass) {
-                    ERRSender.ERR_PASSWDMISMATCH(this);
-                    return
-                }
-                this._flags = userFromMongo.flags;
-                this._socket.logger._CLIENT_LOGGED();
-            }
-            //if first user
-            Redis.getUsers((users)=>{
-                if(!users){
-                    this._addFlag('O');
-                }
-            });
-            this._identity = identity;
-            this._registeredWithPass = true;
-        } else {
-            this._registeredWithPass = false;
-            this._identity = 'GUEST_' + identity;
-            this._socket.logger._CLIENT_GUEST();
-        }
-        this._realname = realname;
-        this._mergeToRedis();
-        RPLSender.RPL_MOTDSTART(this.socket);
-        RPLSender.RPL_MOTD(this.socket);
-        RPLSender.RPL_ENDOFMOTD(this.socket);
-    }
-
-    /**
-     * set the user name
-     * @param {string} name
-     */
-    set name(name) {
-        let error = false;
-        if (name === null) {
-            this.socket.logger._USER_CHANGE_NICK('Guest_' + this._id);
-            RPLSender.NICK(this.name, 'Guest_' + this._id, this);
-            this._name = null;
-            error = true;
-        } else {
-            if (name[0] === ':') {
-                name = name.slice(1, name.length);
-            }
-            clients.forEach((c) => {
-                if (c.name === name) {
-                    if (!c.isRegisteredWithPass() && this.isRegisteredWithPass()) {
-                        c.name = null;
-                    } else {
-                        ERRSender.ERR_NICKNAMEINUSE(this);
-                        error = true;
-                    }
-                }
-            });
-            let match = name.match(/[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]+/);
-            if (!match || (match && match[0] !== name) || name === '' || name.length > 15) {
-                ERRSender.ERR_NONICKNAMEGIVEN(this);
-                error = true;
-            }
-            if (!error) {
-                this.socket.logger._USER_CHANGE_NICK(name);
-                RPLSender.NICK(this.name, name, this);
-                this._name = name;
-            }
-        }
-    }
-
-    del() {
+    remove() {
         for (let i = 0; i < this._channels.length; i++) {
             this._channels[i].removeUser(this, 'Quit', true);
         }
         RPLSender.QUIT(this, 'Gone');
         clients.splice(clients.indexOf(this), 1);
     };
+
+
+    /**
+     * remove channel from list
+     * @param {Channel} channel
+     */
+    removeChannel(channel) {
+        this._channels.splice(this._channels.indexOf(channel), 1);
+    }
+
+    /**
+     * add channel from list
+     * @param {Channel} channel
+     */
+    addChannel(channel) {
+        this._channels.push(channel);
+    }
 
     /**
      *
@@ -317,6 +356,10 @@ class Client {
         return this._flags.indexOf('o') >= 0;
     }
 
+    /**
+     *
+     * @returns {boolean}
+     */
     isInvisible() {
         return this._flags.indexOf('i') > -1;
     }
@@ -330,21 +373,14 @@ class Client {
     }
 
     /**
-     * remove channel from list
-     * @param {Channel} channel
+     * if the client is connected with pass, we save in redis its id, its pass and  its flags
+     * @private
      */
-    removeChannel(channel) {
-        this._channels.splice(this._channels.indexOf(channel), 1);
+    _mergeToRedis() {
+        if (this._registeredWithPass) {
+            Redis.setUser(this);
+        }
     }
-
-    /**
-     * add channel from list
-     * @param {Channel} channel
-     */
-    addChannel(channel) {
-        this._channels.push(channel);
-    }
-
 
     /**
      * find a client in user list
@@ -358,12 +394,6 @@ class Client {
             }
         }
         return null;
-    }
-
-    _mergeToRedis() {
-        if (this._registeredWithPass) {
-            Redis.setUser(this);
-        }
     }
 
     /**

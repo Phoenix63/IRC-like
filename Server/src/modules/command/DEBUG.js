@@ -13,7 +13,39 @@ module.exports = function (socket, command) {
     }
     //view redis
     if(command[1].indexOf("--vr") > -1){
-        Redis.showDBRedis();
+        Redis.getUsers((users)=>{
+            console.log("----------------------------------------REDIS----------------------------------------");
+            console.log("USERS :");
+            for (let key in users) {
+                if(!users.hasOwnProperty(key)) continue;
+                let tmp = JSON.parse(users[key]);
+                for (let key2 in tmp) {
+                    if(!tmp.hasOwnProperty(key2)) continue;
+                    console.log("\t" + key2 + ":" + tmp[key2]);
+                }
+                console.log("\n");
+            }
+        });
+        Redis.getChannels((channels)=>{
+            console.log("Channels :");
+            for (let key in channels) {
+                if(!channels.hasOwnProperty(key)) continue;
+                let tmp = JSON.parse(channels[key]);
+                for (let key2 in tmp) {
+                    if(!tmp.hasOwnProperty(key2)) continue;
+                    if(key2 == "usersFlags"){
+                        console.log("\tUsers Flags : ");
+                        for(let k in (tmp[key2])){
+                            if(!tmp[key2].hasOwnProperty(k)) continue;
+                            console.log("\t\t"+k+":"+tmp[key2][k]);
+                        }
+                    }else{
+                        console.log("\t" + key2 + ":" + tmp[key2]);
+                    }
+                }
+                console.log("\n");
+            }
+        });
     }
     //view mongo
     if(command[1].indexOf("--vm") > -1){
@@ -24,6 +56,7 @@ module.exports = function (socket, command) {
                 us.forEach((user) => {
                     let obj = JSON.parse(user.data);
                     for(let key in obj){
+                        if(!obj.hasOwnProperty(key)) continue;
                         console.log("\t"+key+":"+obj[key]);
                     }
                     console.log("\n");
@@ -34,9 +67,11 @@ module.exports = function (socket, command) {
                 ch.forEach((channel) => {
                     let obj = JSON.parse(channel.data);
                     for(let key in obj){
+                        if(!obj.hasOwnProperty(key)) continue;
                         if(key == "usersFlags"){
                             console.log("\tUsers Flags :");
                             for(let k in obj[key]){
+                                if(!obj[key].hasOwnProperty(k)) continue;
                                 console.log("\t\t"+k+":"+obj[key][k]);
                             }
                         }else{

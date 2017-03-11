@@ -62,49 +62,6 @@ class Redis {
         });
     }
 
-    static getUser(id) {
-        client.hgetall("users", (err, obj) => {
-            if (err) {
-            } else {
-                if (obj && obj[id]) {
-                    return JSON.parse(obj[i]);
-                }
-            }
-            return null;
-        });
-    }
-
-    static showDBRedis() {
-        client.hgetall("users", (err, obj) => {
-            console.log("----------------------------------------REDIS----------------------------------------");
-            console.log("USERS :");
-            for (let key in obj) {
-                let tmp = JSON.parse(obj[key]);
-                for (let key2 in tmp) {
-                    console.log("\t" + key2 + ":" + tmp[key2]);
-                }
-                console.log("\n");
-            }
-        });
-        client.hgetall("channels", (err, obj) => {
-            console.log("Channels :");
-            for (let key in obj) {
-                let args = JSON.parse(obj[key]);
-                for (let key2 in args) {
-                    if(key2 == "usersFlags"){
-                        console.log("\tUsers Flags :");
-                        for(let k in args[key2]){
-                            console.log("\t\t"+k+":"+args[key2][k]);
-                        }
-                    }else{
-                        console.log("\t" + key2 + ":" + args[key2]);
-                    }
-                }
-                console.log("\n");
-            }
-        });
-    }
-
     static quit() {
         Redis.flush();
         client.quit();
