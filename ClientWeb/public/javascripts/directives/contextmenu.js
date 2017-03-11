@@ -3,7 +3,7 @@ myApp.directive('ngContextMenu', function ($parse) {
     var buildMenuItem = function($, $scope, list, item) {
       var $li = $('<li>');
             $a = $('<a>');
-            $a.attr({ tabindex: '-1', href: '#' });
+            $a.attr({ tabindex: '-1', cursor:  'pointer'});
             $a.text(item[0]);
             $li.append($a);
             $li.on('click', function () {

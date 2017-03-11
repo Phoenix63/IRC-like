@@ -23,7 +23,7 @@
         </div>
     </div>
 	
-    <input type="file" id="fileToSend" onchange = "selectedPhoto()"></input>
+    <input type="file" id="fileToSend" ng-model="image" onchange="angular.element(this).scope().uploadImage(this.files)"></input>
 	<form ng-submit="sendMessage()">
 		<div id="divSendMessage">
 			<input id="inputSendMessage" ng-model="newMessage" placeholder="message"></input>
