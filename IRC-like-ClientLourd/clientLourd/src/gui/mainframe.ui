@@ -14,7 +14,7 @@
    <enum>Qt::ClickFocus</enum>
   </property>
   <property name="contextMenuPolicy">
-   <enum>Qt::NoContextMenu</enum>
+   <enum>Qt::PreventContextMenu</enum>
   </property>
   <property name="windowTitle">
    <string>MainFrame</string>
@@ -78,6 +78,9 @@
       </item>
       <item>
        <widget class="QScrollArea" name="scrollArea">
+        <property name="contextMenuPolicy">
+         <enum>Qt::DefaultContextMenu</enum>
+        </property>
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>

@@ -49,41 +49,56 @@ MainFrame::MainFrame(QWidget *parent, QTcpSocket *socket, QString host) :
 
 
     /********************************* Right Click ************************************/
-    QLabel label;
-    QGraphicsTextItem txt;
-
-
-    txt.setTextInteractionFlags(Qt::TextSelectableByMouse);
-    label.setTextInteractionFlags(Qt::TextSelectableByMouse);
     m_pContextMenu = new QMenu(this);
 
-    setContextMenuPolicy(Qt::CustomContextMenu);
 
+    setContextMenuPolicy(Qt::CustomContextMenu);
     connect(this,SIGNAL(customContextMenuRequested(const QPoint)),this,
               SLOT(contextMenuRequested(const QPoint&)));
 
 
     //actions definitions :
-    m_pCopy = m_pContextMenu->addAction("Copier");
-
-    m_pSendFile = m_pContextMenu->addAction("Envoi Fichier ...");
-    //m_pBanUser = m_pContextMenu->addAction("bannir");
-    m_pLogout = m_pContextMenu->addAction("Se déconnecter");
+     /* **************   ChatBox  *********************/
+    if(ui->chatBox->layout() && ui->nickBox->layout()){
 
 
 
 
 
+        m_pCopy = m_pContextMenu->addAction("Copier");
+        m_pRefresh = m_pContextMenu->addAction("Rafraîchir");
+        m_pClean = m_pContextMenu->addAction("Nettoyer écran");
+        m_pSendFile = m_pContextMenu->addAction("Envoi Fichier ...");
+        m_pClose = m_pContextMenu->addAction("Fermer");
+        m_pLogout = m_pContextMenu->addAction("Se déconnecter");
 
-
-    //user
+    //SIGNALS SLOTS
     connect(m_pCopy,SIGNAL(triggered()),this,SLOT(copy()));
     connect(m_pSendFile,SIGNAL(triggered()),this,SLOT(on_pushButton_upload_clicked()));
+    //connect(m_pRefresh,SIGNAL(triggered()),this,SLOT(on_actionDisconnect_triggered()));
+    connect(m_pClean,SIGNAL(triggered()),this,SLOT(needClean()));
+    connect(m_pClose,SIGNAL(triggered()),this,SLOT(closeEvent(QCloseEvent *event)));
 
+    connect(m_pLogout,SIGNAL(triggered()),this,SLOT(on_actionDisconnect_triggered()));
+    }
+    /*****************  UserList *********************/
+
+    if (ui->userList->layout()){
+
+
+
+
+        m_pWhisper = m_pContextMenu->addAction("Message Privé");
+        //m_pBanUser = m_pContextMenu->addAction("Bannir");
+        m_pKickUser = m_pContextMenu->addAction("Faire quitter");
+
+    //connect(m_pBanUser,SIGNAL(triggered()),this,SLOT(on_userList_doubleClicked(QModelIndex));
+    connect(m_pWhisper,SIGNAL(triggered()),this,SLOT(on_userList_doubleClicked(const QModelIndex &index)));
+
+    }
+    /*****************  ChanList *********************/
 
     //channel
-    connect(m_pLogout,SIGNAL(triggered()),this,SLOT(on_actionDisconnect_triggered()));
-
 
 
 }
@@ -103,6 +118,8 @@ void MainFrame::printMsgLine(Message chatMsgLine)
 {
     QHBoxLayout *pseudoBox = new QHBoxLayout;
     QHBoxLayout *chatLine = new QHBoxLayout;
+
+
     pseudoBox->setSpacing(2);
     chatLine->setSpacing(2);
 
@@ -121,10 +138,14 @@ void MainFrame::printMsgLine(Message chatMsgLine)
     pseudoBox->addWidget(lPseudo);
     ui->nickBox->addLayout(pseudoBox);
     QLabel *lMessage = new QLabel(chatMsgLine.message());
+    /********* right click *********/
+    lMessage->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    /********* right click ********/
     lMessage->setFixedHeight(20);
     chatLine->addWidget(lMessage);
     chatLine->addStretch(0);
     ui->chatBox->addLayout(chatLine);
+
 }
 
 void MainFrame::PrintMsg(QList<Message> chatMsgList)
@@ -530,4 +551,17 @@ qDebug() << "Leave";
 return QWidget::event(e);
 }
 
+/*//whisper
+void MainFrame::whisper()
+{
+    MainFrame::on_userList_doubleClicked;
+    /*QModelIndex index;
+    return on_userList_doubleClicked();
+}
+//close
+void MainFrame::close()
+{
+    return MainFrame::closeEvent(QCloseEvent *event);
+}
 
+*/

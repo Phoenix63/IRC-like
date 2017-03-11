@@ -19,8 +19,6 @@
 
 
 
-
-
 class QCompleter;
 class QTcpSocket;
 
@@ -117,6 +115,7 @@ private slots :
     void contextMenuRequested(const QPoint &point)
     {
         m_pContextMenu->popup(mapToGlobal(point));
+
     }
 
     void paste();
@@ -124,23 +123,30 @@ private slots :
     void copy();
     //void keyPressEvent(QKeyEvent * event);
     //void banUser();
+    //void whisper();
+    //void clean();
+    //void closeEvent();
 
 private:
     QMenu* m_pContextMenu;
 
 
 
+
     //Actions
     QAction* m_pCopy;
-    //QAction* m_pPaste;
-    QAction* m_pSendFile;
     //QAction* m_pBanUser;
+    QAction* m_pRefresh;
+    QAction* m_pClean;
+    QAction* m_pSendFile;
+    QAction* m_pWhisper;
+    QAction* m_pKickUser;
+    QAction* m_pClose;
     QAction* m_pLogout;
 
 
 protected:
-bool event(QEvent* e) override;
-
+    bool event(QEvent* e) override;
 
 
 };
