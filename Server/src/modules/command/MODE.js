@@ -10,7 +10,7 @@ module.exports = function (socket, command) {
         ERRSender.ERR_NOTREGISTERED(socket.client, 'MODE');
         return;
     }
-    let channelModeRegex = /^(#[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15}) ([+|-])([opsitnmlbvk]{1,11})(?: ([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15})$|$)/.exec(command[1]);
+    let channelModeRegex = /^(#[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15}) ([+|-])([opsitnmlbvk]{1,11})(?: ([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15})(?: ([0-9]{1,9})$|$)|$)/.exec(command[1]);
     let userModeRegex = /^([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15}) ([+|-])([iswo]{1,11})$/.exec(command[1]);
 
     if (channelModeRegex) {
@@ -19,6 +19,7 @@ module.exports = function (socket, command) {
         let flags = channelModeRegex[3];
         //arg4 can be nickame or channel limit or channel key
         let arg4 = channelModeRegex[4];
+        let banishmentTime = channelModeRegex[5];
         let channel = Channel.getChannelByName(nameChannel);
         let user;
         let operator;
@@ -27,7 +28,7 @@ module.exports = function (socket, command) {
             ERRSender.ERR_NOSUCHCHANNEL(socket.client, nameChannel);
             return;
         }
-        operator = channel.getUser(socket.client.id);
+        operator = channel.getUser(socket.client.identity);
         if (!operator) {
             ERRSender.ERR_NOTONCHANNEL(socket.client, channel);
             return;
@@ -36,7 +37,27 @@ module.exports = function (socket, command) {
             ERRSender.ERR_CHANOPRIVSNEEDED(socket.client, nameChannel);
             return;
         }
-        if (arg4 && flags.indexOf('k') === -1 && flags.indexOf('l') === -1) {
+        if(arg4 && flags.indexOf('b')>-1){
+            let userBanned = Client.getClient(arg4);
+            if (!userBanned) {
+                ERRSender.ERR_NOSUCHNICK(socket.client, arg4);
+                return;
+            }
+            if(sign === '+' && banishmentTime){
+                if(!channel.getUser(arg4)){
+                    ERRSender.ERR_USERNOTINCHANNEL(socket.client, arg4, channel.name);
+                }
+                if(userBanned.isAdmin() || userBanned.isSuperAdmin() || channel.isUserOperator(userBanned)){
+                    ERRSender.ERR_USERSDONTMATCH(socket.client);
+                    return;
+                }
+                channel.ban(userBanned, banishmentTime);
+            }else if(sign === '-'){
+                channel.unban(userBanned);
+            }
+        }
+
+        if (arg4 && (flags.indexOf('o') >-1 || flags.indexOf('v') > -1)) {
             user = channel.getUser(arg4);
             if (!user) {
                 ERRSender.ERR_USERNOTINCHANNEL(socket.client, arg4, channel.name);
@@ -115,6 +136,7 @@ module.exports = function (socket, command) {
         let user = Client.getClient(nameUser);
         if (!user) {
             ERRSender.ERR_NOSUCHNICK(socket.client, nameUser);
+            return;
         }
         if (user === socket.client) {
             if (flags.indexOf('i') > -1) {

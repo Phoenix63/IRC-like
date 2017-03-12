@@ -253,8 +253,6 @@ class Client {
         return this._identity !== null;
     }
 
-
-
     remove() {
         for (let i = 0; i < this._channels.length; i++) {
             this._channels[i].removeUser(this, 'Quit', true);
@@ -377,19 +375,19 @@ class Client {
      * @private
      */
     _mergeToRedis() {
-        if (this._registeredWithPass) {
+        if (this._registeredWithPass && this._identity) {
             Redis.setUser(this);
         }
     }
 
     /**
-     * find a client in user list
-     * @param {string} id
+     *
+     * @param {number|string|Client} id -> identifiant|nickname|client
      * @returns {null|Client}
      */
     static getClient(id) {
         for (let key in clients) {
-            if (key === id || clients[key].name === id || clients[key].id === id) {
+            if (key === id || clients[key].name === id || clients[key].identity === id) {
                 return clients[key];
             }
         }

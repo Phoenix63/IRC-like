@@ -24,7 +24,7 @@ process.on('SIGINT', () => {
     });
     setTimeout(()=>{
         process.exit();
-    },3000)
+    },1000)
 });
 //catches uncaught exceptions
 if(process.argv[2] === 'PROD'){

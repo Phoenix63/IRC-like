@@ -28,8 +28,7 @@ class Redis {
                 creator: channel.creator,
                 flags: channel.channelFlags,
                 usersFlags: channel.getOnlyRegisteredUsersFlags(),
-                bannedUsers: channel.bannedUsers,
-                invitations: channel.getOnlyRegisteredUsersInvitations(),
+                bannedIP: channel.bannedIP,
                 pass: channel.pass,
                 size: channel.size,
                 topic: (channel.topic || '')
@@ -48,9 +47,9 @@ class Redis {
 
     static setUser(user) {
         client.hmset(
-            "users", user.id,
+            "users", user.identity,
             JSON.stringify({
-                id: user.id,
+                identity: user.identity,
                 pass: user.pass,
                 flags: user.flags
             }));

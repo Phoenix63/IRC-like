@@ -29,8 +29,7 @@ module.exports = function (callback) {
                 let chan = new Channel({identity: obj.creator}, obj.name, obj.pass, parseInt(obj.size), obj.topic);
                 chan.usersFlags = obj.usersFlags;
                 chan.flags = obj.flags;
-                chan.bannedUsers = obj.bannedUsers;
-                chan.invitations = obj.invitations;
+                chan.bannedIP = obj.bannedIP;
             });
             Trigger.update();
         });

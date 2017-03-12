@@ -162,11 +162,15 @@ class Socket {
     }
 
     closeTheSockets() {/*
-        if (this.isTcp) {
-            this._socket.
-        } else {
-            this._socket.emit('message', data);
-        }*/
+     if (this.isTcp) {
+     this._socket.
+     } else {
+     this._socket.emit('message', data);
+     }*/
+    }
+
+    get ip() {
+        return this.isTcp ? this._socket.remoteAddress:this._socket.handshake.address;
     }
 
 

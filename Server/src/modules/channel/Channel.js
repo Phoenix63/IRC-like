@@ -33,10 +33,9 @@ class Channel {
          */
         this._flags = '';
         this._usersFlags = {};
-
         this._pass = pass || '';
         this._size = size;
-        this._bannedUsers = [];
+        this._bannedIP = {};//key = ip, value = endTimeOfBan(ms)
         this._users = [];
         this._creator = creator.identity;
         this._invitations = [];
@@ -91,12 +90,12 @@ class Channel {
 
     /**
      *
-     * @param id|nickname|client
+     * @param {number|string|Client} id -> identifiant|nickname|client
      * @returns {null|Client}
      */
     getUser(id) {
         for (let j = 0; j < this._users.length; j++) {
-            if (this._users[j] === id || this._users[j].id === id || this._users[j].name === id) {
+            if (this._users[j] === id || this._users[j].identity === id || this._users[j].name === id) {
                 return this._users[j];
             }
         }
@@ -165,10 +164,7 @@ class Channel {
      * @returns {boolean}
      */
     isUserVoice(client) {
-        if (this._usersFlags[client.identity] && this._usersFlags[client.identity].indexOf('v') >= 0){
-            return true;
-        }
-        return false;
+        return this._usersFlags[client.identity].indexOf('v') >= 0;
     }
 
     /**
@@ -187,8 +183,21 @@ class Channel {
         return this._flags;
     }
 
-    get bannedUsers() {
-        return this._bannedUsers;
+    /**
+     *
+     * @returns {{}}
+     */
+    get bannedIP() {
+        return this._bannedIP;
+    }
+
+    /**
+     *
+     * @param {{}} bannedIP
+     */
+    set bannedIP(bannedIP) {
+        this._bannedIP = bannedIP;
+        this._mergeToRedis();
     }
 
     /**
@@ -204,6 +213,10 @@ class Channel {
         }
     }
 
+    /**
+     *if the channel is persistent, ie if it is created by an administrator, we save in redis
+     * @private
+     */
     _mergeToRedis() {
         if (this._persistent) {
             Redis.setChannel(this);
@@ -251,6 +264,7 @@ class Channel {
     /**
      * @param {Client} client
      * @param {string} flags
+     * @private
      */
     _addClientFlag(client, flags) {
         let arrayFlags = flags.split('');
@@ -284,6 +298,7 @@ class Channel {
     /**
      *
      * @param {String} flags
+     * @private
      */
     _addChannelFlag(flags) {
         let arrayFlags = flags.split('');
@@ -299,6 +314,7 @@ class Channel {
     /**
      *
      * @param {String} flags
+     * @private
      */
     _removeChannelFlag(flags) {
         let arrayFlags = flags.split('');
@@ -339,9 +355,8 @@ class Channel {
         }
     }
 
-
     /**
-     * return true if the clinet is operator
+     *
      * @param {Client} client
      * @returns {boolean}
      */
@@ -354,22 +369,24 @@ class Channel {
         return false;
     }
 
-    set usersFlags(flags){
+    /**
+     *
+     * @param {{}} flags
+     */
+    set usersFlags(flags) {
         this._usersFlags = flags;
         this._mergeToRedis();
     }
-    set flags(flags){
+
+    /**
+     *
+     * @param {string} flags
+     */
+    set flags(flags) {
         this._flags = flags;
         this._mergeToRedis();
     }
-    set invitations(invitations){
-        this._invitations = invitations;
-        this._mergeToRedis();
-    }
-    set bannedUsers(bannedUsers){
-        this._bannedUsers = bannedUsers;
-        this._mergeToRedis();
-    }
+
 
     /**
      * add user to the channel
@@ -377,11 +394,11 @@ class Channel {
      * @param {string} key
      */
     addUser(user, key = '') {
-        if (this._bannedUsers.indexOf(user) >= 0) {
+        if (this._isBan(user)) {
             ERRSender.ERR_BANNEDFROMCHAN(user, this);
             return;
         }
-        if (this.isInvitation && this._invitations.indexOf(user) === -1) {
+        if (this.isInvitation && this._invitations.indexOf(user.identity) === -1) {
             ERRSender.ERR_INVITEONLYCHAN(user, this);
             return;
         }
@@ -476,37 +493,78 @@ class Channel {
     /**
      *
      * @param {Socket} socket
-     * @param {Client} client
+     * @param {Client} guest
      */
-    invite(socket, client) {
-        if (this._invitations.indexOf(client) === -1) {
-            this._invitations.push(client);
-            RPLSender.RPL_SERVER_ACCEPT_THE_INVITATION(socket, client, this);
-            RPLSender.RPL_YOU_HAVE_BEEN_INVITED(socket, client, this);
+    invite(socket, guest) {
+        if (this._invitations.indexOf(guest.identity) === -1) {
+            this._invitations.push(guest.identity);
+            RPLSender.RPL_SERVER_ACCEPT_THE_INVITATION(socket, guest, this);
+            RPLSender.RPL_YOU_HAVE_BEEN_INVITED(socket, guest, this);
             this._mergeToRedis();
         }
     }
 
-    getOnlyRegisteredUsersFlags(){
+    /**
+     *
+     * @param {Client} userBanned
+     * @param {number} banishmentTime
+     */
+    ban(userBanned, banishmentTime) {
+        let banDuration = parseInt(banishmentTime) * 1000;//millisecond
+        let endTimeOfBan = Date.now() + banDuration;
+        this._bannedIP[userBanned.socket.ip] = endTimeOfBan;
+        this._mergeToRedis();
+        RPLSender.RPL_CHANNELMODEIS(this, this.name + " +b " + userBanned.name + " " + banishmentTime);
+        this.removeUser(userBanned);
+    }
+
+    /**
+     *
+     * @param {Client} userBanned
+     */
+    unban(userBanned) {
+        if (this._bannedIP[userBanned.socket.ip]) {
+            RPLSender.RPL_CHANNELMODEIS(this, this.name + " -b " + userBanned.name);
+            this._mergeToRedis();
+            delete this._bannedIP[userBanned.socket.ip];
+        }
+    }
+
+    /**
+     *
+     * @param {Client} user
+     * @returns {boolean}
+     * @private
+     */
+    _isBan(user) {
+        if (this._bannedIP[user.socket.ip] > Date.now()) {
+            return true;
+        } else {
+            delete this._bannedIP[user.socket.ip];
+            return false;
+        }
+    }
+
+    /**
+     *return flags only from registered users
+     * @returns {{}} registeredUsersFlags
+     */
+    getOnlyRegisteredUsersFlags() {
         let registeredUsersFlags = {};
-        for(let key in this._usersFlags){
-            if(this._usersFlags.hasOwnProperty(key)){
+        for (let key in this._usersFlags) {
+            if (this._usersFlags.hasOwnProperty(key)) {
                 let user = Client.getClient(key);
                 //if someone connected match with in usersFlags
-                if(user && user.isRegisteredWithPass()){
+                if (user && user.isRegisteredWithPass()) {
                     registeredUsersFlags[key] = this._usersFlags[key];
                 }
                 //keep flags load in DB
-                else if(!user){
+                else if (!user) {
                     registeredUsersFlags[key] = this._usersFlags[key];
                 }
             }
         }
         return registeredUsersFlags;
-    }
-
-    getOnlyRegisteredUsersInvitations(){
-
     }
 
     /**
@@ -529,7 +587,6 @@ class Channel {
     static list() {
         return channels;
     }
-
 }
 
 export default Channel;
