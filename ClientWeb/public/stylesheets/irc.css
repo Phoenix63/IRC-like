@@ -140,6 +140,11 @@ h3::after {
 	z-index:100000;
 }
 
+.previewImage {
+	width:50px;
+	height:40px;
+}
+
 .notif-messageOn {
 	color:red;
 }
