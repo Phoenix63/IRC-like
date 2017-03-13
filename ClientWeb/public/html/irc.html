@@ -13,7 +13,7 @@
         </div>
     </div>
     <div id="messages" scroll-bottom="currentChannel.messages">
-        <h3>{{topicChannel}}</h3>
+        <h3><span><img id="fleche" src="images/fleche.png"></span> {{topicChannel}}</h3>
         <div ng-repeat="message in currentChannel.messages track by $index" ng-bind-html="message[0].right === 5 ? (message[2] | insertHtml) : message">
             <div class="messInBox">
 				<p class="users" ng-class="message[0].right === 3 ? 'admin-color' : (message[0].right === 1 ? 'operator-color' : ( message[0].right === 2 ? 'user-color' : 'default-color'))">{{message[0].nick}}</p>
@@ -24,9 +24,14 @@
     </div>
 	
     <input type="file" id="fileToSend" ng-model="image" onchange="angular.element(this).scope().uploadImage(this.files)"></input>
-	<form ng-submit="sendMessage()">
+	<form id="test" ng-submit="sendMessage()">
+		<div id="div_emoji">
+                <img class="bouton_emoji" src="img/joie.png">
+        </div>
 		<div id="divSendMessage">
-			<input id="inputSendMessage" ng-model="newMessage" placeholder="message"></input>
+			<input id="inputSendMessage" ng-model="newMessage" placeholder="Entrez votre message"></input>
+        </div>
+        <div id="divSubmit">
 			<button type="submit" id="submitSendMessage">Envoyer</button>
 		</div>
 	</form>
@@ -45,6 +50,8 @@
             </div>
         </form>
     </div>
+	
     
     <div id="masque"></div>
+	
 </div>

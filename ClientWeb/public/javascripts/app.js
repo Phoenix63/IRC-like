@@ -38,7 +38,7 @@ myApp.factory("userInfo", function() {
       "setRight": function(newRight) {
         this.right = newRight;
       },
-      "server": "http://tehroux.fr",
+      "server": "http://crismos.fr",
       "port": 8089,
       "socket": "",
       "setNick": function(newUserNick) {
