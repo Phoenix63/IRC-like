@@ -10,7 +10,7 @@ module.exports = function (socket, command) {
     }
 
     let message = command[1].split(' ')[1];
-    if(message && message[0] === ':') {
+    if (message && message[0] === ':') {
         message = message.slice(1, message.length);
     } else {
         message = 'Gone';
@@ -21,7 +21,7 @@ module.exports = function (socket, command) {
     Channel.list().forEach((chan) => {
         if (channels.indexOf(chan.name) >= 0) {
             chan.removeUser(socket.client, message);
-            channels.splice(channels.indexOf(chan.name),1);
+            channels.splice(channels.indexOf(chan.name), 1);
         }
     });
     channels.forEach((errname) => {

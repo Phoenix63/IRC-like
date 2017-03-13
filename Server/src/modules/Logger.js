@@ -4,7 +4,6 @@ import Client from './client/Client';
 import colors from 'colors';
 
 
-
 function throwError(client, message) {
     if (client && client.socket && client.socket.emit)
         client.socket.emit('end');
@@ -12,8 +11,8 @@ function throwError(client, message) {
 }
 
 function log(txt) {
-    if(process.env.parent === 'DEV') {
-        process.stdout.write(txt.replace('\n','')+'\n');
+    if (process.env.parent === 'DEV') {
+        process.stdout.write(txt.replace('\n', '') + '\n');
     }
 }
 
@@ -50,26 +49,26 @@ class Logger {
     };
 
     _SEND_TO_CLIENT(message) {
-        log(colors.grey('[to] ') + colors.green(this.client.name) + '<< ' + message+'\n');
+        log(colors.grey('[to] ') + colors.green(this.client.name) + '<< ' + message + '\n');
     };
 
     _USER_SEND_CMD(message) {
-        if(message.indexOf('PASS ')===0) {
+        if (message.indexOf('PASS ') === 0) {
             message = 'PASS ********';
         }
         log(colors.grey('[from] ') + colors.red(this.client.name) + '>> ' + message);
     };
 
     _CLIENT_LOGGED() {
-        log(colors.yellow(this.client.name + ' is now logged as '+this.client.identity));
+        log(colors.yellow(this.client.name + ' is now logged as ' + this.client.identity));
     };
 
     _CLIENT_GUEST() {
-        log(colors.yellow(this.client.name + ' is a guest: '+this.client.identity));
+        log(colors.yellow(this.client.name + ' is a guest: ' + this.client.identity));
     }
 
     _CLIENT_IS_NOW_ADMIN() {
-        log(colors.yellow(this.client.identity+' is now ')+colors.red('ADMIN'));
+        log(colors.yellow(this.client.identity + ' is now ') + colors.red('ADMIN'));
     }
 
 }

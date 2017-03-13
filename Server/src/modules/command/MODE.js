@@ -37,27 +37,27 @@ module.exports = function (socket, command) {
             ERRSender.ERR_CHANOPRIVSNEEDED(socket.client, nameChannel);
             return;
         }
-        if(arg4 && flags.indexOf('b')>-1){
+        if (arg4 && flags.indexOf('b') > -1) {
             let userBanned = Client.getClient(arg4);
             if (!userBanned) {
                 ERRSender.ERR_NOSUCHNICK(socket.client, arg4);
                 return;
             }
-            if(sign === '+' && banishmentTime){
-                if(!channel.getUser(arg4)){
+            if (sign === '+' && banishmentTime) {
+                if (!channel.getUser(arg4)) {
                     ERRSender.ERR_USERNOTINCHANNEL(socket.client, arg4, channel.name);
                 }
-                if(userBanned.isAdmin() || userBanned.isSuperAdmin() || channel.isUserOperator(userBanned)){
+                if (userBanned.isAdmin() || userBanned.isSuperAdmin() || channel.isUserOperator(userBanned)) {
                     ERRSender.ERR_USERSDONTMATCH(socket.client);
                     return;
                 }
                 channel.ban(userBanned, banishmentTime);
-            }else if(sign === '-'){
+            } else if (sign === '-') {
                 channel.unban(userBanned);
             }
         }
 
-        if (arg4 && (flags.indexOf('o') >-1 || flags.indexOf('v') > -1)) {
+        if (arg4 && (flags.indexOf('o') > -1 || flags.indexOf('v') > -1)) {
             user = channel.getUser(arg4);
             if (!user) {
                 ERRSender.ERR_USERNOTINCHANNEL(socket.client, arg4, channel.name);
@@ -153,8 +153,8 @@ module.exports = function (socket, command) {
             }
         } else if (user != socket.client) {
             /*Possibility of change*/
-            if(!user.isRegisteredWithPass()){
-                ERRSender.ERR_NOTREGISTERED(socket.client,"MODE");
+            if (!user.isRegisteredWithPass()) {
+                ERRSender.ERR_NOTREGISTERED(socket.client, "MODE");
                 return;
             }
             if (socket.client.isSuperAdmin()) {

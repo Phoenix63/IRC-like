@@ -27,15 +27,15 @@ class Socket {
         this._onSignal = {};
 
         this._life = 1;
-        if(interval>0) {
+        if (interval > 0) {
             this._interval = setInterval(() => {
-                if(this._life <= 0) {
+                if (this._life <= 0) {
                     this._socket.destroy();
-                }  else {
+                } else {
                     this._life--;
-                    this.send(':'+config.ip+' PING :'+shortid.generate());
+                    this.send(':' + config.ip + ' PING :' + shortid.generate());
                 }
-            }, interval/2);
+            }, interval / 2);
         }
 
     }
@@ -170,7 +170,7 @@ class Socket {
     }
 
     get ip() {
-        return this.isTcp ? this._socket.remoteAddress:this._socket.handshake.address;
+        return this.isTcp ? this._socket.remoteAddress : this._socket.handshake.address;
     }
 
 

@@ -9,6 +9,7 @@ class Trigger {
             callback();
         }
     }
+
     static setCallback(cb) {
         callback = cb;
     }

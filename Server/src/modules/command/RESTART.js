@@ -11,7 +11,7 @@ module.exports = function (socket, command) {
         return;
     }
 
-    if(!socket.client.isAdmin()) {
+    if (!socket.client.isAdmin()) {
         ERRSender.ERR_NOPRIVILEGES(socket.client);
         return;
     }

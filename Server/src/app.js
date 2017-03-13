@@ -22,14 +22,14 @@ process.on('SIGINT', () => {
         console.log('Quit redis');
         Redis.quit();
     });
-    setTimeout(()=>{
+    setTimeout(() => {
         process.exit();
-    },1000)
+    }, 1000)
 });
 //catches uncaught exceptions
-if(process.argv[2] === 'PROD'){
+if (process.argv[2] === 'PROD') {
     process.on('uncaughtException', (err) => {
-        if(err){
+        if (err) {
             console.log(colors.red(err.stack));
         }
     });

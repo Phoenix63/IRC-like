@@ -5,16 +5,16 @@ import Trigger from './Trigger';
 let MongoClient = require('mongodb').MongoClient;
 let url;
 //For unitTest we use an other DB and we drop it before starting
-if(process.argv[2] === 'TEST'){
+if (process.argv[2] === 'TEST') {
     url = 'mongodb://' + config.mongo.host + ':' + config.mongo.port + '/' + config.mongo.dbtest;
-}else{
+} else {
     url = 'mongodb://' + config.mongo.host + ':' + config.mongo.port + '/' + config.mongo.db;
 }
 
 module.exports = function (callback) {
     Trigger.setCallback(callback);
     MongoClient.connect(url, (err, db) => {
-        if(process.argv[2] === 'TEST'){
+        if (process.argv[2] === 'TEST') {
             db.dropDatabase();
         }
         db.collection('users').find().toArray((err, us) => {

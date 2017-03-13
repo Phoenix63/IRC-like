@@ -13,10 +13,10 @@ module.exports = function (socket, command) {
     let cmd = command[1].split(' ');
     let name = cmd[0];
     let realname = cmd.splice(3, cmd.length).join(' ');
-    if(realname[0] !== ':' || realname.length<2) {
+    if (realname[0] !== ':' || realname.length < 2) {
         realname = null;
     } else {
-        realname = realname.slice(1,realname.length);
+        realname = realname.slice(1, realname.length);
     }
 
     if (!name || !realname) {

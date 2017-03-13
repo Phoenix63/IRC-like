@@ -12,7 +12,7 @@ function createServer(callback) {
             socket.disconnect();
         };
         socket.on('message', (msg) => {
-            if(socket.manager._mode === 'file') {
+            if (socket.manager._mode === 'file') {
                 socket.manager.emit('data', msg);
             } else {
                 if (!(msg.length > 510)) {

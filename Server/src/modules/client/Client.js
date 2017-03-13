@@ -66,11 +66,11 @@ class Client {
         }
 
         if (this._pass) {
-            Redis.getUsers((users)=>{
-                if(!users){
+            Redis.getUsers((users) => {
+                if (!users) {
                     this._addFlag('O');
-                }else{
-                    if(users[identity]){
+                } else {
+                    if (users[identity]) {
                         let userFromMongo = JSON.parse(users[identity]);
                         if (userFromMongo.pass != this._pass) {
                             ERRSender.ERR_PASSWDMISMATCH(this);

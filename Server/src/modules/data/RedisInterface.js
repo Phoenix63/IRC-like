@@ -13,7 +13,7 @@ class Redis {
 
     static flush() {
         client.flushdb(function (err, succeeded) {
-            if(err){
+            if (err) {
                 throw err;
             }
         });

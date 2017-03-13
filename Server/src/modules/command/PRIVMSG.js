@@ -14,7 +14,7 @@ module.exports = function (socket, command) {
     }
 
     let receivers = command[1].split(' ')[0].split(',');
-    if(receivers.length <= 0) {
+    if (receivers.length <= 0) {
         ERRSender.ERR_NORECIPIENT(socket.client, 'PRIVMSG');
         return;
     }
@@ -28,14 +28,14 @@ module.exports = function (socket, command) {
 
     let files = [];
     message.replace(/\[FILE=[^\]]/g, '');
-    let regex = new RegExp('http(s)?://'+config.image_server.outip+':'+config.image_server.port+'/public/[^ ]+', 'g');
-    if(message.match(regex)) {
+    let regex = new RegExp('http(s)?://' + config.image_server.outip + ':' + config.image_server.port + '/public/[^ ]+', 'g');
+    if (message.match(regex)) {
         files = message.match(regex);
     }
 
     let error = true;
-    if(receivers.indexOf('@global') >= 0 && socket.client.isAdmin()) {
-        socket.broadcast(':@[ADMIN]'+socket.client.name+' PRIVMSG @global :'+message);
+    if (receivers.indexOf('@global') >= 0 && socket.client.isAdmin()) {
+        socket.broadcast(':@[ADMIN]' + socket.client.name + ' PRIVMSG @global :' + message);
     }
     let clients = {};
     let channels = {};
@@ -48,20 +48,20 @@ module.exports = function (socket, command) {
     let errReceive = [];
     receivers.forEach((r) => {
         if (clients[r]) {
-            if(clients[r].away){
+            if (clients[r].away) {
                 RPLSender.RPL_AWAY(socket, clients[r].name, clients[r].away);
-            }else {
+            } else {
                 clients[r].socket.send(':' + socket.client.name + ' PRIVMSG ' + r + ' :' + message);
             }
         } else if (channels[r]) {
-            if ((channels[r].channelFlags.indexOf('n')>-1 && channels[r].users.indexOf(socket.client) >= 0) || channels[r].channelFlags.indexOf('n') === -1) {
-                if(channels[r].isModerated && !channels[r].isUserVoice(socket.client)){
-                    ERRSender.ERR_CANNOTSENDTOCHAN(socket.client,channels[r].name);
+            if ((channels[r].channelFlags.indexOf('n') > -1 && channels[r].users.indexOf(socket.client) >= 0) || channels[r].channelFlags.indexOf('n') === -1) {
+                if (channels[r].isModerated && !channels[r].isUserVoice(socket.client)) {
+                    ERRSender.ERR_CANNOTSENDTOCHAN(socket.client, channels[r].name);
                     return;
                 }
                 files.forEach((url) => {
                     channels[r].addFile(socket.client, url);
-                    message.replace(url, '[FILE='+url+']');
+                    message.replace(url, '[FILE=' + url + ']');
                 });
                 channels[r].broadcast(':' + socket.client.name + ' PRIVMSG ' + r + ' :' + message, socket.client);
             } else {
@@ -72,13 +72,12 @@ module.exports = function (socket, command) {
         }
     });
     errReceive.forEach((err) => {
-        if(err[0] === '#') {
+        if (err[0] === '#') {
             ERRSender.ERR_NOSUCHCHANNEL(socket.client, err);
         } else {
             ERRSender.ERR_NOSUCHNICK(socket.client, err);
         }
     });
-
 
 
 };

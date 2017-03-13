@@ -11,33 +11,33 @@ module.exports = function (socket, command) {
         return;
     }
     let inviteRegex = /^([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15}) (#[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15})[ ]*/.exec(command[1]);
-    if(inviteRegex){
+    if (inviteRegex) {
         let nameOfTheGuest = inviteRegex[1];
         let nameChannel = inviteRegex[2];
         let channel = Channel.getChannelByName(nameChannel);
         let guest = Client.getClient(nameOfTheGuest);
-        if(!guest){
+        if (!guest) {
             ERRSender.ERR_NOSUCHNICK(socket.client, nameOfTheGuest);
             return;
         }
-        if(!channel){
+        if (!channel) {
             ERRSender.ERR_NOSUCHCHANNEL(socket.client, nameChannel);
             return;
         }
-        if (!channel.isInvitation){
+        if (!channel.isInvitation) {
             ERRSender.ERR_NOSUCHCHANNEL(socket.client, nameChannel);
             return;
         }
-        if(!channel.isUserOperator(socket.client)){
+        if (!channel.isUserOperator(socket.client)) {
             ERRSender.ERR_CHANOPRIVSNEEDED(socket.client, nameChannel);
             return;
         }
-        if (channel.getUser(guest.name)){
+        if (channel.getUser(guest.name)) {
             ERRSender.ERR_USERONCHANNEL(socket, guest.name, channel.name);
             return;
         }
-        if(guest.away){
-            RPLSender.RPL_AWAY(socket,guest.name,guest.away);
+        if (guest.away) {
+            RPLSender.RPL_AWAY(socket, guest.name, guest.away);
             return;
         }
         channel.invite(socket, guest);
