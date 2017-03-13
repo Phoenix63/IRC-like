@@ -140,9 +140,34 @@ h3::after {
 	z-index:100000;
 }
 
+
+#masque {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 9000;
+    background-color: #000;
+    display: none;
+}
+
+#dialog {
+    display: none;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 9999;
+    padding: 20px;
+    color: #00008B;
+    border: 3px solid #fff;
+    border-radius: 15px;
+    background-color: #C0C0C0;
+    max-width: 100%; 
+}
+
 .previewImage {
 	width:50px;
 	height:40px;
+	border-radius:5px;
 }
 
 .notif-messageOn {

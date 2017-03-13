@@ -18,8 +18,16 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 	//var testUser = new User("test");
 	//testUser.setRight(5);
 	//$scope.currentChannel.messages.push([testUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "<br /><p>test file download</p><a href='../images/panda.jpg' target='_blank' download><img src='../images/panda.jpg'/></a>"]);
+	
+	
+	$scope.newLogInNick = function() {
+		userInfo.setNick($scope.newNick);
+		userInfo.socket.emit("message", "NICK " + userInfo.nick);
+		$("#dialog").fadeOut();
+		$("#masque").fadeOut();
+	}
+	
 	$scope.uploadImage = function(fich) {
-		alert(fich[0].name);
 		if(isImage(fich[0].name)) {
 			var readerPreview = new FileReader();
 			readerPreview.onload = function (e) {	
@@ -168,7 +176,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 		var cmdAway = $scope.newMessage.match(/^\/away[ ][\w\W]+$/);
 		var cmdPrivMsg = $scope.newMessage.match(/^\/privmsg[ ][#][\w\S]+[ ][\W\w]+$/);
 		var cmdMute = $scope.newMessage.match(/^\/mute[ ][\S\w]+$/);
-		var cmdDeMute = $scope.newMessage.match(/^\/demute[ ][\S\w]+$/);
+		var cmdDeMute = $scope.newMessage.match(/^\/demute[ ][\S\w]+$/); 
 		if($scope.newMessage.match(/^\/[a-z]+/g)) {
 			if(cmdJoin != null) {
 				var command = (/^(\/[a-z]+)[ ]([\w\S]+)$/).exec($scope.newMessage);
@@ -481,7 +489,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 								}
 							}
 							else if(cmd[2].includes("b") && cmd[2][0] === "-" && (cmd[2].includes("o") === false) && (cmd[2].includes("l") === false) && (cmd[2].includes("v") === false) && (cmd[2].includes("k") === false)) {
-								if(cmd[3] !== undefined  && cmd[3] !== "") {
+								if(cmd[3] !== undefined  && cmd[3] !== "" && cmd[4] !== undefined && cmd[4] !== "") {
 									modeL[9][0] = true;
 									modeL[0][0] = true;
 									if(cmd[2].includes("p")) {
@@ -507,8 +515,8 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 									$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You must put an user"]);
 								}
 							}
-							else if(cmd[2].includes("b") && cmd[2][0] === "-" && (cmd[2].includes("o") === false) && (cmd[2].includes("l") === false) && (cmd[2].includes("v") === false) && (cmd[2].includes("k") === false)) {
-								if(cmd[3] !== undefined  && cmd[3] !== "") {
+							else if(cmd[2].includes("b") && cmd[2][0] === "+" && (cmd[2].includes("o") === false) && (cmd[2].includes("l") === false) && (cmd[2].includes("v") === false) && (cmd[2].includes("k") === false)) {
+								if(cmd[3] !== undefined  && cmd[3] !== "" && cmd[4] !== undefined && cmd[4] !== "") {
 									modeL[9][0] = true;
 									modeL[1][0] = true;
 									if(cmd[2].includes("p")) {
@@ -703,8 +711,14 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 							if(cmd[3] === undefined) {
 								userInfo.socket.emit("message", "MODE " + cmd[1] + " " + flag);
 							}
-							else {
+							else if(cmd[3] !== undefined && cmd[4] !== undefined && flag.includes("b")){
+								userInfo.socket.emit("message", "MODE " + cmd[1] + " " + flag + " " + cmd[3] + " " + cmd[4]);
+							}
+							else if(cmd[3] !== undefined) {
 								userInfo.socket.emit("message", "MODE " + cmd[1] + " " + flag + " " + cmd[3]);
+							}
+							else {
+								$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command invalid"]);
 							}
 						}
 						else {
@@ -835,8 +849,14 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
     userInfo.socket.on("message", function(msg) {
 		if(msg.match(/^:[\S]+[ ]433[ ][\S]+[ ][\W\w]+$/)) {
 			if(connect !== true) {
-				alert("Pseudo déjà utilisé sur le serveur");
-				$location.path("/");
+			var xHeight = $(document).height();
+				var xWidth = $(window).width();
+				$("#masque").css({"width":xWidth,"height":xHeight});
+				$("#masque").fadeIn();
+				$("#masque").fadeTo("fast",0.6);
+				$("#dialog").css("top", (xHeight/2) - (70/2));
+				$("#dialog").css("left", (xWidth/2) - (524/2));
+				$("#dialog").fadeIn();
 			}
 			else {
 				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Le pseudo est deja utilisé"]);
@@ -1140,11 +1160,6 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 					break;
 				}
 			}
-			for(var i = 0; i<$scope.channels.length; i++) {
-				if(rspQuitUser === $scope.channels[i].chan) {
-					$scope.channels.splice(i, 1);
-				}
-			}
 		}
 		else if(msg.match(/^[\w\S]+[ ]341[ ][\S\w]+[ ][\w\S]+$/)) {
 			var rspInvite = (/^[\w\S]+[ ]341[ ]([\S\w]+)[ ]([\w\S]+)$/).exec(msg);
@@ -1267,6 +1282,10 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			var rspMode = (/^:[0-9.a-z:]+[ ]324[ ]MODE[ ]([#][\S\w]+)[ ]([\w\S]+)$/).exec(msg);
 			var rspModeCh = rspMode[1];
 			var rspModeFlag = rspMode[2];
+			/*for(var i = 0; i<$scope.channels.length; i++) {
+				if(rspModeCh === $scope.channels[i].nick) {
+				}
+			}*/
 			if(rspModeFlag === "-k") {
 				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspModeCh + " don't have a password anymore"]);
 			}
@@ -1327,7 +1346,14 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			else if(rspModeFlag === "-l") {
 				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The limit of users is  " + rspModeUser + " on " + rspModeCh]);
 			}
-			else if(rspModeFlag === "+b") {
+		}
+		else if(msg.match(/^:[0-9.a-z:]+[ ]324[ ]MODE[ ][#][\S\w]+[ ][\w\S]+[ ][\w\S]+[\S]+$/)) {
+			var rspBan = (/^:[0-9.a-z:]+[ ]324[ ]MODE[ ]([#][\S\w]+)[ ]([\w\S]+)[ ]([\w\S]+)([\S]+)$/).exec(msg);
+			var rspChanBan = rspBan[1];
+			var rspModeBan = rspBan[2];
+			var rspUserBan = rspBan[3];
+			var rspTimeBan = rspBan[4];
+			if(rspModeFlag === "+b") {
 				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The user " + rspModeUser + " is now banned from " + rspModeCh]);
 			}
 			else if(rspModeFlag === "-b") {
