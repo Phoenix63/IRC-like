@@ -2,26 +2,25 @@
 <div ng-controller="log_in_controller">
 
     <section id="connexion" class="formulaire">
-        <form ng-submit="index.html" class="formType">
+        <form ng-submit="valid() && logIn()" class="formType" novalidate>
             <div class="container login-container">
                 <span>
                     <label for="connexion_pseudo">
                         Pseudo
                     </label>
-                    <input id="connexion_pseudo" type="text" ng-model="nickname" value="test"/>
-                    <p>{{alreadyUsedNIck}}</p>
+                    <input id="connexion_pseudo" type="text" ng-model="nickname" placeholder="Optionnal"/>
                 </span>
                 <span>
                     <label for="connexion_id">
                         Id
                     </label>
-                    <input id="connexion_pseudo" type="text" ng-model="id" value="Obligatoire"/>
+                    <input id="connexion_pseudo" type="text" ng-model="id" placeholder="Optionnal"/>
                 </span>
-                <span>
+                <span ng-show="isSetId()">
                     <label for="connexion_password">
-                        mot de passe
+                        Password
                     </label>
-                    <input id="connexion_password" type="password" ng-model="password"/>
+                    <input id="connexion_password" type="password" ng-model="password" placeholder="Required"/>
                 </span>
             </div>
             <div class="container server-container">
@@ -29,15 +28,15 @@
                     <label for="connexion_server">
                         Server
                     </label>
-                    <input id="connexion_server" type="text" ng-model="server" value="127.0.0.1"/>
+                    <input id="connexion_server" type="text" ng-model="server" placeholder="Optionnal"/>
                 </span>
-                <span>
+                <span  ng-show="isSetServer()">
                     <label for="connexion_port">
                         Port
                     </label>
-                    <input id="connexion_port" type="text" ng-model="port" value="8089"/>
+                    <input id="connexion_port" type="text" ng-model="port" placeholder="Optionnel"/>
                 </span>
-                <button ng-click="logIn()" class="btn-solid btn-connect">Se connecter</button>
+                <button type="submit" class="btn-solid btn-connect">Connect</button>
             </div>
         </form>
 
