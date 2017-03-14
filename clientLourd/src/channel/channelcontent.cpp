@@ -1,6 +1,5 @@
 #include "channelcontent.h"
 
-
 /*
  * User functions
  */
@@ -37,11 +36,20 @@ QList<User *> ChannelContent::users()
 
 User * ChannelContent::findUser(QString nick)
 {
-    for (auto i:aUsers.keys()){
+    for (auto i:aUsers.keys()) {
         if (i->name() == nick)
             return i;
     }
     return nullptr;
+}
+
+bool ChannelContent::contains(QString nick)
+{
+    for (auto i:aUsers.keys()) {
+		if(i->name() == nick)
+			return true;
+	}
+	return false;
 }
 
 /*

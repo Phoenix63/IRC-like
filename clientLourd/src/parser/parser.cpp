@@ -489,11 +489,18 @@ bool Parser::in_isNickEdit(QString string)
         return false;
     QString nick = string.split(' ').at(0);
     QString newNick = string.split(' ').at(2);
+    for (auto i:channel->channelNames()) {
+        if (channel->contains(nick, i))
+    		channel->appendChannel(nick + " changed his nickname to " + newNick, i, "");
+        if (i == nick) {
+            channel->changeName(nick, newNick);
+            emit channelModifiedSignal();
+        }
+    }
     if (!nick.compare(self.name()))
         nickname(newNick);
-    channel->changeNick(nick, newNick);
-    channel->appendChannel(nick + " changed his nickname to " + newNick, "\"Debug\"", "");
-    emit userModifiedSignal();
+	channel->changeNick(nick, newNick);
+	emit userModifiedSignal();
     emit chatModifiedSignal();
     return true;
 }
@@ -505,13 +512,12 @@ bool Parser::in_isKickMesg(QString string)
     QString admin = string.split(' ').at(0);
     QString chan = string.split(' ').at(2);
     QString kicked = string.split(' ').at(3);
-    if(!kicked.compare(self.name())){
+    if(!kicked.compare(self.name())) {
         channel->appendChannel("You were kicked from " + chan + " by " + admin, "\"Debug\"", "");
         channel->leave(chan);
-    }
-    else{
-        channel->appendChannel(kicked + " was kicked from " + chan + " by " + admin, "\"Debug\"", "");
-    }
+    } else {
+    	channel->appendChannel(kicked + " was kicked by " + admin, chan, "");
+	}
     emit channelModifiedSignal();
     emit changeChannelSignal();
     return true;

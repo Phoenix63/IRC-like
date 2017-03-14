@@ -19,7 +19,7 @@ public:
     void renameUser(QString oldNick, QString newNick);
     QList<User *> users();
     User* findUser(QString nick);
-
+    bool contains(QString nick);
     //Chat functions
     void appendChat(QString heure, User *pseudo, QString message);
     void clearContent();
@@ -43,6 +43,7 @@ public:
     void oper(User *user, bool val);
     void voice(QString user, bool val);
     void oper(QString user, bool val);
+
 private:
     QString aTopic;
     QHash<User *, Mode> aUsers;

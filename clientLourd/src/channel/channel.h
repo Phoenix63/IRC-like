@@ -18,8 +18,6 @@ template<typename> class QList;
 class Channel
 {
 public:
-
-    UserList userList;
     // Constructor
     Channel(ParserEmoji *emoji);
 
@@ -46,6 +44,7 @@ public:
     // Current channel name getter
     QString channelName();
     QList<QString> channelNames();
+    void changeName(QString oldChan, QString newChan);
 
     // User functions
     void addUser(QString user, QString channel);
@@ -55,6 +54,7 @@ public:
     void removeUser(QString user, QString channel);
     void changeNick(QString user, QString nick);
     QList<User *> users();
+    bool contains(QString nick, QString channel);
 
     // User mode
     bool oper(User *user, QString chan);
@@ -83,6 +83,7 @@ private:
     QString currentChannel;
     // Qhash wich contain message: key = channel name, content = message list
     QHash<QString, ChannelContent> channels;
+	UserList userList;
 };
 
 #endif // CHANNEL_H

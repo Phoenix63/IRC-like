@@ -118,6 +118,11 @@ QList<QString> Channel::channelNames()
     return channels.keys();
 }
 
+void Channel::changeName(QString oldChan, QString newChan)
+{
+	channels[newChan] = channels.take(oldChan);
+}
+
 /*
  * User list functions
  */
@@ -157,6 +162,11 @@ void Channel::removeUser(QString user, QString channel)
 QList<User *> Channel::users()
 {
     return channels[currentChannel].users();
+}
+
+bool Channel::contains(QString nick, QString channel)
+{
+	return channels[channel].contains(nick);
 }
 
 void Channel::changeNick(QString nick, QString newNick)
