@@ -38,7 +38,7 @@ myApp.factory("userInfo", function() {
       "setRight": function(newRight) {
         this.right = newRight;
       },
-      "server": "http://crismos.fr",
+      "server": "http://tehroux.fr",
       "port": 8089,
       "socket": "",
       "setNick": function(newUserNick) {
@@ -59,8 +59,7 @@ myApp.factory("userInfo", function() {
       },
       "connect": function() {
         this.socket = io(this.server+":"+this.port);
-		this.filePort = io(this.server+":8091");
-		
+		this.filePort = io(this.server+":8091", {'forceNew': true });
       },
       "afterConnection": function() {
         this.userN = "Guest_"+this.userN;

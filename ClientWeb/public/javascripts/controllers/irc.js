@@ -35,9 +35,9 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 					if(ev === true) {
 						var readerSend = new FileReader();
 						readerSend.onload = function() {
-							alert("a envoyer");
-							//userInfo.filePort.emit("file", "FILE " + fich[0].size + " " + fich[0].name);
-							//userInfo.filePort.emit("message", "");
+							userInfo.filePort.emit("data", "FILE " + fich[0].size + " " + fich[0].name);
+							alert(readerSend.result);
+							userInfo.filePort.emit("data", readerSend.result);
 						}
 						readerSend.readAsBinaryString(fich[0]);
 					}
@@ -51,9 +51,9 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				if(ev === true) {
 					var readerSend = new FileReader();
 					readerSend.onload = function() {
-						alert("a envoyer");
-						//userInfo.filePort.emit("file", "FILE " + fich[0].size + " " + fich[0].name);
-						//userInfo.filePort.emit("message", "");
+						userInfo.filePort.emit("data", "FILE " + fich[0].size + " " + fich[0].name);
+						alert(readerSend.result);
+						userInfo.filePort.emit("data", readerSend.result);
 					}
 					readerSend.readAsBinaryString(fich[0]);
 				}
@@ -843,9 +843,10 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
     }
 	
 	userInfo.filePort.on("file", function(msg){
+		alert(msg);
 		$scope.currentChannel.messages.push([new User("file"), new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), msg]);
+		$scope.$apply();
 	});
-	
     userInfo.socket.on("message", function(msg) {
 		if(msg.match(/^:[\S]+[ ]433[ ][\S]+[ ][\W\w]+$/)) {
 			if(connect !== true) {
@@ -932,7 +933,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			}
 		}
         else if(msg.match(/^:[\w\S]+[ ]NICK[ ][\w\S]+$/)) {
-			
+			connect = true;
             var msgToPush = in_isNickname(msg);
             var oldname = msgToPush[0];
 			
@@ -1451,9 +1452,6 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				$scope.currenChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Topic -> " + commandMsg]);
 			}
 		}
-		else if(msg.match(/^[\S\w]+[ ]372[ ][\W\w]+$/)) {
-			connect = true;
-		}
 		else if(msg.match(/^:[0-9.a-z:]+[ ]322[ ][\S]+[ ][#][\w\S]+[ ][\S]+[ ][:][\w\W]+$/)) {
 			var list = in_isList(msg);
 			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Channel : " + list[0] + " with " + list[1] + " user(s) - Topic ->" + list[2]]);
@@ -1478,6 +1476,9 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			
 		}
 		else if(msg.match(/^[\S]+[ ]431[ ][\w\W]+$/)) {
+			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "This nickname is not valid"]);		
+		}
+		else if(msg.match(/^[\S]+[ ]433[ ][\w\W]+$/)) {
 			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "This nickname is not valid"]);		
 		}
 		else if(msg.match(/^[\S]+[ ]475[ ][\w\W]+\(\+k\)$/)) {
