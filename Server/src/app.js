@@ -9,6 +9,7 @@ import MessageManager from './modules/CommandManager';
 import RPLSender from './modules/responses/RPLSender';
 import colors from 'colors';
 import Redis from './modules/data/RedisInterface';
+import child_process from 'child_process';
 
 RedisInterface.init();
 
@@ -21,10 +22,8 @@ process.on('SIGINT', () => {
         console.log('Database saved!');
         console.log('Quit redis');
         Redis.quit();
-    });
-    setTimeout(() => {
         process.exit();
-    }, 1000)
+    });
 });
 //catches uncaught exceptions
 if (process.argv[2] === 'PROD') {
@@ -49,3 +48,10 @@ dbLoader(() => {
         });
     });
 });
+
+if(process.env.parent === 'TEST') {
+    let child = child_process.spawn('mocha', []);
+    child.stdout.on('data', function (data) {
+        console.log(data.toString());
+    });
+}

@@ -12,8 +12,12 @@ if (process.argv[2] === 'TEST') {
 }
 
 module.exports = function (callback) {
-    Trigger.setCallback(callback);
+
     MongoClient.connect(url, (err, db) => {
+        Trigger.setCallback(()=>{
+            db.close();
+            callback();
+        });
         if (process.argv[2] === 'TEST') {
             db.dropDatabase();
         }

@@ -5,7 +5,7 @@ let client;
 class Redis {
 
     static init() {
-        client = redis.createClient(6379, "localhost");
+        client = redis.createClient({host: config.redis.host, port:config.redis.port});
         client.on("error", function (err) {
             console.log("Error " + err);
         });

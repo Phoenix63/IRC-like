@@ -1,7 +1,6 @@
 "use strict";
 
 import ERRSender from './../responses/ERRSender';
-import RPLSender from './../responses/RPLSender';
 import cluster from 'cluster';
 
 module.exports = function (socket, command) {
