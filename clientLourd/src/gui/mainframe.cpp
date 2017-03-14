@@ -76,6 +76,11 @@ void MainFrame::printMsgLine(Message chatMsgLine)
     ui->chatBox->addLayout(chatLine);
 }
 
+void MainFrame::connectSocket()
+{
+    connect(socket, &QTcpSocket::readyRead, this, &MainFrame::readyRead);
+}
+
 void MainFrame::PrintMsg(QList<Message> chatMsgList)
 {
     clean();
@@ -184,6 +189,7 @@ void MainFrame::closeEvent (QCloseEvent *event)
         clean();
         event->accept();
     }
+	emit deleteMainFrame(this);
 }
 
 /*
@@ -302,6 +308,7 @@ void MainFrame::on_actionDisconnect_triggered()
     if (reply == QMessageBox::Yes) {
         this->close();
         emit showLogin();
+		emit deleteMainFrame(this);
     }
 }
 
@@ -352,10 +359,7 @@ void MainFrame::initUIStyle()
 
 void MainFrame::initConnect()
 {
-    // Socket related connects
-    connect(socket, &QTcpSocket::readyRead, this, &MainFrame::readyRead);
-
-    // Ui related connects
+	// Ui related connects
     connect(ui->scrollArea->verticalScrollBar(), &QScrollBar::rangeChanged, this, &MainFrame::moveScrollBarToBottom);
 
     // Parser related connects

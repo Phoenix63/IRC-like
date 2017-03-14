@@ -55,6 +55,7 @@ private slots:
     void on_pushButton_savePreset_clicked();
     void on_pushButton_deletePreset_clicked();
     void on_presetList_activated(const QString &arg1);
+	void deleteMain(MainFrame *mainFrame);
 
 private:
     Ui::Login *ui;

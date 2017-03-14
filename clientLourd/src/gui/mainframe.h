@@ -30,6 +30,7 @@ public:
     explicit MainFrame(QWidget *parent = 0, QTcpSocket *socket=NULL, QString host = "localhost");
 	~MainFrame();
 
+	void connectSocket();
 	void printMsgLine(Message chatMsgLine);
 	void PrintMsg(QList<Message> chatMsgList);
 	void clearLayout(QLayout *layout);
@@ -59,6 +60,7 @@ public slots:
 
 signals:
 	void showLogin();
+	void deleteMainFrame(MainFrame *mainFrame);
 
 private slots:
 	void on_channelList_itemSelectionChanged();

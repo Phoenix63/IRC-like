@@ -36,7 +36,6 @@ void Login::initUIStyle()
 Login::~Login()
 {
     delete ui;
-    delete main;
     delete socket;
 }
 
@@ -104,6 +103,7 @@ void Login::on_pushButton_connect_clicked()
             sendInfos();
             while (socket->waitForReadyRead(0));
             joinChannels(ui->channelList);
+            main->connectSocket();
         }
     }
 }
@@ -222,4 +222,9 @@ void Login::on_pushButton_deletePreset_clicked()
 	config.delConfig();
 	config.saveConfig();
 	loadPresetList();
+}
+
+void Login::deleteMain(MainFrame *mainFrame)
+{
+    delete mainFrame;
 }
