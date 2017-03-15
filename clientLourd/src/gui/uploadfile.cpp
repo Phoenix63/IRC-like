@@ -26,7 +26,6 @@ void Upload::run()
         QString fileName = i.split('/').last();
         QString toSend = "FILE " + QString::number(size, 10) + " " + fileName + '\n';
         socket->write(toSend.toLatin1());
-        socket->waitForReadyRead(1000);
         inputFile.open(QIODevice::ReadOnly);
         read = inputFile.read(100);
         while (read.size() > 0)
@@ -37,11 +36,5 @@ void Upload::run()
             read = inputFile.read(100);
         }
         inputFile.close();
-        socket->waitForReadyRead(-1);
-        QString url = socket->readLine();
-        url.remove(0, 1);
-        int j = url.indexOf(QRegularExpression(":.+$"));
-        url = url.right(url.length() - j - 1);
-        emit resultReady(url);
     }
 }

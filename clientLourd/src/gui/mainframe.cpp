@@ -279,18 +279,20 @@ void MainFrame::on_pushButton_upload_clicked()
         QMessageBox::information(this, "Error", "Host not found");
     QStringList homePath = QStandardPaths::standardLocations(QStandardPaths::HomeLocation);
     QStringList files = QFileDialog::getOpenFileNames(this, "Select one or more files to open", homePath.first());
-    Upload *up = new Upload(this, host, files, tmp);
-    connect(up, &Upload::finished, up, &QObject::deleteLater);
-    up->start();
-    UploadWindow *progress = new UploadWindow(this, tmp);
-    connect(progress, &UploadWindow::resultReady, this, &MainFrame::handleResults);
-    progress->show();
+    if (files.size() != 0) {
+        Upload *up = new Upload(this, host, files, tmp);
+        UploadWindow *progress = new UploadWindow(this, tmp);
+        connect(up, &Upload::finished, up, &QObject::deleteLater);
+        connect(progress, &UploadWindow::resultReady, this, &MainFrame::handleResults);
+        up->start();
+        progress->show();
+    }
 }
 
 void MainFrame::handleResults(QString url)
 {
-    url.prepend("PRIVMSG " + channel.channelName() + " :");
-    parser.sendToServer(socket, url);
+    QString message = "PRIVMSG " + channel.channelName() + " :" + url;
+    parser.sendToServer(socket, message);
     url.remove(url.length() - 1, 1);
     channel.appendCurrent(url, parser.userNick());
     chatModified();

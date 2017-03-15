@@ -34,15 +34,17 @@ void UploadWindow::readyRead()
 
 void UploadWindow::parse(QString string)
 {
-    if(string.startsWith("^FILE\\sTRANSFERT"))
+    string.remove(0, 1);
+    int j = string.indexOf(QRegularExpression(":.+$"));
+    if(string.contains("TRANSFERT"))
     {
-        int j = string.indexOf(QRegularExpression(":.+$"));
         QString progress = string.right(string.length() - j - 1);
         ui->progressBar->setMaximum(progress.split('/').at(1).toInt());
         ui->progressBar->setValue(progress.split('/').at(0).toInt());
     } else {
-        QLabel *result = new QLabel(string);
+        QString url = string.right(string.length() - j - 1);
+        QLabel *result = new QLabel(url);
         ui->urlLayout->addWidget(result);
-        emit resultReady(string);
+        emit resultReady(url);
     }
 }
