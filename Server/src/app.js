@@ -17,7 +17,11 @@ function _start() {
     child.on('close', function (code) {
         debug("Finished with code " + code);
         if(!code || code === 15) {
-            _start();
+            if(process.env.RUNNING !== 'TEST') {
+                _start();
+            } else {
+                process.exit();
+            }
         } else {
             process.exit(0);
         }

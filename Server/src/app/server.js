@@ -41,5 +41,8 @@ function run(cluster) {
         child.stdout.on('data', function (data) {
             test(data.toString());
         });
+        child.on('exit', function() {
+            cluster.worker.send({quitmessage: 'quit'});
+        });
     }
 }

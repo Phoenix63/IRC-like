@@ -60,13 +60,25 @@ function run(cluster) {
         let server = cluster.fork();
 
         server.on('message', (message) => {
-            if(message.quitmessage && message.quitmessage === 'restart') {
-                server.disconnect();
-                server.kill();
+            if(message.quitmessage) {
+                if(message.quitmessage === 'restart') {
+                    server.disconnect();
+                    server.kill();
+                } else if (message.quitmessage === 'quit') {
+                    server._quitSignal = 'quit';
+                    server.disconnect();
+                    server.kill();
+                }
             }
+
+
         });
         server.on('exit', () => {
-            process.kill(process.pid, 'SIGTERM');
+            if(server._quitSignal && server._quitSignal === 'quit') {
+                process.kill(process.pid, 'SIGTERM');
+            } else {
+                process.kill(process.pid, 'SIGINT');
+            }
         });
     });
 }

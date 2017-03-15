@@ -351,7 +351,7 @@ class Client {
      * @returns {boolean}
      */
     isAdmin() {
-        return this._flags.indexOf('o') >= 0;
+        return (this._flags.indexOf('o') >= 0 || this._flags.indexOf('O') >= 0);
     }
 
     /**

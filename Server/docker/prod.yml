@@ -28,10 +28,12 @@ services:
      - preload
 
   fileserver:
-    image: bitnami/node:7
-    command: sh -c 'npm run build && node ./dist/modules/file/server.js'
+    image: pandirc/dev
+    command: npm run build
+    entrypoint: node ./dist/lib/file/server.js
     environment:
     - RUNNING=PROD
+    - DEBUG=fileserver:*
     hostname: fileserver
     volumes:
      - ./..:/app

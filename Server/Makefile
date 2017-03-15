@@ -62,34 +62,31 @@ build:
 
 deps:
 	make head
-	docker-compose -f ./docker/deps.yml up
+	docker-compose -f docker/deps.yml up
 
 prod:
 	make head
-	docker-compose -f ./docker/prod.yml up
+	docker-compose -f docker/build.yml up --abort-on-container-exit && docker-compose -f docker/prod.yml up
 
 prod-deamon:
 	make head
-	docker-compose -f ./docker/prod.yml up -d
+	docker-compose -f docker/build.yml up --abort-on-container-exit && docker-compose -f docker/prod.yml up -d
 
 dev:
 	make head
-	docker-compose -f ./docker/dev.yml up
+	docker-compose -f docker/build.yml up --abort-on-container-exit && docker-compose -f docker/dev.yml up
 
 file:
 	make head
-	docker-compose -f ./docker/fileserver.yml up
+	docker-compose -f docker/fileserver.yml up
 
 unit:
 	make head
-	docker-compose -f ./docker/test.yml up
+	docker-compose -f docker/build.yml up --abort-on-container-exit && docker-compose -f docker/test.yml up --abort-on-container-exit
 
 clean:
-	docker-compose -f ./docker/deps.yml rm -f
-	docker-compose -f ./docker/test.yml rm -f
-	docker-compose -f ./docker/prod.yml rm -f
-	docker-compose -f ./docker/dev.yml rm -f
-	docker-compose -f ./docker/fileserver.yml rm -f
-
-a:
-	docker-compose -f ./docker/perso.yml up
+	docker-compose -f docker/deps.yml rm -f
+	docker-compose -f docker/test.yml rm -f
+	docker-compose -f docker/prod.yml rm -f
+	docker-compose -f docker/dev.yml rm -f
+	docker-compose -f docker/fileserver.yml rm -f

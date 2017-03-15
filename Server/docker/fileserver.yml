@@ -4,6 +4,7 @@ services:
     image: pandirc/dev
     command: sh -c 'nodemon --watch src/lib/file --exec babel-node ./src/lib/file/server.js DEV'
     environment:
+    - RUNNING=DEV
     - DEBUG=fileserver:*
     hostname: fileserver
     volumes:
