@@ -1,13 +1,19 @@
 version: "2"
-#nodemon --ignore ./src/modules/file --ignore ./__uploaded_files__ --exec babel-node ./src/server.js DEV
-#node ./dist/server.js DEV
+
 services:
+  preload:
+    image: pandirc/dev
+    entrypoint: npm run build
+    volumes:
+     - ./..:/app
+
   node:
     image: pandirc/dev
-    command: sh -c 'npm run build'
-    entrypoint: node src/nodemon.js
+    command: npm run build
+    #entrypoint: ./docker/script.sh
+    entrypoint: node ./dist/app.js DEV
     environment:
-    - DEBUG=server:*
+      - DEBUG=*,-babel
     hostname: node
     stop_signal: SIGINT
     volumes:
@@ -19,14 +25,11 @@ services:
      - mongo:mongo
      - redis:redis
      - fileserver:fileserver
+     - preload
 
   fileserver:
     image: pandirc/dev
-    command: sh -c 'echo "running"'
-    entrypoint: nodemon --delay 10000 --watch ./src/modules/file --ignore ./__uploaded_files__ --exec babel-node ./src/modules/file/server.js DEV
-    stop_signal: SIGINT
-    environment:
-    - DEBUG=fileserver
+    command: sh -c 'nodemon --watch ./src/modules/file --ignore ./__uploaded_files__ --exec babel-node ./src/modules/file/server.js DEV'
     hostname: fileserver
     volumes:
      - ./..:/app
@@ -36,6 +39,7 @@ services:
     - "8091:8091"
     links:
     - redis:redis
+    - preload
 
   mongo:
     image: mongo:3.4

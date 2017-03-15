@@ -113,7 +113,7 @@ let ERRSender = {
      * @static
      */
     ERR_PASSWDMISMATCH: (client) => {
-        client.socket.send(':'+ config.ip + ' 464 '+client.name+ ' :Password incorrect');
+        client.socket.send(':' + config.ip + ' 464 ' + client.name + ' :Password incorrect');
     },
     /**
      *
@@ -146,7 +146,7 @@ let ERRSender = {
      * @constructor
      */
     ERR_CHANOPRIVSNEEDED: (client, channelName) => {
-        client.socket.send(':'+config.ip+' 482 '+channelName+' :You\'re not channel operator');
+        client.socket.send(':' + config.ip + ' 482 ' + channelName + ' :You\'re not channel operator');
     },
     /**
      *
@@ -156,7 +156,7 @@ let ERRSender = {
      * @constructor
      */
     ERR_USERNOTINCHANNEL: (client, nameUser, channelName) => {
-        client.socket.send(':'+config.ip+' 441 '+nameUser +' '+channelName+' :They aren\'t on that channel');
+        client.socket.send(':' + config.ip + ' 441 ' + nameUser + ' ' + channelName + ' :They aren\'t on that channel');
     },
     /**
      *
@@ -165,7 +165,7 @@ let ERRSender = {
      * @constructor
      */
     ERR_USERSDONTMATCH: (client) => {
-        client.socket.send(':'+config.ip+' 502 :Cant change mode for other users');
+        client.socket.send(':' + config.ip + ' 502 :Cant change mode for other users');
     },
     /**
      *
@@ -174,7 +174,7 @@ let ERRSender = {
      * @constructor
      */
     ERR_UMODEUNKNOWNFLAG: (client) => {
-        client.socket.send(':'+config.ip+' 501 :Unknown MODE flag');
+        client.socket.send(':' + config.ip + ' 501 :Unknown MODE flag');
     },
     /**
      *
@@ -183,7 +183,7 @@ let ERRSender = {
      * @constructor
      */
     ERR_KEYSET: (client, channelName) => {
-        client.socket.send(':'+config.ip+' 467 '+channelName+' :Channel key already set');
+        client.socket.send(':' + config.ip + ' 467 ' + channelName + ' :Channel key already set');
     },
 
     /**
@@ -192,7 +192,7 @@ let ERRSender = {
      * @constructor
      */
     ERR_NOPRIVILEGES: (client) => {
-        client.socket.send(':'+config.ip+' 481 :Permission Denied- You\'re not an IRC operator');
+        client.socket.send(':' + config.ip + ' 481 :Permission Denied- You\'re not an IRC operator');
     },
     /**
      *
@@ -201,7 +201,7 @@ let ERRSender = {
      * @constructor
      */
     ERR_NOSUCHNICK: (client, nick) => {
-        client.socket.send(':'+config.ip+' 401 '+nick+' :No such nick/channel');
+        client.socket.send(':' + config.ip + ' 401 ' + nick + ' :No such nick/channel');
     },
     /**
      *
@@ -210,16 +210,16 @@ let ERRSender = {
      * @param nameChannel
      * @constructor
      */
-    ERR_USERONCHANNEL: (socket, nameGuest, nameChannel)=>{
-        socket.send(':'+config.ip+' 443 '+nameGuest+' '+nameChannel+' :is already on channel');
+    ERR_USERONCHANNEL: (socket, nameGuest, nameChannel) => {
+        socket.send(':' + config.ip + ' 443 ' + nameGuest + ' ' + nameChannel + ' :is already on channel');
     },
     /**
-     * 
+     *
      * @param client
      * @constructor
      */
     ERR_FILESIZE: (client) => {
-        client.socket.send(':'+config.ip+' 601 :your file size must be 0 < filesize < '+config.fileSizeLimit+' Ko');
+        client.socket.send(':' + config.ip + ' 601 :your file size must be 0 < filesize < ' + config.fileSizeLimit + ' Ko');
     }
 
 };

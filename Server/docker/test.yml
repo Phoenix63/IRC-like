@@ -1,37 +1,58 @@
+version: "2"
 
-node:
-  image: pandirc/runtest
-  command: sh -c 'npm run build && node dist/server.js TEST'
-  hostname: node
-  volumes:
-   - ./..:/app
-  ports:
-   - "8088:8088"
-   - "8089:8089"
-   - "3001:3001"
-  links:
-   - mongo:mongo
-   - redis:redis
-   - fileserver:fileserver
+services:
+  preload:
+    image: pandirc/dev
+    entrypoint: npm run build
+    volumes:
+     - ./..:/app
 
-fileserver:
-  image: bitnami/node:7
-  command: sh -c 'npm run build && node ./dist/modules/file/server.js TEST'
-  hostname: fileserver
-  volumes:
-   - ./..:/app
-  ports:
-   - "8090:8090"
-   - "8091:8091"
-  links:
-   - redis:redis
+  node:
+    image: pandirc/runtest
+    command: npm run build
+    #entrypoint: ./docker/script.sh
+    entrypoint: node ./dist/app.js TEST
+    environment:
+      - DEBUG=app:test
+    hostname: node
+    stop_signal: SIGINT
+    volumes:
+     - ./..:/app
+    ports:
+     - "8088:8088"
+     - "8089:8089"
+    links:
+     - mongo:mongo
+     - redis:redis
+     - fileserver:fileserver
+    depends_on:
+     - preload
 
-mongo:
-  image: mongo:3.4
-  hostname: mongo
-  volumes:
-   - mongoirc:/data/db
+  fileserver:
+    image: pandirc/dev
+    command: sh -c 'nodemon --watch ./src/modules/file --ignore ./__uploaded_files__ --exec babel-node ./src/modules/file/server.js DEV'
+    hostname: fileserver
+    volumes:
+     - ./..:/app
+    ports:
+    - "3001:3001"
+    - "8090:8090"
+    - "8091:8091"
+    links:
+    - redis:redis
+    - preload
 
-redis:
-  image: redis:3.2
-  hostname: redis
+  mongo:
+    image: mongo:3.4
+    hostname: mongo
+    volumes:
+     - mongoirc:/data/db
+
+  redis:
+    image: redis:3.2
+    hostname: redis
+
+volumes:
+  mongoirc:
+    external:
+      name: mongoirc

@@ -10,10 +10,10 @@ class Sio {
             socket.emit('connect', null);
             socket.kill = function() {
                 socket.disconnect();
-            }
+            };
             socket.write = function(data) {
                 socket.emit('file', data);
-            }
+            };
             socket.pause = function(){};
             socket.resume = function(){};
             socket.setTimeout = function(){};

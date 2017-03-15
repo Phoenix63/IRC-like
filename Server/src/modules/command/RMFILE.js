@@ -1,4 +1,3 @@
-
 import ERRSender from './../responses/ERRSender';
 import RPLSender from './../responses/RPLSender';
 import Channel from './../channel/Channel';
@@ -12,7 +11,7 @@ module.exports = (socket, command) => {
 
     let argv = /^(#[^, ]+) ([^ ]+)/g.exec(command[1]);
 
-    if(!argv) {
+    if (!argv) {
         ERRSender.ERR_NEEDMOREPARAMS(socket.client, 'RMFILE');
         return;
     }
@@ -21,17 +20,17 @@ module.exports = (socket, command) => {
     let url = argv[2];
 
     let chan = Channel.getChannelByName(channel);
-    if(!chan) {
+    if (!chan) {
         ERRSender.ERR_NOSUCHCHANNEL(socket.client, channel);
         return;
     }
 
-    if(!chan.isUserOperator(socket.client)) {
+    if (!chan.isUserOperator(socket.client)) {
         ERRSender.ERR_CHANOPRIVSNEEDED(socket.client, channel);
         return;
     }
 
-    if(url === '*') {
+    if (url === '*') {
         chan.deleteFiles();
     } else {
         chan.removeFile(url);

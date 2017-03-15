@@ -1,4 +1,3 @@
-
 node:
   image: bitnami/node:7
   command: sh -c 'npm run build && node ./dist/app.js PROD'

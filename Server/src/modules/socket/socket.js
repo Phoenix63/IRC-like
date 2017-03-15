@@ -27,15 +27,15 @@ class Socket {
         this._onSignal = {};
 
         this._life = 1;
-        if(interval>0) {
+        if (interval > 0) {
             this._interval = setInterval(() => {
-                if(this._life <= 0) {
+                if (this._life <= 0) {
                     this._socket.destroy();
-                }  else {
+                } else {
                     this._life--;
-                    this.send(':'+config.ip+' PING :'+shortid.generate());
+                    this.send(':' + config.ip + ' PING :' + shortid.generate());
                 }
-            }, interval/2);
+            }, interval / 2);
         }
 
     }
@@ -148,10 +148,11 @@ class Socket {
     /**
      * delete socket
      */
+    //onClose not close ...
     close() {
         clearInterval(this._interval);
         if (this._client) {
-            this._client.del();
+            this._client.remove();
         }
         if (this._logger) {
             this._logger._CLIENT_DISCONNECTED();
@@ -160,19 +161,32 @@ class Socket {
         delete this;
     }
 
+    closeTheSockets() {/*
+     if (this.isTcp) {
+     this._socket.
+     } else {
+     this._socket.emit('message', data);
+     }*/
+    }
+
+    get ip() {
+        return this.isTcp ? this._socket.remoteAddress : this._socket.handshake.address;
+    }
+
+
 }
 
 function create(callback) {
+    sio.create(function (socket) {
+        let soc = new Socket('sio', socket);
+        socket.manager = soc;
+        callback(soc);
+    });
     tcp.create(function (socket) {
         let soc = new Socket('tcp', socket);
         socket.manager = soc;
         callback(soc);
     });
-    sio.create(function (socket) {
-        let soc = new Socket('sio', socket);
-        socket.manager = soc;
-        callback(soc);
-    })
 }
 
 export default {create: create};

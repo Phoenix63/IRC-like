@@ -16,33 +16,32 @@ module.exports = function (socket, command) {
         let chan = cmd[0];
         let user = cmd[1];
 
-        if(chan[0] !== '#') {
-            ERRSender.ERR_NOSUCHCHANNEL(socket.client,chan);
+        if (chan[0] !== '#') {
+            ERRSender.ERR_NOSUCHCHANNEL(socket.client, chan);
             return;
         }
 
         let channel = Channel.getChannelByName(chan);
-        if(!channel) {
-            ERRSender.ERR_NOSUCHCHANNEL(socket.client,chan);
+        if (!channel) {
+            ERRSender.ERR_NOSUCHCHANNEL(socket.client, chan);
         } else {
-            if(channel.isUserOperator(socket.client)) {
+            if (channel.isUserOperator(socket.client)) {
                 let kicked = channel.getUser(user);
-                if(kicked) {
+                if (kicked) {
                     RPLSender.KICK(socket.client, kicked.name, channel);
                     channel.removeUser(kicked);
                 } else {
-                    ERRSender.ERR_NOTONCHANNEL(socket.client,chan);
+                    ERRSender.ERR_NOTONCHANNEL(socket.client, chan);
                 }
             } else {
-                ERRSender.ERR_CHANOPRIVSNEEDED(socket.client,chan);
+                ERRSender.ERR_CHANOPRIVSNEEDED(socket.client, chan);
             }
         }
 
 
     } catch (e) {
-        ERRSender.ERR_NEEDMOREPARAMS(socket.client,'KICK');
+        ERRSender.ERR_NEEDMOREPARAMS(socket.client, 'KICK');
     }
-
 
 
 };

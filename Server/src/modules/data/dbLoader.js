@@ -1,58 +1,41 @@
-
-let MongoClient = require('mongodb').MongoClient;
-let config = require('./../../ENV.json');
-
+import config from './../../ENV.json';
 import Redis from './RedisInterface';
-let redis = Redis.instance;
-
-import Caller from './Caller';
 import Channel from './../channel/Channel';
+import Trigger from './Trigger';
+let MongoClient = require('mongodb').MongoClient;
+let url;
+//For unitTest we use an other DB and we drop it before starting
+if (process.argv[2] === 'TEST') {
+    url = 'mongodb://' + config.mongo.host + ':' + config.mongo.port + '/' + config.mongo.dbtest;
+} else {
+    url = 'mongodb://' + config.mongo.host + ':' + config.mongo.port + '/' + config.mongo.db;
+}
 
-var url = 'mongodb://'+config.mongo.host+':'+config.mongo.port+'/'+config.mongo.db;
+module.exports = function (callback) {
 
-module.exports = function(callback) {
-
-    if(process.env.parent !== 'TEST') {
-        MongoClient.connect(url, (err, db) => {
-
-            let caller = new Caller(() => {
-                db.close();
-                callback();
-            });
-
-            let users = db.collection('users');
-            users.find().toArray((err, us) => {
-
-                let admin = db.collection('admin');
-                admin.find().toArray((err, ads) => {
-
-                    let channels = db.collection('channels');
-                    channels.find().toArray((err, cs) => {
-                        caller.toSave = (ads.length?ads.length:0) + (us.length?us.length:0) + (cs.length?cs.length:0);
-                        us.forEach((user) => {
-                            redis.addUser(user.identity, user.pass);
-                            caller.incSaved();
-                        });
-
-                        ads.forEach((tuple) => {
-                            redis.setAdmin({identity: tuple.name, role: tuple.role});
-                            caller.incSaved();
-                        });
-
-                        cs.forEach((channel) => {
-                            let obj = JSON.parse(channel.data);
-                            let chan = new Channel({identity: obj.creator}, obj.name, obj.pass, parseInt(obj.size), (obj.topic||''));
-                            chan.setUserFlags(obj.userflags);
-                            caller.incSaved();
-                        });
-                    });
-                });
-            });
-
-
+    MongoClient.connect(url, (err, db) => {
+        Trigger.setCallback(()=>{
+            db.close();
+            callback();
         });
-    } else {
-        callback();
-    }
-
+        if (process.argv[2] === 'TEST') {
+            db.dropDatabase();
+        }
+        db.collection('users').find().toArray((err, us) => {
+            us.forEach((user) => {
+                Redis.setUser(JSON.parse(user.data));
+            });
+            Trigger.update();
+        });
+        db.collection('channels').find().toArray((err, cs) => {
+            cs.forEach((channel) => {
+                let obj = JSON.parse(channel.data);
+                let chan = new Channel({identity: obj.creator}, obj.name, obj.pass, parseInt(obj.size), obj.topic);
+                chan.usersFlags = obj.usersFlags;
+                chan.flags = obj.flags;
+                chan.bannedIP = obj.bannedIP;
+            });
+            Trigger.update();
+        });
+    });
 };

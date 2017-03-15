@@ -5,6 +5,9 @@
   "main": "app.js",
   "scripts": {
     "dev": "docker-compose -f ./docker/dev.yml up",
+    "DEV": "babel src --out-dir dist --source-maps inline --copy-files && babel-node ./src/app.js DEV",
+    "TEST": "babel src --out-dir dist --source-maps inline --copy-files && babel-node ./src/app.js TEST",
+    "PROD": "babel src --out-dir dist --source-maps inline --copy-files && babel-node ./src/app.js PROD",
     "watch": "babel --watch src --out-dir dist --source-maps inline --copy-files",
     "build": "babel src --out-dir dist --source-maps inline --copy-files",
     "prod": "docker-compose -f ./docker/prod.yml up",

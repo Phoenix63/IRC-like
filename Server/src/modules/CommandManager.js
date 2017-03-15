@@ -14,16 +14,18 @@ let allowedCommand = {
     'WHO': require('./command/WHO'),
     'USER': require('./command/USER'),
     'PASS': require('./command/PASS'),
-    'PONG': function(){},
+    'PONG': function () {
+    },
     'WHOIS': require('./command/WHOIS'),
-    'MODE':require('./command/MODE'),
+    'MODE': require('./command/MODE'),
     'TOPIC': require('./command/TOPIC'),
     'RESTART': require('./command/RESTART'),
     'KICK': require('./command/KICK'),
     'INVITE': require('./command/INVITE'),
     'AWAY': require('./command/AWAY'),
     'LISTFILES': require('./command/LISTFILES'),
-    'RMFILE': require('./command/RMFILE')
+    'RMFILE': require('./command/RMFILE'),
+    'DEBUG': require('./command/DEBUG')
 };
 
 class CommandManager {
@@ -48,11 +50,11 @@ class CommandManager {
         //let command = line.match(/^[A-Z]+(.+)?/g);
         let command = /(^[A-Z]+)(.*)?/.exec(line);
         if (command && command[1]) {
-            if(!command[2]) {
+            if (!command[2]) {
                 command[2] = '';
             }
-            if(command[2] && command[2][0] === ' ') {
-                command[2] = command[2].slice(1,command[2].length);
+            if (command[2] && command[2][0] === ' ') {
+                command[2] = command[2].slice(1, command[2].length);
             }
             return [command[1], command[2]];
         } else {

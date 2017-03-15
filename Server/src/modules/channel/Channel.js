@@ -1,10 +1,9 @@
 "use strict";
 
-import Client from './../client/client';
+import Client from '../client/Client';
 import ERRSender from './../responses/ERRSender';
 import RPLSender from './../responses/RPLSender';
 import Redis from './../data/RedisInterface';
-let redis = Redis.instance;
 
 let channels = [];
 
@@ -20,56 +19,46 @@ class Channel {
      * @param {string} topic
      * @constructor
      */
-    constructor(creator, name, pass, size, topic='') {
-         /**
-         s 		canal secret; le canal est totalement invisible
-         p 		canal privé; le nom du canal est invisible
-         n 		les messages externes ne sont pas autorisés
-         m 		canal modéré, seuls les utilisateurs en mode +v et les opérateurs peuvent envoyer un message
-         i 		canal accessible uniquement sur invitation (commande /invite)
-         t 		sujet du canal uniquement modifiable par les opérateurs du canal
+    constructor(creator, name, pass, size, topic = '') {
+        /**
+         *  s       canal secret; le canal est totalement invisible
+         *  p       canal privé; le nom du canal est invisible
+         *  n       les messages externes ne sont pas autorisés
+         *  m       canal modéré, seuls les utilisateurs en mode +v et les opérateurs peuvent envoyer un message
+         *  i       canal accessible uniquement sur invitation (commande /invite)
+         *  t       sujet du canal uniquement modifiable par les opérateurs du canal
+         *
+         *  o    +  nom de l'utilisateur concerné    Opérateur de canal : peut changer les modes du channel et expulser les autres utilisateurs
+         *  v    +  nom de l'utilisateur concerné    verbose ou voiced : autorise l'utilisateur à parler sur un canal modéré (mode +m)
          */
         this._flags = '';
-
+        this._usersFlags = {};
         this._pass = pass || '';
         this._size = size;
-        this._bannedUsers = [];
+        this._bannedIP = {};//key = ip, value = endTimeOfBan(ms)
         this._users = [];
-
         this._creator = creator.identity;
-        /**
-         o 	@ 	nom de l'utilisateur concerné 	Opérateur de canal : peut changer les modes du channel et expulser les autres utilisateurs
-         v 	+ 	nom de l'utilisateur concerné 	verbose ou voiced : autorise l'utilisateur à parler sur un canal modéré (mode +m)
-         */
-        this._usersFlags = {};
         this._invitations = [];
         this._name = name;
-        this._temporary = true;
+        this._persistent = false;
         this._topic = topic;
-
         this._files = {};
 
-
-        // not loaded from db
-        if(creator instanceof Client) {
-            if(creator.isAdmin()) {
+        // not loaded from mongo
+        if (creator instanceof Client) {
+            if (creator.isAdmin() || creator.isSuperAdmin()) {
                 this.setPersistent(true);
             }
-
             this.addUser(creator, pass);
-        } else {
+            this._addChannelFlag('tn');
+        }
+        //load from mongo
+        else {
             this.setPersistent(true);
         }
-
-        this._addChannelFlag('tn');
         channels.push(this);
     }
 
-    _change() {
-        if(!this._temporary && process.env.parent !== 'TEST') {
-            redis.upsertChannel(this);
-        }
-    }
 
     /**
      *
@@ -84,7 +73,7 @@ class Channel {
      * @returns {string|NULL}
      */
     get topic() {
-        if(this._topic !== '') {
+        if (this._topic !== '') {
             return this._topic;
         } else {
             return null;
@@ -101,13 +90,13 @@ class Channel {
 
     /**
      *
-     * @param id|nickname|client
+     * @param {number|string|Client} id -> identifiant|nickname|client
      * @returns {null|Client}
      */
     getUser(id) {
-        for (let key in this._users) {
-            if (key === id || this._users[key].name === id || this._users[key].id === id) {
-                return this._users[key];
+        for (let j = 0; j < this._users.length; j++) {
+            if (this._users[j] === id || this._users[j].identity === id || this._users[j].name === id) {
+                return this._users[j];
             }
         }
         return null;
@@ -145,8 +134,6 @@ class Channel {
         return (this._flags.indexOf('m') >= 0);
     }
 
-
-
     /**
      *
      * @returns {string}
@@ -172,8 +159,17 @@ class Channel {
     }
 
     /**
+     * return true if the client is voice
+     * @param {Client} client
+     * @returns {boolean}
+     */
+    isUserVoice(client) {
+        return this._usersFlags[client.identity].indexOf('v') >= 0;
+    }
+
+    /**
      *
-     * @returns {Client}
+     * @returns {Client|Object}
      */
     get creator() {
         return this._creator;
@@ -181,10 +177,27 @@ class Channel {
 
     /**
      *
-     * @returns {string|*|string}
+     * @returns {string}
      */
     get channelFlags() {
         return this._flags;
+    }
+
+    /**
+     *
+     * @returns {{}}
+     */
+    get bannedIP() {
+        return this._bannedIP;
+    }
+
+    /**
+     *
+     * @param {{}} bannedIP
+     */
+    set bannedIP(bannedIP) {
+        this._bannedIP = bannedIP;
+        this._mergeToRedis();
     }
 
     /**
@@ -192,57 +205,31 @@ class Channel {
      * @param {Boolean} bool
      */
     setPersistent(bool) {
-        this._temporary = !bool;
-        if(bool) {
-            redis.upsertChannel(this);
+        this._persistent = bool;
+        if (bool) {
+            Redis.setChannel(this);
         } else {
-            redis.deleteChannel(this);
+            Redis.deleteChannel(this);
         }
     }
 
+    /**
+     *if the channel is persistent, ie if it is created by an administrator, we save in redis
+     * @private
+     */
+    _mergeToRedis() {
+        if (this._persistent) {
+            Redis.setChannel(this);
+        }
+    }
 
     /**
      *
      * @param {string|NULL} newTopic
      */
-    set topic(newTopic){
+    set topic(newTopic) {
         this._topic = newTopic;
-        this._change();
-    }
-
-    /**
-     * this method is only called when bdd is loading
-     * @param {Client} client
-     * @param {JSON} flags
-     */
-    _addClientFlag(client, flags) {
-        let arrayFlags = flags.split('');
-        arrayFlags.forEach((flag) => {
-            if (this._usersFlags[client.identity].indexOf(flag) === -1) {
-                this._usersFlags[client.identity] += flag;
-                RPLSender.RPL_CHANNELMODEIS(this,this._name+' +'+flag+' '+client.name);
-            }
-        });
-        this._change();
-    }
-
-
-    /**
-     *
-     * @param client
-     * @param flags
-     * @private
-     */
-    _removeClientFlag(client, flags) {
-        let arrayFlags = flags.split('');
-        arrayFlags.forEach((flag) => {
-            let tmp = this._usersFlags[client.identity].length;
-            this._usersFlags[client.identity] = this._usersFlags[client.identity].replace(flag, '');
-            if(tmp-1 === this._usersFlags[client.identity].length){
-                RPLSender.RPL_CHANNELMODEIS(this,this._name+' -'+flag+' '+client.name);
-            }
-        });
-        this._change();
+        this._mergeToRedis();
     }
 
     /**
@@ -253,7 +240,7 @@ class Channel {
     addFile(client, url) {
         let split = url.split('/');
         this._files[url] = {
-            name: split[split.length-1],
+            name: split[split.length - 1],
             client: client
         };
     }
@@ -275,99 +262,130 @@ class Channel {
     }
 
     /**
+     * @param {Client} client
+     * @param {string} flags
+     * @private
+     */
+    _addClientFlag(client, flags) {
+        let arrayFlags = flags.split('');
+        arrayFlags.forEach((flag) => {
+            if (this._usersFlags[client.identity].indexOf(flag) === -1) {
+                this._usersFlags[client.identity] += flag;
+                RPLSender.RPL_CHANNELMODEIS(this, this._name + ' +' + flag + ' ' + client.name);
+            }
+        });
+        this._mergeToRedis();
+    }
+
+    /**
+     *
+     * @param {Client} client
+     * @param {string} flags
+     * @private
+     */
+    _removeClientFlag(client, flags) {
+        let arrayFlags = flags.split('');
+        arrayFlags.forEach((flag) => {
+            let tmp = this._usersFlags[client.identity].length;
+            this._usersFlags[client.identity] = this._usersFlags[client.identity].replace(flag, '');
+            if (tmp - 1 === this._usersFlags[client.identity].length) {
+                RPLSender.RPL_CHANNELMODEIS(this, this._name + ' -' + flag + ' ' + client.name);
+            }
+        });
+        this._mergeToRedis();
+    }
+
+    /**
      *
      * @param {String} flags
+     * @private
      */
     _addChannelFlag(flags) {
         let arrayFlags = flags.split('');
         arrayFlags.forEach((flag) => {
-            if(this._flags.indexOf(flag)===-1){
+            if (this._flags.indexOf(flag) === -1) {
                 this._flags += flag;
-                RPLSender.RPL_CHANNELMODEIS(this,this._name+' +'+flag);
+                RPLSender.RPL_CHANNELMODEIS(this, this._name + ' +' + flag);
             }
         });
-        this._change();
+        this._mergeToRedis();
     }
+
     /**
      *
      * @param {String} flags
+     * @private
      */
     _removeChannelFlag(flags) {
         let arrayFlags = flags.split('');
         arrayFlags.forEach((flag) => {
             let tmp = this._flags.length;
-            this._flags = this._flags.replace(flag,'');
-            if(tmp-1 === this._flags.length){
-                RPLSender.RPL_CHANNELMODEIS(this,this._name+' -'+flag);
+            this._flags = this._flags.replace(flag, '');
+            if (tmp - 1 === this._flags.length) {
+                RPLSender.RPL_CHANNELMODEIS(this, this._name + ' -' + flag);
             }
         });
-        this._change();
+        this._mergeToRedis();
     }
 
     /**
      *
-     * @param operator
-     * @param flag
-     * @param client
+     * @param {string} operator
+     * @param {string} flag
+     * @param {Client} client
      */
     changeClientFlag(operator, flag, client) {
-        if(operator==='+') {
+        if (operator === '+') {
             this._addClientFlag(client, flag);
-        }else {
+        } else {
             this._removeClientFlag(client, flag);
         }
     }
 
     /**
      *
-     * @param operator
-     * @param flag
+     * @param {string} operator
+     * @param {string} flag
      */
     changeChannelFlag(operator, flag) {
-        if(operator==='+') {
+        if (operator === '+') {
             this._addChannelFlag(flag);
-        }else {
+        } else {
             this._removeChannelFlag(flag);
         }
     }
 
-
     /**
-     * return true if the clinet is operator
+     *
      * @param {Client} client
      * @returns {boolean}
      */
     isUserOperator(client) {
         if (this._usersFlags[client.identity] && this._usersFlags[client.identity].indexOf('o') >= 0) {
             return true;
-        } else if(this._temporary && client.identity === this._creator) {
+        } else if (!this._persistent && client.identity === this._creator) {
             return true;
         }
         return false;
     }
 
-
     /**
-     * return true if the client is voice
-     * @param {Client} client
-     * @returns {boolean}
+     *
+     * @param {{}} flags
      */
-    isUserVoice(client) {
-        if (this._usersFlags[client.identity] && this._usersFlags[client.identity].indexOf('v') >= 0)
-            return true;
-        return false;
+    set usersFlags(flags) {
+        this._usersFlags = flags;
+        this._mergeToRedis();
     }
-
 
     /**
      *
      * @param {string} flags
      */
-    setUserFlags(flags) {
-        this._usersFlags = flags;
-        this._change();
+    set flags(flags) {
+        this._flags = flags;
+        this._mergeToRedis();
     }
-
 
 
     /**
@@ -375,12 +393,12 @@ class Channel {
      * @param {Client} user
      * @param {string} key
      */
-    addUser(user, key='') {
-        if (this._bannedUsers.indexOf(user) >= 0) {
+    addUser(user, key = '') {
+        if (this._isBan(user)) {
             ERRSender.ERR_BANNEDFROMCHAN(user, this);
             return;
         }
-        if (this.isInvitation && this._invitations.indexOf(user) === -1) {
+        if (this.isInvitation && this._invitations.indexOf(user.identity) === -1) {
             ERRSender.ERR_INVITEONLYCHAN(user, this);
             return;
         }
@@ -392,27 +410,25 @@ class Channel {
             ERRSender.ERR_CHANNELISFULL(user, this);
             return;
         }
-        if(this._users.indexOf(user) < 0) {
+        if (this._users.indexOf(user) < 0) {
             this._users.push(user);
-            if(user.isUser()) {
 
-                if(!this._usersFlags[user.identity]) {
-                    this._usersFlags[user.identity] = '';
-                }
-
-                if (this._users.length === 1 && this._temporary) {
-                    this._addClientFlag(user,'o')
-                }
-
-                if (this._pass.length>0){
-                    this._addChannelFlag('p');
-                }
-
-                if(user.isAdmin() || user.isSuperAdmin() || user.identity === this._creator) {
-                    this._addClientFlag(user,'o')
-                }
+            if (!this._usersFlags[user.identity]) {
+                this._usersFlags[user.identity] = '';
             }
-            this._change();
+
+            if (this._users.length === 1) {
+                this._addClientFlag(user, 'o')
+            }
+
+            if (this._pass.length > 0) {
+                this._addChannelFlag('p');
+            }
+
+            if (user.isAdmin() || user.isSuperAdmin() || user.identity === this._creator) {
+                this._addClientFlag(user, 'o')
+            }
+            this._mergeToRedis();
             user.addChannel(this);
             RPLSender.JOIN(user, this);
             RPLSender.RPL_TOPIC('JOIN', user, this);
@@ -425,7 +441,7 @@ class Channel {
      * @param {Client} user
      * @param {string} message
      */
-    removeUser(user, message='Gone', bool) {
+    removeUser(user, message = 'Gone', bool) {
         let index = this._users.indexOf(user);
         if (index < 0) {
             ERRSender.ERR_NOTONCHANNEL(user, this);
@@ -433,16 +449,15 @@ class Channel {
             this._users.splice(index, 1);
             RPLSender.PART(user, this, message);
 
-            if(!bool) {
+            if (!bool) {
                 user.removeChannel(this);
             }
 
 
-            if(this._temporary && this._users.length <= 0) {
+            if (!this._persistent && this._users.length <= 0) {
                 channels.splice(channels.indexOf(this), 1);
             }
         }
-
     }
 
     /**
@@ -451,6 +466,7 @@ class Channel {
      */
     setSize(size) {
         this._size = size;
+        this._mergeToRedis();
     }
 
     /**
@@ -459,6 +475,7 @@ class Channel {
      */
     setPass(pass) {
         this._pass = pass;
+        this._mergeToRedis();
     }
 
     /**
@@ -476,25 +493,87 @@ class Channel {
     /**
      *
      * @param {Socket} socket
-     * @param {Client} client
+     * @param {Client} guest
      */
-    invite(socket, client){
-        if(this._invitations.indexOf(client)===-1){
-            this._invitations.push(client);
-            RPLSender.RPL_SERVER_ACCEPT_THE_INVITATION(socket, client, this);
-            RPLSender.RPL_YOU_HAVE_BEEN_INVITED(socket, client, this);
+    invite(socket, guest) {
+        if (this._invitations.indexOf(guest.identity) === -1) {
+            this._invitations.push(guest.identity);
+            RPLSender.RPL_SERVER_ACCEPT_THE_INVITATION(socket, guest, this);
+            RPLSender.RPL_YOU_HAVE_BEEN_INVITED(socket, guest, this);
+            this._mergeToRedis();
         }
     }
 
-
+    /**
+     *
+     * @param {Client} userBanned
+     * @param {number} banishmentTime
+     */
+    ban(userBanned, banishmentTime) {
+        let banDuration = parseInt(banishmentTime) * 1000;//millisecond
+        let endTimeOfBan = Date.now() + banDuration;
+        this._bannedIP[userBanned.socket.ip] = endTimeOfBan;
+        this._mergeToRedis();
+        RPLSender.RPL_CHANNELMODEIS(this, this.name + " +b " + userBanned.name + " " + banishmentTime);
+        this.removeUser(userBanned);
+    }
 
     /**
      *
-     * @returns {Array<Channel>}
+     * @param {Client} userBanned
      */
-    static getChannelByName(nameChannel){
-        for(let i = 0; i< Channel.list().length;i++){
-            if(Channel.list()[i].name===nameChannel){
+    unban(userBanned) {
+        if (this._bannedIP[userBanned.socket.ip]) {
+            RPLSender.RPL_CHANNELMODEIS(this, this.name + " -b " + userBanned.name);
+            this._mergeToRedis();
+            delete this._bannedIP[userBanned.socket.ip];
+        }
+    }
+
+    /**
+     *
+     * @param {Client} user
+     * @returns {boolean}
+     * @private
+     */
+    _isBan(user) {
+        if (this._bannedIP[user.socket.ip] > Date.now()) {
+            return true;
+        } else {
+            delete this._bannedIP[user.socket.ip];
+            return false;
+        }
+    }
+
+    /**
+     *return flags only from registered users
+     * @returns {{}} registeredUsersFlags
+     */
+    getOnlyRegisteredUsersFlags() {
+        let registeredUsersFlags = {};
+        for (let key in this._usersFlags) {
+            if (this._usersFlags.hasOwnProperty(key)) {
+                let user = Client.getClient(key);
+                //if someone connected match with in usersFlags
+                if (user && user.isRegisteredWithPass()) {
+                    registeredUsersFlags[key] = this._usersFlags[key];
+                }
+                //keep flags load in DB
+                else if (!user) {
+                    registeredUsersFlags[key] = this._usersFlags[key];
+                }
+            }
+        }
+        return registeredUsersFlags;
+    }
+
+    /**
+     *
+     * @returns {Channel}
+     */
+    static getChannelByName(nameChannel) {
+        for (let i = 0; i < Channel.list().length; i++) {
+            if (Channel.list()[i].name === nameChannel) {
                 return Channel.list()[i];
             }
         }
@@ -503,12 +582,11 @@ class Channel {
 
     /**
      *
-     * @returns {Array}
+     * @returns {Array<Channel>}
      */
     static list() {
         return channels;
     }
-
 }
 
 export default Channel;

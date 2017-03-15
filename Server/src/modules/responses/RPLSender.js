@@ -1,6 +1,6 @@
 import Channel from './../channel/Channel';
 import config from './../../config.json';
-import Client from './../client/client';
+import Client from '../client/Client';
 
 let RPLSender = {
 
@@ -20,7 +20,7 @@ let RPLSender = {
         let ret = ':' + config.ip + ' 353 ' + client.name + ' ' + sep + ' ' + channel.name;
         let us = '';
         channel.users.forEach((user) => {
-            if(user.isInvisible()){
+            if (user.isInvisible()) {
                 return;
             }
             let delimiter = '';
@@ -47,10 +47,10 @@ let RPLSender = {
     RPL_WHOREPLY: (client, channel) => {
         channel.users.forEach((u) => {
             let delimiter = '';
-            if(channel.isUserOperator(u)) {
+            if (channel.isUserOperator(u)) {
                 delimiter += '@';
             }
-            else if(channel.isUserVoice(u)) {
+            else if (channel.isUserVoice(u)) {
                 delimiter += '+';
             }
             client.socket.send(
@@ -72,9 +72,9 @@ let RPLSender = {
      */
     RPL_TOPIC: (command, client, channel) => {
         if (channel.topic) {
-            channel.broadcast(':' + config.ip + ' 332 '+command+' ' + channel.name + ' :' + channel.topic,null);
+            channel.broadcast(':' + config.ip + ' 332 ' + command + ' ' + channel.name + ' :' + channel.topic, null);
         } else {
-            channel.broadcast(':' + config.ip + ' 331 '+command+' ' + channel.name + ' :No topic is set',null);
+            channel.broadcast(':' + config.ip + ' 331 ' + command + ' ' + channel.name + ' :No topic is set', null);
         }
     },
 
@@ -85,7 +85,7 @@ let RPLSender = {
      * @static
      */
     JOIN: (client, channel) => {
-        channel.broadcast(':'+((channel.isUserOperator(client) ? '@' : '') + client.name)+' JOIN '+channel.name, null);
+        channel.broadcast(':' + ((channel.isUserOperator(client) ? '@' : '') + client.name) + ' JOIN ' + channel.name, null);
     },
 
     /**
@@ -95,9 +95,9 @@ let RPLSender = {
      * @param {string} message
      * @static
      */
-    PART: (client, channel, message='Gone') => {
-        channel.broadcast(':' + client.name + ' PART ' + channel.name + ' :'+message, client);
-        client.socket.send(':' + client.name + ' PART ' + channel.name + ' :'+message);
+    PART: (client, channel, message = 'Gone') => {
+        channel.broadcast(':' + client.name + ' PART ' + channel.name + ' :' + message, client);
+        client.socket.send(':' + client.name + ' PART ' + channel.name + ' :' + message);
     },
 
     /**
@@ -135,7 +135,7 @@ let RPLSender = {
      */
     HEADER: (socket) => {
         socket.send(':' + config.ip + ' NOTICE AUTH :*** YOU ARE CONNECTED');
-        socket.send(':' + config.ip + ' NOTICE NICK :*** '+socket.client.name);
+        socket.send(':' + config.ip + ' NOTICE NICK :*** ' + socket.client.name);
     },
 
     /**
@@ -144,7 +144,7 @@ let RPLSender = {
      * @static
      */
     RPL_MOTDSTART: (socket) => {
-        socket.send(':'+config.ip+' 375 :- '+config.ip+' Message of the day - ');
+        socket.send(':' + config.ip + ' 375 :- ' + config.ip + ' Message of the day - ');
     },
 
     /**
@@ -153,7 +153,7 @@ let RPLSender = {
      * @static
      */
     RPL_MOTD: (socket) => {
-        socket.send(':'+config.ip+' 372 :- Welcome '+socket.client.identity);
+        socket.send(':' + config.ip + ' 372 :- Welcome ' + socket.client.identity);
     },
 
     /**
@@ -163,7 +163,7 @@ let RPLSender = {
      */
 
     RPL_ENDOFMOTD: (socket) => {
-        socket.send(':'+config.ip+' 376 :End of /MOTD command');
+        socket.send(':' + config.ip + ' 376 :End of /MOTD command');
     },
 
     /**
@@ -173,7 +173,7 @@ let RPLSender = {
      * @static
      */
     RPL_WHOISUSER: (client, user) => {
-        client.socket.send(':'+config.ip+' 311 '+user.name+ ' ' + user.identity + ' ' + config.ip + ' * :'+user.realname);
+        client.socket.send(':' + config.ip + ' 311 ' + user.name + ' ' + user.identity + ' ' + config.ip + ' * :' + user.realname);
     },
 
     /**
@@ -182,8 +182,8 @@ let RPLSender = {
      * @param {string} message
      * @static
      */
-    QUIT: (client, message='Gone') => {
-        client.socket.broadcast(':'+client.name+' QUIT :'+message, null);
+    QUIT: (client, message = 'Gone') => {
+        client.socket.broadcast(':' + client.name + ' QUIT :' + message, null);
     },
 
     /**
@@ -192,8 +192,8 @@ let RPLSender = {
      * @param {string} cmd
      * @static
      */
-    RPL_CHANNELMODEIS: (chan, cmd)=> {
-        chan.broadcast(':'+config.ip+' 324 MODE '+cmd, null);
+    RPL_CHANNELMODEIS: (chan, cmd) => {
+        chan.broadcast(':' + config.ip + ' 324 MODE ' + cmd, null);
     },
     /**
      *
@@ -201,17 +201,17 @@ let RPLSender = {
      * @param {string} cmd
      * @static
      */
-    RPL_UMODEIS: (client, cmd)=> {
-        client.socket.send(':'+config.ip+' 221 MODE '+cmd);
+    RPL_UMODEIS: (client, cmd) => {
+        client.socket.send(':' + config.ip + ' 221 MODE ' + cmd);
     },
     /**
      *
      * @param cmd
      * @constructor
      */
-    RPL_UMODEIS_BROADCAST_ALL: (cmd)=> {
-        Client.list().forEach((client)=>{
-            client.socket.send(':'+config.ip+' 221 MODE '+cmd);
+    RPL_UMODEIS_BROADCAST_ALL: (cmd) => {
+        Client.list().forEach((client) => {
+            client.socket.send(':' + config.ip + ' 221 MODE ' + cmd);
         });
     },
     /**
@@ -222,7 +222,7 @@ let RPLSender = {
      * @constructor
      */
     KICK: (client, kicked, channel) => {
-        channel.broadcast(':'+client.name+' KICK '+channel.name+' '+kicked);
+        channel.broadcast(':' + client.name + ' KICK ' + channel.name + ' ' + kicked);
     },
     /**
      *
@@ -231,8 +231,8 @@ let RPLSender = {
      * @param chan
      * @constructor
      */
-    RPL_SERVER_ACCEPT_THE_INVITATION: (socket, guest, chan)=>{
-        socket.send(':'+config.ip+' 341 '+guest.name+' '+chan.name);
+    RPL_SERVER_ACCEPT_THE_INVITATION: (socket, guest, chan) => {
+        socket.send(':' + config.ip + ' 341 ' + guest.name + ' ' + chan.name);
     },
     /**
      *
@@ -241,8 +241,8 @@ let RPLSender = {
      * @param chan
      * @constructor
      */
-    RPL_YOU_HAVE_BEEN_INVITED: (socket, guest, chan)=>{
-        guest.socket.send(':'+config.ip+' 641 '+socket.client.name+' '+chan.name);
+    RPL_YOU_HAVE_BEEN_INVITED: (socket, guest, chan) => {
+        guest.socket.send(':' + config.ip + ' 641 ' + socket.client.name + ' ' + chan.name);
     },
     /**
      *
@@ -252,7 +252,7 @@ let RPLSender = {
      * @constructor
      */
     RPL_AWAY: (socket, nick, msg) => {
-        socket.send(':'+config.ip+' 301 '+nick+' :'+msg);
+        socket.send(':' + config.ip + ' 301 ' + nick + ' :' + msg);
     },
     /**
      *
@@ -260,7 +260,7 @@ let RPLSender = {
      * @constructor
      */
     RPL_UNAWAY: (socket) => {
-        socket.send(':'+config.ip+' 305 :You are no longer marked as being away');
+        socket.send(':' + config.ip + ' 305 :You are no longer marked as being away');
     },
     /**
      *
@@ -268,7 +268,7 @@ let RPLSender = {
      * @constructor
      */
     RPL_NOWAWAY: (socket) => {
-        socket.send(':'+config.ip+' 306 :You have been marked as being away');
+        socket.send(':' + config.ip + ' 306 :You have been marked as being away');
     },
 
     /**
@@ -278,12 +278,12 @@ let RPLSender = {
      * @constructor
      */
     LISTFILES: (socket, chan) => {
-        socket.send(':'+config.ip+' LISTFILES '+chan.name+' :/list start');
+        socket.send(':' + config.ip + ' LISTFILES ' + chan.name + ' :/list start');
         let files = chan.getFiles();
-        for(var key in files) {
-            socket.send(':'+config.ip+' LISTFILES '+chan.name+' '+key+' '+files[key].name+' '+files[key].client.name);
+        for (var key in files) {
+            socket.send(':' + config.ip + ' LISTFILES ' + chan.name + ' ' + key + ' ' + files[key].name + ' ' + files[key].client.name);
         }
-        socket.send(':'+config.ip+' LISTFILES '+chan.name+' :/list end');
+        socket.send(':' + config.ip + ' LISTFILES ' + chan.name + ' :/list end');
     },
 
     /**
@@ -294,7 +294,7 @@ let RPLSender = {
      * @constructor
      */
     RMFILE: (socket, chan, file) => {
-        chan.broadcast(':'+socket.client.name+' RMFILE :'+file, null);
+        chan.broadcast(':' + socket.client.name + ' RMFILE :' + file, null);
     }
 
 };
