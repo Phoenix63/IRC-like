@@ -8,7 +8,7 @@ import dbSaver from "../data/dbSaver";
 import dbLoader from "../data/dbLoader";
 
 module.exports = function (socket, command) {
-    if (process.argv[2] === 'PROD') {
+    if (process.env.RUNNING === 'PROD') {
         return;
     }
     //view redis

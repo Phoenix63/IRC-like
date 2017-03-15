@@ -1,6 +1,6 @@
 "use strict"
 
-import Client from './client/client';
+import Client from './client/Client';
 import colors from './util/Color';
 let debug = require('debug')('server:logger');
 
@@ -44,7 +44,7 @@ class Logger {
     };
 
     _SEND_TO_CLIENT(message) {
-        debug(colors.magenta('[to] ') + colors.green(this.client.name) + '<< ' + message+'\n');
+        debug(colors.magenta('[to] ') + colors.green(this.client.name) + '<< ' + message);
     };
 
     _USER_SEND_CMD(message) {

@@ -4,7 +4,7 @@ import Trigger from './Trigger';
 let MongoClient = require('mongodb').MongoClient;
 let url;
 //For unitTest we use an other DB
-if (process.argv[2] === 'TEST') {
+if (process.env.RUNNING === 'TEST') {
     url = 'mongodb://' + config.mongo.host + ':' + config.mongo.port + '/' + config.mongo.dbtest;
 } else {
     url = 'mongodb://' + config.mongo.host + ':' + config.mongo.port + '/' + config.mongo.db;

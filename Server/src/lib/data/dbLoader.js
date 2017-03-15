@@ -5,7 +5,7 @@ import Trigger from './Trigger';
 let MongoClient = require('mongodb').MongoClient;
 let url;
 //For unitTest we use an other DB and we drop it before starting
-if (process.argv[2] === 'TEST') {
+if (process.env.RUNNING === 'TEST') {
     url = 'mongodb://' + config.mongo.host + ':' + config.mongo.port + '/' + config.mongo.dbtest;
 } else {
     url = 'mongodb://' + config.mongo.host + ':' + config.mongo.port + '/' + config.mongo.db;
@@ -18,7 +18,7 @@ module.exports = function (callback) {
             db.close();
             callback();
         });
-        if (process.argv[2] === 'TEST') {
+        if (process.env.RUNNING === 'TEST') {
             db.dropDatabase();
         }
         db.collection('users').find().toArray((err, us) => {

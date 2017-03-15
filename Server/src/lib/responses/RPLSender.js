@@ -1,6 +1,6 @@
 import Channel from './../channel/Channel';
 import config from './../../config.json';
-import Client from '../client/Client';
+import Client from './../client/Client';
 
 let RPLSender = {
 

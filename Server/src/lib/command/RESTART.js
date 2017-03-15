@@ -5,7 +5,7 @@ import cluster from 'cluster';
 
 module.exports = function (socket, command) {
 
-    if (!socket.client.isRegistered) {
+    /*if (!socket.client.isRegistered) {
         ERRSender.ERR_NOTREGISTERED(socket.client, 'WHO');
         return;
     }
@@ -13,7 +13,7 @@ module.exports = function (socket, command) {
     if (!socket.client.isAdmin()) {
         ERRSender.ERR_NOPRIVILEGES(socket.client);
         return;
-    }
+    }*/
 
-    cluster.worker.send({quitmessage: 'quit'});
+    //cluster.worker.send({quitmessage: 'quit'});
 };

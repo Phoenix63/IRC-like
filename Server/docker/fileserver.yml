@@ -1,6 +1,6 @@
 fileserver:
   image: pandirc/dev
-  command: sh -c 'nodemon --watch src/modules/file --exec babel-node ./src/modules/file/server.js DEV'
+  command: sh -c 'nodemon --watch src/lib/file --exec babel-node ./src/lib/file/server.js DEV'
   hostname: fileserver
   volumes:
    - ./..:/app
