@@ -8,5 +8,8 @@ if(process.env.RUNNING) {
 }
 
 process.on('SIGINT', () => {
-    process.exit(0);
+    process.exit(2);
+});
+process.on('SIGTERM', () => {
+    process.exit(15);
 });

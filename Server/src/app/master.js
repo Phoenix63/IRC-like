@@ -75,9 +75,9 @@ function run(cluster) {
         });
         server.on('exit', () => {
             if(server._quitSignal && server._quitSignal === 'quit') {
-                process.kill(process.pid, 'SIGTERM');
-            } else {
                 process.kill(process.pid, 'SIGINT');
+            } else {
+                process.kill(process.pid, 'SIGTERM');
             }
         });
     });

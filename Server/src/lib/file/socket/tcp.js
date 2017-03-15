@@ -10,6 +10,16 @@ class TcpCreator {
             socket.kill = function() {
                 socket.destroy();
             }
+
+            socket.on('error', () => {
+                debug('socket error');
+            })
+            socket.on('close', () => {
+                debug('socket close');
+            });
+            socket.on('end', () => {
+                debug('socket end');
+            });
             callback(socket);
         });
         this._server.listen(config.image_server.tcpport, config.image_server.ip);

@@ -1,6 +1,6 @@
 import config from './../../ENV.json';
 import Redis from './RedisInterface';
-import Trigger from './Trigger';
+import Caller from './Caller';
 let MongoClient = require('mongodb').MongoClient;
 let url;
 //For unitTest we use an other DB
@@ -11,9 +11,9 @@ if (process.env.RUNNING === 'TEST') {
 }
 
 module.exports = function (callback) {
-    Trigger.setCallback(callback);
-    MongoClient.connect(url, (err, db) => {
-        Redis.getUsers((users) => {
+    let caller = new Caller(callback);
+    MongoClient.connect(url, function(err, db) {
+        Redis.getUsers(function(users) {
             if (users) {
                 for (let key in users) {
                     if (!users.hasOwnProperty(key)) continue;
@@ -21,21 +21,23 @@ module.exports = function (callback) {
                         identity: key,
                         data: users[key]
                     }, {upsert: true});
+                    caller.incSaved();
                 }
             }
-            Trigger.update();
-        });
-        Redis.getChannels((chans) => {
-            if (chans) {
-                for (let key in chans) {
-                    if (!chans.hasOwnProperty(key)) continue;
-                    db.collection('channels').findOneAndUpdate({name: key}, {
-                        name: key,
-                        data: chans[key]
-                    }, {upsert: true});
+            Redis.getChannels(function(chans) {
+                caller.toSave = (users?Object.keys(users).length:0) + (chans?Object.keys(chans).length:0);
+                if (chans) {
+                    for (let key in chans) {
+                        if (!chans.hasOwnProperty(key)) continue;
+                        db.collection('channels').findOneAndUpdate({name: key}, {
+                            name: key,
+                            data: chans[key]
+                        }, {upsert: true});
+                        caller.incSaved();
+                    }
                 }
-            }
-            Trigger.update();
+            });
         });
+
     });
 };

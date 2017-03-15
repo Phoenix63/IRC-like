@@ -1,5 +1,6 @@
 let redis = require('redis');
 let config = require('./../../ENV.json');
+let debug = require('debug')('server:redis');
 let client;
 
 class Redis {
@@ -7,7 +8,7 @@ class Redis {
     static init() {
         client = redis.createClient({host: config.redis.host, port:config.redis.port});
         client.on("error", function (err) {
-            console.log("Error " + err);
+            debug("Error " + err);
         });
     }
 

@@ -1,5 +1,5 @@
 "use strict";
-
+let debug = require('debug')('server:debugdb');
 let MongoClient = require('mongodb').MongoClient;
 import Redis from './../data/RedisInterface';
 import config from './../../ENV.json';
@@ -14,36 +14,36 @@ module.exports = function (socket, command) {
     //view redis
     if (command[1].indexOf("--vr") > -1) {
         Redis.getUsers((users) => {
-            console.log("----------------------------------------REDIS----------------------------------------");
-            console.log("USERS :");
+            debug("----------------------------------------REDIS----------------------------------------");
+            debug("USERS :");
             for (let key in users) {
                 if (!users.hasOwnProperty(key)) continue;
                 let tmp = JSON.parse(users[key]);
                 for (let key2 in tmp) {
                     if (!tmp.hasOwnProperty(key2)) continue;
-                    console.log("\t" + key2 + ":" + tmp[key2]);
+                    debug("\t" + key2 + ":" + tmp[key2]);
                 }
-                console.log("\n");
+                debug("\n");
             }
         });
         Redis.getChannels((channels) => {
-            console.log("Channels :");
+            debug("Channels :");
             for (let key in channels) {
                 if (!channels.hasOwnProperty(key)) continue;
                 let tmp = JSON.parse(channels[key]);
                 for (let key2 in tmp) {
                     if (!tmp.hasOwnProperty(key2)) continue;
                     if (key2 == "usersFlags") {
-                        console.log("\tUsers Flags : ");
+                        debug("\tUsers Flags : ");
                         for (let k in (tmp[key2])) {
                             if (!tmp[key2].hasOwnProperty(k)) continue;
-                            console.log("\t\t" + k + ":" + tmp[key2][k]);
+                            debug("\t\t" + k + ":" + tmp[key2][k]);
                         }
                     } else {
-                        console.log("\t" + key2 + ":" + tmp[key2]);
+                        debug("\t" + key2 + ":" + tmp[key2]);
                     }
                 }
-                console.log("\n");
+                debug("\n");
             }
         });
     }
@@ -51,34 +51,34 @@ module.exports = function (socket, command) {
     if (command[1].indexOf("--vm") > -1) {
         MongoClient.connect(url, (err, db) => {
             db.collection('users').find().toArray((err, us) => {
-                console.log("----------------------------------------MONGO----------------------------------------");
-                console.log("USERS :");
+                debug("----------------------------------------MONGO----------------------------------------");
+                debug("USERS :");
                 us.forEach((user) => {
                     let obj = JSON.parse(user.data);
                     for (let key in obj) {
                         if (!obj.hasOwnProperty(key)) continue;
-                        console.log("\t" + key + ":" + obj[key]);
+                        debug("\t" + key + ":" + obj[key]);
                     }
-                    console.log("\n");
+                    debug("\n");
                 });
             });
             db.collection('channels').find().toArray((err, ch) => {
-                console.log("Channels :");
+                debug("Channels :");
                 ch.forEach((channel) => {
                     let obj = JSON.parse(channel.data);
                     for (let key in obj) {
                         if (!obj.hasOwnProperty(key)) continue;
                         if (key == "usersFlags") {
-                            console.log("\tUsers Flags :");
+                            debug("\tUsers Flags :");
                             for (let k in obj[key]) {
                                 if (!obj[key].hasOwnProperty(k)) continue;
-                                console.log("\t\t" + k + ":" + obj[key][k]);
+                                debug("\t\t" + k + ":" + obj[key][k]);
                             }
                         } else {
-                            console.log("\t" + key + ":" + obj[key]);
+                            debug("\t" + key + ":" + obj[key]);
                         }
                     }
-                    console.log("\n");
+                    debug("\n");
                 });
             });
         });
@@ -86,22 +86,22 @@ module.exports = function (socket, command) {
     }
     if (command[1].indexOf("--loadOnMongo") > -1) {
         dbSaver(() => {
-            console.log("Transfert redis to mongo");
+            debug("Transfert redis to mongo");
         });
     }
     if (command[1].indexOf("--loadOnRedis") > -1) {
         dbLoader(() => {
-            console.log("Transfert mongo to redis");
+            debug("Transfert mongo to redis");
         });
     }
     if (command[1].indexOf("--dr") > -1) {
         Redis.flush();
-        console.log("Redis has been deleted");
+        debug("Redis has been deleted");
     }
     if (command[1].indexOf("--dm") > -1) {
         MongoClient.connect(url, (err, db) => {
             db.dropDatabase();
         });
-        console.log("Mongo has been deleted");
+        debug("Mongo has been deleted");
     }
 };
