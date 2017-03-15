@@ -29,6 +29,9 @@
         <height>16777215</height>
        </size>
       </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
+      </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
       </property>
@@ -53,6 +56,9 @@
         <layout class="QVBoxLayout" name="verticalLayout">
          <item>
           <widget class="QLineEdit" name="topicDisplay">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="frame">
             <bool>false</bool>
            </property>
@@ -66,6 +72,9 @@
       </item>
       <item>
        <widget class="QScrollArea" name="scrollArea">
+        <property name="focusPolicy">
+         <enum>Qt::NoFocus</enum>
+        </property>
         <property name="autoFillBackground">
          <bool>true</bool>
         </property>
@@ -150,6 +159,9 @@
          </property>
          <item>
           <widget class="QPushButton" name="pushButton_upload">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="text">
             <string/>
            </property>
@@ -159,7 +171,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="messageSender">
+          <widget class="MCLineEdit" name="messageSender">
            <property name="minimumSize">
             <size>
              <width>0</width>
@@ -171,6 +183,9 @@
              <width>16777215</width>
              <height>20</height>
             </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::TabFocus</enum>
            </property>
            <property name="frame">
             <bool>false</bool>
@@ -190,6 +205,9 @@
              <width>16777215</width>
              <height>20</height>
             </size>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
            </property>
            <property name="flat">
             <bool>true</bool>
@@ -214,6 +232,9 @@
         <width>150</width>
         <height>16777215</height>
        </size>
+      </property>
+      <property name="focusPolicy">
+       <enum>Qt::NoFocus</enum>
       </property>
       <property name="frameShape">
        <enum>QFrame::StyledPanel</enum>
@@ -300,6 +321,13 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MCLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>src/gui/mclineedit.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

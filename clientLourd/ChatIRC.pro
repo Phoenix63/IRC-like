@@ -33,6 +33,7 @@ SOURCES += \
     src/gui/channellist.cpp \
     src/gui/login.cpp \
     src/gui/mainframe.cpp \
+	src/gui/mclineedit.cpp \
     src/gui/msglist.cpp \
     src/gui/uploadfile.cpp \
     src/parser/parser.cpp \
@@ -57,6 +58,7 @@ HEADERS  += \
     src/gui/channellist.h \
     src/gui/login.h \
     src/gui/mainframe.h \
+	src/gui/mclineedit.h \
     src/gui/msglist.h \
     src/gui/uploadfile.h \
     src/parser/err_response.h \

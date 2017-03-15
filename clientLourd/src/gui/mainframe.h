@@ -96,7 +96,8 @@ private:
 	Parser parser;
 	Channel channel;
 	MsgList msgList;
-    QCompleter *StringCompleter;
+    QCompleter *stringCompleter;
+    QCompleter *emoteCompleter;
 };
 
 #endif // MAINFRAME_H

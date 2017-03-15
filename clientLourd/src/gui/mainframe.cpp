@@ -26,7 +26,7 @@ MainFrame::MainFrame(QWidget *parent, QTcpSocket *socket, QString host) :
     socket(socket),
     host(host),
     channel(&parserEmoji),
-    StringCompleter(nullptr)
+    stringCompleter(nullptr)
 {
     initUiConf();
     initConnect();
@@ -40,7 +40,7 @@ MainFrame::MainFrame(QWidget *parent, QTcpSocket *socket, QString host) :
 MainFrame::~MainFrame()
 {
     delete ui;
-    delete StringCompleter;
+    delete stringCompleter;
 }
 
 /*
@@ -376,22 +376,30 @@ void MainFrame::initConnect()
 
 void MainFrame::initCompletion()
 {
-    QStringList CompletionList;
-    CompletionList << "/clean" << "/debug" << "/nick" << "/user" << "/join" << "/names"
+    //Commands completion
+    QStringList completionList;
+    completionList << "/clean" << "/debug" << "/nick" << "/user" << "/join" << "/names"
                    << "/pass" << "/part" << "/list" << "/topic" << "/kick" << "/who"
                    << "/whois" << "/mode" << "/msg" << "/quit" << "/away" << "/back"
 				   << "/invite" << "/files" << "/rmfile";
-    StringCompleter = new QCompleter(CompletionList,this);
-    StringCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    StringCompleter->popup()->setTabKeyNavigation(true);
-    ui->messageSender->setCompleter(StringCompleter);
+    stringCompleter = new QCompleter(completionList,this);
+    stringCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    stringCompleter->popup()->setTabKeyNavigation(true);
+    ui->messageSender->setCompleter(stringCompleter);
+
+    //Emotes completion
+    QStringList emoteList = parserEmoji.keys();
+    emoteCompleter = new QCompleter(emoteList,this);
+    emoteCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    stringCompleter->popup()->setTabKeyNavigation(true);
+    ui->messageSender->setMultipleCompleter(emoteCompleter);
 }
 
 void MainFrame::on_userList_doubleClicked(const QModelIndex &index)
 {
     QString user = ui->userList->item(index.row())->text();
     if(user[0] == '@')
-        user.remove(0,1);
+        user.remove(0, 1);
     channel.joinWhisper(user);
     channelModified();
     channel.change(user);
