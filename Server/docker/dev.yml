@@ -10,10 +10,10 @@ services:
   node:
     image: pandirc/dev
     command: npm run build
-    #entrypoint: ./docker/script.sh
-    entrypoint: node ./dist/app.js DEV
+    entrypoint: node ./dist/app.js
     environment:
-      - DEBUG=*,-babel
+      - DEBUG=*,-babel,-socket.io:*
+      - RUNNING=DEV
     hostname: node
     stop_signal: SIGINT
     volumes:

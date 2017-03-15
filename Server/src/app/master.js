@@ -3,12 +3,16 @@ import dbSaver from './../lib/data/dbSaver';
 import dbLoader from './../lib/data/dbLoader';
 import colors from './../lib/util/Color';
 
+process.title = 'pandirc:master';
+
 module.exports = {
     run: run
 };
 
+
 function run(cluster) {
     "use strict";
+    let _quiting = false;
 
     let debug = require('debug')('server:app:master');
 
@@ -17,12 +21,28 @@ function run(cluster) {
     process.env.RUNNING = process.env.RUNNING || 'PROD';
 
     process.on('SIGINT', () => {
-        debug(colors.yellow('Saving database...'));
-        dbSaver(() => {
-            debug(colors.yellow('Database saved!'));
-            RedisInterface.quit();
-            process.exit();
-        });
+        if(!_quiting) {
+            _quiting = true;
+            debug(colors.yellow('Saving database...'));
+            dbSaver(() => {
+                debug(colors.yellow('Database saved!'));
+                RedisInterface.quit();
+                process.exit(2);
+            });
+        }
+
+    });
+    process.on('SIGTERM', () => {
+        if(!_quiting) {
+            _quiting = true;
+            debug(colors.red('Server is going to restart'));
+            debug(colors.yellow('Saving database...'));
+            dbSaver(() => {
+                debug(colors.yellow('Database saved!'));
+                RedisInterface.quit();
+                process.exit(15);
+            });
+        }
     });
 
     if (process.env.RUNNING === 'PROD') {
@@ -40,7 +60,13 @@ function run(cluster) {
         let server = cluster.fork();
 
         server.on('message', (message) => {
-            debug(message);
+            if(message.quitmessage && message.quitmessage === 'restart') {
+                server.disconnect();
+                server.kill();
+            }
+        });
+        server.on('exit', () => {
+            process.kill(process.pid, 'SIGTERM');
         });
     });
 }

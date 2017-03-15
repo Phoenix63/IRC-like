@@ -7,6 +7,8 @@ import RPLSender from './../lib/responses/RPLSender';
 import colors from './../lib/util/Color';
 import child_process from 'child_process';
 
+process.title = 'pandirc:server';
+
 module.exports = {
     run: run
 };

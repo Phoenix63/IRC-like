@@ -53,6 +53,7 @@ help:
 
 build:
 	make head
+	docker volume create --name=mongoirc
 	docker pull bitnami/node:7
 	docker pull redis:3.2
 	docker pull mongo:3.4
@@ -65,17 +66,14 @@ deps:
 
 prod:
 	make head
-	make clean
 	docker-compose -f ./docker/prod.yml up
 
 prod-deamon:
 	make head
-	make clean
 	docker-compose -f ./docker/prod.yml up -d
 
 dev:
 	make head
-	make clean
 	docker-compose -f ./docker/dev.yml up
 
 file:
@@ -84,7 +82,7 @@ file:
 
 unit:
 	make head
-	docker-compose -f ./docker/test.yml up --abort-on-container-exit
+	docker-compose -f ./docker/test.yml up
 
 clean:
 	docker-compose -f ./docker/deps.yml rm -f

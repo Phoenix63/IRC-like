@@ -1,36 +1,58 @@
-node:
-  image: bitnami/node:7
-  command: sh -c 'npm run build && node ./dist/app.js PROD'
-  hostname: node
-  volumes:
-   - ./..:/app
-  ports:
-   - "8088:8088"
-   - "8089:8089"
-   - "3001:3001"
-  links:
-   - mongo_prod:mongo
-   - redis_prod:redis
-   - fileserver:fileserver
+version: "2"
 
-fileserver:
-  image: bitnami/node:7
-  command: sh -c 'npm run build && node ./dist/modules/file/server.js PROD'
-  hostname: fileserver
-  volumes:
-   - ./..:/app
-  ports:
-   - "8090:8090"
-   - "8091:8091"
-  links:
-   - redis_prod:redis
+services:
+  preload:
+    image: pandirc/dev
+    entrypoint: npm run build
+    volumes:
+     - ./..:/app
 
-mongo_prod:
-  image: mongo:3.4
-  hostname: mongo_prod
-  volumes:
-   - mongoirc_prod:/data/db
+  node:
+    image: pandirc/dev
+    command: npm run build
+    entrypoint: node ./dist/app.js
+    environment:
+      - DEBUG=*,-babel,-socket.io:*
+      - RUNNING=PROD
+    hostname: node
+    stop_signal: SIGINT
+    volumes:
+     - ./..:/app
+    ports:
+     - "8088:8088"
+     - "8089:8089"
+    links:
+     - mongo:mongo
+     - redis:redis
+     - fileserver:fileserver
+     - preload
 
-redis_prod:
-  image: redis:3.2
-  hostname: redis_prod
+  fileserver:
+    image: bitnami/node:7
+    command: sh -c 'npm run build && node ./dist/modules/file/server.js'
+    environment:
+    - RUNNING=PROD
+    hostname: fileserver
+    volumes:
+     - ./..:/app
+    ports:
+     - "8090:8090"
+     - "8091:8091"
+     - "3001:3001"
+    links:
+     - redis:redis
+
+  mongo:
+    image: mongo:3.4
+    hostname: mongo
+    volumes:
+     - mongoirc:/data/db
+
+  redis:
+    image: redis:3.2
+    hostname: redis
+
+volumes:
+  mongoirc:
+    external:
+      name: mongoirc

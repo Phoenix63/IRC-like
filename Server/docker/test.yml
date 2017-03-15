@@ -10,10 +10,10 @@ services:
   node:
     image: pandirc/runtest
     command: npm run build
-    #entrypoint: ./docker/script.sh
-    entrypoint: node ./dist/app.js TEST
+    entrypoint: node ./dist/app.js
     environment:
       - DEBUG=app:test
+      - RUNNING=TEST
     hostname: node
     stop_signal: SIGINT
     volumes:

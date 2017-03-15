@@ -32,6 +32,7 @@ class FileReceiver {
         if(process.env.ENV === 'DEV') {
             debug('FILE TRANSFERT:'+this._currentSize+'/'+this._size);
         }
+        this._socket.write(':'+config.ip+' FILE TRANSFERT :'+this._currentSize+'/'+this._size+'\n');
 
         if(this._currentSize >= this._size) {
             this._full();

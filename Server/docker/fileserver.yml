@@ -1,10 +1,14 @@
-fileserver:
-  image: pandirc/dev
-  command: sh -c 'nodemon --watch src/lib/file --exec babel-node ./src/lib/file/server.js DEV'
-  hostname: fileserver
-  volumes:
-   - ./..:/app
-  ports:
-  - "3001:3001"
-  - "8090:8090"
-  - "8091:8091"
+version: "2"
+services:
+  fileserver:
+    image: pandirc/dev
+    command: sh -c 'nodemon --watch src/lib/file --exec babel-node ./src/lib/file/server.js DEV'
+    environment:
+    - DEBUG=fileserver:*
+    hostname: fileserver
+    volumes:
+     - ./..:/app
+    ports:
+    - "3001:3001"
+    - "8090:8090"
+    - "8091:8091"
