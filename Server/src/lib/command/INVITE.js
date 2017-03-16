@@ -10,7 +10,7 @@ module.exports = function (socket, command) {
         ERRSender.ERR_NOTREGISTERED(socket.client, 'INVITE');
         return;
     }
-    let inviteRegex = /^([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15}) (#[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15})[ ]*/.exec(command[1]);
+    let inviteRegex = /^([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15}) ([#&][a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15})[ ]*/.exec(command[1]);
     if (inviteRegex) {
         let nameOfTheGuest = inviteRegex[1];
         let nameChannel = inviteRegex[2];
@@ -40,7 +40,10 @@ module.exports = function (socket, command) {
             RPLSender.RPL_AWAY(socket, guest.name, guest.away);
             return;
         }
+
         channel.invite(socket, guest);
+
+
     } else {
         ERRSender.ERR_UNKNOWNCOMMAND(socket.client, command[1]);
     }

@@ -6,7 +6,7 @@ services:
     command: npm run build
     entrypoint: node ./dist/app.js
     environment:
-      - DEBUG=*,-babel,-socket.io:*
+      - Ouais
       - RUNNING=DEV
     hostname: node
     stop_signal: SIGINT

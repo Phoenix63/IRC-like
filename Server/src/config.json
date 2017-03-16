@@ -1,5 +1,5 @@
 {
-  "ip": "node",
+  "ip": "25.36.22.132",
   "tcp_server": {
     "port": 8088
   },
@@ -7,7 +7,7 @@
     "port": 8089
   },
   "image_server": {
-    "ip": "fileserver",
+    "ip": "25.36.22.132",
     "outip": "25.36.22.132",
     "port": 3001,
     "tcpport": 8090,

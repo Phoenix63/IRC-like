@@ -7,7 +7,7 @@ import Channel from './../channel/Channel';
 module.exports = function (socket, command) {
 
     if (!socket.client.isRegistered) {
-        ERRSender.ERR_NOTREGISTERED(socket.client, 'WHO');
+        ERRSender.ERR_NOTREGISTERED(socket.client, 'KICK');
         return;
     }
 

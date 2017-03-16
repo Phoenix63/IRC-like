@@ -15,6 +15,9 @@ class BufferManager {
         let bufs = [];
         while(index >= 0) {
             let split = BufferManager.splitAt(buf1, index);
+            if(!split || !split[0]) {
+                break;
+            }
             if(!split[0].equals(new Buffer(0))) {
                 bufs.push(split[0]);
                 buf1 = split[1];

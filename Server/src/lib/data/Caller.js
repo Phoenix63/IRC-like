@@ -1,7 +1,7 @@
 class Caller {
     constructor(callback) {
         this._callback = function() {
-            setTimeout(callback, 1000);
+            setTimeout(callback, 300);
         };
         this._saved = 0;
         this._toSave = 0;

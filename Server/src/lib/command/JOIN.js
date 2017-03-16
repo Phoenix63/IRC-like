@@ -22,7 +22,8 @@ module.exports = function (socket, command) {
                 }
             });
             if (err) {
-                new Channel(socket.client, name, key, 20);
+                let chan = new Channel(socket.client, name, key, 20);
+                chan.addUser(socket.client, key);
             }
         }
     }
