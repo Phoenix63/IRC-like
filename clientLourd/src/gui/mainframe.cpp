@@ -295,15 +295,15 @@ void MainFrame::on_pushButton_upload_clicked()
 {
     QTcpSocket *tmp = new QTcpSocket();
     tmp->connectToHost(host, 8090);
-    if (!socket->waitForConnected(5000))
+    if (!tmp->waitForConnected(5000))
         QMessageBox::information(this, "Error", "Host not found");
     QStringList homePath = QStandardPaths::standardLocations(QStandardPaths::HomeLocation);
     QStringList files = QFileDialog::getOpenFileNames(this, "Select one or more files to open", homePath.first());
     if (files.size() != 0) {
-        Upload *up = new Upload(this, host, files, tmp);
         UploadWindow *progress = new UploadWindow(this, tmp);
-        connect(up, &Upload::finished, up, &QObject::deleteLater);
+        Upload *up = new Upload(this, host, files, tmp);
         connect(progress, &UploadWindow::resultReady, this, &MainFrame::handleResults);
+        connect(up, &Upload::finished, up, &QObject::deleteLater);
         up->start();
         progress->show();
     }

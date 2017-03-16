@@ -31,7 +31,7 @@ public:
     void joinWhisper(QString dest);
 
     //Belote commands
-	void joinBelote(QString room, QTcpSocket *socket);
+    void joinBelote(QString room, QTcpSocket *socket, QString nick);
     void beloteParse(QString room, QString command);
     // Channel quit functions
     void leave(QString channel);

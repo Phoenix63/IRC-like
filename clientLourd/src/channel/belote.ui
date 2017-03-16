@@ -97,7 +97,7 @@
        </layout>
       </item>
       <item>
-       <layout class="QVBoxLayout" name="southCards">
+       <layout class="QHBoxLayout" name="southCards">
         <item>
          <spacer name="verticalSpacer_2">
           <property name="orientation">

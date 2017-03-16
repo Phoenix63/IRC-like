@@ -50,10 +50,10 @@ void Channel::joinWhisper(QString dest){
  * Channel: Belote
  */
 
-void Channel::joinBelote(QString room, QTcpSocket *socket)
+void Channel::joinBelote(QString room, QTcpSocket *socket, QString nick)
 {
     if (!channels.contains(room))
-        channels[room] = new Belote(NULL, socket);
+        channels[room] = new Belote(NULL, socket, room, nick);
 }
 
 void Channel::beloteParse(QString room, QString command)

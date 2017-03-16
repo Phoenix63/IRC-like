@@ -406,7 +406,7 @@ bool Parser::in_isChanList(QString string)
     QString chan = string.split(' ').at(3);
     QString topic = string.right(string.length() - j - 1);
     if (chan.startsWith('&')) {
-        channel->joinBelote(chan, socket);
+        channel->joinBelote(chan, socket, self.name());
     } else {
         channel->join(chan, topic);
         emit channelModifiedSignal();

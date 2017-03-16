@@ -17,7 +17,7 @@ class Belote : public QMainWindow, public ChannelContent
     Q_OBJECT
 
 public:
-    explicit Belote(QWidget *parent = 0, QTcpSocket *socket = NULL);
+    explicit Belote(QWidget *parent = 0, QTcpSocket *socket = NULL, QString channelName = "", QString username = "");
     ~Belote();
     void lobbyWait();
 
@@ -29,12 +29,22 @@ private:
     //Hand functions
     void receiveCard(BELOTE::CARD);
     void playCard(BELOTE::CARD);
+    void emptyHand();
+    //UI
+    void clean();
+    void clearLayout(QLayout *layout);
+    void chooseTeam();
     //Out functions
 
     //In functions
     bool in_isTeamSelec(QString string);
     bool in_isCardDeal(QString string);
+    bool in_isPartNote(QString string);
+    bool in_isFullTeam(QString string);
+    bool in_isGameReset(QString string);
 private:
+    QString username;
+    QString channelName;
     Ui::Belote *ui;
     QTcpSocket *socket;
     QHash<BELOTE::CARD, QPushButton *> hand;
