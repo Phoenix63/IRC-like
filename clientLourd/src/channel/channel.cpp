@@ -131,26 +131,26 @@ void Channel::addUser(QString user, QString channel)
 {
     if(user.startsWith('@')) {
         user.remove(0, 1);
-        channels[channel].addUser(userList.addUser(user));
+        channels[channel].addUser(aUserList.addUser(user));
         channels[channel].oper(user, true);
     } else {
-        channels[channel].addUser(userList.addUser(user));
+        channels[channel].addUser(aUserList.addUser(user));
     }
 }
 
 void Channel::addUser(User *user)
 {
-    userList.addUser(user);
+    aUserList.addUser(user);
 }
 
 void Channel::addUser(QString user)
 {
-    userList.addUser(user);
+    aUserList.addUser(user);
 }
 
 void Channel::deleteUser(QString user)
 {
-	userList.deleteUser(user);
+    aUserList.deleteUser(user);
 }
 
 void Channel::removeUser(QString user, QString channel)
@@ -162,6 +162,11 @@ void Channel::removeUser(QString user, QString channel)
 QList<User *> Channel::users()
 {
     return channels[currentChannel].users();
+}
+
+QStringList Channel::userList()
+{
+    return channels[currentChannel].userList();
 }
 
 bool Channel::contains(QString nick, QString channel)

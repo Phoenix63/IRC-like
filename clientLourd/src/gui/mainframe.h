@@ -1,6 +1,6 @@
 #ifndef GUI_MAINFRAME_H
 #define GUI_MAINFRAME_H
-
+//TODO menus contextuels et aide
 #include <QMainWindow>
 
 #include "msglist.h"
@@ -48,6 +48,7 @@ public slots:
 	void changeChannel();
 	void topicModified();
 	void lineAdded();
+    void refreshMentionList();
 
 	//Socket slots
 	void readyRead();

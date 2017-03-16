@@ -34,6 +34,15 @@ QList<User *> ChannelContent::users()
     return aUsers.keys();
 }
 
+QStringList ChannelContent::userList()
+{
+    QStringList tmp;
+    for (auto i:aUsers.keys()) {
+        tmp.append(i->name());
+    }
+    return tmp;
+}
+
 User * ChannelContent::findUser(QString nick)
 {
     for (auto i:aUsers.keys()) {

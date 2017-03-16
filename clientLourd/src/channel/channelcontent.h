@@ -18,6 +18,7 @@ public:
     void removeUser(QString userName);
     void renameUser(QString oldNick, QString newNick);
     QList<User *> users();
+    QStringList userList();
     User* findUser(QString nick);
     bool contains(QString nick);
     //Chat functions

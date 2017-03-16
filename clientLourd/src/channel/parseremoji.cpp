@@ -24,6 +24,7 @@ ParserEmoji::ParserEmoji()
 
 QString ParserEmoji::parse(QString string)
 {
+	//TODO recuperer les mentions sur soi + jouer AH.wav + notifications
     for(auto  i : emotes.keys()) {
         QByteArray* byteArray = new QByteArray();
         QBuffer buffer(byteArray);

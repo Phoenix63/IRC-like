@@ -26,7 +26,8 @@ MainFrame::MainFrame(QWidget *parent, QTcpSocket *socket, QString host) :
     socket(socket),
     host(host),
     channel(&parserEmoji),
-    stringCompleter(nullptr)
+    stringCompleter(nullptr),
+    emoteCompleter(nullptr)
 {
     initUiConf();
     initConnect();
@@ -138,6 +139,21 @@ void MainFrame::userModified()
         if (!i->modeI())
             ui->userList->addItem((i->modeO() || channel.oper(i)) ? '@' + i->name() : i->name());
     }
+    refreshMentionList();
+}
+
+void MainFrame::refreshMentionList()
+{
+    delete emoteCompleter;
+    //Emotes completion
+    QStringList emoteList = parserEmoji.keys();
+    for (auto i:channel.userList()) {
+        emoteList << '@' + i;
+    }
+    emoteCompleter = new QCompleter(emoteList,this);
+    emoteCompleter->setCaseSensitivity(Qt::CaseInsensitive);
+    stringCompleter->popup()->setTabKeyNavigation(true);
+    ui->messageSender->setMultipleCompleter(emoteCompleter);
 }
 
 void MainFrame::chatModified()
@@ -387,12 +403,7 @@ void MainFrame::initCompletion()
     stringCompleter->popup()->setTabKeyNavigation(true);
     ui->messageSender->setCompleter(stringCompleter);
 
-    //Emotes completion
-    QStringList emoteList = parserEmoji.keys();
-    emoteCompleter = new QCompleter(emoteList,this);
-    emoteCompleter->setCaseSensitivity(Qt::CaseInsensitive);
-    stringCompleter->popup()->setTabKeyNavigation(true);
-    ui->messageSender->setMultipleCompleter(emoteCompleter);
+
 }
 
 void MainFrame::on_userList_doubleClicked(const QModelIndex &index)

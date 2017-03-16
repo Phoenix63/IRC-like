@@ -54,6 +54,7 @@ public:
     void removeUser(QString user, QString channel);
     void changeNick(QString user, QString nick);
     QList<User *> users();
+    QStringList userList();
     bool contains(QString nick, QString channel);
 
     // User mode
@@ -83,7 +84,7 @@ private:
     QString currentChannel;
     // Qhash wich contain message: key = channel name, content = message list
     QHash<QString, ChannelContent> channels;
-	UserList userList;
+    UserList aUserList;
 };
 
 #endif // CHANNEL_H
