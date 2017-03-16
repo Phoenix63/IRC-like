@@ -60,7 +60,10 @@ class Channel {
         else {
             this.setPersistent(true);
         }
-        channels.push(this);
+        if(this.name[0] === '#') {
+            channels.push(this);
+        }
+
     }
 
 
@@ -442,7 +445,7 @@ class Channel {
             }
 
             this._flags.split('').forEach((flag) => {
-                RPLSender.RPL_CHANNELMODEIS(this, this._name + ' +' + flag);
+                RPLSender.RPL_CHANNELMODEIS(this, this._name + ' +' + flag, user);
             });
 
             this._mergeToRedis();

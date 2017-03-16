@@ -15,13 +15,7 @@ class Deck {
 
     cut() {
         let cut = Math.floor(Math.random()*20)+6;
-        this._cards = (
-            this._cards.slice(cut, this._cards.length).join(',')
-            +','
-            +this._cards.slice(0,cut).join(',')).split(',')
-            .map(function(num) {
-                return parseInt(num);
-            });
+        this._cards = this._cards.slice(cut, this._cards.length).concat(this._cards.slice(0,cut));
     }
 
     /**

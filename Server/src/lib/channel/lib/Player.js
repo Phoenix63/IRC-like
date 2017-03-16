@@ -22,6 +22,14 @@ class Player {
     }
 
     /**
+     *
+     * @return {Team|null}
+     */
+    get team() {
+        return this._team;
+    }
+
+    /**
      * return Card if the card is valid or null if the player doesn't have this card
      * @param {number} cardvalue
      * @return {Card|null}
@@ -49,10 +57,10 @@ class Player {
 
     /**
      *
-     * @param {Team} team
+     * @param {Team|null} t
      */
-    set team(team) {
-        this._team = team;
+    set team(t) {
+        this._team = t;
     }
 
     toString() {

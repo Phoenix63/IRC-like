@@ -14,6 +14,9 @@ class Sio {
             socket.write = function(data) {
                 socket.emit('file', data);
             };
+            socket.destroy = function() {
+                socket.disconnect();
+            }
             socket.pause = function(){};
             socket.resume = function(){};
             socket.setTimeout = function(){};

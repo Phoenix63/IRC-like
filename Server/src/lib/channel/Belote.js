@@ -20,10 +20,10 @@ class Belote extends Channel {
     }
 
     addUser(user, key = '') {
-        if (this.isInvitation && this._invitations.indexOf(user.identity) === -1 && user.identity !== this.creator) {
+        /*if (this.isInvitation && this._invitations.indexOf(user.identity) === -1 && user.identity !== this.creator) {
             ERRSender.ERR_INVITEONLYCHAN(user, this);
             return;
-        }
+        }*/
         if (this.users.length >= this.size) {
             ERRSender.ERR_CHANNELISFULL(user, this);
             return;
@@ -41,7 +41,7 @@ class Belote extends Channel {
             RPLSender.RPL_NAMREPLY(user, this);
 
             this._flags.split('').forEach((flag) => {
-                RPLSender.RPL_CHANNELMODEIS(this, this._name + ' +' + flag);
+                RPLSender.RPL_CHANNELMODEIS(this, this._name + ' +' + flag, user);
             });
 
             this.game.addUser(user);
@@ -58,7 +58,10 @@ class Belote extends Channel {
 
             user.removeChannel(this);
 
-            belotes.splice(belotes.indexOf(this), 1);
+            if(this._users.length <= 0) {
+                belotes.splice(belotes.indexOf(this), 1);
+            }
+
 
             this.game.removeUser(user);
         }

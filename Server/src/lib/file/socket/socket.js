@@ -5,9 +5,28 @@ import Sio from './sio';
 import config from './../../../config.json';
 let debug = require('debug')('fileserver:socket');
 
+import fs from 'fs';
+
+class SocketKicker {
+    constructor(socket) {
+        this.timeout = null;
+        this.socket = socket;
+    }
+
+    alive() {
+        if(this.timeout) {
+            clearTimeout(this.timeout);
+        }
+        this.timeout = setTimeout(() => {
+             this.socket.destroy();
+        }, 5000);
+    }
+}
+
 function manage(socket) {
     socket.buffer = '';
     socket.filereceiver = null;
+    socket.kicker = new SocketKicker(socket);
 
     debug('new connection from '+(socket.remoteAddress));
 
@@ -22,10 +41,24 @@ function manage(socket) {
     socket.buffer = new Buffer(0);
 
     socket.on('data', (data) => {
+        socket.kicker.alive();
+        if(typeof data === "string") {
+            data = new Buffer(data);
+        }
+        if(!(data instanceof Buffer)) {
+            let arr = [];
+            for(let key in data) {
+                arr.push(data[key]);
+            }
+            data = new Buffer(arr);
+        }
         let splited = bufferManager.split(data, '\n');
         for(let key in splited) {
             let line = splited[key];
             if(line) {
+                if(line.toString().indexOf('FILE ') >= 0) {
+                    debug(line.toString());
+                }
                 let cmd = (line.toString().match(/FILE [0-9]+ .*/) || [null])[0];
                 if(cmd) {
                     let argv = line.toString().split(' ');

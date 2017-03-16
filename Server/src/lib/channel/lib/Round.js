@@ -18,13 +18,22 @@ class Round {
 
         this._deck.reset();
 
-        this._atout = null;
+        this._trump = null;
         this._takeTurn = -1;
+        this._play = 0;
 
         this._players.forEach((player) => {
             player.send(':'+this.game.ip+' BELOTE '+this.game.name+' :round start '+this._players.join(','));
         });
         this._giveCards();
+    }
+
+    isPlayerTurn(player) {
+        return (this._play === this._players.indexOf(player));
+    }
+
+    playerHaveToTake(player) {
+        return ((this._takeTurn >= 0) && this.isPlayerTurn(player));
     }
 
     _end() {
@@ -38,37 +47,60 @@ class Round {
         for(let i=0; i<4; i++) {
             this._players[i].addCardToHand(this._deck.getCards(2));
         }
-        this._showAtout();
+        this._showTrump();
     }
 
-    _showAtout() {
-        this._atout = this._deck.getCards(1)[0];
+    _showTrump() {
+        this._trump = this._deck.getCards(1)[0];
         this._takeTurn = 0;
+        this._play = 0;
+        this.game.broadcast(':'+this.game.ip+' BELOTE '+this.game.name+' :donald is '+this._trump);
+        this._notifPlayerToTake();
     }
 
-    playerTakeAtout(player, colors) {
+    _notifPlayerToTake() {
+        this._players[this._play].client.socket.send(':'+this.game.ip+' BELOTE '+this.game.name+' :do you take '+this._trump+' (turn '+this._takeTurn+')');
+    }
+
+    playerTakeTrump(player, colors) {
         let index = this._players.indexOf(player);
-        if(index >= 0 && this._atout) {
-            if(this._takeTurn === 0 && colors === this._atout.color || this._takeTurn === 1 && colors !== this._atout.color) {
-                this._players[index].addCardToHand([this._atout]);
-                this._atout = null;
-                this._takeTurn = -1;
+        if(colors < 0) {
+            this._play++;
+            if(this._play > 4) {
+                this._play = 0;
+                this._takeTurn++;
+                if(this._takeTurn > 1) {
+                    this._takeTurn = 1;
+                    this._play = 3;
+                    this._players[this._play].client.socket.send(':'+this.game.ip+' BELOTE '+this.game.name+' ERR :you have to take... you are the cow!');
+                }
+            }
+            this._notifPlayerToTake();
+        } else if(index >= 0 && this._trump) {
+            if(this._takeTurn === 0 && colors === this._trump.color || this._takeTurn === 1 && colors !== this._trump.color) {
+                this._players[index].addCardToHand([this._trump]);
+
+                player.team.take();
+                this.game.broadcast(':'+this.game.ip+' BELOTE '+this.game.name+' :player '+this._play+' take '+this._trump.value+' color is '+colors);
 
                 for(let i = 0 ; i<4; i++) {
                     this._players[i].addCardToHand(this._deck.getCards((i === index ? 2 : 3)));
                 }
-
+                this._trump = null;
                 this._gameStart();
 
             } else {
-                // le joueur n'a pas le droit de prendre à cette couleur
+                this._players[this._play].client.socket.send(':'+this.game.ip+' BELOTE '+this.game.name+' ERR :you cannot take this card (wrong color)');
             }
         } else {
-            // le joueur n'est pas dans la partie
+            this._players[this._play].client.socket.send(':'+this.game.ip+' BELOTE '+this.game.name+' ERR :you are not on this game');
         }
     }
 
     _gameStart() {
-        console.log('game start');
+        this._takeTurn = -1;
+        this._play = 0;
     }
 }
+
+export default Round

@@ -190,10 +190,16 @@ let RPLSender = {
      *
      * @param {Channel} chan
      * @param {string} cmd
+     * @param {Client|null} user
      * @static
      */
-    RPL_CHANNELMODEIS: (chan, cmd) => {
-        chan.broadcast(':' + config.ip + ' 324 MODE ' + cmd, null);
+    RPL_CHANNELMODEIS: (chan, cmd, user=null) => {
+        if(!user) {
+            chan.broadcast(':' + config.ip + ' 324 MODE ' + cmd, null);
+        } else {
+            user.socket.send(':' + config.ip + ' 324 MODE ' + cmd);
+        }
+
     },
     /**
      *

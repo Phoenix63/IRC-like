@@ -6,10 +6,17 @@ class Team {
         this.game = game;
         this._players = [];
         this._points = 0;
+
+        this._take = false;
+    }
+
+    take() {
+        this._take = true;
     }
 
     resetPoints() {
         this._points = 0;
+        this._take = false;
     }
 
     addPoints(val) {
@@ -32,25 +39,21 @@ class Team {
             return false;
         }
         if(this.contains(player)) {
-            player.send(':'+this.game.ip+' BELOTE '+this.game.name+' ERR :already in team');
+            //player.send(':'+this.game.ip+' BELOTE '+this.game.name+' ERR :already in team');
             return false;
         }
-        if(this.game.teams[this.game.indexOf(this+1)%2].contains(player)) {
-            this.game.teams[this.game.indexOf(this+1)%2].removePlayer(player);
+        if(this.game.otherTeam(this).contains(player)) {
+            this.game.otherTeam(this).removePlayer(player);
         }
-        this._players.add(player);
+        this._players.push(player);
         player.team = this;
 
         this.game.broadcast(':'+this.game.ip+' BELOTE '+this.game.name+' :'+player+' join team '+this.id);
 
-        if(this.isFull() && this.game.teams[this.game.indexOf(this+1)%2].isFull()) {
+        if(this.isFull() && this.game.otherTeam(this).isFull()) {
             this.game.teamArefull();
         }
         return true;
-    }
-
-    removePlayer(player) {
-        this.game.broadcast(':'+this.game.ip+' BELOTE '+this.game.name+' :'+player+' leave team '+this.id);
     }
 
     isFull() {
