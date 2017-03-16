@@ -17,8 +17,8 @@ Channel::Channel(ParserEmoji *emoji):
     emoji(emoji)
 {
     currentChannel = QString("\"Debug\"");
-    channels[currentChannel] = ChannelContent();
-    channels[currentChannel].topic("Here we see debug command.");
+    channels[currentChannel] = new ChannelContent();
+    channels[currentChannel]->topic("Here we see debug command.");
 }
 
 /*
@@ -27,7 +27,7 @@ Channel::Channel(ParserEmoji *emoji):
 
  QList<Message> Channel::chatContent()
  {
-     return channels[currentChannel].chatContent();
+     return channels[currentChannel]->chatContent();
  }
 
 /*
@@ -37,14 +37,28 @@ Channel::Channel(ParserEmoji *emoji):
 void Channel::join(QString chan, QString topic)
 {
     if (!channels.contains(chan)) {
-        channels[chan] = ChannelContent();
-        channels[chan].topic(topic);
+        channels[chan] = new ChannelContent();
+        channels[chan]->topic(topic);
     }
 }
 
 void Channel::joinWhisper(QString dest){
     if (!channels.contains(dest))
-        channels[dest] = ChannelContent();
+        channels[dest] = new ChannelContent();
+}
+/*
+ * Channel: Belote
+ */
+
+void Channel::joinBelote(QString room, QTcpSocket *socket)
+{
+    if (!channels.contains(room))
+        channels[room] = new Belote(NULL, socket);
+}
+
+void Channel::beloteParse(QString room, QString command)
+{
+    channels[room]->parse(command);
 }
 
 /*
@@ -54,6 +68,7 @@ void Channel::joinWhisper(QString dest){
 void Channel::leave(QString chan){
     if(channels.contains(chan) && chan.compare("\"Debug\"") != 0) {
         change("\"Debug\"");
+        delete channels[chan];
         channels.remove(chan);
     }
 }
@@ -66,32 +81,32 @@ void Channel::leave(QString chan){
  {
      QString time = '[' + QTime::currentTime().toString() + ']';
      if (channels.contains(currentChannel))
-         channels[currentChannel].appendChat(time + "    ", channels[currentChannel].findUser(pseudo) , " : " + emoji->parse(string));
+         channels[currentChannel]->appendChat(time + "    ", channels[currentChannel]->findUser(pseudo) , " : " + emoji->parse(string));
  }
 
  void Channel::appendChannel(QString string, QString channel, QString send)
  {
      QString time = '[' + QTime::currentTime().toString() + ']';
      if (channels.contains(channel))
-         channels[channel].appendChat(time + "    ", channels[channel].findUser(send)," : " + emoji->parse(string));
+         channels[channel]->appendChat(time + "    ", channels[channel]->findUser(send)," : " + emoji->parse(string));
  }
 
  void Channel::appendCurrent(QString string, User *pseudo)
  {
      QString time = '[' + QTime::currentTime().toString() + ']';
      if (channels.contains(currentChannel))
-         channels[currentChannel].appendChat(time + "    ", pseudo, " : " + emoji->parse(string));
+         channels[currentChannel]->appendChat(time + "    ", pseudo, " : " + emoji->parse(string));
  }
 
  void Channel::appendChannel(QString string, QString channel, User *send)
  {
      QString time = '[' + QTime::currentTime().toString() + ']';
      if (channels.contains(channel))
-         channels[channel].appendChat(time + "    ", send," : " + emoji->parse(string));
+         channels[channel]->appendChat(time + "    ", send," : " + emoji->parse(string));
  }
 
 void Channel::clean(){
-    channels[currentChannel].clearContent();
+    channels[currentChannel]->clearContent();
 }
 
 /*
@@ -131,10 +146,10 @@ void Channel::addUser(QString user, QString channel)
 {
     if(user.startsWith('@')) {
         user.remove(0, 1);
-        channels[channel].addUser(aUserList.addUser(user));
-        channels[channel].oper(user, true);
+        channels[channel]->addUser(aUserList.addUser(user));
+        channels[channel]->oper(user, true);
     } else {
-        channels[channel].addUser(aUserList.addUser(user));
+        channels[channel]->addUser(aUserList.addUser(user));
     }
 }
 
@@ -156,28 +171,28 @@ void Channel::deleteUser(QString user)
 void Channel::removeUser(QString user, QString channel)
 {
     if (channels.contains(channel))
-        channels[channel].removeUser(user);
+        channels[channel]->removeUser(user);
 }
 
 QList<User *> Channel::users()
 {
-    return channels[currentChannel].users();
+    return channels[currentChannel]->users();
 }
 
 QStringList Channel::userList()
 {
-    return channels[currentChannel].userList();
+    return channels[currentChannel]->userList();
 }
 
 bool Channel::contains(QString nick, QString channel)
 {
-	return channels[channel].contains(nick);
+	return channels[channel]->contains(nick);
 }
 
 void Channel::changeNick(QString nick, QString newNick)
 {
     for (auto i:channels.keys()) {
-        channels[i].renameUser(nick, newNick);
+        channels[i]->renameUser(nick, newNick);
     }
     if (channels.keys().contains(nick)) {
         channels[newNick] = channels[nick];
@@ -190,32 +205,32 @@ void Channel::changeNick(QString nick, QString newNick)
 
 bool Channel::voice(User *user, QString chan)
 {
-    return channels[chan].voice(user);
+    return channels[chan]->voice(user);
 }
 
 bool Channel::oper(User *user, QString chan)
 {
-    return channels[chan].oper(user);
+    return channels[chan]->oper(user);
 }
 
 void Channel::voice(User *user, QString chan, bool value)
 {
-    channels[chan].voice(user, value);
+    channels[chan]->voice(user, value);
 }
 
 void Channel::oper(User *user, QString chan, bool value)
 {
-    channels[chan].oper(user, value);
+    channels[chan]->oper(user, value);
 }
 
 void Channel::voice(QString user, QString chan, bool value)
 {
-    channels[chan].voice(user,value);
+    channels[chan]->voice(user,value);
 }
 
 void Channel::oper(QString user, QString chan, bool value)
 {
-    channels[chan].oper(user,value);
+    channels[chan]->oper(user,value);
 }
 
 /*
@@ -225,30 +240,30 @@ void Channel::oper(QString user, QString chan, bool value)
 void Channel::topic(QString topic, QString channel)
 {
     if (channels.contains(channel))
-        channels[channel].topic(topic);
+        channels[channel]->topic(topic);
 }
 
 QString Channel::topic()
 {
-    return channels[currentChannel].topic();
+    return channels[currentChannel]->topic();
 }
 
 bool Channel::notif(QString chan)
 {
     if (channels.contains(chan))
-        return channels[chan].notif();
+        return channels[chan]->notif();
     else return false;
 }
 
 void Channel::togleNotif(QString chan, bool newValue)
 {
     if (channels.contains(chan))
-            channels[chan].togleNotif(newValue);
+            channels[chan]->togleNotif(newValue);
 }
 
 Message Channel::getLast()
 {
-    return channels[currentChannel].getLast();
+    return channels[currentChannel]->getLast();
 }
 
 /*
@@ -257,20 +272,20 @@ Message Channel::getLast()
 
 bool Channel::oper(User *user)
 {
-    return channels[currentChannel].oper(user);
+    return channels[currentChannel]->oper(user);
 }
 
 
 bool Channel::oper(QString user)
 {
-    return channels[currentChannel].oper(user);
+    return channels[currentChannel]->oper(user);
 }
 bool Channel::voice(User *user)
 {
-    return channels[currentChannel].voice(user);
+    return channels[currentChannel]->voice(user);
 }
 
 bool Channel::voice(QString user)
 {
-    return channels[currentChannel].voice(user);
+    return channels[currentChannel]->voice(user);
 }

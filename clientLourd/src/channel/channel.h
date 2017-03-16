@@ -3,7 +3,9 @@
 
 #include <QHash>
 #include <QString>
+#include <QTcpSocket>
 
+#include "belote.h"
 #include "channelcontent.h"
 #include "message.h"
 #include "parseremoji.h"
@@ -28,6 +30,9 @@ public:
     void join(QString chan, QString topic);
     void joinWhisper(QString dest);
 
+    //Belote commands
+	void joinBelote(QString room, QTcpSocket *socket);
+    void beloteParse(QString room, QString command);
     // Channel quit functions
     void leave(QString channel);
 
@@ -83,7 +88,7 @@ private:
     // Current channel name
     QString currentChannel;
     // Qhash wich contain message: key = channel name, content = message list
-    QHash<QString, ChannelContent> channels;
+    QHash<QString, ChannelContent *> channels;
     UserList aUserList;
 };
 

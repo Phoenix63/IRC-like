@@ -74,6 +74,7 @@ bool Parser::out(QString string)
     if (!out_isMsgMsg(string))
 	if (!out_isAwayMsg(string))
     if (!out_isInvMsg(string))
+    if (!out_isBeloteMsg(string))
     if (!out_isPrivMsg(string))
         return false;
     return true;
@@ -89,6 +90,7 @@ void Parser::in(QString string)
     string = string.left(string.length() - 1);
     string = string.right(string.length() - 2);
     //Parse the message starting from error code to detect server name
+    qDebug() << "test " << string;
     if (!in_isInitMesg(string))
     if (!in_isChanList(string))
     if (!in_isNameList(string))
@@ -110,6 +112,8 @@ void Parser::in(QString string)
 	if (!in_isAwayStatus(string))
 	if (!in_isAwayPrivMsg(string))
     if (!in_isInvMsg(string))
+    if (!in_isInvBelMsg(string))
+    if (!in_isBeloteMsg(string))
     if (!in_isConfirmInv(string))
     if (!in_isPing(string)) {
         channel->appendChannel(string, "\"Debug\"", nullptr);
@@ -353,6 +357,14 @@ bool Parser::out_isQuitMsg(QString string)
     return true;
 }
 
+bool Parser::out_isBeloteMsg(QString string)
+{
+	if (!string.startsWith("/belote"))
+		return false;
+	string.replace(QString("/belote"), QString("BELOTE JOIN"));
+    sendToServer(socket, string);
+    return true;
+}
 /*
  * Parseur: In private function's
  */
@@ -374,8 +386,12 @@ bool Parser::in_isChanList(QString string)
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString chan = string.split(' ').at(3);
     QString topic = string.right(string.length() - j - 1);
-    channel->join(chan, topic);
-    emit channelModifiedSignal();
+    if (chan.startsWith('&')) {
+        channel->joinBelote(chan, socket);
+    } else {
+        channel->join(chan, topic);
+        emit channelModifiedSignal();
+    }
     return true;
 }
 
@@ -594,6 +610,30 @@ bool Parser::in_isInvMsg(QString string)
     return true;
 }
 
+bool Parser::in_isInvBelMsg(QString string)
+{
+    if (!string.contains(QRegularExpression(IRC::RPL::INVBELOTE)))
+        return false;
+    QString chan = string.split(' ').at(3);
+	QString tmp = "Do you want to play belote in : " + chan + '?';
+    if (QMessageBox::Yes == QMessageBox(QMessageBox::Information, "Invitation", "Do you want to join : " + chan + '?', QMessageBox::Yes|QMessageBox::No).exec())
+    {
+        sendToServer(socket, "BELOTE JOIN " + chan + '\n');
+    }
+    return true;
+}
+
+bool Parser::in_isBeloteMsg(QString string)
+{
+    QString chan = string.split(' ').at(2);
+    if (!string.contains(QRegularExpression(IRC::RPL::BELOTE)))
+        return false;
+    int j = string.indexOf(QRegularExpression(":.+$"));
+    QString message = string.right(string.length() - j - 1);
+    channel->beloteParse(chan, message);
+    return true;
+}
+
 bool Parser::in_isConfirmInv(QString string)
 {
     if (!string.contains(QRegularExpression(IRC::RPL::INVITING)))
@@ -662,7 +702,7 @@ bool Parser::in_isChanMode(QString string)
 {
     if (!string.contains(IRC::RPL::MODECHAN))
         return false;
-    modeParser->parseChan(string);
+    //modeParser->parseChan(string);
     emit channelModifiedSignal();
     return true;
 }

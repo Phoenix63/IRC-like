@@ -65,6 +65,7 @@ private:
 	bool out_isInvMsg(QString string);
 	bool out_isListFile(QString string);
 	bool out_isRmFile(QString string);
+	bool out_isBeloteMsg(QString string);
 
 	// In functions
 	bool in_isInitMesg(QString string);
@@ -87,6 +88,8 @@ private:
 	bool in_isAwayStatus(QString string);
 	bool in_isAwayPrivMsg(QString string);
 	bool in_isInvMsg(QString string);
+	bool in_isInvBelMsg(QString string);
+	bool in_isBeloteMsg(QString string);
 	bool in_isConfirmInv(QString string);
 	bool in_isListFile(QString string);
 	bool in_isRmFile(QString string);

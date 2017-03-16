@@ -1,5 +1,12 @@
 #include "channelcontent.h"
 
+
+void ChannelContent::parse(QString command)
+{
+    (void)command;
+    return;
+}
+
 /*
  * User functions
  */

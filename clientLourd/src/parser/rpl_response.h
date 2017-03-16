@@ -22,6 +22,8 @@ const QRegularExpression MOTD         ("^\\S+\\s372\\s");
 const QRegularExpression MOTDSTART    ("^\\S+\\s375\\s");
 const QRegularExpression ENDOFMOTD    ("^\\S+\\s376\\s");
 const QRegularExpression INVITED      ("^\\S+\\s641\\s");
+const QRegularExpression INVBELOTE    ("^\\S+\\s642\\s");
+const QRegularExpression BELOTE       ("^\\S+\\sBELOTE\\s");
 const QRegularExpression JOIN         ("^\\S+\\sJOIN\\s");
 const QRegularExpression PART         ("^\\S+\\sPART\\s");
 const QRegularExpression QUIT		  ("^\\S+\\sQUIT\\s");
@@ -29,10 +31,10 @@ const QRegularExpression NICK         ("^\\S+\\sNICK\\s");
 const QRegularExpression PING         ("^\\S+\\sPING\\s");
 const QRegularExpression KICK         ("^\\S+\\sKICK\\s");
 const QRegularExpression NOTICE       ("^\\S+\\sNOTICE\\sNICK");
-const QRegularExpression PRIVMSG      ("^\\S+\\sPRIVMSG\\s#\\S+");
-const QRegularExpression WHISPER      ("^\\S+\\sPRIVMSG\\s\\S+");
-const QRegularExpression FILELIST	  ("^\\S+\\sLISTFILES\\s\\S+");
-const QRegularExpression RMFILE	      ("^\\S+\\sRMFILE\\s\\S+");
+const QRegularExpression PRIVMSG      ("^\\S+\\sPRIVMSG\\s#");
+const QRegularExpression WHISPER      ("^\\S+\\sPRIVMSG\\s");
+const QRegularExpression FILELIST	  ("^\\S+\\sLISTFILES\\s");
+const QRegularExpression RMFILE	      ("^\\S+\\sRMFILE\\s");
 }
 
 }
