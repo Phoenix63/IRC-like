@@ -3,6 +3,7 @@
 
 #include <QHash>
 #include <QList>
+#include <QStringList>
 
 #include "message.h"
 #include "mode.h"
@@ -13,7 +14,7 @@ class QString;
 class ChannelContent
 {
 public:
-    void parse(QString command);
+    virtual void parse(QString command);
     //User functions
     void addUser(User *newUser);
     void removeUser(QString userName);

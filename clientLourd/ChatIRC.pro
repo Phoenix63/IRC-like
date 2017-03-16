@@ -21,6 +21,7 @@ TEMPLATE = app
 
 SOURCES += \
     src/main.cpp \
+    src/channel/belote.cpp \
     src/channel/channel.cpp \
     src/channel/channelcontent.cpp \
     src/channel/message.cpp \
@@ -33,7 +34,7 @@ SOURCES += \
     src/gui/channellist.cpp \
     src/gui/login.cpp \
     src/gui/mainframe.cpp \
-	src/gui/mclineedit.cpp \
+    src/gui/mclineedit.cpp \
     src/gui/msglist.cpp \
     src/gui/uploadfile.cpp \
     src/parser/parser.cpp \
@@ -44,6 +45,7 @@ SOURCES += \
 
 
 HEADERS  += \
+    src/channel/belote.h \
     src/channel/channel.h \
     src/channel/channelcontent.h \
     src/channel/message.h \
@@ -58,7 +60,7 @@ HEADERS  += \
     src/gui/channellist.h \
     src/gui/login.h \
     src/gui/mainframe.h \
-	src/gui/mclineedit.h \
+    src/gui/mclineedit.h \
     src/gui/msglist.h \
     src/gui/uploadfile.h \
     src/parser/err_response.h \
@@ -67,9 +69,10 @@ HEADERS  += \
     src/parser/rpl_response.h \
     src/user/user.h \
     src/user/userlist.h \
-    src/gui/uploadwindow.h
+    src/gui/uploadwindow.h 
 
 FORMS    += \
+    src/channel/belote.ui \
     src/gui/login.ui \
     src/gui/mainframe.ui \
     src/gui/channellist.ui \

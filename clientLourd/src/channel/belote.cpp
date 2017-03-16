@@ -11,6 +11,9 @@ Belote::Belote(QWidget *parent, QTcpSocket *sock) :
 {
     ui->setupUi(this);
     this->show();
+    this->centralWidget()->setStyleSheet("background-image : url(\"ressources/img/tapis.jpg\"); "
+                                         "background-repeat : no-repeat;"
+                                         "border-image: url(\"ressources/img/tapis.jpg\") 0 0 0 0 stretch stretch;");
     lobbyWait();
 }
 

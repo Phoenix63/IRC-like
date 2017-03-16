@@ -1,8 +1,10 @@
 #include "mainframe.h"
 
+#include <QCloseEvent>
 #include <QCompleter>
 #include <QFileDialog>
 #include <QHBoxLayout>
+#include <QKeyEvent>
 #include <QLabel>
 #include <QMessageBox>
 #include <QScrollBar>
@@ -126,9 +128,11 @@ void MainFrame::channelModified()
 
     ui->channelList->clear();
     for (auto i:channel.channelNames()) {
-        ui->channelList->addItem(i);
-        if (channel.notif(i))
-            ui->channelList->findItems(i,Qt::MatchExactly)[0]->setForeground(QColor("red"));
+        if (!i.startsWith('&')) {
+            ui->channelList->addItem(i);
+            if (channel.notif(i))
+                ui->channelList->findItems(i,Qt::MatchExactly)[0]->setForeground(QColor("red"));
+        }
     }
 }
 
@@ -397,7 +401,7 @@ void MainFrame::initCompletion()
     completionList << "/clean" << "/debug" << "/nick" << "/user" << "/join" << "/names"
                    << "/pass" << "/part" << "/list" << "/topic" << "/kick" << "/who"
                    << "/whois" << "/mode" << "/msg" << "/quit" << "/away" << "/back"
-				   << "/invite" << "/files" << "/rmfile";
+				   << "/invite" << "/files" << "/rmfile" << "/belote";
     stringCompleter = new QCompleter(completionList,this);
     stringCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     stringCompleter->popup()->setTabKeyNavigation(true);
