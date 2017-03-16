@@ -144,12 +144,14 @@ void Channel::changeName(QString oldChan, QString newChan)
 
 void Channel::addUser(QString user, QString channel)
 {
-    if(user.startsWith('@')) {
-        user.remove(0, 1);
-        channels[channel]->addUser(aUserList.addUser(user));
-        channels[channel]->oper(user, true);
-    } else {
-        channels[channel]->addUser(aUserList.addUser(user));
+    if(channels.keys().contains(channel)) {
+        if(user.startsWith('@')) {
+            user.remove(0, 1);
+            channels[channel]->addUser(aUserList.addUser(user));
+            channels[channel]->oper(user, true);
+        } else {
+            channels[channel]->addUser(aUserList.addUser(user));
+        }
     }
 }
 

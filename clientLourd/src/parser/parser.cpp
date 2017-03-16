@@ -62,13 +62,14 @@ bool Parser::out(QString string)
     if (!out_isPassMsg(string))
     if (!out_isPartMsg(string))
     if (!out_isListMsg(string))
-    if (!out_isListFile(string))
-	if (!out_isRmFile(string))
+    if (!out_isListFileMsg(string))
+    if (!out_isRmFileMsg(string))
     if (!out_isCleanMsg(string))
     if (!out_isDebugMsg(string))
     if (!out_isModeMsg(string))
     if (!out_isTopicMsg(string))
     if (!out_isKickMsg(string))
+    if (!out_isServKickMsg(string))
     if (!out_isWhoisMsg(string))
     if (!out_isWhoMsg(string))
     if (!out_isMsgMsg(string))
@@ -90,21 +91,21 @@ void Parser::in(QString string)
     string = string.left(string.length() - 1);
     string = string.right(string.length() - 2);
     //Parse the message starting from error code to detect server name
-    qDebug() << "test " << string;
-    if (!in_isInitMesg(string))
+    if (!in_isInitMsg(string))
     if (!in_isChanList(string))
     if (!in_isNameList(string))
     if (!in_isJoinNote(string))
     if (!in_isPartNote(string))
 	if (!in_isQuitNote(string))
-    if (!in_isPrivMesg(string))
-    if (!in_isWhisMesg(string))
+    if (!in_isPrivMsg(string))
+    if (!in_isWhisMsg(string))
     if (!in_isNickEdit(string))
-    if (!in_isListMesg(string))
-    if (!in_isListFile(string))
-	if (!in_isRmFile(string))
+    if (!in_isListMsg(string))
+    if (!in_isListFileMsg(string))
+    if (!in_isRmFileMsg(string))
     if (!in_isSetTopic(string))
-    if (!in_isKickMesg(string))
+    if (!in_isKickMsg(string))
+    if (!in_isEndKickMsg(string))
     if (!in_isNoNick(string))
     if (!in_isNoChan(string))
     if (!in_isUserMode(string))
@@ -215,7 +216,7 @@ bool Parser::out_isListMsg(QString string)
     return true;
 }
 
-bool Parser::out_isListFile(QString string)
+bool Parser::out_isListFileMsg(QString string)
 {
     if(!string.startsWith("/files"))
         return false;
@@ -227,7 +228,7 @@ bool Parser::out_isListFile(QString string)
     return true;
 }
 
-bool Parser::out_isRmFile(QString string)
+bool Parser::out_isRmFileMsg(QString string)
 {
     if(!string.startsWith("/rmfile"))
         return false;
@@ -255,9 +256,27 @@ bool Parser::out_isTopicMsg(QString string)
 
 bool Parser::out_isKickMsg(QString string)
 {
+    string.remove(string.length() - 1, 1);
     if (!string.startsWith("/kick"))
         return false;
-    string = string.right(string.length() - 5);
+    QString user = string.split(' ').at(1);
+    QString command;
+    if (!user.startsWith('#'))
+        command = "MODE " + channel->channelName() + " +b " + user + " 0\n";
+    else {
+        //second arg is a channel, user is the third arg
+        QString nick = string.split(' ').at(2);
+        command = "MODE " + user + " +b " + nick + " 0\n";
+    }
+    sendToServer(socket, command);
+    return true;
+}
+
+bool Parser::out_isServKickMsg(QString string)
+{
+    if (!string.startsWith("/serverkick"))
+        return false;
+    string = string.right(string.length() - 11);
     string.prepend("KICK");
     sendToServer(socket, string);
     return true;
@@ -368,7 +387,7 @@ bool Parser::out_isBeloteMsg(QString string)
 /*
  * Parseur: In private function's
  */
-bool Parser::in_isInitMesg(QString string)
+bool Parser::in_isInitMsg(QString string)
 {
     if (!string.contains(IRC::RPL::NOTICE))
         return false;
@@ -466,7 +485,7 @@ bool Parser::in_isQuitNote(QString string)
     return true;
 }
 
-bool Parser::in_isPrivMesg(QString string)
+bool Parser::in_isPrivMsg(QString string)
 {
     if (!string.contains(IRC::RPL::PRIVMSG))
         return false;
@@ -482,7 +501,7 @@ bool Parser::in_isPrivMesg(QString string)
     return true;
 }
 
-bool Parser::in_isWhisMesg(QString string)
+bool Parser::in_isWhisMsg(QString string)
 {
     if (!string.contains(IRC::RPL::WHISPER))
         return false;
@@ -521,15 +540,15 @@ bool Parser::in_isNickEdit(QString string)
     return true;
 }
 
-bool Parser::in_isKickMesg(QString string)
+bool Parser::in_isKickMsg(QString string)
 {
-    if(!string.contains(IRC::RPL::KICK))
+    if (!string.contains(IRC::RPL::KICK))
         return false;
     QString admin = string.split(' ').at(0);
     QString chan = string.split(' ').at(2);
     QString kicked = string.split(' ').at(3);
     if(!kicked.compare(self.name())) {
-        channel->appendChannel("You were kicked from " + chan + " by " + admin, "\"Debug\"", "");
+        channel->appendChannel("You were kicked from " + chan + " by " + admin, "\"Debug\"", nullptr);
         channel->leave(chan);
     } else {
     	channel->appendChannel(kicked + " was kicked by " + admin, chan, "");
@@ -539,9 +558,19 @@ bool Parser::in_isKickMesg(QString string)
     return true;
 }
 
+bool Parser::in_isEndKickMsg(QString string)
+{
+    if (!string.contains(IRC::RPL::ENDOFKICK))
+        return false;
+    QString chan = string.split(' ').at(2);
+    channel->appendChannel("Your mode in " + chan + " has been updated", "\"Debug\"", "");
+    emit channelModifiedSignal();
+    return true;
+}
+
 bool Parser::in_isPing(QString string)
 {
-    if(!string.contains(IRC::RPL::PING))
+    if (!string.contains(IRC::RPL::PING))
         return false;
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString pong = string.right(string.length() - j) + '\n';
@@ -550,7 +579,7 @@ bool Parser::in_isPing(QString string)
     return true;
 }
 
-bool Parser::in_isListMesg(QString string)
+bool Parser::in_isListMsg(QString string)
 {
     if(!string.contains(IRC::RPL::LIST))
         return false;
@@ -561,7 +590,7 @@ bool Parser::in_isListMesg(QString string)
     return true;
 }
 
-bool Parser::in_isListFile(QString string)
+bool Parser::in_isListFileMsg(QString string)
 {
     if (!string.contains(IRC::RPL::FILELIST))
         return false;
@@ -573,7 +602,7 @@ bool Parser::in_isListFile(QString string)
     return true;
 }
 
-bool Parser::in_isRmFile(QString string)
+bool Parser::in_isRmFileMsg(QString string)
 {
     if (!string.contains(IRC::RPL::RMFILE))
         return false;
@@ -702,7 +731,7 @@ bool Parser::in_isChanMode(QString string)
 {
     if (!string.contains(IRC::RPL::MODECHAN))
         return false;
-    //modeParser->parseChan(string);
+    modeParser->parseChan(string);
     emit channelModifiedSignal();
     return true;
 }

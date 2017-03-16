@@ -6,6 +6,7 @@
 MAKEFILE += chatIRC.make
 
 MOC_DIR += mocs
+DESTDIR = $$PROJECT_ROOT
 OBJECTS_DIR += objects
 UI_DIR += uis
 QT       += core gui
@@ -46,6 +47,7 @@ SOURCES += \
 
 HEADERS  += \
     src/channel/belote.h \
+    src/channel/card.h \
     src/channel/channel.h \
     src/channel/channelcontent.h \
     src/channel/message.h \

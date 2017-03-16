@@ -20,6 +20,7 @@ const QRegularExpression WHOREPLY     ("^\\S+\\s352\\s");
 const QRegularExpression NAMEREPLY    ("^\\S+\\s353\\s");
 const QRegularExpression MOTD         ("^\\S+\\s372\\s");
 const QRegularExpression MOTDSTART    ("^\\S+\\s375\\s");
+const QRegularExpression ENDOFKICK    ("^\\S+\\s442\\s");
 const QRegularExpression ENDOFMOTD    ("^\\S+\\s376\\s");
 const QRegularExpression INVITED      ("^\\S+\\s641\\s");
 const QRegularExpression INVBELOTE    ("^\\S+\\s642\\s");

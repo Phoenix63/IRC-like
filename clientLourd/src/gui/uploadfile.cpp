@@ -31,7 +31,6 @@ void Upload::run()
         while (read.size() > 0)
         {
             socket->write(read);
-            socket->waitForBytesWritten();
             read.clear();
             read = inputFile.read(100);
         }
