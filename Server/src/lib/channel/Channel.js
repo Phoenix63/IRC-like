@@ -272,9 +272,9 @@ class Channel {
             if (this._usersFlags[client.identity].indexOf(flag) === -1) {
                 this._usersFlags[client.identity] += flag;
                 RPLSender.RPL_CHANNELMODEIS(this, this._name + ' +' + flag + ' ' + client.name);
+                this._mergeToRedis();
             }
         });
-        this._mergeToRedis();
     }
 
     /**
@@ -290,9 +290,9 @@ class Channel {
             this._usersFlags[client.identity] = this._usersFlags[client.identity].replace(flag, '');
             if (tmp - 1 === this._usersFlags[client.identity].length) {
                 RPLSender.RPL_CHANNELMODEIS(this, this._name + ' -' + flag + ' ' + client.name);
+                this._mergeToRedis();
             }
         });
-        this._mergeToRedis();
     }
 
     /**
@@ -306,9 +306,9 @@ class Channel {
             if (this._flags.indexOf(flag) === -1) {
                 this._flags += flag;
                 RPLSender.RPL_CHANNELMODEIS(this, this._name + ' +' + flag);
+                this._mergeToRedis();
             }
         });
-        this._mergeToRedis();
     }
 
     /**
@@ -323,9 +323,9 @@ class Channel {
             this._flags = this._flags.replace(flag, '');
             if (tmp - 1 === this._flags.length) {
                 RPLSender.RPL_CHANNELMODEIS(this, this._name + ' -' + flag);
+                this._mergeToRedis();
             }
         });
-        this._mergeToRedis();
     }
 
     /**
@@ -412,11 +412,13 @@ class Channel {
         }
         if (this._users.indexOf(user) < 0) {
             this._users.push(user);
-
+            user.addChannel(this);
             if (!this._usersFlags[user.identity]) {
                 this._usersFlags[user.identity] = '';
             }
-
+            RPLSender.JOIN(user, this);
+            RPLSender.RPL_TOPIC('JOIN', user, this);
+            RPLSender.RPL_NAMREPLY(user, this);
             if (this._users.length === 1) {
                 this._addClientFlag(user, 'o')
             }
@@ -429,10 +431,7 @@ class Channel {
                 this._addClientFlag(user, 'o')
             }
             this._mergeToRedis();
-            user.addChannel(this);
-            RPLSender.JOIN(user, this);
-            RPLSender.RPL_TOPIC('JOIN', user, this);
-            RPLSender.RPL_NAMREPLY(user, this);
+
         }
     }
 
@@ -456,6 +455,7 @@ class Channel {
 
             if (!this._persistent && this._users.length <= 0) {
                 channels.splice(channels.indexOf(this), 1);
+                Redis.deleteChannel(this);
             }
         }
     }
