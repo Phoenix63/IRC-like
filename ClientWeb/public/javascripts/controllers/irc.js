@@ -36,7 +36,6 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						var readerSend = new FileReader();
 						readerSend.onload = function() {
 							userInfo.filePort.emit("data", "FILE " + fich[0].size + " " + fich[0].name);
-							alert(readerSend.result);
 							userInfo.filePort.emit("data", readerSend.result);
 						}
 						readerSend.readAsBinaryString(fich[0]);
@@ -52,8 +51,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 					var readerSend = new FileReader();
 					readerSend.onload = function() {
 						userInfo.filePort.emit("data", "FILE " + fich[0].size + " " + fich[0].name);
-						alert(readerSend.result);
-						userInfo.filePort.emit("data", readerSend.result);
+						userInfo.filePort.emit("data", "" + readerSend.result);
 					}
 					readerSend.readAsBinaryString(fich[0]);
 				}
@@ -155,12 +153,59 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			user.removeUserMute(userL.nick);
 		}],
 		["Kick", function ($itemScope) {
-			userInfo.socket.emit("message", "KICK " + userL.nick + " " + $scope.currentChannel.chan);
+			userInfo.socket.emit("message", "KICK " + $scope.currentChannel.chan + " " + userL.nick);
 		}],
 		["Bann", function ($itemScope) {
 			//only if admin
 		}]
 	];};
+	
+	$scope.helpPandirc = function() {
+		bootbox.alert("<strong>Basic command</strong>" +
+					"<br />" +
+					"<p><div class = 'commandHelp'>/join #NameOfChannel</div> -> Join the the channel #NameOfChannel</p>" +
+					"<p><div class = 'commandHelp'>/nick newNicl</div> -> Change youre nickname</p>" +
+					"<p><div class = 'commandHelp'>/part <#NameOfChannel></div> -> Part the channel #NameOfChannel or the current channel</p>" +
+					"<p><div class = 'commandHelp'>/topic <#NameOfChannel></div> -> Print the topic of the channel #NameOf channel or the current channel</p>" +
+					"<p><div class = 'commandHelp'>/topic #NameOfChannel newTopic</div> -> Set the topic of the channel newTopic</p>" +
+					"<p><div class = 'commandHelp'>/kick #NameOfChannel NickOfUser</div> -> Kick the user of the channel (only the operators and admins could kick)</p>" +
+					"<p><div class = 'commandHelp'>/names <#NameOfChannel></div> -> List the users in the channels with their abilitation @ : admin or operators</p>" +
+					"<p><div class = 'commandHelp'>/list</div> -> List all the channels with their topic</p>" +
+					"<p><div class = 'commandHelp'>/quit</div> -> Quit the server</p>" +
+					"<p><div class = 'commandHelp'>/who #NameOfChannel</div> -> List the detail of the users in the channel</p>" +
+					"<p><div class = 'commandHelp'>/whois NickOfUser</div> -> Information of the user" +
+					"<p><div class = 'commandHelp'>/away message</div> -> You can't receive privmsg and the message is put for user who want to privmsg you" +
+					"<p><div class = 'commandHelp'>/away</div> -> You are not away anymore</p>" +
+					"<p><div class = 'commandHelp'>/invite NickOfUser #Channel</div> -> Invite an user to the channel (if the channel is +i)</p>" +
+					"<p><div class = 'commandHelp'>/msg NickOfUser message</div> -> Send the privmsg message to the user</p>" +
+					"<p><div class = 'commandHelp'>/privmsg #Channel message</div> -> Send message to the channel</p>" +
+					"<p><div class = 'commandHelp'>/mute NickOfUser</div> -> mute an user</p>" +
+					"<p><div class = 'commandHelp'>/demute NickOfUser</div> -> demute an user</p>" +
+					"<br /><strong>Command Advanced for operators or admins</strong>" +
+					"<br /><p>Command channel /mode #Channel flag <DependsOfFlags> <DependOfFlags> :</p>" +
+					"<p>You could combine certain flag together if their not in conflit and you cant put a +flag and a -flag in the same line</p>" +
+					"<p>Command user /mode NickOf user flag (only for admins)</p>" +
+					"<p>flag channel (+ or -) : b i o p s t n m l v k</p>" +
+					"<p>flag user (+ or -) : i s w b o</p>" +
+					"<p>The flags :</p>" +
+					"<p>channel b -> Bann or debann an user (/mode #Channel +b NickOfUser) <div class = 'commandHelp'>/mode #Channel -b NickOfUser</div></p>" +
+					"<p>channel o -> Upgrade an user to operator in the channel (or Downgrade) <div class = 'commandHelp'>/mode #Channel +o NickOfUSer</div></p>" +
+					"<p>channel p -> The channel is private (name of channel is invisible) <div class = 'commandHelp'>/mode #Channel +p</div></p>" +
+					"<p>channel s -> The channel is secret (channel invisible) <div class = 'commandHelp'>/mode #Channel +s</div></p>" +
+					"<p>channel i -> The channel is now on invitation <div class = 'commandHelp'>/mode #Channel +i</div></p>" +
+					"<p>channel t -> The topic could only be settled by operators <div class = 'commandHelp'>/mode #Channel +t</div></p>" +
+					"<p>channel n -> The channel could not have message from user in other channels <div class = 'commandHelp'>/mode #Channel +n</div></p>" +
+					"<p>channel m -> The channel is moderate <div class = 'commandHelp'>/mode #Channel +m</div></p>" +
+					"<p>channel l -> Limits the number of users in the channels <div class = 'commandHelp'>/mode #Channel +l number</div></p>" +
+					"<p>channel v -> Give or take the right to talk of an user in the moderate channel (need a channel moderate) <div class = 'commandHelp'>/mode #channel +v NickOfUser</div></p>" +
+					"<p>channel k -> Put a key in the channel <div class = 'commandHelp'>/mode #Channel +k key</div></p>" +
+					"<p>user i -> Put an user to invisible mode <div class = 'commandHelp'>/mode NickOfUser +i</div></p>" +
+					"<p>user b -> Bann or debann a user in the server <div class = 'commandHelp'>/mode NickOfUser +b</div> <div class = 'commandHelp'>/mode NickOfUser -b</div></p>" +
+					"<p>user o -> Upgrade a user to admin <div class = 'commandHelp'>/mode NickOfUser +o</div></p>" +
+					"<p>user w -> The user could receive WALLOPS <div class = 'commandHelp'>/mode NickOfUser +w</div></p>" +
+					"<p>user s -> Mark an user as receiving notification from server <div class = 'commandHelp'>/mode NickOfUser +s</div></p>");
+	}
+	
 	
     $scope.sendMessage = function() {
         var cmdJoin = $scope.newMessage.match(/^\/join[ ][\w\S]+$/);
@@ -843,6 +888,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
     }
 	
 	userInfo.filePort.on("file", function(msg){
+		alert("dde");
 		alert(msg);
 		$scope.currentChannel.messages.push([new User("file"), new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), msg]);
 		$scope.$apply();

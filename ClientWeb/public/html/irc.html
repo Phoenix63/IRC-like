@@ -25,9 +25,7 @@
 	
     <input type="file" id="fileToSend" ng-model="image" onchange="angular.element(this).scope().uploadImage(this.files)"></input>
 	<form id="test" ng-submit="sendMessage()">
-		<div id="div_emoji">
-                <img class="bouton_emoji" src="img/joie.png">
-        </div>
+        <button id="div_emoji" ng-click="helpPandirc()">help</button>
 		<div id="divSendMessage">
 			<input id="inputSendMessage" ng-model="newMessage" placeholder="Entrez votre message"></input>
         </div>

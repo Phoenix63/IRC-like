@@ -315,6 +315,10 @@ h3::after {
 	font:bold 13px Arial;
 }
 
+.commandHelp {
+	color:blue;
+}
+
 #menu_emoji {
     width: 620px;
     height: 225px; z-index: 999;
