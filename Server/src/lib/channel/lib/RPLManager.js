@@ -73,6 +73,10 @@ class RPLManager {
         this.game.broadcast(this.head+' 1015 :round start '+players);
     }
 
+    teamWin(id) {
+        this.game.broadcast(this.head+' 1016 :team '+id+' win');
+    }
+
     /*
     *
     * ============================

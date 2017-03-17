@@ -78,7 +78,6 @@ class Round {
         let index = this._players.indexOf(player);
         if(!this._players[0].team._take && !this._players[1].team._take) {
             if(colors < 0) {
-
                 let isNext = true;
 
                 this._play++;
@@ -138,7 +137,7 @@ class Round {
     }
 
     playerPlayCard(player, card) {
-        if(this._players[0].team._take || this._players[1].team._take) {
+        if(this.game.isTrumpTaken()) {
             if(this._play === this._players.indexOf(player)) {
                 player._hand.forEach((c) => {
                     if(c.value === card) {
@@ -155,6 +154,9 @@ class Round {
                     if(play.indexOf(card) >= 0) {
                         let end = false;
                         this._folds[this._currentFold].push([player, card]);
+
+                        this._deck._played.push(card);
+
                         debug('----------------- pli ('+this._trump.color+') ------------');
                         let better = false;
                         debug(this._folds[this._currentFold].map((c) => {
@@ -206,6 +208,7 @@ class Round {
             }
         } else {
             // l'atout n'est pas choisis
+            debug('atout pas choisis');
         }
 
     }

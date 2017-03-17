@@ -19,6 +19,10 @@ class Game {
         this._players = [];
         this.rpl = new RPLManger(this);
 
+        this._points = [0,0];
+
+        this._rounds = 0;
+
         /*
         * -1 : lobby
         * 0 : game
@@ -51,38 +55,78 @@ class Game {
         return this._state;
     }
 
-    teamArefull() {
-        this.state = 1;
+    _roundFactory() {
+        let arr = [
+            this._teams[0]._players[0],
+            this._teams[1]._players[0],
+            this._teams[0]._players[1],
+            this._teams[1]._players[1]
+        ];
         this._round = new Round(this,
-            [this.teams[0]._players[0], this.teams[1]._players[0],this.teams[0]._players[1],this.teams[1]._players[1]],
+            arr.slice(this._rounds,arr.length).concat(arr.slice(0,this._rounds)),
             this.teams[0],
             this.teams[1],
             this._deck,
             () => {
-                let t1 = this.teams[0];
-                let t2 = this.teams[1];
-                let t1p = 0;
-                let t2p = 0;
-
-                if(t1.getPoints() < 1) {
-                    t1p = t1.getBonus();
-                    t2p = 252 + t2.getBonus();
-                } else if (t2.getPoints() < 1) {
-                    t2p = t1.getBonus();
-                    t1p = 252 + t1.getBonus();
-                } else if(t1._take && (t1.getPoints()+t1.getBonus() < t2.getPoints()+t2.getBonus())) {
-                    t1p = t1.getBonus();
-                    t2p = 162 + t2.getBonus();
-                } else if(t2._take && (t1.getPoints()+t1.getBonus() > t2.getPoints()+t2.getBonus())) {
-                    t2p = t2.getBonus();
-                    t1p = 162 + t1.getBonus();
-                } else {
-                    t1p = t1.getPoints() + t1.getBonus();
-                    t2p = t2.getPoints() + t2.getBonus();
-                }
-                this.rpl.teamScore(t1p,t2p);
+                this._rounds++;
+                this._round = null;
+                this._deck.reset();
+                this._deck.cut();
+                this._players.forEach((player) => {
+                    player._hand = [];
+                });
+                this._roundParser.call(this);
             }
         );
+    }
+
+    isTrumpTaken() {
+        return (this._teams[0].isTaker() || this._teams[1].isTaker());
+    }
+
+    _roundParser() {
+        let t1 = this.teams[0];
+        let t2 = this.teams[1];
+        let t1p = 0;
+        let t2p = 0;
+
+        if(t1.getPoints() < 1) {
+            t1p = t1.getBonus();
+            t2p = 252 + t2.getBonus();
+        } else if (t2.getPoints() < 1) {
+            t2p = t1.getBonus();
+            t1p = 252 + t1.getBonus();
+        } else if(t1._take && (t1.getPoints()+t1.getBonus() < t2.getPoints()+t2.getBonus())) {
+            t1p = t1.getBonus();
+            t2p = 162 + t2.getBonus();
+        } else if(t2._take && (t1.getPoints()+t1.getBonus() > t2.getPoints()+t2.getBonus())) {
+            t2p = t2.getBonus();
+            t1p = 162 + t1.getBonus();
+        } else {
+            t1p = t1.getPoints() + t1.getBonus();
+            t2p = t2.getPoints() + t2.getBonus();
+        }
+
+
+        this._points[0] += t1p;
+        this._points[1] += t2p;
+
+        this.rpl.teamScore(this._points[0],this._points[1]);
+
+        this._teams.forEach((team) => {
+            team.resetTake();
+        });
+
+        if(this._points[0] !== this._points[1] && (this._points[0] >= 1000 || this._points[1] >= 1000)) {
+            this.rpl.teamWin(this._points[0]>=this._points[1]?0:1);
+        } else {
+            this._roundFactory.call(this);
+        }
+    }
+
+    teamArefull() {
+        this.state = 1;
+        this._roundFactory.call(this);
     }
 
     /**
@@ -123,12 +167,10 @@ class Game {
                 if(player) {
                     this._teams[team].addPlayer(player);
                 } else {
-                    // le joueur n'est pas dans cette partie
                     this.rpl.ERR_NOTINGAME(client.socket);
                 }
             });
         } else {
-            // team invalide
             this.rpl.ERR_INVALIDTEAMID(client.socket);
         }
     }
@@ -157,8 +199,6 @@ class Game {
             this.getPlayerFromClient(client, (player) => {
                 this._round.playerPlayCard(player, parseInt(card));
             });
-        } else {
-            console.log('la partie n a pas commencé');
         }
     }
 
