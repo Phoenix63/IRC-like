@@ -34,6 +34,8 @@ private:
     void clean();
     void clearLayout(QLayout *layout);
     void chooseTeam();
+    void chooseTrump(BELOTE::CARD card);
+    void displayCard(BELOTE::CARD);
     //Out functions
 
     //In functions
@@ -42,6 +44,7 @@ private:
     bool in_isPartNote(QString string);
     bool in_isFullTeam(QString string);
     bool in_isGameReset(QString string);
+    bool in_isTrumpChoice(QString string);
 private:
     QString username;
     QString channelName;

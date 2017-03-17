@@ -1,6 +1,7 @@
 #include "belote.h"
 #include "ui_belote.h"
 
+#include <QLabel>
 #include <QMessageBox>
 
 Belote::Belote(QWidget *parent, QTcpSocket *sock, QString chan, QString nick) :
@@ -58,6 +59,29 @@ BELOTE::CARD Belote::findCard()
     }
 }
 
+void Belote::chooseTrump(BELOTE::CARD card)
+{
+    clearLayout(ui->buttons);
+    int trump = card / 8;
+    //TODO find proper way to implement
+}
+
+void Belote::displayCard(BELOTE::CARD card)
+{
+    unsigned int trump = card / 8;
+    unsigned int value = card % 8;
+    QPixmap cards("ressources/img/cards.jpg");
+    QRect rect(73*value, 97*trump, 73, 97);
+    QPixmap cropped = cards.copy(rect);
+    cropped.scaledToHeight(70,Qt::SmoothTransformation);
+    QLabel *lCard = new QLabel;
+    lCard->setPixmap(cropped);
+    ui->board->addWidget(lCard);
+}
+
+/*
+ *
+ */
 void Belote::lobbyWait()
 {
     QMessageBox waiting;
@@ -115,6 +139,7 @@ void Belote::parse(QString string)
     if (!in_isTeamSelec(string))
     if (!in_isFullTeam(string))
     if (!in_isGameReset(string))
+    if (!in_isTrumpChoice(string))
     if (!in_isCardDeal(string))
         qDebug() << "cant find this";
 }
@@ -127,6 +152,16 @@ bool Belote::in_isCardDeal(QString string)
     for (auto i:cardList) {
         receiveCard((BELOTE::CARD)i.toInt());
     }
+    return true;
+}
+
+bool Belote::in_isTrumpChoice(QString string)
+{
+    if (!string.startsWith("donald"))
+        return false;
+    BELOTE::CARD card =(BELOTE::CARD)string.split(' ').last().toInt();
+    displayCard(card);
+    chooseTrump(card);
     return true;
 }
 
