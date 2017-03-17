@@ -1,37 +1,54 @@
+version: "2"
 
-node:
-  image: pandirc/runtest
-  command: sh -c 'npm run build && node dist/server.js TEST'
-  hostname: node
-  volumes:
-   - ./..:/app
-  ports:
-   - "8088:8088"
-   - "8089:8089"
-   - "3001:3001"
-  links:
-   - mongo:mongo
-   - redis:redis
-   - fileserver:fileserver
+services:
+  node:
+    image: pandirc/runtest
+    command: npm run build
+    entrypoint: node ./dist/app.js
+    environment:
+      - DEBUG=app:test
+      - RUNNING=TEST
+    hostname: node
+    stop_signal: SIGINT
+    volumes:
+     - ./..:/app
+    ports:
+     - "8088:8088"
+     - "8089:8089"
+    links:
+     - mongo:mongo
+     - redis:redis
+     - fileserver:fileserver
 
-fileserver:
-  image: bitnami/node:7
-  command: sh -c 'npm run build && node ./dist/modules/file/server.js PROD'
-  hostname: fileserver
-  volumes:
-   - ./..:/app
-  ports:
-   - "8090:8090"
-   - "8091:8091"
-  links:
-   - redis:redis
+  fileserver:
+    image: pandirc/dev
+    command: npm run build
+    entrypoint: node ./dist/lib/file/server.js
+    stop_signal: SIGINT
+    environment:
+    - RUNNING=TEST
+    - DEBUG=fileserver:*
+    hostname: fileserver
+    volumes:
+     - ./..:/app
+    ports:
+    - "3001:3001"
+    - "8090:8090"
+    - "8091:8091"
+    links:
+    - redis:redis
 
-mongo:
-  image: mongo
-  hostname: mongo
-  volumes:
-   - mongoirc:/data/db
+  mongo:
+    image: mongo:3.4
+    hostname: mongo
+    volumes:
+     - mongoirc:/data/db
 
-redis:
-  image: redis
-  hostname: redis
+  redis:
+    image: redis:3.2
+    hostname: redis
+
+volumes:
+  mongoirc:
+    external:
+      name: mongoirc

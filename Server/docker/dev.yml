@@ -1,36 +1,53 @@
-node:
-  image: pandirc/dev
-  command: sh -c 'nodemon --ignore ./src/modules/file --ignore ./__uploaded_files__ --exec babel-node ./src/server.js DEV'
-  hostname: node
-  volumes:
-   - ./..:/app
-  ports:
-   - "8088:8088"
-   - "8089:8089"
-  links:
-   - mongo:mongo
-   - redis:redis
-   - fileserver:fileserver
+version: "2"
 
-fileserver:
-  image: pandirc/dev
-  command: sh -c 'nodemon --watch ./src/modules/file --ignore ./__uploaded_files__ --exec babel-node ./src/modules/file/server.js DEV'
-  hostname: fileserver
-  volumes:
-   - ./..:/app
-  ports:
-  - "3001:3001"
-  - "8090:8090"
-  - "8091:8091"
-  links:
-  - redis:redis
+services:
+  node:
+    image: pandirc/dev
+    command: npm run build
+    entrypoint: node ./dist/app.js
+    environment:
+      - Ouais
+      - RUNNING=DEV
+    hostname: node
+    stop_signal: SIGINT
+    volumes:
+     - ./..:/app
+    ports:
+     - "8088:8088"
+     - "8089:8089"
+    links:
+     - mongo:mongo
+     - redis:redis
+     - fileserver:fileserver
 
-mongo:
-  image: mongo
-  hostname: mongo
-  volumes:
-   - mongoirc:/data/db
+  fileserver:
+    image: pandirc/dev
+    command: npm run build
+    entrypoint: node ./dist/lib/file/server.js
+    environment:
+    - RUNNING=DEV
+    - DEBUG=fileserver:*
+    hostname: fileserver
+    volumes:
+     - ./..:/app
+    ports:
+    - "3001:3001"
+    - "8090:8090"
+    - "8091:8091"
+    links:
+    - redis:redis
 
-redis:
-  image: redis
-  hostname: redis
+  mongo:
+    image: mongo:3.4
+    hostname: mongo
+    volumes:
+     - mongoirc:/data/db
+
+  redis:
+    image: redis:3.2
+    hostname: redis
+
+volumes:
+  mongoirc:
+    external:
+      name: mongoirc

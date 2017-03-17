@@ -5,6 +5,9 @@
   "main": "app.js",
   "scripts": {
     "dev": "docker-compose -f ./docker/dev.yml up",
+    "DEV": "babel src --out-dir dist --source-maps inline --copy-files && babel-node ./src/app.js DEV",
+    "TEST": "babel src --out-dir dist --source-maps inline --copy-files && babel-node ./src/app.js TEST",
+    "PROD": "babel src --out-dir dist --source-maps inline --copy-files && babel-node ./src/app.js PROD",
     "watch": "babel --watch src --out-dir dist --source-maps inline --copy-files",
     "build": "babel src --out-dir dist --source-maps inline --copy-files",
     "prod": "docker-compose -f ./docker/prod.yml up",
@@ -13,9 +16,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "colors": "^1.1.2",
+    "async": "^2.1.5",
     "crypto": "0.0.3",
+    "debug": "^2.6.1",
     "express": "^4.15.0",
+    "getpid": "0.0.1",
     "mongodb": "^2.2.23",
     "redis": "^2.6.5",
     "screenshot": "^0.1.0",
@@ -25,7 +30,9 @@
   "devDependencies": {
     "assert": "^1.4.1",
     "babel-cli": "^6.22.2",
+    "babel-core": "^6.23.1",
     "babel-preset-es2015": "^6.22.0",
+    "babel-watch": "^2.0.6",
     "nodemon": "^1.11.0",
     "should": "^11.2.0",
     "sinon": "^1.17.7"

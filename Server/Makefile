@@ -53,40 +53,40 @@ help:
 
 build:
 	make head
+	docker volume create --name=mongoirc
 	docker pull bitnami/node:7
+	docker pull redis:3.2
+	docker pull mongo:3.4
 	docker build -f docker/runtest.Dockerfile -t pandirc/runtest .
 	docker build -f docker/dev.Dockerfile -t pandirc/dev .
 
 deps:
 	make head
-	docker-compose -f ./docker/deps.yml up
+	docker-compose -f docker/deps.yml up
 
 prod:
 	make head
-	make clean
-	docker-compose -f ./docker/prod.yml up
+	docker-compose -f docker/build.yml up --abort-on-container-exit && docker-compose -f docker/prod.yml up
 
 prod-deamon:
 	make head
-	make clean
-	docker-compose -f ./docker/prod.yml up -d
+	docker-compose -f docker/build.yml up --abort-on-container-exit && docker-compose -f docker/prod.yml up -d
 
 dev:
 	make head
-	make clean
-	docker-compose -f ./docker/dev.yml up
+	docker-compose -f docker/build.yml up --abort-on-container-exit && docker-compose -f docker/dev.yml up
 
 file:
 	make head
-	docker-compose -f ./docker/fileserver.yml up
+	docker-compose -f docker/fileserver.yml up
 
 unit:
 	make head
-	docker-compose -f ./docker/test.yml up
+	docker-compose -f docker/build.yml up --abort-on-container-exit && docker-compose -f docker/test.yml up --abort-on-container-exit
 
 clean:
-	docker-compose -f ./docker/deps.yml rm -f
-	docker-compose -f ./docker/test.yml rm -f
-	docker-compose -f ./docker/prod.yml rm -f
-	docker-compose -f ./docker/dev.yml rm -f
-	docker-compose -f ./docker/fileserver.yml rm -f
+	docker-compose -f docker/deps.yml rm -f
+	docker-compose -f docker/test.yml rm -f
+	docker-compose -f docker/prod.yml rm -f
+	docker-compose -f docker/dev.yml rm -f
+	docker-compose -f docker/fileserver.yml rm -f

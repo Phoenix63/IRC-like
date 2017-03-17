@@ -1,4 +1,2 @@
-
-FROM bitnami/node:7
-
+FROM pandirc/dev
 RUN npm install -g mocha

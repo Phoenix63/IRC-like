@@ -1,29 +1,37 @@
-import child_process from 'child_process';
+let spawn = require('child_process').spawn;
+let debug = require('debug')('pandirc:runner');
 
-const env = process.argv[2] || 'PROD';
-console.log('ENV: '+env);
+process.env.RUNNING = process.env.RUNNING || 'PROD';
 
-let childprocess = createChild();
+let child = null;
 
-process.on('SIGINT', () => {
-    if(childprocess && childprocess.kill) {
-        createChild = null;
-        childprocess.kill(0);
-    }
-});
+function _start() {
+    child = spawn('node', ['./dist/run.js'], {RUNNING: process.env.RUNNING, DEBUG:process.env.DEBUG});
 
-function createChild() {
-    let child = child_process.spawn('node', ['./dist/server.js', env]);
-    child.stdout.on('data', function (data) {
-        console.log(data.toString());
-    });
+    debug('running server ('+process.env.RUNNING+')...');
 
-    child.on('exit', function (code) {
-        console.log('child process exited with code ' + code.toString());
-        if(createChild) {
-            child = createChild();
+    child.stdout.on('data', function (data) {   process.stdout.write(data.toString());  });
+
+    child.stderr.on('data', function (data) {   process.stdout.write(data.toString());  });
+
+    child.on('close', function (code) {
+        debug("Finished with code " + code);
+        if(!code || code === 15) {
+            if(process.env.RUNNING !== 'TEST') {
+                _start();
+            } else {
+                process.exit();
+            }
+        } else {
+            process.exit(0);
         }
     });
-
-    return child;
 }
+
+_start();
+
+process.on('SIGINT', function() {
+    if(child) {
+        child.kill('SIGINT');
+    }
+});
