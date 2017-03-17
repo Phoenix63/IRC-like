@@ -222,13 +222,23 @@ let RPLSender = {
     },
     /**
      *
-     * @param client
-     * @param kicked
-     * @param channel
+     * @param {Client} client
+     * @param {Client} kicked
+     * @param {Channel} channel
      * @constructor
      */
     KICK: (client, kicked, channel) => {
-        channel.broadcast(':' + client.name + ' KICK ' + channel.name + ' ' + kicked);
+        channel.broadcast(':' + client.name + ' KICK ' + channel.name + ' ' + kicked, null);
+    },
+
+    /**
+     *
+     * @param {Client} client
+     * @param {Client} kicked
+     * @constructor
+     */
+    SKICK: (client, kicked) => {
+        client.socket.broadcast(':'+client.name+' SKICK '+kicked, null);
     },
     /**
      *

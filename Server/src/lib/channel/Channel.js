@@ -596,6 +596,10 @@ class Channel {
         return null;
     }
 
+    toString() {
+        return this.name;
+    }
+
     /**
      *
      * @returns {Array<Channel>}

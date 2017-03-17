@@ -36,9 +36,7 @@ class Round {
         
         this._currentFold = 0;
 
-        this._players.forEach((player) => {
-            this.game.rpl.roundStart(this._players.join(','));
-        });
+        this.game.rpl.roundStart(this._players.join(','));
         this._giveCards();
     }
 
@@ -136,7 +134,7 @@ class Round {
     }
 
     _notifyToPlay() {
-        this.game.rpl.playerTurn(this._players[this._play]);
+        this.game.rpl.playerTurn(this._players[this._play], this._players[this._play].getPlayableCard(this._trump, this._folds[this._currentFold]).playable.join(','));
     }
 
     playerPlayCard(player, card) {
@@ -148,133 +146,17 @@ class Round {
                     }
                 });
 
-                // verifier que le joueur a la carte
                 if(player._hand.indexOf(card) >= 0) {
-                    let masterCardOwner = null;
-                    let play = false;
-                    if(this._folds[this._currentFold].length > 0) {
-                        let firstCard = this._folds[this._currentFold][0][1];
-                        let firstCardOwner = this._folds[this._currentFold][0][0];
-                        let playercards = player.getCardByColors([firstCard.color]);
-                        let playertrumps = player.getCardByColors([this._trump.color]);
-                        let masterCard = firstCard;
-                        masterCardOwner = firstCardOwner;
-                        let pcards = [];
+                    let cds = player.getPlayableCard(this._trump, this._folds[this._currentFold]);
+                    let play = cds.playable;
+                    let masterCardOwner = cds.master.player;
+                    let masterCard = cds.master.card;
 
-                        this._folds[this._currentFold].forEach((arr) => {
-                            if(arr[1].compare(masterCard, masterCard.color, this._trump.color)>0) {
-                                masterCard = arr[1];
-                                masterCardOwner = arr[0];
-                            }
-
-                        });
-
-                        if(masterCard.color !== this._trump.color && masterCard.color === firstCard.color) {
-                            debug('pli normal');
-                            playertrumps.map((trump) => {
-                                pcards.push(trump);
-                            });
-                            playercards.map((c) => {
-                                pcards.push(c);
-                            })
-                            if(pcards.length === 0) {
-                                player._hand.map((c)=> {
-                                    pcards.push(c);
-                                })
-                                debug('ne peut pas couper ni jouer à la couleur');
-                            } else {
-                                debug('peut couper ou jouer à la couleur');
-                            }
-                        } else {
-                            if(masterCard.color !== firstCard.color) {
-                                debug('le pli est coupé');
-
-                                if(player.team.contains(masterCardOwner)) {
-                                    debug('le coéquipié est maitre');
-
-                                    playercards.map((c) => {
-                                        pcards.push(c);
-                                    });
-
-                                    if(pcards.length === 0) {
-                                        debug('ne peut pas fournir la couleur');
-                                        player._hand.map((c) => {
-                                            pcards.push(c);
-                                        });
-                                    }
-                                } else {
-                                    debug('le coequipié n est pas maitre');
-
-                                    playercards.map((c) => {
-                                        pcards.push(c);
-                                    })
-                                    if(pcards.length === 0) {
-                                        debug('ne peut pas jouer à la couleur');
-                                        playertrumps.map((trump) => {
-                                            if(trump.compare(masterCard, masterCard.color, this._trump.color)>0)
-                                                pcards.push(trump);
-                                        });
-                                        if(pcards.length === 0) {
-                                            debug('ne peut pas monter à l atout');
-                                            playertrumps.map((trump) => {
-                                                pcards.push(trump);
-                                            });
-                                            if(pcards.length === 0) {
-                                                debug('ne peut pas pisser');
-                                                player._hand.map((c)=> {
-                                                    pcards.push(c);
-                                                })
-                                            }
-                                        }
-                                    }
-                                }
-
-
-                            } else {
-                                debug('pli à l atout');
-                                playertrumps.map((trump) => {
-                                    if(trump.compare(masterCard, masterCard.color, this._trump.color)>0)
-                                        pcards.push(trump);
-                                });
-                                if(pcards.length === 0) {
-                                    debug('ne peut pas monter à l atout');
-                                    playertrumps.map((trump) => {
-                                        pcards.push(trump);
-                                    });
-                                    if(pcards.length === 0) {
-                                        debug('ne peut pas pisser');
-                                        player._hand.map((c)=> {
-                                            pcards.push(c);
-                                        })
-                                    }
-                                }
-                            }
-
-                        }
-
-                        debug('--------- '+player.client.name+' ----------');
-                        debug(player._hand.map((c) => {
-                            return c.toString(true, this._trump.color);
-                        }).join('\t| '));
-                        debug('- peut jouer -');
-                        debug(pcards.map((c) => {
-                            return c.toString(true, this._trump.color);
-                        }).join('\t| '));
-
-                        if(pcards.indexOf(card) >= 0) {
-                            play = true;
-                        }
-
-
-                    } else {
-                        play = true;
-                    }
-
-
-                    if(play) {
+                    if(play.indexOf(card) >= 0) {
                         let end = false;
                         this._folds[this._currentFold].push([player, card]);
-                        debug('----------------- pli ------------');
+                        debug('----------------- pli ('+this._trump.color+') ------------');
+                        let better = false;
                         debug(this._folds[this._currentFold].map((c) => {
                             return c[1].toString(true, this._trump.color);
                         }).join('\t| '));

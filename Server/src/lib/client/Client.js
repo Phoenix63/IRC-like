@@ -387,11 +387,15 @@ class Client {
      */
     static getClient(id) {
         for (let key in clients) {
-            if (key === id || clients[key].name === id || clients[key].identity === id) {
+            if (clients[key].name === id || key === id || clients[key].identity === id) {
                 return clients[key];
             }
         }
         return null;
+    }
+
+    toString() {
+        return this.name;
     }
 
     /**

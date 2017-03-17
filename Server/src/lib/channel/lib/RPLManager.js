@@ -49,8 +49,8 @@ class RPLManager {
         this.game.broadcast(this.head+' 1009 : player '+turn+' take '+trump+' color '+trump.color);
     }
 
-    playerTurn(player) {
-        player.send(this.head+' 1010 :it is your turn');
+    playerTurn(player, cards) {
+        player.send(this.head+' 1010 :it is your turn '+cards);
     }
 
     playerHaveToTake(player, trump, turn) {

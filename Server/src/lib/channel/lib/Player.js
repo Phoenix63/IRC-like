@@ -1,4 +1,6 @@
 
+const debug = require('debug')('delote:player');
+
 class Player {
     constructor(game, client) {
         this.game = game;
@@ -76,6 +78,107 @@ class Player {
 
     toString() {
         return this.client.name;
+    }
+
+    getPlayableCard(trump, fold) {
+        let pcards = [];
+
+        let masterCardOwner = null;
+        let masterCard = null;
+
+        if (fold.length > 0) {
+            let firstCard = fold[0][1];
+            let firstCardOwner = fold[0][0];
+            let playercards = this.getCardByColors([firstCard.color]);
+            let playertrumps = this.getCardByColors([trump.color]);
+            masterCard = firstCard;
+            masterCardOwner = firstCardOwner;
+
+            fold.forEach((arr) => {
+                if (arr[1].compare(masterCard, masterCard.color, trump.color) > 0) {
+                    masterCard = arr[1];
+                    masterCardOwner = arr[0];
+                }
+
+            });
+
+            if (masterCard.color !== trump.color && masterCard.color === firstCard.color) {
+                playertrumps.map((trump) => {
+                    pcards.push(trump);
+                });
+                playercards.map((c) => {
+                    pcards.push(c);
+                })
+                if (pcards.length === 0) {
+                    this._hand.map((c) => {
+                        pcards.push(c);
+                    })
+                }
+            } else {
+                if (masterCard.color !== firstCard.color) {
+
+                    if (this.team.contains(masterCardOwner)) {
+                        playercards.map((c) => {
+                            pcards.push(c);
+                        });
+
+                        if (pcards.length === 0) {
+                            this._hand.map((c) => {
+                                pcards.push(c);
+                            });
+                        }
+                    } else {
+                        playercards.map((c) => {
+                            pcards.push(c);
+                        })
+                        if (pcards.length === 0) {
+                            playertrumps.map((trump) => {
+                                if (trump.compare(masterCard, masterCard.color, trump.color) > 0)
+                                    pcards.push(trump);
+                            });
+                            if (pcards.length === 0) {
+                                playertrumps.map((trump) => {
+                                    pcards.push(trump);
+                                });
+                                if (pcards.length === 0) {
+                                    this._hand.map((c) => {
+                                        pcards.push(c);
+                                    })
+                                }
+                            }
+                        }
+                    }
+
+
+                } else {
+                    playertrumps.map((trump) => {
+                        if (trump.compare(masterCard, masterCard.color, trump.color) > 0)
+                            pcards.push(trump);
+                    });
+                    if (pcards.length === 0) {
+                        playertrumps.map((trump) => {
+                            pcards.push(trump);
+                        });
+                        if (pcards.length === 0) {
+                            this._hand.map((c) => {
+                                pcards.push(c);
+                            })
+                        }
+                    }
+                }
+
+            }
+        } else {
+            pcards = this._hand;
+        }
+
+        return {
+            playable: pcards,
+            master: {
+                player: masterCardOwner,
+                card: masterCard
+            }
+        };
     }
 }
 
