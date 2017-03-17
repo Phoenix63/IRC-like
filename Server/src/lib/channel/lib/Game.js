@@ -23,10 +23,6 @@ class Game {
 
         this._rounds = 0;
 
-        /*
-        * -1 : lobby
-        * 0 : game
-         */
         this._state = -1;
 
         this._teams = [new Team(this, 0), new Team(this, 1)];
@@ -114,7 +110,7 @@ class Game {
         this.rpl.teamScore(this._points[0],this._points[1]);
 
         this._teams.forEach((team) => {
-            team.resetTake();
+            team.resetPoints();
         });
 
         if(this._points[0] !== this._points[1] && (this._points[0] >= 1000 || this._points[1] >= 1000)) {

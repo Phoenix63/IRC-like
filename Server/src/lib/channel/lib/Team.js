@@ -15,10 +15,6 @@ class Team {
         this._take = true;
     }
 
-    resetTake() {
-        this._take = false;
-    }
-
     isTaker() {
         return this._take;
     }

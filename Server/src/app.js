@@ -8,7 +8,7 @@ let child = null;
 function _start() {
     child = spawn('node', ['./dist/run.js'], {RUNNING: process.env.RUNNING, DEBUG:process.env.DEBUG});
 
-    debug('running server...');
+    debug('running server ('+process.env.RUNNING+')...');
 
     child.stdout.on('data', function (data) {   process.stdout.write(data.toString());  });
 
