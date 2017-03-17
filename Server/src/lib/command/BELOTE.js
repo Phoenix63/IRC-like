@@ -67,6 +67,24 @@ module.exports = function (socket, command) {
                 } catch(e) {
                     ERRSender.ERR_NEEDMOREPARAMS(socket.client, 'BELOTE TAKE');
                 }
+            },
+            'PLAY': (arg) => {
+                try {
+                    let chan = arg[1];
+                    let card = arg[2];
+
+                    try {
+                        Belote.list().forEach((belote) => {
+                            if(chan === belote.name) {
+                                belote.game.userPlayCard(socket.client, card);
+                            }
+                        });
+                    } catch(e) {
+                        debug(e);
+                    }
+                } catch(e) {
+                    ERRSender.ERR_NEEDMOREPARAMS(socket.client, 'BELOTE PLAY');
+                }
             }
         }
 

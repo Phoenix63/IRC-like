@@ -23,31 +23,38 @@ class Card {
     /**
      *
      * @param {Card} card
+     * @param {number} firstColor
      * @param {number} trump
      * @return {number}
      */
-    compare(card, trump) {
+    compare(card, firstColor, trump) {
         if(this.color === trump && card.color !== trump) {
             return 1;
         }
         if(this.color !== trump && card.color === trump) {
             return -1;
         }
-        if(this.color !== trump && card.color !== trump) {
-            let order = [7,3,6,5,4,2,1,0];
-            return (order.indexOf(this.high)>order.indexOf(card.high)?1:-1);
-        }
         if(this.color === trump && card.color === trump) {
             let order = [4,2,7,6,5,3,1,0];
             return (order.indexOf(this.high)>order.indexOf(card.high)?1:-1);
         }
+        if(this.color === firstColor && card.color === firstColor) {
+            let order = [7,3,6,5,4,2,1,0];
+            return (order.indexOf(this.high)>order.indexOf(card.high)?1:-1);
+        }
+        if(this.color === firstColor && card.color !== firstColor) {
+            return 1;
+        }
+        if(this.color !== firstColor && card.color === firstColor) {
+            return -1;
+        }
+        return 0;
     }
 
     getPoints(trump) {
+        let val = [0,0,0,10,2,3,4,11]
         if(this.color === trump) {
-            let val = [0,0,14,10,20,3,4,11];
-        } else {
-            let val = [0,0,0,10,2,3,4,11];
+            val = [0,0,14,10,20,3,4,11];
         }
         return val[this.high];
     }
@@ -55,7 +62,7 @@ class Card {
     toString(debug=null, trump=-1) {
         if(debug) {
             let str = '';
-            switch(Math.floor(this.value/8)) {
+            switch(this.high) {
                 case 0: str = '7'; break;
                 case 1: str = '8'; break;
                 case 2: str = '9'; break;
@@ -65,14 +72,14 @@ class Card {
                 case 6: str = 'R'; break;
                 case 7: str = 'A'; break;
             }
-            switch(Math.floor(this.value%8)) {
-                case 0: str += '♠'; break;
-                case 1: str += '♥'; break;
-                case 2: str += '♣'; break;
-                case 3: str += '♦'; break;
+            switch(this.color) {
+                case 0: str += '_Pi'; break;
+                case 1: str += '_Co'; break;
+                case 2: str += '_Tr'; break;
+                case 3: str += '_Ca'; break;
             }
             if(trump !== -1) {
-                return str+'('+this.getPoints(trump)+')';
+                return this.value+':'+str+'('+(this.getPoints(trump)>9?this.getPoints(trump):'0'+this.getPoints(trump))+')';
             }
             return str;
         } else {

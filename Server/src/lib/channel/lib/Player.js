@@ -13,7 +13,9 @@ class Player {
      * @param {Array<Card>} card
      */
     addCardToHand(card) {
-        this._hand.concat(card);
+        card.map((c)=>{
+            this._hand.push(c);
+        });
         this.send(':'+this.game.ip+' BELOTE '+this.game.name+' :you receive cards '+card.join(','));
     }
 
@@ -44,7 +46,7 @@ class Player {
         }
         if(playedCard) {
             let index = this._hand.indexOf(playedCard);
-            this._hand = this._hand.slice(0,index).concat(a.slice(index+1, this._hand.length));
+            this._hand = this._hand.slice(0,index).concat(this._hand.slice(index+1, this._hand.length));
             return playedCard;
         } else {
             return null;
@@ -61,6 +63,15 @@ class Player {
      */
     set team(t) {
         this._team = t;
+    }
+
+    getCardByColors(colors) {
+        let ret = [];
+        this._hand.forEach((card) => {
+            if(colors.indexOf(card.color)>=0)
+                ret.push(card);
+        });
+        return ret;
     }
 
     toString() {

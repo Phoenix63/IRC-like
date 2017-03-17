@@ -8,19 +8,31 @@ class Team {
         this._points = 0;
 
         this._take = false;
+        this._br = false;
     }
 
     take() {
         this._take = true;
     }
 
+    setBr() {
+        this._br = true;
+    }
+
+    getBonus() {
+        if(this._br)
+            return 20;
+        return 0;
+    }
+
     resetPoints() {
         this._points = 0;
         this._take = false;
+        this._br = false;
     }
 
     addPoints(val) {
-        this._points = val;
+        this._points += val;
     }
 
     getPoints() {

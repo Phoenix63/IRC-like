@@ -7,9 +7,9 @@ class Deck {
         for(let i=0; i<32; i++) {
             this._cards.push(new Card(i));
         }
-        this._cards.sort(function() {
+        /*this._cards.sort(function() {
             return Math.floor(Math.random()*3)-1;
-        });
+        });*/
         this._played = [];
     }
 

@@ -59,9 +59,29 @@ class Game {
             this.teams[0],
             this.teams[1],
             this._deck,
-            function() {
-                // end of the round
-                console.log('end of round');
+            () => {
+                let t1 = this.teams[0];
+                let t2 = this.teams[1];
+                let t1p = 0;
+                let t2p = 0;
+
+                if(t1.getPoints() < 1) {
+                    t1p = t1.getBonus();
+                    t2p = 252 + t2.getBonus();
+                } else if (t2.getPoints() < 1) {
+                    t2p = t1.getBonus();
+                    t1p = 252 + t1.getBonus();
+                } else if(t1._take && (t1.getPoints()+t1.getBonus() < t2.getPoints()+t2.getBonus())) {
+                    t1p = t1.getBonus();
+                    t2p = 162 + t2.getBonus();
+                } else if(t2._take && (t1.getPoints()+t1.getBonus() > t2.getPoints()+t2.getBonus())) {
+                    t2p = t2.getBonus();
+                    t1p = 162 + t1.getBonus();
+                } else {
+                    t1p = t1.getPoints() + t1.getBonus();
+                    t2p = t2.getPoints() + t2.getBonus();
+                }
+                this.broadcast(':'+this.ip+' BELOTE '+this.name+' :team points '+t1p+','+t2p);
             }
         );
     }
@@ -127,6 +147,16 @@ class Game {
             });
         } else {
             client.socket.send(':'+config.ip+' BELOTE '+this.name+' ERR :invalid color value');
+        }
+    }
+
+    userPlayCard(client, card) {
+        if(this._round) {
+            this.getPlayerFromClient(client, (player) => {
+                this._round.playerPlayCard(player, parseInt(card));
+            });
+        } else {
+            console.log('la partie n a pas commencé');
         }
     }
 
