@@ -6,6 +6,7 @@
 #include <QTcpSocket>
 
 #include "card.h"
+#include "customlayout.h"
 #include "../channelcontent.h"
 
 namespace Ui {
@@ -25,6 +26,7 @@ public:
 
 public slots:
     void playCard();
+    void take(int trump, CustomLayout *layout);
 private:
     //Hand functions
     void receiveCard(int val);

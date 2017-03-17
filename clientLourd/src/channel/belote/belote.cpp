@@ -173,57 +173,35 @@ void Belote::chooseTeam()
 
 void Belote::firstRound(int trump)
 {
-    QPushButton *take = new QPushButton("Take", this);
-    ui->buttons->addWidget(take);
-    QPushButton *no = new QPushButton("No", this);
-    ui->buttons->addWidget(no);
-    while(1) {
-        if (take->isDown()) {
-            socket->write("BELOTE TAKE " + trump + '\n');
-            break;
-        }
-        else if (no->isDown()) {
-            socket->write("BELOTE TAKE -1\n");
-            break;
-        }
-    }
+    setInactive();
+    CustomLayout *tmp = new CustomLayout();
+    tmp->setLayout(ui->buttons);
+    tmp->addButton("Take", trump);
+    tmp->addButton("No", -1);
+    connect(tmp, &CustomLayout::isClicked, this, &Belote::take);
+}
+
+void Belote::take(int trump, CustomLayout *layout)
+{
+    socket->write("BELOTE TAKE " + trump + '\n');
+    clearLayout(ui->buttons);
+    delete layout;
 }
 
 void Belote::secondRound(int trump)
 {
-    clearLayout(ui->buttons);
-    QPushButton *spades = new QPushButton("Spades", this);
-    QPushButton *hearts = new QPushButton("Hearths", this);
-    QPushButton *clubs = new QPushButton("Clubs", this);
-    QPushButton *diamonds = new QPushButton("Diamonds", this);
-    QPushButton *no = new QPushButton("No", this);
-    ui->buttons->addWidget(no);
+    CustomLayout *tmp = new CustomLayout();
+    tmp->setLayout(ui->buttons);
     if (trump != 0)
-        ui->buttons->addWidget(spades);
+        tmp->addButton("Spades", 0);
     if (trump != 1)
-        ui->buttons->addWidget(hearts);
+        tmp->addButton("Hearths", 1);
     if (trump != 2)
-        ui->buttons->addWidget(clubs);
+        tmp->addButton("Clubs", 2);
     if (trump != 3)
-        ui->buttons->addWidget(diamonds);
-    while(1) {
-        if (spades->isDown()) {
-            socket->write("BELOTE TAKE 0\n");
-            break;
-        } else if (hearts->isDown()) {
-            socket->write("BELOTE TAKE 1\n");
-            break;
-        } else if (clubs->isDown()) {
-            socket->write("BELOTE TAKE 2\n");
-            break;
-        } else if (diamonds->isDown()) {
-            socket->write("BELOTE TAKE 3\n");
-            break;
-        } else if (no->isDown()) {
-            socket->write("BELOTE TAKE -1\n");
-            break;
-        }
-    }
+    tmp->addButton("Diamonds", 3);
+    tmp->addButton("No", -1);
+    connect(tmp, &CustomLayout::isClicked, this, &Belote::take);
 }
 
 void Belote::parse(QString string)

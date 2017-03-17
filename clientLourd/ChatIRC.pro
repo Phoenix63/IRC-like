@@ -43,7 +43,8 @@ SOURCES += \
     src/user/user.cpp \
     src/user/userlist.cpp \
     src/gui/uploadwindow.cpp \
-    src/channel/belote/card.cpp
+    src/channel/belote/card.cpp \
+    src/channel/belote/customlayout.cpp
 
 
 HEADERS  += \
@@ -73,7 +74,8 @@ HEADERS  += \
     src/user/userlist.h \
     src/gui/uploadwindow.h \ 
     src/channel/belote/card.h \
-    src/channel/belote/rpl_response.h
+    src/channel/belote/rpl_response.h \
+    src/channel/belote/customlayout.h
 
 FORMS    += \
     src/channel/belote/belote.ui \
