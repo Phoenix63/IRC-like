@@ -16,7 +16,7 @@ class Player {
         card.map((c)=>{
             this._hand.push(c);
         });
-        this.send(':'+this.game.ip+' BELOTE '+this.game.name+' :you receive cards '+card.join(','));
+        this.game.rpl.receiveCards(this, card.join(','));
     }
 
     resetHand() {

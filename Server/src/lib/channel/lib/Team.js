@@ -47,11 +47,11 @@ class Team {
      */
     addPlayer(player) {
         if(this.isFull()) {
-            player.send(':'+this.game.ip+' BELOTE '+this.game.name+' ERR :team is full');
+            this.game.rpl.ERR_TEAMISFULL(player.client.socket);
             return false;
         }
         if(this.contains(player)) {
-            //player.send(':'+this.game.ip+' BELOTE '+this.game.name+' ERR :already in team');
+            // already in team (catched by game)
             return false;
         }
         if(this.game.otherTeam(this).contains(player)) {
@@ -60,7 +60,7 @@ class Team {
         this._players.push(player);
         player.team = this;
 
-        this.game.broadcast(':'+this.game.ip+' BELOTE '+this.game.name+' :'+player+' join team '+this.id);
+        this.game.rpl.teamJoin(player, this.id);
 
         if(this.isFull() && this.game.otherTeam(this).isFull()) {
             this.game.teamArefull();

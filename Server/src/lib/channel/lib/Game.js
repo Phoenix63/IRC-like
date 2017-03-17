@@ -3,6 +3,7 @@ import Team from './Team';
 import Deck from './Deck';
 import Player from './Player';
 import Round from './Round';
+import RPLManger from './RPLManager';
 
 class Game {
     /**
@@ -16,6 +17,7 @@ class Game {
         this._round = null;
         this._deck = new Deck();
         this._players = [];
+        this.rpl = new RPLManger(this);
 
         /*
         * -1 : lobby
@@ -32,16 +34,13 @@ class Game {
 
     set state(val) {
         if(val === 0) {
-            this.broadcast(':'+config.ip+' BELOTE '+this.name+' :team selection');
+            this.rpl.gameSelection();
         } else if(val === 1) {
-            this.broadcast(':'+config.ip+' BELOTE '+this.name+' :game start');
-            this.broadcast(':'+config.ip+' BELOTE '+this.name+' :team 0 '+this._teams[0].toString());
-            this.broadcast(':'+config.ip+' BELOTE '+this.name+' :team 1 '+this._teams[1].toString());
+            this.rpl.gameStart(this._teams);
         } else {
             val = -1;
         }
         this._state = val;
-        console.log('state: '+val);
     }
 
     broadcast(message) {
@@ -81,7 +80,7 @@ class Game {
                     t1p = t1.getPoints() + t1.getBonus();
                     t2p = t2.getPoints() + t2.getBonus();
                 }
-                this.broadcast(':'+this.ip+' BELOTE '+this.name+' :team points '+t1p+','+t2p);
+                this.rpl.teamScore(t1p,t2p);
             }
         );
     }
@@ -104,12 +103,15 @@ class Game {
                 this._players.splice(this._players.indexOf(player), 1);
                 this.state = -1;
                 if(this._players.length === 3) {
-                    this.broadcast(':'+this.ip+' BELOTE '+this.name+' :game reset');
+                    this.rpl.gameReset();
                 }
             }
         });
         this._round = null;
         this._deck = new Deck();
+        this._players.forEach((player) => {
+            player._hand = [];
+        });
         this._teams = [new Team(this, 0), new Team(this, 1)];
 
     }
@@ -122,12 +124,12 @@ class Game {
                     this._teams[team].addPlayer(player);
                 } else {
                     // le joueur n'est pas dans cette partie
-                    client.socket.send(':'+config.ip+' BELOTE '+this.name+' ERR :you are not on this game');
+                    this.rpl.ERR_NOTINGAME(client.socket);
                 }
             });
         } else {
             // team invalide
-            client.socket.send(':'+config.ip+' BELOTE '+this.name+' ERR :invalid teamid value');
+            this.rpl.ERR_INVALIDTEAMID(client.socket);
         }
     }
 
@@ -135,18 +137,18 @@ class Game {
         color = parseInt(color);
         if([-1, 0,1,2,3].indexOf(color) >= 0) {
             this.getPlayerFromClient(client, (player) => {
-                if(player) {
+                if(player && this._round) {
                     if(this._round.playerHaveToTake(player)) {
                         this._round.playerTakeTrump(player, color);
                     } else {
-                        client.socket.send(':'+config.ip+' BELOTE '+this.name+' ERR :you cannot take, wait for other players');
+                        this.rpl.ERR_NOTYOURTURN(client.socket);
                     }
                 } else {
-                    client.socket.send(':'+config.ip+' BELOTE '+this.name+' ERR :you are not on this game');
+                    this.rpl.ERR_NOTINGAME(client.socket);
                 }
             });
         } else {
-            client.socket.send(':'+config.ip+' BELOTE '+this.name+' ERR :invalid color value');
+            this.rpl.ERR_INVALIDCOLORVAL(client.socket);
         }
     }
 

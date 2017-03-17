@@ -37,7 +37,7 @@ class Round {
         this._currentFold = 0;
 
         this._players.forEach((player) => {
-            player.send(':'+this.game.ip+' BELOTE '+this.game.name+' :round start '+this._players.join(','));
+            this.game.rpl.roundStart(this._players.join(','));
         });
         this._giveCards();
     }
@@ -68,35 +68,42 @@ class Round {
         this._trump = this._deck.getCards(1)[0];
         this._takeTurn = 0;
         this._play = 0;
-        this.game.broadcast(':'+this.game.ip+' BELOTE '+this.game.name+' :donald is '+this._trump);
-        this._notifPlayerToTake();
+        this.game.rpl.trumpIs(this._trump);
+        this._notifyPlayerToTake();
     }
 
-    _notifPlayerToTake() {
-        this._players[this._play].client.socket.send(':'+this.game.ip+' BELOTE '+this.game.name+' :do you take '+this._trump+' (turn '+this._takeTurn+')');
+    _notifyPlayerToTake() {
+        this.game.rpl.playerHaveToTake(this._players[this._play], this._trump, this._takeTurn);
     }
 
     playerTakeTrump(player, colors) {
         let index = this._players.indexOf(player);
         if(!this._players[0].team._take && !this._players[1].team._take) {
             if(colors < 0) {
+
+                let isNext = true;
+
                 this._play++;
                 if(this._play > 4) {
                     this._play = 0;
                     this._takeTurn++;
                     if(this._takeTurn > 1) {
+                        isNext = false;
                         this._takeTurn = 1;
                         this._play = 3;
-                        this._players[this._play].client.socket.send(':'+this.game.ip+' BELOTE '+this.game.name+' ERR :you have to take... you are the cow!');
+                        this.game.rpl.ERR_PLAYERISCOW(this._players[this._play].client.socket);
                     }
                 }
-                this._notifPlayerToTake();
+                if(isNext) {
+                    this.game.rpl.playerDoNotTake();
+                }
+                this._notifyPlayerToTake();
             } else if(index >= 0 && this._trump) {
                 if(this._takeTurn === 0 && colors === this._trump.color || this._takeTurn === 1 && colors !== this._trump.color) {
                     this._players[index].addCardToHand([this._trump]);
 
                     player.team.take();
-                    this.game.broadcast(':'+this.game.ip+' BELOTE '+this.game.name+' :player '+this._play+' take '+this._trump.value+' color is '+colors);
+                    this.game.rpl.playerTake(this._play, this._trump);
 
                     for(let i = 0 ; i<4; i++) {
                         this._players[i].addCardToHand(this._deck.getCards((i === index ? 2 : 3)));
@@ -104,10 +111,10 @@ class Round {
                     this._gameStart();
 
                 } else {
-                    this._players[this._play].client.socket.send(':'+this.game.ip+' BELOTE '+this.game.name+' ERR :you cannot take this card (wrong color)');
+                    this.game.rpl.ERR_WRONGCOLOR(this._players[this._play].client.socket);
                 }
             } else {
-                this._players[this._play].client.socket.send(':'+this.game.ip+' BELOTE '+this.game.name+' ERR :you are not on this game');
+                this.game.rpl.ERR_NOTINGAME(this._players[this._play].client.socket);
             }
         } else {
             // l'atout est deja choisis
@@ -125,11 +132,11 @@ class Round {
             }).join('\t| '));
         });
 
-        this._notifToPlay();
+        this._notifyToPlay();
     }
 
-    _notifToPlay() {
-        this._players[this._play].client.socket.send(':'+this.game.ip+' BELOTE '+this.game.name+' :that is your turn');
+    _notifyToPlay() {
+        this.game.rpl.playerTurn(this._players[this._play]);
     }
 
     playerPlayCard(player, card) {
@@ -271,7 +278,7 @@ class Round {
                         debug(this._folds[this._currentFold].map((c) => {
                             return c[1].toString(true, this._trump.color);
                         }).join('\t| '));
-                        this.game.broadcast(':'+this.game.ip+' BELOTE '+this.game.name+' :player '+this._play+' play '+card.value);
+                        this.game.rpl.playerPlay(this._play, card);
                         player.play(card.value);
                         this._play++;
                         if(this._play >= 4) {
@@ -300,20 +307,20 @@ class Round {
 
                         }
                         if(!end) {
-                            this._notifToPlay();
+                            this._notifyToPlay();
                         } else {
-                            this.game.broadcast(':'+this.game.ip+' BELOTE '+this.game.name+' :round end');
+                            this.game.rpl.roundEnd();
                             this._endCallback();
                         }
                     } else {
-                        player.client.socket.send(':'+this.game.ip+' BELOTE '+this.name+' ERR :this card cannot be played');
+                        this.game.rpl.ERR_INVALIDCARD(player.client.socket);
                     }
                 } else {
-                    player.client.socket.send(':'+this.game.ip+' BELOTE '+this.name+' ERR :you do not have this card');
+                    this.game.rpl.ERR_PLAYERDONOTHAVECARD(player.client.socket);
                 }
 
             } else {
-                player.client.socket.send(':'+this.game.ip+' BELOTE '+this.name+' ERR :you cannot play, wait for other players');
+                this.game.rpl.ERR_NOTYOURTURN(player.client.socket);
             }
         } else {
             // l'atout n'est pas choisis
