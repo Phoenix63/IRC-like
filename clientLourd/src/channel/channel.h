@@ -5,7 +5,7 @@
 #include <QString>
 #include <QTcpSocket>
 
-#include "belote.h"
+#include "belote/belote.h"
 #include "channelcontent.h"
 #include "message.h"
 #include "parseremoji.h"

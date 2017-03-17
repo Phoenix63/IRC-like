@@ -11,7 +11,7 @@ OBJECTS_DIR += objects
 UI_DIR += uis
 QT       += core gui
 QT       += network
-RC_FILE = src/gui/myapp.rc
+RC_ICONS = ressources/img/pandab.ico
 
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -22,7 +22,7 @@ TEMPLATE = app
 
 SOURCES += \
     src/main.cpp \
-    src/channel/belote.cpp \
+    src/channel/belote/belote.cpp \
     src/channel/channel.cpp \
     src/channel/channelcontent.cpp \
     src/channel/message.cpp \
@@ -42,12 +42,12 @@ SOURCES += \
     src/parser/parsermode.cpp \
     src/user/user.cpp \
     src/user/userlist.cpp \
-    src/gui/uploadwindow.cpp
+    src/gui/uploadwindow.cpp \
+    src/channel/belote/card.cpp
 
 
 HEADERS  += \
-    src/channel/belote.h \
-    src/channel/card.h \
+    src/channel/belote/belote.h \
     src/channel/channel.h \
     src/channel/channelcontent.h \
     src/channel/message.h \
@@ -71,14 +71,13 @@ HEADERS  += \
     src/parser/rpl_response.h \
     src/user/user.h \
     src/user/userlist.h \
-    src/gui/uploadwindow.h 
+    src/gui/uploadwindow.h \ 
+    src/channel/belote/card.h \
+    src/channel/belote/rpl_response.h
 
 FORMS    += \
-    src/channel/belote.ui \
+    src/channel/belote/belote.ui \
     src/gui/login.ui \
     src/gui/mainframe.ui \
     src/gui/channellist.ui \
     src/gui/uploadwindow.ui
-
-RESOURCES += \
-    src/gui/myapp.rc

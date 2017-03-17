@@ -657,8 +657,8 @@ bool Parser::in_isBeloteMsg(QString string)
     QString chan = string.split(' ').at(2);
     if (!string.contains(QRegularExpression(IRC::RPL::BELOTE)))
         return false;
-    int j = string.indexOf(QRegularExpression(":.+$"));
-    QString message = string.right(string.length() - j - 1);
+    int j = string.indexOf(QRegularExpression("BELOTE"));
+    QString message = string.right(string.length() - j);
     channel->beloteParse(chan, message);
     return true;
 }

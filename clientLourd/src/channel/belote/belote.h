@@ -6,7 +6,7 @@
 #include <QTcpSocket>
 
 #include "card.h"
-#include "channelcontent.h"
+#include "../channelcontent.h"
 
 namespace Ui {
 class Belote;
@@ -24,33 +24,45 @@ public:
     void parse(QString string);
 
 public slots:
-    BELOTE::CARD findCard();
+    void playCard();
 private:
     //Hand functions
-    void receiveCard(BELOTE::CARD);
-    void playCard(BELOTE::CARD);
+    void receiveCard(int val);
     void emptyHand();
+    Card * findCard();
+    int position();
+    void position(int val);
+    void setInactive();
+    void setActive(QString string);
+
     //UI
     void clean();
     void clearLayout(QLayout *layout);
     void chooseTeam();
-    void chooseTrump(BELOTE::CARD card);
-    void displayCard(BELOTE::CARD);
+    void chooseTrump(Card *card);
+    void displayCard(Card *card);
+    //Game functions
+    void firstRound(int trump);
+    void secondRound(int trump);
     //Out functions
 
     //In functions
+    bool in_isGameStart(QString string);
     bool in_isTeamSelec(QString string);
     bool in_isCardDeal(QString string);
-    bool in_isPartNote(QString string);
     bool in_isFullTeam(QString string);
     bool in_isGameReset(QString string);
     bool in_isTrumpChoice(QString string);
+    bool in_isYourTurn(QString string);
+    bool in_isPlayerPlay(QString string);
+    bool in_isTakeTurn(QString string);
 private:
     QString username;
     QString channelName;
+    int aPosition;
     Ui::Belote *ui;
     QTcpSocket *socket;
-    QHash<BELOTE::CARD, QPushButton *> hand;
+    QHash<Card *, QPushButton *> hand;
 };
 
 #endif // BELOTE_H

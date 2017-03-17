@@ -306,6 +306,7 @@ void MainFrame::on_pushButton_upload_clicked()
         connect(up, &Upload::finished, up, &QObject::deleteLater);
         up->start();
         progress->show();
+        ui->messageSender->setFocus();
     }
 }
 

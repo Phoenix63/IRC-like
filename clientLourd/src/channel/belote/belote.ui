@@ -22,7 +22,7 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
     <item>
-     <layout class="QVBoxLayout" name="West">
+     <layout class="QVBoxLayout" name="west">
       <item>
        <spacer name="horizontalSpacer_2">
         <property name="orientation">
@@ -44,7 +44,7 @@
     <item>
      <layout class="QVBoxLayout" name="Main">
       <item>
-       <layout class="QHBoxLayout" name="northCards">
+       <layout class="QHBoxLayout" name="north">
         <item>
          <spacer name="verticalSpacer">
           <property name="orientation">
@@ -135,7 +135,7 @@
      </layout>
     </item>
     <item>
-     <layout class="QVBoxLayout" name="East">
+     <layout class="QVBoxLayout" name="east">
       <item>
        <spacer name="horizontalSpacer_3">
         <property name="orientation">
