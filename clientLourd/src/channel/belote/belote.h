@@ -63,6 +63,7 @@ private:
     bool in_isPlayerPlay(QString string);
     bool in_isEndFold(QString string);
     bool in_isTakeTurn(QString string);
+    bool in_isRoundEnd(QString string);
 private:
     QString username;
     QString channelName;
@@ -71,6 +72,7 @@ private:
     QTcpSocket *socket;
     QList<Card *> lastFold;
     QHash<Card *, QPushButton *> hand;
+    QDialog *fold;
 };
 
 #endif // BELOTE_H

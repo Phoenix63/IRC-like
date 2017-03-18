@@ -13,6 +13,9 @@ Belote::Belote(QWidget *parent, QTcpSocket *sock, QString chan, QString nick) :
     username(nick)
 {
     ui->setupUi(this);
+    fold = new QDialog(this);
+    QHBoxLayout *test = new QHBoxLayout();
+    fold->setLayout(test);
     this->show();
     this->setWindowTitle(nick + " - " + "Belote room : " + chan);
     this->setObjectName("Belote");
@@ -42,18 +45,9 @@ void Belote::position(int val)
  * User interface functions
  */
 
-void Belote::refreshHand()
-{
-    clearLayout(ui->southCards);
-    for (auto i:hand.keys()) {
-        qDebug() << "code : " << i->code();
-        //ui->southCards->addWidget(hand[i]);
-    }
-}
-
 void Belote::clean()
 {
-    clearLayout(ui->southCards);
+    clearLayout(ui->south);
     clearLayout(ui->north);
     clearLayout(ui->east);
     clearLayout(ui->west);
@@ -86,21 +80,24 @@ void Belote::parse(QString string)
     if (!in_isPlayerPlay(string))
     if (!in_isEndFold(string))
     if (!in_isCardDeal(string))
+    if (!in_isRoundEnd(string))
     if (!in_isYourTurn(string))
         qDebug() << "cant find this";
 }
 
 void Belote::playCard()
 {
-    for(auto i:hand.keys()){
+    for(auto i:hand.keys()) {
         if (hand[i]->isDown()) {
             Card * toPlay = i;
             QString message = "BELOTE PLAY " + channelName + " " + QString::number(toPlay->code()) + '\n';
             socket->write(message.toUtf8());
+            hand[i]->setIcon(QIcon());
+            hand[i]->clearMask();
+            ui->south->removeWidget(hand[i]);
             hand.remove(i);
         }
     }
-    refreshHand();
 }
 
 void Belote::setInactive()
@@ -112,6 +109,7 @@ void Belote::setInactive()
 
 void Belote::setActive(QString string)
 {
+    setInactive();
     QStringList cards = string.split(',');
     QList<int> iCards;
     for(auto i:cards) {
@@ -148,7 +146,6 @@ void Belote::lobbyWait()
 void Belote::receiveCard(int val)
 {
     Card *card = new Card(val);
-    qDebug() << val << card->rank() << card->suit() << card->value();
     QPixmap cards("ressources/img/cards.jpg");
     QRect rect(73*card->rank(), 97*card->suit(), 73, 97);
     QPixmap cropped = cards.copy(rect);
@@ -157,7 +154,7 @@ void Belote::receiveCard(int val)
     newCard->setIcon(cropped);
     newCard->setStyleSheet("background-color: rgba( 255, 255, 255, 0%);");
     newCard->setIconSize(QSize(70, 90));
-    ui->southCards->addWidget(newCard);
+    ui->south->addWidget(newCard);
     hand[card] = newCard;
     connect(newCard , &QPushButton::pressed, this, &Belote::playCard);
 }
@@ -200,7 +197,6 @@ bool Belote::in_isTrumpChoice(QString string)
 
 void Belote::firstRound(int trump)
 {
-    setInactive();
     CustomLayout *tmp = new CustomLayout();
     tmp->setLayout(ui->buttons);
     tmp->addButton("Take", trump / 8);
@@ -210,13 +206,9 @@ void Belote::firstRound(int trump)
 
 void Belote::take(int trump, CustomLayout *layout)
 {
-    qDebug() << trump;
-    QString message = "BELOTE TAKE ";
-    message.append(channelName + " ");
-    message.append(QString::number(trump) + '\n');
-    qDebug() << message;
+    QString message = "BELOTE TAKE " + channelName + " " + QString::number(trump) + '\n';
+    qDebug() << "taking : " << message;
     socket->write(message.toUtf8());
-    qDebug() << "vaudou";
     delete layout;
 }
 
@@ -231,8 +223,9 @@ void Belote::secondRound(int trump)
     if (trump != 2)
         tmp->addButton("Clubs", 2);
     if (trump != 3)
-    tmp->addButton("Diamonds", 3);
-    tmp->addButton("No", -1);
+        tmp->addButton("Diamonds", 3);
+    if (aPosition != 3)
+        tmp->addButton("No", -1);
     connect(tmp, &CustomLayout::isClicked, this, &Belote::take);
 }
 
@@ -275,6 +268,7 @@ bool Belote::in_isEndFold(QString string)
     QStringList cardList = cards.split(',');
     clearLayout(ui->board);
     lastFold.clear();
+    fold->close();
     for (auto i:cardList)
         lastFold.append(new Card(i.toInt()));
     return true;
@@ -318,7 +312,6 @@ bool Belote::in_isGameStart(QString string)
     QString eastPlayer = playerList.at((position() + 1) % 4);
     QString northPlayer = playerList.at((position() + 2) % 4);
     QString westPlayer = playerList.at((position() + 3) % 4);
-    qDebug() << eastPlayer << northPlayer;
     QLabel *east = new QLabel(eastPlayer);
     ui->east->addWidget(east);
     QLabel *north = new QLabel(northPlayer);
@@ -333,12 +326,17 @@ bool Belote::in_isYourTurn(QString string)
     if (!string.contains(BELOTE::RPL::YOURTURN))
         return false;
     clearLayout(ui->buttons);
-    QLabel *wait = new QLabel("Your turn to play");
-    ui->buttons->addWidget(wait);
-    wait->show();
     QString cardList = string.split(' ').last();
-    qDebug() << cardList;
+    qDebug() << "set active : " << cardList;
     setActive(cardList);
+    return true;
+}
+
+bool Belote::in_isRoundEnd(QString string)
+{
+    if (!string.contains(BELOTE::RPL::ROUNDEND))
+        return false;
+    clearLayout(ui->south);
     return true;
 }
 
@@ -353,9 +351,8 @@ bool Belote::in_isFullTeam(QString string)
 
 void Belote::on_actionLast_Fold_triggered()
 {
-    QDialog *fold = new QDialog(this);
-    QHBoxLayout *tmp = new QHBoxLayout();
-    fold->setLayout(tmp);
+    QLayout *tmp = fold->layout();
+    clearLayout(tmp);
     QPixmap cards("ressources/img/cards.jpg");
     for (auto i:lastFold) {
         QRect rect(73*i->rank(), 97*i->suit(), 73, 97);

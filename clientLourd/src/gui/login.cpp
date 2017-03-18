@@ -25,6 +25,7 @@ Login::Login(QWidget *parent) :
 	config.loadConfig();
     loadPresetList();
     initUIStyle();
+    ui->lineEdit_pass->setEchoMode(QLineEdit::Password);
 }
 
 void Login::initUIStyle()

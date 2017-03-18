@@ -33,7 +33,9 @@ void CustomLayout::addButton(QString name, int value)
 void CustomLayout::clicked()
 {
     for (auto i:buttons.keys()) {
-        if (i->isDown())
+        if (i->isDown()) {
+            qDebug() << "button : " << i->text();
             emit isClicked(buttons[i], this);
+        }
     }
 }
