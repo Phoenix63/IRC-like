@@ -17,7 +17,7 @@ module.exports = function (socket, command) {
     }
 
     let channels = command[1].split(' ')[0].split(',');
-    socket.send(channels);
+
     Channel.list().forEach((chan) => {
         if (channels.indexOf(chan.name) >= 0) {
             chan.removeUser(socket.client, message);

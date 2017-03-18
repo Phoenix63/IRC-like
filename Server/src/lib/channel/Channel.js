@@ -12,7 +12,7 @@ class Channel {
 
     /**
      *
-     * @param {Client} creator
+     * @param {Client|Object} creator
      * @param {string} name
      * @param {string} pass
      * @param {number} size
@@ -272,6 +272,17 @@ class Channel {
 
     deleteFiles() {
         this._files = {};
+    }
+
+    remove() {
+
+        this._persistent = false;
+
+        this._users.map((u) => {
+            this.removeUser(u);
+        });
+
+        Redis.deleteChannel(this);
     }
 
     /**

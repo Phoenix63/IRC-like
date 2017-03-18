@@ -11,8 +11,7 @@ module.exports = function (socket, command) {
     let awayRegex = /^:([ a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,50})$/.exec(command[1]);
 
     if (awayRegex && awayRegex[1].trim().length !== 0) {
-        let messageAway = awayRegex[1];
-        socket.client.away = messageAway;
+        socket.client.away = awayRegex[1];
         RPLSender.RPL_NOWAWAY(socket);
 
     } else {

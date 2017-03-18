@@ -26,7 +26,8 @@ let allowedCommand = {
     'LISTFILES': require('./command/LISTFILES'),
     'RMFILE': require('./command/RMFILE'),
     'DEBUG': require('./command/DEBUG'),
-    'BELOTE': require('./command/BELOTE')
+    'BELOTE': require('./command/BELOTE'),
+    'RMCHAN': require('./command/RMCHAN')
 };
 
 class CommandManager {

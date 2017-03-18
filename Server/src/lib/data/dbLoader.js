@@ -34,6 +34,7 @@ module.exports = function (callback) {
                     chan.usersFlags = obj.usersFlags;
                     chan.flags = obj.flags;
                     chan.bannedIP = obj.bannedIP;
+                    Redis.setChannel(chan);
                     caller.incSaved();
                 });
             });

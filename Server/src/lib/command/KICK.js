@@ -20,12 +20,12 @@ module.exports = function (socket, command) {
         if(!user && socket.client.isAdmin()) {
             user = chan[0];
 
-            client = Client.getClient(user);
+            let kicked = Client.getClient(user);
 
-            if(client) {
+            if(kicked) {
 
-                RPLSender.SKICK(socket.client, kicked.name);
-                client.socket.close();
+                RPLSender.SKICK(socket.client, kicked);
+                kicked.socket.close();
 
 
             } else {
@@ -46,7 +46,7 @@ module.exports = function (socket, command) {
                 if (channel.isUserOperator(socket.client)) {
                     let kicked = channel.getUser(user);
                     if (kicked) {
-                        RPLSender.KICK(socket.client, kicked.name, channel);
+                        RPLSender.KICK(socket.client, kicked, channel);
                         channel.removeUser(kicked);
                     } else {
                         ERRSender.ERR_NOTONCHANNEL(socket.client, chan);

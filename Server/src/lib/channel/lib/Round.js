@@ -81,7 +81,7 @@ class Round {
                 let isNext = true;
 
                 this._play++;
-                if(this._play > 4) {
+                if(this._play >= 4) {
                     this._play = 0;
                     this._takeTurn++;
                     if(this._takeTurn > 1) {
@@ -100,6 +100,11 @@ class Round {
                     this._players[index].addCardToHand([this._trump]);
 
                     player.team.take();
+
+                    this._trump = {
+                        color: colors
+                    };
+
                     this.game.rpl.playerTake(this._play, this._trump);
 
                     for(let i = 0 ; i<4; i++) {

@@ -189,4 +189,7 @@ function create(callback) {
     });
 }
 
-export default {create: create};
+export default {
+    create: create,
+    list: ()=>(sockets)
+};
