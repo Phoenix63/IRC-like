@@ -282,9 +282,11 @@ class Channel {
     _addClientFlag(client, flags) {
         let arrayFlags = flags.split('');
         arrayFlags.forEach((flag) => {
-            if (this._usersFlags[client.identity].indexOf(flag) === -1) {
-                this._usersFlags[client.identity] += flag;
-                RPLSender.RPL_CHANNELMODEIS(this, this._name + ' +' + flag + ' ' + client.name);
+            if(flag !== 'o' || (flag === 'o' && client.isRegisteredWithPass())) {
+                if (this._usersFlags[client.identity].indexOf(flag) === -1) {
+                    this._usersFlags[client.identity] += flag;
+                    RPLSender.RPL_CHANNELMODEIS(this, this._name + ' +' + flag + ' ' + client.name);
+                }
             }
         });
         this._mergeToRedis();
@@ -437,11 +439,11 @@ class Channel {
             RPLSender.RPL_NAMREPLY(user, this);
 
             if (this._users.length === 1) {
-                this._addClientFlag(user, 'o')
+                this._addClientFlag(user, 'o');
             }
 
             if (user.isAdmin() || user.isSuperAdmin() || user.identity === this._creator) {
-                this._addClientFlag(user, 'o')
+                this._addClientFlag(user, 'o');
             }
 
             this._flags.split('').forEach((flag) => {
@@ -469,6 +471,9 @@ class Channel {
                 user.removeChannel(this);
             }
 
+            if(!this._persistent && this._creator === user.identity) {
+                this._creator = '##### NONE ####';
+            }
 
             if (!this._persistent && this._users.length <= 0) {
                 channels.splice(channels.indexOf(this), 1);
