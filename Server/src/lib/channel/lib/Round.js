@@ -152,22 +152,33 @@ class Round {
                     let masterCard = cds.master.card;
 
                     if(play.indexOf(card) >= 0) {
+
+                        if(!masterCard || card.compare(masterCard, this._folds[this._currentFold][0][1].color, this._trump.color)>0) {
+                            masterCard = card;
+                            masterCardOwner = player;
+                        }
+
+
                         let end = false;
                         this._folds[this._currentFold].push([player, card]);
 
                         this._deck._played.push(card);
 
-                        debug('----------------- pli ('+this._trump.color+') ------------');
-                        let better = false;
-                        debug(this._folds[this._currentFold].map((c) => {
-                            return c[1].toString(true, this._trump.color);
-                        }).join('\t| '));
                         this.game.rpl.playerPlay(this._play, card);
                         player.play(card.value);
                         this._play++;
                         if(this._play >= 4) {
                             this._play = 0;
                         }
+
+                        debug('----------------- pli ('+this._trump.color+') ------------');
+                        debug(this._folds[this._currentFold].map((c) => {
+                            if(c[1] === masterCard)
+                                return '*'+c[1].toString(true, this._trump.color);
+                            return c[1].toString(true, this._trump.color);
+                        }).join('\t| '));
+                        console.log();
+
                         if(this._folds[this._currentFold].length >= 4) {
                             this._players.forEach((player) => {
                                 debug('--------- '+player.client.name+' ----------');
@@ -182,6 +193,9 @@ class Round {
                             } else {
                                 this._play = this._players.indexOf(masterCardOwner);
                             }
+                            this.game.rpl.endOfFold(this._folds[this._currentFold-1].map((f) => {
+                                return f[1];
+                            }).join(','));
                             this._folds[this._currentFold-1].forEach((pc) => {
                                 masterCardOwner.team.addPoints(pc[1].getPoints(this._trump.color));
                             });

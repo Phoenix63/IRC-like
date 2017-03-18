@@ -11,7 +11,8 @@
     "watch": "babel --watch src --out-dir dist --source-maps inline --copy-files",
     "build": "babel src --out-dir dist --source-maps inline --copy-files",
     "prod": "docker-compose -f ./docker/prod.yml up",
-    "test": "docker-compose -f ./docker/test.yml up"
+    "test": "docker-compose -f ./docker/test.yml up",
+    "belote": "npm run build && DEBUG=*,-babel,-socket.io*,-engine*,-server:send RUNNING=DEV node dist/app"
   },
   "author": "",
   "license": "ISC",

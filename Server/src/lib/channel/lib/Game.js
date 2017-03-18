@@ -4,6 +4,9 @@ import Deck from './Deck';
 import Player from './Player';
 import Round from './Round';
 import RPLManger from './RPLManager';
+import colors from './../../util/Color';
+
+const debug = require('debug')('belote:rpl');
 
 class Game {
     /**
@@ -44,6 +47,7 @@ class Game {
     }
 
     broadcast(message) {
+        debug(colors.magenta('[to] ')+colors.green('all')+'\t'+message);
         this._belote.broadcast(message, null);
     }
 
@@ -115,6 +119,18 @@ class Game {
 
         if(this._points[0] !== this._points[1] && (this._points[0] >= 1000 || this._points[1] >= 1000)) {
             this.rpl.teamWin(this._points[0]>=this._points[1]?0:1);
+            this._points = [0,0];
+
+            this._round = null;
+            this._deck = new Deck();
+
+            this._players.forEach((player) => {
+                player._hand = [];
+            });
+
+            this._teams = [new Team(this, 0), new Team(this, 1)];
+            this.state = 0;
+
         } else {
             this._roundFactory.call(this);
         }
