@@ -38,7 +38,7 @@ myApp.factory("userInfo", function() {
       "setRight": function(newRight) {
         this.right = newRight;
       },
-      "server": "http://crismos.fr",
+      "server": "http://25.36.22.132",
       "port": 8089,
       "socket": "",
 	  "filePort": "",
@@ -59,8 +59,10 @@ myApp.factory("userInfo", function() {
         this.port = newPort;
       },
       "connect": function() {
-        this.socket = io(this.server+":"+this.port, {'forceNew': true });
-		this.filePort = io(this.server+":8091", {'forceNew': true });
+        this.socket = io(this.server+":"+this.port);
+      },
+	  "connectFile": function() {
+        this.filePort = io(this.server+":8091");
       },
       "afterConnection": function() {
         this.userN = "Guest_"+this.userN;

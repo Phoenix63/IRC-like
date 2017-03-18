@@ -58,3 +58,10 @@
 		return [channel, numberOfUser, topic];
 	}
 	
+	function in_isFile(msg) {
+		var newLink = msg.replace(":","");
+		var tabNames = msg.split(".");
+		var nameOfFile = tabNames[tabNames.length-2] + "." + tabNames[tabNames.length-1];
+		return [newLink, nameOfFile];
+	}
+	

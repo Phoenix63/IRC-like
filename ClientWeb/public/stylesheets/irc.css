@@ -114,6 +114,7 @@ h3::after {
 
 #div_emoji{
     height: 50px;
+	margin-top:10px;
     margin-left: 15px;
     width: 10%;
 }
@@ -234,6 +235,29 @@ h3::after {
     max-width: 100%; 
 }
 
+.connectedUser {
+	display:inline-block;
+	background:green;
+	border-radius:50%;
+	width:20px;
+	height:20px;
+	border:2px solid #679403; 
+}
+
+.notConnectedUser {
+	display:inline-block;
+	background:red;
+	border-radius:50%;
+	width:20px;
+	height:20px;
+	border:2px solid #679403; 
+}
+
+#topic {
+	display:inline-block;
+}
+
+
 .previewImage {
 	width:50px;
 	height:40px;
@@ -263,7 +287,29 @@ h3::after {
 .default-color {
 	color:blue;
 }
+.class-user-file {
+	font-weight:bold;
+	display:inline-block;
+	font-size:120%;
+}
+.class-operator-file {
+	font-weight:bold;
+	display:inline-block;
+	font-size:120%;
+	color:#9932CC;
+}
 
+.class-admin-file {
+	font-weight:bold;
+	display:inline-block;
+	font-size:120%;
+	color:#A52A2A;
+}
+.class-default-file {
+	display:inline-block;
+	font-size:120%;
+	color:blue;
+}
 
 .messInBox {
 	border-bottom:0.1px grey groove;

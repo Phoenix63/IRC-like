@@ -7,6 +7,7 @@ myApp.controller('log_in_controller', function ($scope, $location, userInfo) {
 			userInfo.setServer($scope.server);
 		}
 		userInfo.connect();
+		userInfo.connectFile();
 
 		if(!($scope.isSetNick()) && !($scope.isSetId())) {
 			userInfo.socket.emit("message", "USER " + userInfo.userN + " 0 * : " + userInfo.realName);
