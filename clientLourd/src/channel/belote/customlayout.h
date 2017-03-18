@@ -10,6 +10,7 @@ class CustomLayout : public QObject
     Q_OBJECT
 public:
     CustomLayout();
+    ~CustomLayout();
     void setLayout(QHBoxLayout *lay);
     void addButton(QString name, int value);
 signals:

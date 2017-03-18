@@ -27,6 +27,9 @@ public:
 public slots:
     void playCard();
     void take(int trump, CustomLayout *layout);
+private slots:
+    void on_actionLast_Fold_triggered();
+
 private:
     //Hand functions
     void receiveCard(int val);
@@ -41,8 +44,8 @@ private:
     void clean();
     void clearLayout(QLayout *layout);
     void chooseTeam();
-    void chooseTrump(Card *card);
     void displayCard(Card *card);
+    void refreshHand();
     //Game functions
     void firstRound(int trump);
     void secondRound(int trump);
@@ -55,8 +58,10 @@ private:
     bool in_isFullTeam(QString string);
     bool in_isGameReset(QString string);
     bool in_isTrumpChoice(QString string);
+    bool in_isPlayerTake(QString string);
     bool in_isYourTurn(QString string);
     bool in_isPlayerPlay(QString string);
+    bool in_isEndFold(QString string);
     bool in_isTakeTurn(QString string);
 private:
     QString username;
@@ -64,6 +69,7 @@ private:
     int aPosition;
     Ui::Belote *ui;
     QTcpSocket *socket;
+    QList<Card *> lastFold;
     QHash<Card *, QPushButton *> hand;
 };
 

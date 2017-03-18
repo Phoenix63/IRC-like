@@ -20,6 +20,8 @@ const QRegularExpression DIDNTTAKE    ("^BELOTE\\s\\S+\\s1012\\s");
 const QRegularExpression PLAYED       ("^BELOTE\\s\\S+\\s1013\\s");
 const QRegularExpression TEAMJOIN     ("^BELOTE\\s\\S+\\s1014\\s");
 const QRegularExpression ROUNDSTART   ("^BELOTE\\s\\S+\\s1015\\s");
+const QRegularExpression TEAMWIN      ("^BELOTE\\s\\S+\\s1016\\s");
+const QRegularExpression ENDFOLD      ("^BELOTE\\s\\S+\\s1017\\s");
 }
 
 namespace ERR {

@@ -42,6 +42,15 @@ void Belote::position(int val)
  * User interface functions
  */
 
+void Belote::refreshHand()
+{
+    clearLayout(ui->southCards);
+    for (auto i:hand.keys()) {
+        qDebug() << "code : " << i->code();
+        //ui->southCards->addWidget(hand[i]);
+    }
+}
+
 void Belote::clean()
 {
     clearLayout(ui->southCards);
@@ -61,8 +70,24 @@ void Belote::clearLayout(QLayout *layout)
         if (item->widget()) {
             delete item->widget();
         }
-        delete item;
     }
+}
+
+void Belote::parse(QString string)
+{
+    qDebug() << "belote :" << string;
+    if (!in_isTeamSelec(string))
+    if (!in_isGameStart(string))
+    if (!in_isFullTeam(string))
+    if (!in_isGameReset(string))
+    if (!in_isTrumpChoice(string))
+    if (!in_isPlayerTake(string))
+    if (!in_isTakeTurn(string))
+    if (!in_isPlayerPlay(string))
+    if (!in_isEndFold(string))
+    if (!in_isCardDeal(string))
+    if (!in_isYourTurn(string))
+        qDebug() << "cant find this";
 }
 
 void Belote::playCard()
@@ -70,12 +95,12 @@ void Belote::playCard()
     for(auto i:hand.keys()){
         if (hand[i]->isDown()) {
             Card * toPlay = i;
-            displayCard(toPlay);
-            hand.remove(toPlay);
-            QString message = "BELOTE PLAY " + channelName + " " + toPlay->code() + '\n';
+            QString message = "BELOTE PLAY " + channelName + " " + QString::number(toPlay->code()) + '\n';
             socket->write(message.toUtf8());
+            hand.remove(i);
         }
     }
+    refreshHand();
 }
 
 void Belote::setInactive()
@@ -96,13 +121,6 @@ void Belote::setActive(QString string)
         if (iCards.contains(i->code()))
             hand[i]->setEnabled(true);
     }
-}
-
-void Belote::chooseTrump(Card *card)
-{
-    clearLayout(ui->buttons);
-    int trump = card->suit();
-    //TODO find proper way to implement
 }
 
 void Belote::displayCard(Card *card)
@@ -137,8 +155,7 @@ void Belote::receiveCard(int val)
     cropped.scaledToHeight(70,Qt::SmoothTransformation);
     QPushButton *newCard = new QPushButton();
     newCard->setIcon(cropped);
-    newCard->setStyleSheet("border-image : none; \
-                            background-color: rgba( 255, 255, 255, 0% );");
+    newCard->setStyleSheet("background-color: rgba( 255, 255, 255, 0%);");
     newCard->setIconSize(QSize(70, 90));
     ui->southCards->addWidget(newCard);
     hand[card] = newCard;
@@ -158,8 +175,8 @@ void Belote::chooseTeam()
     clearLayout(ui->buttons);
     QMessageBox teamSelec;
     teamSelec.setText("Which team do you want to join ?");
-    QPushButton *blueTeam = teamSelec.addButton(tr("Blue"), QMessageBox::NoRole);
-    QPushButton *redTeam = teamSelec.addButton(tr("Red"), QMessageBox::NoRole);
+    QPushButton *blueTeam = teamSelec.addButton(tr("Kotei"), QMessageBox::NoRole);
+    QPushButton *redTeam = teamSelec.addButton(tr("Jbzz"), QMessageBox::NoRole);
     teamSelec.exec();
     if (teamSelec.clickedButton() == blueTeam) {
         QString message = "BELOTE READY " + channelName + " 0\n";
@@ -171,20 +188,35 @@ void Belote::chooseTeam()
     teamSelec.close();
 }
 
+bool Belote::in_isTrumpChoice(QString string)
+{
+    if (!string.contains(BELOTE::RPL::TRUMPIS))
+        return false;
+    int iCard = string.split(' ').last().toInt();
+    Card *card = new Card(iCard);
+    displayCard(card);
+    return true;
+}
+
 void Belote::firstRound(int trump)
 {
     setInactive();
     CustomLayout *tmp = new CustomLayout();
     tmp->setLayout(ui->buttons);
-    tmp->addButton("Take", trump);
+    tmp->addButton("Take", trump / 8);
     tmp->addButton("No", -1);
     connect(tmp, &CustomLayout::isClicked, this, &Belote::take);
 }
 
 void Belote::take(int trump, CustomLayout *layout)
 {
-    socket->write("BELOTE TAKE " + trump + '\n');
-    clearLayout(ui->buttons);
+    qDebug() << trump;
+    QString message = "BELOTE TAKE ";
+    message.append(channelName + " ");
+    message.append(QString::number(trump) + '\n');
+    qDebug() << message;
+    socket->write(message.toUtf8());
+    qDebug() << "vaudou";
     delete layout;
 }
 
@@ -204,40 +236,24 @@ void Belote::secondRound(int trump)
     connect(tmp, &CustomLayout::isClicked, this, &Belote::take);
 }
 
-void Belote::parse(QString string)
-{
-    qDebug() << "belote :" << string;
-    if (!in_isTeamSelec(string))
-    if (!in_isGameStart(string))
-    if (!in_isFullTeam(string))
-    if (!in_isGameReset(string))
-    if (!in_isTrumpChoice(string))
-    if (!in_isTakeTurn(string))
-    if (!in_isPlayerPlay(string))
-    if (!in_isCardDeal(string))
-        qDebug() << "cant find this";
-}
-
 bool Belote::in_isCardDeal(QString string)
 {
     if (!string.contains(BELOTE::RPL::RECEIVED))
         return false;
     QStringList cardList = string.split(' ').last().split(',');
-    qDebug() << cardList;
+    qDebug() << "cartes recues : " << cardList;
     for (auto i:cardList) {
         receiveCard(i.toInt());
     }
+    setInactive();
     return true;
 }
 
-bool Belote::in_isTrumpChoice(QString string)
+bool Belote::in_isPlayerTake(QString string)
 {
-    if (!string.contains(BELOTE::RPL::TRUMPIS))
+    if (!string.contains(BELOTE::RPL::PLAYERTAKE))
         return false;
-    int iCard = string.split(' ').last().toInt();
-    Card *card = new Card(iCard);
-    displayCard(card);
-    chooseTrump(card);
+    clearLayout(ui->board);
     return true;
 }
 
@@ -246,7 +262,21 @@ bool Belote::in_isPlayerPlay(QString string)
     if (!string.contains(BELOTE::RPL::PLAYED))
         return false;
     int card = string.split(' ').last().toInt();
-    displayCard(new Card(card));
+    Card *played = new Card(card);
+    displayCard(played);
+    return true;
+}
+
+bool Belote::in_isEndFold(QString string)
+{
+    if (!string.contains(BELOTE::RPL::ENDFOLD))
+        return false;
+    QString cards = string.split(' ').last();
+    QStringList cardList = cards.split(',');
+    clearLayout(ui->board);
+    lastFold.clear();
+    for (auto i:cardList)
+        lastFold.append(new Card(i.toInt()));
     return true;
 }
 
@@ -305,12 +335,10 @@ bool Belote::in_isYourTurn(QString string)
     clearLayout(ui->buttons);
     QLabel *wait = new QLabel("Your turn to play");
     ui->buttons->addWidget(wait);
-    wait->setStyleSheet("border-image : none;");
+    wait->show();
     QString cardList = string.split(' ').last();
+    qDebug() << cardList;
     setActive(cardList);
-    while(1) {
-        playCard();
-    }
     return true;
 }
 
@@ -321,4 +349,21 @@ bool Belote::in_isFullTeam(QString string)
     QMessageBox::information(this, "Error", "Team is full");
     chooseTeam();
     return true;
+}
+
+void Belote::on_actionLast_Fold_triggered()
+{
+    QDialog *fold = new QDialog(this);
+    QHBoxLayout *tmp = new QHBoxLayout();
+    fold->setLayout(tmp);
+    QPixmap cards("ressources/img/cards.jpg");
+    for (auto i:lastFold) {
+        QRect rect(73*i->rank(), 97*i->suit(), 73, 97);
+        QPixmap cropped = cards.copy(rect);
+        cropped.scaledToHeight(70,Qt::SmoothTransformation);
+        QLabel *lCard = new QLabel;
+        lCard->setPixmap(cropped);
+        tmp->addWidget(lCard);
+    }
+    fold->show();
 }
