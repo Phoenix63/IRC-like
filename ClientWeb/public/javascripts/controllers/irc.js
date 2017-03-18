@@ -220,6 +220,15 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 		}]
 	];};
 	
+	$scope.menuOptionsAway = function() {return [
+		["Away", function ($itemScope) {
+			userInfo.socket.emit("message", "AWAY : Gone");
+		}],
+		["Unaway", function ($itemScope) {
+			userInfo.socket.emit("message", "AWAY");
+		}]
+	];};
+	
 	$scope.helpPandirc = function() {
 		bootbox.alert("<strong>Basic command</strong>" +
 					"<br />" +

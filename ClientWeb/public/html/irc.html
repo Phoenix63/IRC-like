@@ -13,7 +13,7 @@
         </div>
     </div>
     <div id="messages" scroll-bottom="currentChannel.messages">
-        <h3><span><img id="fleche" src="images/fleche.png"></span> <div id="topic">{{topicChannel}}</div> <div ng-class="$connected === true ? 'connectedUser' : 'notConnectedUser'"></div></h3>
+        <h3><span><img id="fleche" src="images/fleche.png"></span> <div id="topic">{{topicChannel}}</div> <div ng-context-menu="menuOptionsAway()" ng-class="$connected === true ? 'connectedUser' : 'notConnectedUser'"></div></h3>
         <div ng-repeat="message in currentChannel.messages track by $index" ng-bind-html="message[0].right === 5 ? (message[2] | insertHtml) : message">
             <div class="messInBox">
 				<p class="users" ng-class="message[0].right === 3 ? 'admin-color' : (message[0].right === 1 ? 'operator-color' : ( message[0].right === 2 ? 'user-color' : 'default-color'))">{{message[0].nick}}</p>
