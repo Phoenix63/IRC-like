@@ -7,23 +7,17 @@ CustomLayout::CustomLayout()
 
 CustomLayout::~CustomLayout()
 {
-    QLayoutItem *item;
-    while((item = layout->takeAt(0))) {
-        if (item->widget()) {
-            qDebug() << "deleting stuff";
-            delete item->widget();
-        }
-    }
 }
 
-void CustomLayout::setLayout(QHBoxLayout *lay)
+void CustomLayout::setLayout(QHBoxLayout *lay, QWidget *parent)
 {
     layout = lay;
+    this->parent = parent;
 }
 
 void CustomLayout::addButton(QString name, int value)
 {
-    QPushButton *but = new QPushButton(name);
+    QPushButton *but = new QPushButton(parent);
     but->setText(name);
     buttons[but] = value;
     layout->addWidget(but);
@@ -33,9 +27,11 @@ void CustomLayout::addButton(QString name, int value)
 void CustomLayout::clicked()
 {
     for (auto i:buttons.keys()) {
-        if (i->isDown()) {
-            qDebug() << "button : " << i->text();
-            emit isClicked(buttons[i], this);
+        if (i) {
+            if (i->isDown()) {
+                qDebug() << "button : " << i->text();
+                emit isClicked(buttons[i], this);
+            }
         }
     }
 }

@@ -76,6 +76,7 @@ bool Parser::out(QString string)
 	if (!out_isAwayMsg(string))
     if (!out_isInvMsg(string))
     if (!out_isBeloteMsg(string))
+    if (!out_isRmChanMsg(string))
     if (!out_isPrivMsg(string))
         return false;
     return true;
@@ -373,6 +374,22 @@ bool Parser::out_isQuitMsg(QString string)
             return false;
     string.replace(QString("/quit"), QString("QUIT"));
     sendToServer(socket, string);
+    return true;
+}
+
+bool Parser::out_isRmChanMsg(QString string)
+{
+    if (!string.startsWith("/rmchan"))
+        return false;
+    string.trimmed();
+    if (string.split(' ').size == 1)
+        string = "RMCHAN " + channel->channelName();
+    else
+        string = "RMCHAN " + string.split(' ').at(1);
+    string.append('\n');
+    sendToServer(socket, string);
+    channel->change("\"Debug\"");
+    emit changeChannelSignal();
     return true;
 }
 

@@ -402,7 +402,7 @@ void MainFrame::initCompletion()
     completionList << "/clean" << "/debug" << "/nick" << "/user" << "/join" << "/names"
                    << "/pass" << "/part" << "/list" << "/topic" << "/kick" << "/who"
                    << "/whois" << "/mode" << "/msg" << "/quit" << "/away" << "/back"
-                   << "/invite" << "/files" << "/rmfile" << "/belote" << "/serverkick";
+                   << "/invite" << "/files" << "/rmfile" << "/belote" << "/serverkick" <<"/rmchan";
     stringCompleter = new QCompleter(completionList,this);
     stringCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     stringCompleter->popup()->setTabKeyNavigation(true);

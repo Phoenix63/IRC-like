@@ -67,6 +67,7 @@ private:
     bool out_isListFileMsg(QString string);
     bool out_isRmFileMsg(QString string);
 	bool out_isBeloteMsg(QString string);
+    bool out_isRmChanMsg(QString string);
 
 	// In functions
     bool in_isInitMsg(QString string);

@@ -23,6 +23,11 @@ Belote::Belote(QWidget *parent, QTcpSocket *sock, QString chan, QString nick) :
                         "border-image: url(\"ressources/img/tapis.jpg\") 0 0 0 0 stretch stretch;"
                         "}"
                         );
+    ui->scoreboard->setColumnCount(2);
+    ui->scoreboard->setColumnWidth(0, 50);
+    ui->scoreboard->setColumnWidth(1, 50);
+    ui->scoreboard->verticalHeader()->setVisible(false);
+    ui->scoreboard->setHorizontalHeaderLabels(QString("Kotei;Jbzz").split(';'));
     lobbyWait();
 }
 
@@ -198,7 +203,7 @@ bool Belote::in_isTrumpChoice(QString string)
 void Belote::firstRound(int trump)
 {
     CustomLayout *tmp = new CustomLayout();
-    tmp->setLayout(ui->buttons);
+    tmp->setLayout(ui->buttons, this);
     tmp->addButton("Take", trump / 8);
     tmp->addButton("No", -1);
     connect(tmp, &CustomLayout::isClicked, this, &Belote::take);
@@ -212,10 +217,12 @@ void Belote::take(int trump, CustomLayout *layout)
     delete layout;
 }
 
-void Belote::secondRound(int trump)
+void Belote::secondRound(int card)
 {
+    int trump = card / 8;
+    clearLayout(ui->buttons);
     CustomLayout *tmp = new CustomLayout();
-    tmp->setLayout(ui->buttons);
+    tmp->setLayout(ui->buttons, this);
     if (trump != 0)
         tmp->addButton("Spades", 0);
     if (trump != 1)
@@ -336,8 +343,20 @@ bool Belote::in_isRoundEnd(QString string)
 {
     if (!string.contains(BELOTE::RPL::ROUNDEND))
         return false;
-    clearLayout(ui->south);
+    clean();
     return true;
+}
+
+bool Belote::in_isTeamPoints(QString string)
+{
+    if (!string.contains(BELOTE::RPL::TEAMPOINTS))
+        return false;
+    ui->scoreboard->insertRow(ui->scoreboard->rowCount());
+    QString points = string.split(' ').last();
+    score0 += string.split(',').at(0).toInt();
+    score1 += string.split(',').at(1).toInt();
+    ui->scoreboard->setItem(ui->scoreboard->rowCount() - 1, 0, new QTableWidgetItem(score0));
+    ui->scoreboard->setItem(ui->scoreboard->rowCount() - 1, 1, new QTableWidgetItem(score1));
 }
 
 bool Belote::in_isFullTeam(QString string)
@@ -363,4 +382,11 @@ void Belote::on_actionLast_Fold_triggered()
         tmp->addWidget(lCard);
     }
     fold->show();
+}
+
+void Belote::closeEvent(QCloseEvent *event)
+{
+    QString part = "PART " + channelName + '\n';
+    socket->write(part.toUtf8());
+    event->accept();
 }

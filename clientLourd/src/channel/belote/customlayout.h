@@ -11,13 +11,14 @@ class CustomLayout : public QObject
 public:
     CustomLayout();
     ~CustomLayout();
-    void setLayout(QHBoxLayout *lay);
+    void setLayout(QHBoxLayout *lay, QWidget *parent);
     void addButton(QString name, int value);
 signals:
     void isClicked(int value, CustomLayout *layout);
 public slots:
     void clicked();
 private:
+QWidget *parent;
 QHash<QPushButton *, int> buttons;
 QHBoxLayout *layout;
 };

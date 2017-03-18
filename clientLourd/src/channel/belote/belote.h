@@ -20,6 +20,7 @@ class Belote : public QMainWindow, public ChannelContent
 public:
     explicit Belote(QWidget *parent = 0, QTcpSocket *socket = NULL, QString channelName = "", QString username = "");
     ~Belote();
+    void closeEvent(QCloseEvent *event);
     void lobbyWait();
 
     void parse(QString string);
@@ -64,7 +65,10 @@ private:
     bool in_isEndFold(QString string);
     bool in_isTakeTurn(QString string);
     bool in_isRoundEnd(QString string);
+    bool in_isTeamPoints(QString string);
 private:
+    int score0;
+    int score1;
     QString username;
     QString channelName;
     int aPosition;
