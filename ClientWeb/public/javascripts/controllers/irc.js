@@ -30,13 +30,39 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 		userInfo.connectFile();
 		boolFile = true;
 		var msgToSend = "";
-		if(isImage(fich[0].name)) {
-			var readerPreview = new FileReader();
-			readerPreview.onload = function (e) {	
-				bootbox.prompt("<a href='" + e.target.result + "' target='_blank'><img src='"+ e.target.result +"' class = 'previewImage'></img></a> Do you want to send <strong>" + fich[0].name + "</strong> ?<center><p>Add a message</p></center>", function(ev){
+		if(fich[0].size >= 2097152) {
+			bootbox.alert("File too big");
+		}
+		else if($scope.currentChannel.chan === "@accueil") {
+			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(),  "You should join a channel"]);
+		}
+		else {
+			if(isImage(fich[0].name)) {
+				var readerPreview = new FileReader();
+				readerPreview.onload = function (e) {	
+					bootbox.prompt("<a href='" + e.target.result + "' target='_blank'><img src='"+ e.target.result +"' class = 'previewImage'></img></a> Do you want to send <strong>" + fich[0].name + "</strong> ?<center><p>Add a message</p></center>", function(ev){
+						if(ev !== null) {
+							msgToSend = ev;
+							var readerSend = new FileReader();
+							readerSend.onload = function() {
+								var arrayBuffer = readerSend.result;
+								array1 = new Uint8Array(arrayBuffer);
+								binaryString = String.fromCharCode.apply(null, array1);
+								userInfo.filePort.emit("data", "FILE " + binaryString.length + " " + fich[0].name);
+								userInfo.filePort.emit("data", array1);
+							}
+							readerSend.readAsArrayBuffer(fich[0]);
+						}
+						$scope.$apply();
+					});
+				}
+				readerPreview.readAsDataURL(fich[0]);
+			}
+			else {
+				bootbox.prompt("<img src='../images/fichier.jpg' class = 'previewImage'></img> Do you want to send <strong>" + fich[0].name + "</strong> ?<center><p>Add a message</p></center>", function(ev){
 					if(ev !== null) {
-						msgToSend = ev;
 						var readerSend = new FileReader();
+						msgToSend = ev;
 						readerSend.onload = function() {
 							var arrayBuffer = readerSend.result;
 							array1 = new Uint8Array(arrayBuffer);
@@ -49,63 +75,49 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 					$scope.$apply();
 				});
 			}
-			readerPreview.readAsDataURL(fich[0]);
-		}
-		else {
-			bootbox.prompt("<img src='../images/fichier.jpg' class = 'previewImage'></img> Do you want to send <strong>" + fich[0].name + "</strong> ?<center><p>Add a message</p></center>", function(ev){
-				if(ev !== null) {
-					var readerSend = new FileReader();
-					msgToSend = ev;
-					readerSend.onload = function() {
-						var arrayBuffer = readerSend.result;
-							array1 = new Uint8Array(arrayBuffer);
-							binaryString = String.fromCharCode.apply(null, array1);
-							userInfo.filePort.emit("data", "FILE " + binaryString.length + " " + fich[0].name);
-							userInfo.filePort.emit("data", array1);
+			userInfo.filePort.on("file", function(msg){
+				if(msg.match(/^[\S]+[ ]FILE[ ]TRANSFERT[ ][\S\W]+/g)){
+					var progress = (/^[\S]+[ ]FILE[ ]TRANSFERT[ ]([\S\W]+)/g).exec(msg) [1];
+				}
+				while(msg.match(/^[\S]+[ ]FILE[ ]TRANSFERT[ ][\S\W]+/g)) {
+					console.log("download");
+				}
+				else if(msg.match(/^[\S]+[ ]FILE/g)) {
+					var msgFile = (/^[\S]+[ ]FILE[ ]([\S]+)/g).exec(msg);
+					var fileReceive = in_isFile(msgFile[1]);
+					fileReceive[0] = fileReceive[0].replace("http://127.0.0.1", user.server);
+					if(isImage(msgFile[1])) {
+						if(msgToSend === "") {
+							$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + fileReceive[0] + "' target='_blank'>" + fileReceive[1] + "</a></p><p><a href='" + fileReceive[0] + "' target='_blank'><img src='" + fileReceive[0] + "'/></a></p></div>"]);
+						}
+						else {
+							$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + msgToSend + "</p><p><a href='" + fileReceive[0] + "' target='_blank'><img src='" + fileReceive[0] + "'/></a></p></div>"]);
+						}
 					}
-					readerSend.readAsArrayBuffer(fich[0]);
+					else {
+						if(msgToSend === "") {
+							$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + fileReceive[0] + "' target='_blank'>" + fileReceive[1] + "</a></p></div>"]);
+						}
+						else {
+							$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + msgToSend + "</p><p><a href='" + fileReceive[0] + "' target='_blank'>" + fileReceive[1] + "</a></p></div>"]);
+						}
+					}
+					if($scope.currentChannel.chan !== "@accueil") {
+						if(msgToSend === "") {
+							userInfo.socket.emit("message", "PRIVMSG " + $scope.currentChannel.chan + " :" + fileReceive[0]);
+						}
+						else {
+							userInfo.socket.emit("message", "PRIVMSG " + $scope.currentChannel.chan + " :" + fileReceive[0] + " " + msgToSend);
+						}
+					}
+					else {
+						$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(),  "You should join a channel"]);
+					}
 				}
 				$scope.$apply();
 			});
 		}
-		userInfo.filePort.on("file", function(msg){
-			if(msg.match(/^[\S]+[ ]FILE[ ]TRANSFERT/g)){
-				alert(msg);
-			}
-			else if(msg.match(/^[\S]+[ ]FILE/g)) {
-				var msgFile = (/^[\S]+[ ]FILE[ ]([\S]+)/g).exec(msg);
-				var fileReceive = in_isFile(msgFile[1]);
-				fileReceive[0] = fileReceive[0].replace("http://127.0.0.1", user.server);
-				if(isImage(msgFile[1])) {
-					if(msgToSend === "") {
-						$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + fileReceive[0] + "' target='_blank'>" + fileReceive[1] + "</a></p><p><a href='" + fileReceive[0] + "' target='_blank'><img src='" + fileReceive[0] + "'/></a></p></div>"]);
-					}
-					else {
-						$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + msgToSend + "</p><p><a href='" + fileReceive[0] + "' target='_blank'><img src='" + fileReceive[0] + "'/></a></p></div>"]);
-					}
-				}
-				else {
-					if(msgToSend === "") {
-						$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + fileReceive[0] + "' target='_blank'>" + fileReceive[1] + "</a></p></div>"]);
-					}
-					else {
-						$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + msgToSend + "</p><p><a href='" + fileReceive[0] + "' target='_blank'>" + fileReceive[1] + "</a></p></div>"]);
-					}
-				}
-				if($scope.currentChannel.chan !== "@accueil") {
-					if(msgToSend === "") {
-						userInfo.socket.emit("message", "PRIVMSG " + $scope.currentChannel.chan + " :" + fileReceive[0]);
-					}
-					else {
-						userInfo.socket.emit("message", "PRIVMSG " + $scope.currentChannel.chan + " :" + fileReceive[0] + " " + msgToSend);
-					}
-				}
-				else {
-					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(),  "You should join a channel"]);
-				}
-			}
-			$scope.$apply();
-		});
+		$scope.$apply();
 	};
 	
 	
@@ -1014,6 +1026,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 								var nameOfFile = in_isFile(regxMsg)[1];
 								alert("dansdans");
 								alert($scope.channels[i].chan);
+								alert(regxUser.right);
 								if(regxUser.right === 3) {//admin
 									if(isImage(regxMsg)) {
 										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-admin-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p><p><a href='" + regxMsg + "' target='_blank'><img src='" + regxMsg + "'/></a></p></div>"]);
@@ -1245,14 +1258,6 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			
 			if(user.mute.includes(oldname)) {
 				user.mute[user.mute.indexOf(oldname)] = msgToPush[1];
-			}
-			
-			if(countNick === 0 ) {
-				user.nick = msgToPush[1];
-				if($scope.currentChannel.chan === "@accueil") {
-					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You have changed your nick to " + user.nick]);
-				}
-				countNick = 1;
 			}
 			
 			if(user.nick === oldname) {
