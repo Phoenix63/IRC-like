@@ -104,7 +104,7 @@ h3::after {
 }
 
 
-#div_emoji, #divSendMessage{
+#helpWindows, #divSendMessage{
 
     display: inline-block;
     float: left;
@@ -112,11 +112,10 @@ h3::after {
 }
 
 
-#div_emoji{
-    height: 50px;
-	margin-top:10px;
+#helpWindows{
+	margin-top:15px;
     margin-left: 15px;
-    width: 10%;
+	color:black;
 }
 
 .bouton_emoji{
@@ -241,7 +240,7 @@ h3::after {
 	border-radius:50%;
 	width:20px;
 	height:20px;
-	border:2px solid #679403; 
+	border:1px black groove; 
 }
 
 .notConnectedUser {
@@ -250,7 +249,7 @@ h3::after {
 	border-radius:50%;
 	width:20px;
 	height:20px;
-	border:2px solid #679403; 
+	border:1px black groove; 
 }
 
 #topic {
@@ -405,7 +404,7 @@ h3::after {
 @media screen and (max-width: 533px){
 
 
-    #div_emoji{
+    #helpWindows{
     height: 50px;
     margin-left: 1px;
     width: 5%;
@@ -450,7 +449,7 @@ h3::after {
 
 @media only screen and (max-width: 1000px){
 
-    #div_emoji{
+    #helpWindows{
     background-color: #FFFFFF;
     height: 50px;
     margin-left: 0px;
@@ -523,7 +522,7 @@ h3::after {
 
 @media screen and (max-width: 700px){
 
-    #div_emoji{
+    #helpWindows{
     height: 50px;
     margin-left: 0px;
     width: 35px;
@@ -547,7 +546,7 @@ h3::after {
 
 @media screen and (max-width: 600px){
 
-    #div_emoji{
+    #helpWindows{
     height: 50px;
     margin-left: 0px;
     width: 35px;
@@ -569,7 +568,7 @@ h3::after {
 
 @media screen and (max-width: 550px){
 
-    #div_emoji{
+    #helpWindows{
     height: 50px;
     margin-left: 0px;
     width: 30px;
