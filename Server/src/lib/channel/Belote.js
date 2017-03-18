@@ -56,16 +56,16 @@ class Belote extends Channel {
             this._users.splice(index, 1);
             RPLSender.PART(user, this, message);
 
-            user.removeChannel(this);
+            if (!bool) {
+                user.removeChannel(this);
+            }
+            this.game.removeUser(user);
 
-            if(this._users.length <= 0) {
+
+            if (!this._persistent && this._users.length <= 0) {
                 belotes.splice(belotes.indexOf(this), 1);
             }
-
-
-            this.game.removeUser(user);
         }
-
     }
 
     invite(socket, guest) {

@@ -4,7 +4,7 @@ all:
 	echo ""
 
 	@while [ -z "$$CONTINUE" ]; do \
-		read -r -p "Build project and install dependencies [y/N]: " CONTINUE; \
+		read -r -p "[Y]es: build Server, [N]o show help [y/N]: " CONTINUE; \
 	done ; \
 	[ $$CONTINUE = "y" ] || [ $$CONTINUE = "Y" ] || (make help; exit 1)
 	make build
@@ -22,7 +22,7 @@ head:
 	echo -e "       //  \________________//  \              \/        \/ "
 	echo -e "       \ \ / ____      ____ \   /      "
 	echo -e "        \_/ / #  \    /  # \ \_/    \e[0mServer\033[0;32m    "
-	echo -e "          | |     \  /     | |        \e[0m(v0.1.0)\033[0;32m "
+	echo -e "          | |     \  /     | |        \e[0m(v1.0.0)\033[0;32m "
 	echo -e "          |  \____/  \____/  |        "
 	echo -e "          ||       @@        |        "
 	echo -e "          ||     \_/\_/      |        "
@@ -62,27 +62,27 @@ build:
 
 deps:
 	make head
-	docker-compose -f docker/deps.yml up
+	docker-compose -f docker/deps.yml up --abort-on-container-exit
 
 prod:
 	make head
-	docker-compose -f docker/build.yml up --abort-on-container-exit && docker-compose -f docker/prod.yml up
+	docker-compose -f docker/build.yml up --abort-on-container-exit
+	docker-compose -f docker/prod.yml up
 
 prod-deamon:
 	make head
-	docker-compose -f docker/build.yml up --abort-on-container-exit && docker-compose -f docker/prod.yml up -d
+	docker-compose -f docker/build.yml up --abort-on-container-exit
+	docker-compose -f docker/prod.yml up -d
 
 dev:
 	make head
-	docker-compose -f docker/build.yml up --abort-on-container-exit && docker-compose -f docker/dev.yml up
-
-file:
-	make head
-	docker-compose -f docker/fileserver.yml up
+	docker-compose -f docker/build.yml up --abort-on-container-exit
+	docker-compose -f docker/dev.yml up
 
 unit:
 	make head
-	docker-compose -f docker/build.yml up --abort-on-container-exit && docker-compose -f docker/test.yml up --abort-on-container-exit
+	docker-compose -f docker/build.yml up --abort-on-container-exit
+	docker-compose -f docker/test.yml up --abort-on-container-exit
 
 clean:
 	docker-compose -f docker/deps.yml rm -f

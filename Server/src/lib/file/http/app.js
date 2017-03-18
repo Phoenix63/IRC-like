@@ -2,7 +2,7 @@ let express = require('express');
 let config = require('./../../../config.json');
 let app = express();
 let path = require('path');
-let debug = require('debug')('fileserver:app');
+let debug = require('debug')('pandirc:fileserver:app');
 let mime = require('mime');
 let fs = require('fs');
 

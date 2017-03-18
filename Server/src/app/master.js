@@ -12,7 +12,7 @@ function run(cluster) {
     "use strict";
     let _quiting = false;
 
-    let debug = require('debug')('server:app:master');
+    let debug = require('debug')('pandirc:app:master');
 
     RedisInterface.init();
 

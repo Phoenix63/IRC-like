@@ -1,4 +1,4 @@
-const debug = require('debug')('belote:Round');
+const debug = require('debug')('pandirc:belote:Round');
 
 class Round {
     /**

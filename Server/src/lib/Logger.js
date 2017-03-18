@@ -3,9 +3,9 @@
 import Client from './client/Client';
 import colors from './util/Color';
 
-let debug = require('debug')('server:logger');
-let receive = require('debug')('server:receive');
-let send = require('debug')('server:send');
+let debug = require('debug')('pandirc:logger');
+let receive = require('debug')('pandirc:receive');
+let send = require('debug')('pandirc:send');
 
 
 

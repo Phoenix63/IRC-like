@@ -1,5 +1,5 @@
 
-const debug = require('debug')('delote:player');
+const debug = require('debug')('pandirc:belote:player');
 
 class Player {
     constructor(game, client) {

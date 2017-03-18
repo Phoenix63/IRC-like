@@ -2,7 +2,7 @@
 
 import net from 'net';
 import config from './../../config.json';
-let debug = require('debug')('server:tcp');
+let debug = require('debug')('pandirc:tcp');
 
 function createServer(callback) {
     let server = net.createServer((socket) => {

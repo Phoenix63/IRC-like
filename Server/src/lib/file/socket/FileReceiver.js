@@ -1,7 +1,7 @@
 import FileManager from './../http/FileManager';
 import config from './../../../config.json';
 import shortid from 'shortid';
-var debug = require('debug')('fileserver:filereceiver');
+var debug = require('debug')('pandirc:fileserver:filereceiver');
 
 class FileReceiver {
     constructor(name, size, socket, callback = function(){}) {

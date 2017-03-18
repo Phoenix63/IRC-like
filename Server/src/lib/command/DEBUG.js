@@ -1,5 +1,5 @@
 "use strict";
-let debug = require('debug')('server:debugdb');
+let debug = require('debug')('pandirc:debugdb');
 let MongoClient = require('mongodb').MongoClient;
 import Redis from './../data/RedisInterface';
 import config from './../../ENV.json';

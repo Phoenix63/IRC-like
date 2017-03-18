@@ -1,6 +1,6 @@
 import colors from './../../util/Color';
 
-const debug = require('debug')('belote:rpl');
+const debug = require('debug')('pandirc:belote:rpl');
 
 class RPLManager {
     constructor(game) {

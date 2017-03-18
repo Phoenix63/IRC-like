@@ -6,7 +6,7 @@ import Round from './Round';
 import RPLManger from './RPLManager';
 import colors from './../../util/Color';
 
-const debug = require('debug')('belote:rpl');
+const debug = require('debug')('pandirc:belote:rpl');
 
 class Game {
     /**

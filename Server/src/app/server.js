@@ -18,8 +18,8 @@ function run(cluster) {
 
     RedisInterface.init();
 
-    let debug = require('debug')('server:app:server');
-    let test = require('debug')('app:test');
+    let debug = require('debug')('pandirc:app:server');
+    let test = require('debug')('pandirc:test');
 
     process.env.RUNNING = process.env.RUNNING || 'PROD';
 

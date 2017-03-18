@@ -1,31 +1,90 @@
 let spawn = require('child_process').spawn;
 let debug = require('debug')('pandirc:runner');
+import colors from './lib/util/Color';
 
 process.env.RUNNING = process.env.RUNNING || 'PROD';
 
 let child = null;
 
 function _start() {
-    child = spawn('node', ['./dist/run.js'], {RUNNING: process.env.RUNNING, DEBUG:process.env.DEBUG});
 
-    debug('running server ('+process.env.RUNNING+')...');
+    debug('rebuilding files...');
+    let build = spawn('npm', ['run', 'build']);
 
-    child.stdout.on('data', function (data) {   process.stdout.write(data.toString());  });
+    build.on('close', () => {
 
-    child.stderr.on('data', function (data) {   process.stdout.write(data.toString());  });
+        debug('rebuilding success!');
+        /*child = spawn('node', ['./dist/run.js'], {
+            RUNNING: process.env.RUNNING,
+            DEBUG:process.env.DEBUG
+        });
 
-    child.on('close', function (code) {
-        debug("Finished with code " + code);
-        if(!code || code === 15) {
-            if(process.env.RUNNING !== 'TEST') {
-                _start();
+        child.stdout.pipe(process.stdout);
+        child.stderr.pipe(process.stderr);
+        process.stdin.pipe(child.stdin);
+        process.stdin.resume();
+
+        debug('running server ('+process.env.RUNNING+')...');
+
+        //child.stdout.on('data', function (data) {   process.stdout.write(data.toString());  });
+
+        //child.stderr.on('data', function (data) {   process.stdout.write(data.toString());  });*/
+
+        child = spawn('node', ['./dist/run.js'], {
+            RUNNING: process.env.RUNNING,
+            DEBUG:process.env.DEBUG
+        });
+
+        debug('running server ('+process.env.RUNNING+')...');
+
+        child.stdout.on('data', function (data) {
+            data.toString().split('\n').map((data) => {
+                if(data.toString().trim() !== '') {
+                    let d = data.toString()
+                        .replace(/[A-Za-z,]{4} [1-9]{1,2} [A-Za-z]{3} [0-9]{4} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2} GMT /g, '');
+                    let head = d.slice(0,d.indexOf(' '));
+                    let message = d.replace(head, '');
+
+                    process.stdout.write(
+                        colors.yellow(head)+'\t\t'+message+'\n'
+                    );
+                }
+            })
+
+        });
+
+        child.stderr.on('data', function (data) {
+            data.toString().split('\n').map((data) => {
+                if(data.toString().trim() !== '') {
+                    let d = data.toString()
+                        .replace(/[A-Za-z,]{4} [1-9]{1,2} [A-Za-z]{3} [0-9]{4} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2} GMT /g, '');
+                    let head = d.slice(0,d.indexOf(' '));
+                    let message = d.replace(head, '');
+
+                    process.stdout.write(
+                        colors.yellow(head)+'\t\t'+message+'\n'
+                    );
+                }
+            })
+        });
+
+        child.on('close', function (code) {
+            debug("Finished with code " + code);
+            if(!code || code === 15) {
+                if(process.env.RUNNING !== 'TEST') {
+
+                    _start();
+                } else {
+                    process.exit();
+                }
             } else {
-                process.exit();
+                process.exit(0);
             }
-        } else {
-            process.exit(0);
-        }
+        });
     });
+
+
+
 }
 
 _start();

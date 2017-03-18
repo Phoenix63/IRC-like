@@ -1,20 +1,12 @@
 {
-  "name": "irc-test",
+  "name": "Pandirc-Server",
   "version": "1.0.0",
-  "description": "",
+  "description": "IRC-like Server with belote game!",
   "main": "app.js",
   "scripts": {
-    "dev": "docker-compose -f ./docker/dev.yml up",
-    "DEV": "babel src --out-dir dist --source-maps inline --copy-files && babel-node ./src/app.js DEV",
-    "TEST": "babel src --out-dir dist --source-maps inline --copy-files && babel-node ./src/app.js TEST",
-    "PROD": "babel src --out-dir dist --source-maps inline --copy-files && babel-node ./src/app.js PROD",
     "watch": "babel --watch src --out-dir dist --source-maps inline --copy-files",
-    "build": "babel src --out-dir dist --source-maps inline --copy-files",
-    "prod": "docker-compose -f ./docker/prod.yml up",
-    "test": "docker-compose -f ./docker/test.yml up",
-    "belote": "npm run build && DEBUG=*,-babel,-socket.io*,-engine*,-server:send RUNNING=DEV node dist/app"
+    "build": "babel src --out-dir dist --source-maps inline --copy-files"
   },
-  "author": "",
   "license": "ISC",
   "dependencies": {
     "async": "^2.1.5",
@@ -34,7 +26,6 @@
     "babel-core": "^6.23.1",
     "babel-preset-es2015": "^6.22.0",
     "babel-watch": "^2.0.6",
-    "nodemon": "^1.11.0",
     "should": "^11.2.0",
     "sinon": "^1.17.7"
   }

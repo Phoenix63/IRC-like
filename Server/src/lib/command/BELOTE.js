@@ -3,8 +3,7 @@
 import Belote from './../channel/Belote';
 import ERRSender from './../responses/ERRSender';
 
-let debug = require('debug')('belote');
-import colors from './../util/Color';
+let debug = require('debug')('pandirc:belote:command');
 
 module.exports = function (socket, command) {
     if (!socket.client.isRegistered) {
@@ -25,7 +24,6 @@ module.exports = function (socket, command) {
                         }
                     });
                     if (err) {
-                        debug('create');
                         let bel = new Belote(socket.client, name);
                         bel.addUser(socket.client);
                     }
