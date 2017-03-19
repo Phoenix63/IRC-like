@@ -77,10 +77,19 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				});
 			}
 			userInfo.filePort.on("file", function(msg){
+				$("#fileUpload").show();
 				if(msg.match(/^[\S]+[ ]FILE[ ]TRANSFERT[ ][\S\W]+/g)){
-					console.log("transfering...");
+					var rspTransfert = (/^[\S]+[ ]FILE[ ]TRANSFERT[ ]([\S\W]+)/g).exec(msg);
+					var percentString = rspTransfert[1];
+					percentString = percentString.replace(":","");
+					var number1 = percentString.split("/");
+					var n1 = parseInt(number1[0]);
+					var n2 = parseInt(number1[1]);
+					var percent = Math.ceil((n1/n2)*100);
+					$("#progbar").css("width","" + percent + "%");
 				}
 				else if(msg.match(/^[\S]+[ ]FILE/g)) {
+					$("#fileUpload").hide();
 					var msgFile = (/^[\S]+[ ]FILE[ ]([\S]+)/g).exec(msg);
 					var fileReceive = in_isFile(msgFile[1]);
 					fileReceive[0] = fileReceive[0].replace("http://127.0.0.1", user.server);
@@ -216,7 +225,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			userInfo.socket.emit("message", "KICK " + $scope.currentChannel.chan + " " + userL.nick);
 		}],
 		["Bann", function ($itemScope) {
-			//only if admin
+			userInfo.socket.emit("message", "MODE " + $scope.currentChannel.chan + " +b " + userL.nick);
 		}]
 	];};
 	
@@ -232,7 +241,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 	$scope.helpPandirc = function() {
 		bootbox.alert("<strong>Basic command</strong>" +
 					"<br />" +
-					"<p><div class = 'commandHelp'>/join #NameOfChannel</div> -> Join the the channel #NameOfChannel</p>" +
+					"<p><div class = 'commandHelp'>/join #NameOfChannel</div> -> Join or create the the channel #NameOfChannel</p>" +
 					"<p><div class = 'commandHelp'>/nick newNicl</div> -> Change youre nickname</p>" +
 					"<p><div class = 'commandHelp'>/part <#NameOfChannel></div> -> Part the channel #NameOfChannel or the current channel</p>" +
 					"<p><div class = 'commandHelp'>/topic <#NameOfChannel></div> -> Print the topic of the channel #NameOf channel or the current channel</p>" +
@@ -993,15 +1002,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 								for(var j = 2; j<tabFile.length; j++) {
 									mess = mess + " " + tabFile[j];
 								}
-								if(regxUser.right === 3) {//admin
-									if(isImage(urlFile)) {
-										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-admin-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'><img src='" + urlFile + "'/></a></p></div>"]);
-									}
-									else {
-										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-admin-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'>" + nameOfFile + "</a></p></div>"]);
-									}
-								}
-								else if(regxUser.right === 1) {//operator or creator of channel
+								if(regxUser.right === 1) {//operator or creator of channel
 									if(isImage(urlFile)) {
 										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'><img src='" + urlFile + "'/></a></p></div>"]);
 									}
@@ -1020,15 +1021,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 							}
 							else if(regxMsg.match(regFileWithoutMess)) {
 								var nameOfFile = in_isFile(regxMsg)[1];
-								if(regxUser.right === 3) {//admin
-									if(isImage(regxMsg)) {
-										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-admin-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p><p><a href='" + regxMsg + "' target='_blank'><img src='" + regxMsg + "'/></a></p></div>"]);
-									}
-									else {
-										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-admin-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p></div>"]);
-									}
-								}
-								else if(regxUser.right === 1) {//operator or creator of channel
+								if(regxUser.right === 1) {//operator or creator of channel
 									if(isImage(regxMsg)) {
 										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p><p><a href='" + regxMsg + "' target='_blank'><img src='" + regxMsg + "'/></a></p></div>"]);
 									}
@@ -1066,15 +1059,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						for(var j = 2; j<tabFile.length; j++) {
 							mess = mess + " " + tabFile[j];
 						}
-						if(regxUser.right === 3) {//admin
-							if(isImage(urlFile)) {
-								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-admin-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'><img src='" + urlFile + "'/></a></p></div>"]);
-							}
-							else {
-								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-admin-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'>" + nameOfFile + "</a></p></div>"]);
-							}
-						}
-						else if(regxUser.right === 1) {//operator or creator of channel
+						if(regxUser.right === 1) {//operator or creator of channel
 							if(isImage(urlFile)) {
 								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'><img src='" + urlFile + "'/></a></p></div>"]);
 							}
@@ -1093,15 +1078,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 					}
 					else if(regxMsg.match(regFileWithoutMess)) {
 						var nameOfFile = in_isFile(regxMsg)[1];
-						if(regxUser.right === 3) {//admin
-							if(isImage(regxMsg)) {
-								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-admin-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p><p><a href='" + regxMsg + "' target='_blank'><img src='" + regxMsg + "'/></a></p></div>"]);
-							}
-							else {
-								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-admin-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p></div>"]);
-							}
-						}
-						else if(regxUser.right === 1) {//operator or creator of channel
+						if(regxUser.right === 1) {//operator or creator of channel
 							if(isImage(regxMsg)) {
 								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p><p><a href='" + regxMsg + "' target='_blank'><img src='" + regxMsg + "'/></a></p></div>"]);
 							}
@@ -1343,7 +1320,9 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				var newNick = newUser.nick;
 				newNick = newNick.replace("@","");
 				newUser.setNick(newNick);
-				admin.push(newUser.nick);
+				if(admin.includes(newUser.nick) === false) {
+					admin.push(newUser.nick);
+				}
 			}
 			if($scope.currentChannel.chan !== "@accueil") {
 				for(var i = 0; i<$scope.channels.length; i++) {
@@ -1504,35 +1483,19 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			var mNames = "";
 			var channelName = isNames[0];
 			if(boolNames === false) { // refresh users list in every channels
-				for(var i = 0; i<$scope.channels.length; i++) {
-					if($scope.channels[i].chan === channelName) {
-						$scope.channels[i].listU = usersN;
-						if(channelSet === "=") {
-							$scope.channels[i].setRight(0);
-						}
-						else if(channelSet === "@") {
-							$scope.channels[i].setRight(1);
-						}
-						else {
-							$scope.channels[i].setRight(2);
-						}
-					}
-				}
 				if($scope.currentChannel.chan === channelName) {
 					$scope.currentChannel.listU = usersN;
-					if(channelSet === "=") {
-						$scope.currentChannel.setRight(0);
-					}
-					else if(channelSet === "@") {
-						$scope.currentChannel.setRight(1);
-					}
-					else {
-						$scope.currentChannel.setRight(2);
+				}
+				else {
+					for(var i = 0; i<$scope.channels.length; i++) {
+						if($scope.channels[i].chan === channelName) {
+							$scope.channels[i].listU = usersN;
+						}
 					}
 				}
 				for(var i = 0; i<$scope.currentChannel.listU.length; i++) {
 					if(admin.includes($scope.currentChannel.listU[i])) {
-						$scope.currentChannel.listU[i].setRight(3);
+						$scope.currentChannel.listU[i].setRight(1);
 					}
 				}
 				$scope.channels = isAdmin1(admin, $scope.channels);
@@ -1542,9 +1505,6 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				for(var i = 0; i<usersN.length; i++) {
 					if(usersN[i].right === 1) {
 						mNames = "(Operateur) " + usersN[i].nick + ", " + mNames;
-					}
-					else if(usersN[i].right === 2) {
-						mNames = "(Admin) " + usersN[i].nick + ", " + mNames;
 					}
 					else {
 						mNames = usersN[i].nick + ", " + mNames;
@@ -1720,11 +1680,22 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			var rspModeBan = rspBan[2];
 			var rspUserBan = rspBan[3];
 			var rspTimeBan = rspBan[4];
-			if(rspModeFlag === "+b") {
-				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The user " + rspModeUser + " is now banned from " + rspModeCh]);
+			if(user.nick === rspUserBan) {
+				if(rspModeFlag === "+b") {
+					bootbox.alert("You have benn banned in the channel " + rspChanBan + " time : " + rspTimeBan);
+				}
+				else if(rspModeFlag === "-b") {
+					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You are debanned from the channel " + rspChanBan]);
+				}
+				
 			}
-			else if(rspModeFlag === "-b") {
-				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The user " + rspModeUser + " coundn't join the " + rspModeCh]);
+			else {
+				if(rspModeFlag === "+b") {
+					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The user " + rspModeUser + " is now banned from " + rspModeCh]);
+				}
+				else if(rspModeFlag === "-b") {
+					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The user " + rspModeUser + " coundn't join the " + rspModeCh]);
+				}
 			}
 		}
 		else if(msg.match(/^:[\S]+[ ]221[ ]MODE[ ][\S]+[ ][\S]+$/)) {
@@ -1785,7 +1756,9 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			$scope.$connected = false;
 		}
 		else if(msg.match(/^[\S\w]+[ ]372[ ][\w\W]+$/)) {
-			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Welcome to the Pand'IRC Web Page"]);
+			var pandIRC = new User("PandIrcTeam");
+			pandIRC.setRight(2);
+			$scope.currentChannel.messages.push([pandIRC, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Welcome to the Pand'IRC Web Page"]);
 		}
 		else if(msg.match(/^[\S\w]+[ ]401[ ][\W\w]+$/)) {
 			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "This user isn't in the server or the channel doesn't exist"]);
@@ -1827,9 +1800,6 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			var list = in_isList(msg);
 			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Channel : " + list[0] + " with " + list[1] + " user(s) - Topic ->" + list[2]]);
 		}
-		else if(msg.match(/^:[0-9.a-z:]+[ ][3][7][2][ ][:][-][ ][\w\S]+$/)) { 
-            $scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Welcome " + user.realName]);
-        }
 		else if(msg.match(/^:[\S]+[ ]311[ ][\S\w]+[ ][\S\w]+[ ][\S]+[ ][*][ ][:][ ][\w\W]+$/)) {
 			var regXpTab = (/^:[\S]+[ ]311[ ]([\S\w]+)[ ]([\w\S]+)[ ][\S]+[ ][*][ ][:][ ]([\w\S]+)$/).exec(msg);
 			if(isCmdMute === true) {
@@ -1846,6 +1816,17 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			}
 			
 		}
+		else if(msg.match(/^[\S]+[ ]380[ ][\w\W]+$/)) {
+			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You are now an operator"]);
+			if(admin.includes(user.nick) === false) {
+				admin.push(user.nick);
+			}
+		}
+		else if(msg.match(/^[\S]+[ ]404[ ][#][\S\w]+[ ][\w\W]+$/)) {
+			var rspMsg = (/^[\S]+[ ]404[ ]([#][\S\w]+)[ ][\w\W]+$/).exec(msg);
+			var rspMsgCh = rspMsg[1];
+			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspMsgCh + " cannot have message from away"]);
+		}
 		else if(msg.match(/^[\S]+[ ]431[ ][\w\W]+$/)) {
 			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "This nickname is not valid"]);		
 		}
@@ -1856,6 +1837,11 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			var rspKeyWord = (/^[\S\w]+[ ]475[ ]([\w\W]+)\(\+k\)$/).exec(msg);
 			var rspKeyChn = rspKeyWord[1];
 			scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspKeyChn + " have a keyword"]);
+		}
+		else if(msg.match(/^[\w\S]+[ ]471[ ][#][\w\S]+[ ][\W\w]+\(\+l\)$/)) {
+			var rspLimitsUser = (/^[\w\S]+[ ]471[ ]([#][\w\S]+)[ ][\W\w]+\(\+l\)$/).exec(msg);
+			var rspLimitsCh = rspLimitsUser[1];
+			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The channel " + rspChanI + " couldn't be join anymore (limits of user)"]);
 		}
 		else if(msg.match(/^[\w\S]+[ ]473[ ][#][\w\S]+[ ][\W\w]+\(\+i\)$/)) {
 			var rspJoinI = (/^[\w\S]+[ ]473[ ]([#][\w\S]+)[ ][\W\w]+\(\+i\)$/).exec(msg);
@@ -1871,7 +1857,6 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 		else if(msg.includes("PING")===true) {
 			userInfo.socket.emit("message", "PONG");
 		}
-		
 		$scope.$apply();
     });
 
