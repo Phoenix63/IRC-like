@@ -118,7 +118,6 @@ private slots :
 
     }
 
-    void paste();
 
     void copy();
     //void keyPressEvent(QKeyEvent * event);
@@ -129,9 +128,6 @@ private slots :
 
 private:
     QMenu* m_pContextMenu;
-
-
-
 
     //Actions
     QAction* m_pCopy;

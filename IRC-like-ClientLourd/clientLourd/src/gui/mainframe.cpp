@@ -19,6 +19,7 @@
 #include <QGraphicsItem>
 #include <QLabel>
 
+
 #include "channellist.h"
 #include "ui_mainframe.h"
 #include "../channel/message.h"
@@ -59,18 +60,13 @@ MainFrame::MainFrame(QWidget *parent, QTcpSocket *socket, QString host) :
 
     //actions definitions :
      /* **************   ChatBox  *********************/
-    if(ui->chatBox->layout() && ui->nickBox->layout()){
 
-
-
-
-
-        m_pCopy = m_pContextMenu->addAction("Copier");
-        m_pRefresh = m_pContextMenu->addAction("Rafraîchir");
-        m_pClean = m_pContextMenu->addAction("Nettoyer écran");
-        m_pSendFile = m_pContextMenu->addAction("Envoi Fichier ...");
-        m_pClose = m_pContextMenu->addAction("Fermer");
-        m_pLogout = m_pContextMenu->addAction("Se déconnecter");
+    m_pCopy = m_pContextMenu->addAction("Copier");
+    m_pRefresh = m_pContextMenu->addAction("Rafraîchir");
+    m_pClean = m_pContextMenu->addAction("Nettoyer écran");
+    m_pSendFile = m_pContextMenu->addAction("Envoi Fichier ...");
+    m_pClose = m_pContextMenu->addAction("Fermer");
+    m_pLogout = m_pContextMenu->addAction("Se déconnecter");
 
     //SIGNALS SLOTS
     connect(m_pCopy,SIGNAL(triggered()),this,SLOT(copy()));
@@ -80,25 +76,19 @@ MainFrame::MainFrame(QWidget *parent, QTcpSocket *socket, QString host) :
     connect(m_pClose,SIGNAL(triggered()),this,SLOT(closeEvent(QCloseEvent *event)));
 
     connect(m_pLogout,SIGNAL(triggered()),this,SLOT(on_actionDisconnect_triggered()));
-    }
+
     /*****************  UserList *********************/
 
-    if (ui->userList->layout()){
-
-
-
-
-        m_pWhisper = m_pContextMenu->addAction("Message Privé");
-        //m_pBanUser = m_pContextMenu->addAction("Bannir");
-        m_pKickUser = m_pContextMenu->addAction("Faire quitter");
+    m_pWhisper = m_pContextMenu->addAction("Message Privé");
+    //m_pBanUser = m_pContextMenu->addAction("Bannir");
+    m_pKickUser = m_pContextMenu->addAction("Faire quitter");
 
     //connect(m_pBanUser,SIGNAL(triggered()),this,SLOT(on_userList_doubleClicked(QModelIndex));
     connect(m_pWhisper,SIGNAL(triggered()),this,SLOT(on_userList_doubleClicked(const QModelIndex &index)));
 
-    }
+
     /*****************  ChanList *********************/
 
-    //channel
 
 
 }
@@ -483,25 +473,6 @@ void MainFrame::on_userList_doubleClicked(const QModelIndex &index)
 
 /****************************** Right Click ****************************************/
 
-// clipboard management : copy paste cut
-
-
-void MainFrame::paste() //TO REMOVE ~~~~~~~~~~~~>
-{
-
-     const QClipboard *clipboard = QApplication::clipboard();
-     const QMimeData *mimeData = clipboard->mimeData();
-     QLabel label(mimeData->text());
-     if (mimeData->hasText()){
-         label.setText("");
-         label.setTextFormat(Qt::PlainText);
-
-
-      }
-      /*else {
-         data->setText(tr("Cannot display data"));
-      }*/
-}
 
 void MainFrame::copy()
 {
@@ -551,17 +522,3 @@ qDebug() << "Leave";
 return QWidget::event(e);
 }
 
-/*//whisper
-void MainFrame::whisper()
-{
-    MainFrame::on_userList_doubleClicked;
-    /*QModelIndex index;
-    return on_userList_doubleClicked();
-}
-//close
-void MainFrame::close()
-{
-    return MainFrame::closeEvent(QCloseEvent *event);
-}
-
-*/
