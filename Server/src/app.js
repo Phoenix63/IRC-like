@@ -14,22 +14,6 @@ function _start() {
     build.on('close', () => {
 
         debug('rebuilding success!');
-        /*child = spawn('node', ['./dist/run.js'], {
-            RUNNING: process.env.RUNNING,
-            DEBUG:process.env.DEBUG
-        });
-
-        child.stdout.pipe(process.stdout);
-        child.stderr.pipe(process.stderr);
-        process.stdin.pipe(child.stdin);
-        process.stdin.resume();
-
-        debug('running server ('+process.env.RUNNING+')...');
-
-        //child.stdout.on('data', function (data) {   process.stdout.write(data.toString());  });
-
-        //child.stderr.on('data', function (data) {   process.stdout.write(data.toString());  });*/
-
         child = spawn('node', ['./dist/run.js'], {
             RUNNING: process.env.RUNNING,
             DEBUG:process.env.DEBUG
@@ -41,12 +25,14 @@ function _start() {
             data.toString().split('\n').map((data) => {
                 if(data.toString().trim() !== '') {
                     let d = data.toString()
-                        .replace(/[A-Za-z,]{4} [1-9]{1,2} [A-Za-z]{3} [0-9]{4} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2} GMT /g, '');
-                    let head = d.slice(0,d.indexOf(' '));
-                    let message = d.replace(head, '');
+                        .replace(/[A-Za-z,]{4} [1-9]{1,2} [A-Za-z]{3} [0-9]{4} /g, '').replace(' GMT','');
+                    let date = d.slice(0,d.indexOf(' '));
+                    let head = d.replace(date+' ', '');
+                    head = head.slice(0, head.indexOf(' '));
+                    let message = d.replace(date+' ', '').replace(head+' ', '');
 
                     process.stdout.write(
-                        colors.yellow(head)+'\t\t'+message+'\n'
+                        colors.green(date)+':'+colors.yellow(head)+'\t\t'+message+'\n'
                     );
                 }
             })
@@ -57,12 +43,14 @@ function _start() {
             data.toString().split('\n').map((data) => {
                 if(data.toString().trim() !== '') {
                     let d = data.toString()
-                        .replace(/[A-Za-z,]{4} [1-9]{1,2} [A-Za-z]{3} [0-9]{4} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2} GMT /g, '');
-                    let head = d.slice(0,d.indexOf(' '));
-                    let message = d.replace(head, '');
+                        .replace(/[A-Za-z,]{4} [1-9]{1,2} [A-Za-z]{3} [0-9]{4} /g, '').replace(' GMT','');
+                    let date = d.slice(0,d.indexOf(' '));
+                    let head = d.replace(date+' ', '');
+                    head = head.slice(0, head.indexOf(' '));
+                    let message = d.replace(date+' ', '').replace(head+' ', '');
 
                     process.stdout.write(
-                        colors.yellow(head)+'\t\t'+message+'\n'
+                        colors.green(date)+':'+colors.yellow(head)+'\t\t'+message+'\n'
                     );
                 }
             })
@@ -70,9 +58,8 @@ function _start() {
 
         child.on('close', function (code) {
             debug("Finished with code " + code);
-            if(!code || code === 15) {
+            if(!code || code === 15 || code === 1) {
                 if(process.env.RUNNING !== 'TEST') {
-
                     _start();
                 } else {
                     process.exit();

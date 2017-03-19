@@ -13,8 +13,8 @@ module.exports = function (socket, command) {
         let allowed = {
             'JOIN': (arg) => {
                 let name = arg[1];
-                if (!name.match(/\W/g) || name.match(/\W/g).join('') !== '&' || name[0] !== '&' || name.length <= 1) {
-                    ERRSender.ERR_NOSUCHCHANNEL(socket.client, name);
+                if (!name || !name.match(/\W/g) || name.match(/\W/g).join('') !== '&' || name[0] !== '&' || name.length <= 1) {
+                    ERRSender.ERR_NOSUCHCHANNEL(socket.client, (name?name:'none'));
                 } else {
                     let err = true;
                     Belote.list().forEach((belote) => {
@@ -30,58 +30,57 @@ module.exports = function (socket, command) {
                 }
             },
             'READY': (arg) => {
-                try {
-                    let chan = arg[1];
-                    let state = arg[2];
+                let name = arg[1];
+                let state = arg[2];
 
-                    try {
+                if (!name || !name.match(/\W/g) || name.match(/\W/g).join('') !== '&' || name[0] !== '&' || name.length <= 1) {
+                    ERRSender.ERR_NOSUCHCHANNEL(socket.client, (name?name:'none'));
+                } else {
+                    if(!state || [0,1].indexOf(parseInt(state)) < 0) {
+                        ERRSender.ERR_NEEDMOREPARAMS(socket.client, 'BELOTE READY');
+                    } else {
                         Belote.list().forEach((belote) => {
-                            if(chan === belote.name) {
+                            if(name === belote.name) {
                                 belote.game.userSelectTeam(socket.client, state);
                             }
                         });
-                    } catch(e) {
-                        debug(e);
                     }
-
-                } catch(e) {
-                    ERRSender.ERR_NEEDMOREPARAMS(socket.client, 'BELOTE READY');
                 }
             },
             'TAKE': (arg) => {
-                try {
-                    let chan = arg[1];
-                    let color = arg[2];
+                let name = arg[1];
+                let color = arg[2];
 
-                    try {
+                if (!name || !name.match(/\W/g) || name.match(/\W/g).join('') !== '&' || name[0] !== '&' || name.length <= 1) {
+                    ERRSender.ERR_NOSUCHCHANNEL(socket.client, (name?name:'none'));
+                } else {
+                    if(!color || isNaN(parseInt(color)) || parseInt(color) < -1 || parseInt(color) > 3) {
+                        ERRSender.ERR_NEEDMOREPARAMS(socket.client, 'BELOTE TAKE');
+                    } else {
                         Belote.list().forEach((belote) => {
-                            if(chan === belote.name) {
+                            if(name === belote.name) {
                                 belote.game.userTakeTrump(socket.client, color);
                             }
                         });
-                    } catch(e) {
-                        debug(e);
                     }
-                } catch(e) {
-                    ERRSender.ERR_NEEDMOREPARAMS(socket.client, 'BELOTE TAKE');
                 }
             },
             'PLAY': (arg) => {
-                try {
-                    let chan = arg[1];
-                    let card = arg[2];
+                let name = arg[1];
+                let card = arg[2];
 
-                    try {
+                if (!name || !name.match(/\W/g) || name.match(/\W/g).join('') !== '&' || name[0] !== '&' || name.length <= 1) {
+                    ERRSender.ERR_NOSUCHCHANNEL(socket.client, (name?name:'none'));
+                } else {
+                    if(!card || isNaN(parseInt(card)) || parseInt(card) < 0 || parseInt(card) > 31) {
+                        ERRSender.ERR_NEEDMOREPARAMS(socket.client, 'BELOTE TAKE');
+                    } else {
                         Belote.list().forEach((belote) => {
-                            if(chan === belote.name) {
+                            if(name === belote.name) {
                                 belote.game.userPlayCard(socket.client, card);
                             }
                         });
-                    } catch(e) {
-                        debug(e);
                     }
-                } catch(e) {
-                    ERRSender.ERR_NEEDMOREPARAMS(socket.client, 'BELOTE PLAY');
                 }
             }
         }

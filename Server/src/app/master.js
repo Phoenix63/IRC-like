@@ -2,6 +2,7 @@ import RedisInterface from './../lib/data/RedisInterface';
 import dbSaver from './../lib/data/dbSaver';
 import dbLoader from './../lib/data/dbLoader';
 import colors from './../lib/util/Color';
+import Channel from './../lib/channel/Channel';
 process.title = 'pandirc:master';
 
 module.exports = {
@@ -67,9 +68,12 @@ function run(cluster) {
                     server.disconnect();
                     server.kill();
                 }
+            } else if (message.getChannels) {
+                server.send({
+                    type: 'channels',
+                    channels: Channel.list()
+                });
             }
-
-
         });
         server.on('exit', () => {
             if(server._quitSignal && server._quitSignal === 'quit') {

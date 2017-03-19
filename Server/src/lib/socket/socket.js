@@ -10,7 +10,7 @@ let debug = require('debug')('pandirc:socket');
 let sockets = [];
 let bannedIP = {};
 
-const interval = config.timeout;
+const interval = config.timeout*1000;
 
 class Socket {
     /**
@@ -37,7 +37,7 @@ class Socket {
                     this._life--;
                     this.send(':' + config.ip + ' PING :' + shortid.generate());
                 }
-            }, interval / 2);
+            }, interval);
         }
 
     }
@@ -216,6 +216,9 @@ class Socket {
     static setBan(ipban){
         bannedIP = ipban;
         Redis.setBannedIP(bannedIP);
+    }
+    static list(){
+        return sockets;
     }
 }
 

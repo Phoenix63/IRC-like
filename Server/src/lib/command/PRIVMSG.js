@@ -36,6 +36,7 @@ module.exports = function (socket, command) {
     let error = true;
     if (receivers.indexOf('@global') >= 0 && socket.client.isAdmin()) {
         socket.broadcast(':@[ADMIN]' + socket.client.name + ' PRIVMSG @global :' + message);
+        receivers.splice(receivers.indexOf('@global'), 1);
     }
     let clients = {};
     let channels = {};
@@ -51,7 +52,7 @@ module.exports = function (socket, command) {
             if (clients[r].away) {
                 RPLSender.RPL_AWAY(socket, clients[r].name, clients[r].away);
             } else {
-                clients[r].socket.send(':' + socket.client.name + ' PRIVMSG ' + r + ' :' + message);
+                RPLSender.PRIVMSG(socket, clients[r], message);
             }
         } else if (channels[r]) {
             if ((channels[r].channelFlags.indexOf('n') > -1 && channels[r].users.indexOf(socket.client) >= 0) || channels[r].channelFlags.indexOf('n') === -1) {
@@ -63,7 +64,8 @@ module.exports = function (socket, command) {
                     channels[r].addFile(socket.client, url);
                     message.replace(url, '[FILE=' + url + ']');
                 });
-                channels[r].broadcast(':' + socket.client.name + ' PRIVMSG ' + r + ' :' + message, socket.client);
+                RPLSender.PRIVMSG(socket, channels[r], message);
+                channels[r].addMessage(socket.client, message);
             } else {
                 ERRSender.ERR_CANNOTSENDTOCHAN(socket.client, r);
             }

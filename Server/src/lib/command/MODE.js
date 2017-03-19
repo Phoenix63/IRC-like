@@ -161,7 +161,7 @@ module.exports = function (socket, command) {
         } else if (user != socket.client) {
             /*Possibility of change*/
             if (!user.isRegisteredWithPass()) {
-                ERRSender.ERR_NOTREGISTERED(socket.client, "MODE");
+                ERRSender.ERR_USERSDONTMATCH(socket.client);
                 return;
             }
             if (socket.client.isSuperAdmin()) {

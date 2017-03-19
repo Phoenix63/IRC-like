@@ -85,6 +85,7 @@ class Game {
     }
 
     _roundParser() {
+        this._round++;
         let t1 = this.teams[0];
         let t2 = this.teams[1];
         let t1p = 0;
@@ -129,6 +130,7 @@ class Game {
             });
 
             this._teams = [new Team(this, 0), new Team(this, 1)];
+            this._round = 0;
             this.state = 0;
 
         } else {
@@ -169,7 +171,8 @@ class Game {
             player._hand = [];
         });
         this._teams = [new Team(this, 0), new Team(this, 1)];
-
+        this._points = [0,0];
+        this._round = 0;
     }
 
     userSelectTeam(client, teamId) {

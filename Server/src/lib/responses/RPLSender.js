@@ -1,6 +1,7 @@
 import Channel from './../channel/Channel';
 import config from './../../config.json';
 import Client from './../client/Client';
+import ERRSender from './ERRSender';
 
 let RPLSender = {
 
@@ -164,6 +165,9 @@ let RPLSender = {
 
     RPL_ENDOFMOTD: (socket) => {
         socket.send(':' + config.ip + ' 376 :End of /MOTD command');
+        if(socket.client.isAdmin()) {
+            RPLSender.RPL_YOUREOPER(socket);
+        }
     },
 
     /**
@@ -311,7 +315,38 @@ let RPLSender = {
      */
     RMFILE: (socket, chan, file) => {
         chan.broadcast(':' + socket.client.name + ' RMFILE :' + file, null);
+    },
+
+    RPL_YOUREOPER: (socket) => {
+        socket.send(':'+config.ip+' 381 :You are now an IRC operator');
+    },
+
+    RPL_PASSCHANGED: (socket) => {
+        socket.send(':'+config.ip+' 399 :Your password has been updated');
+    },
+
+    /**
+     *
+     * @param {Socket} socket
+     * @param {Client|Channel} receiver
+     * @param {string} message
+     * @param {Client|null} to
+     * @constructor
+     */
+    PRIVMSG: (socket, receiver, message, to=null) => {
+        if(receiver instanceof Channel) {
+            if(!to) {
+                receiver.broadcast(':' + socket.client.name + ' PRIVMSG '+receiver.name+' :'+message, socket.client);
+            } else {
+                to.socket.send(':' + socket.client.name + ' PRIVMSG '+receiver.name+' :'+message);
+            }
+        } else if (receiver instanceof Client) {
+            receiver.socket.send(':' + socket.client.name + ' PRIVMSG '+receiver.name+' :'+message);
+        } else {
+            ERRSender.ERR_NOSUCHNICK(socket.client, (receiver || {name:'none'}).name);
+        }
     }
+
 
 };
 export default RPLSender

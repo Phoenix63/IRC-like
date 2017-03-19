@@ -12,7 +12,7 @@ class Channel {
 
     /**
      *
-     * @param {Client} creator
+     * @param {Client|Object} creator
      * @param {string} name
      * @param {string} pass
      * @param {number} size
@@ -43,6 +43,7 @@ class Channel {
         this._persistent = false;
         this._topic = topic;
         this._files = {};
+        this._savedMessages = [];
 
         if (this._pass.length > 0) {
             this._addChannelFlag('p');
@@ -64,6 +65,16 @@ class Channel {
             channels.push(this);
         }
 
+    }
+
+    addMessage(user, message) {
+        if(this._savedMessages.length > 10) {
+            this._savedMessages.shift();
+        }
+        this._savedMessages.push({
+            user: user,
+            message: message
+        });
     }
 
 
@@ -212,7 +223,7 @@ class Channel {
      * @private
      */
     _mergeToRedis() {
-        if (this._persistent) {
+        if (this._persistent && this.name[0] === '#') {
             Redis.setChannel(this);
         }
     }
@@ -272,6 +283,21 @@ class Channel {
 
     deleteFiles() {
         this._files = {};
+    }
+
+    remove() {
+
+        this._persistent = false;
+        if(this._users.length > 0) {
+            while(this._users.length > 0) {
+                this.removeUser(this._users[0]);
+            }
+        } else {
+            channels.splice(channels.indexOf(this), 1);
+        }
+
+
+        Redis.deleteChannel(this);
     }
 
     /**
@@ -429,6 +455,10 @@ class Channel {
             if (!this._usersFlags[user.identity]) {
                 this._usersFlags[user.identity] = '';
             }
+
+
+            user.addChannel(this);
+
             RPLSender.JOIN(user, this);
             RPLSender.RPL_TOPIC('JOIN', user, this);
             RPLSender.RPL_NAMREPLY(user, this);
@@ -445,7 +475,9 @@ class Channel {
             });
 
             this._mergeToRedis();
-
+            this._savedMessages.forEach((arr) => {
+                RPLSender.PRIVMSG(arr.user.socket, this, arr.message, user);
+            });
         }
     }
 
@@ -460,6 +492,9 @@ class Channel {
             ERRSender.ERR_NOTONCHANNEL(user, this);
         } else {
             this._users.splice(index, 1);
+            if(this._usersFlags[user.identity] && !user.isRegisteredWithPass()) {
+                delete this._usersFlags[user.identity];
+            }
             RPLSender.PART(user, this, message);
 
             if (!bool) {
@@ -607,6 +642,26 @@ class Channel {
      */
     static list() {
         return channels;
+    }
+
+    /**
+     *
+     * @param {Array<Channel>} chans
+     */
+    static updateList(chans) {
+        chans.map((c) => {
+            let chan =
+                new Channel(
+                    {identity: c._creator},
+                    c._name,
+                    c._pass,
+                    c._size,
+                    c._topic
+                );
+            chan.flags = c._flags;
+            chan._usersFlags = c._usersFlags;
+            chan._files = c._files;
+        });
     }
 }
 

@@ -50,8 +50,8 @@ class RPLManager {
         this.game.broadcast(this.head+' 1008 :donald is '+card);
     }
 
-    playerTake(turn, trump) {
-        this.game.broadcast(this.head+' 1009 : player '+turn+' take '+trump+' color '+trump.color);
+    playerTake(turn, trump, color) {
+        this.game.broadcast(this.head+' 1009 :player '+turn+' take '+trump+' color '+color);
     }
 
     playerTurn(player, cards) {
@@ -85,7 +85,7 @@ class RPLManager {
     }
 
     endOfFold(cards) {
-        this.game.broadcast(this.head+' 1017 : end of fold '+cards);
+        this.game.broadcast(this.head+' 1017 :end of fold '+cards);
     }
 
     /*

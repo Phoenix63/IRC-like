@@ -15,18 +15,19 @@ module.exports = function (socket, command) {
     try {
         let cmd = command[1].split(' ');
         let chan = cmd[0];
-        let user = cmd[1];
 
-        if(!user && socket.client.isAdmin()) {
-            user = chan[0];
+        if(!cmd[1] && socket.client.isAdmin()) {
+            let user = chan;
 
-            client = Client.getClient(user);
+            let kicked = Client.getClient(user);
 
-            if(client) {
-
-                RPLSender.SKICK(socket.client, kicked.name);
-                client.socket.close();
-
+            if(kicked) {
+                if(socket.client.isAdmin() && !kicked.isAdmin() || socket.client.isSuperAdmin()) {
+                    RPLSender.SKICK(socket.client, kicked);
+                    kicked.socket._socket.destroy();
+                } else {
+                    ERRSender.ERR_NOPRIVILEGES(socket.client);
+                }
 
             } else {
                 ERRSender.ERR_NOSUCHNICK(socket.client, user);
@@ -44,9 +45,9 @@ module.exports = function (socket, command) {
                 ERRSender.ERR_NOSUCHCHANNEL(socket.client, chan);
             } else {
                 if (channel.isUserOperator(socket.client)) {
-                    let kicked = channel.getUser(user);
+                    let kicked = channel.getUser(cmd[1]);
                     if (kicked) {
-                        RPLSender.KICK(socket.client, kicked.name, channel);
+                        RPLSender.KICK(socket.client, kicked, channel);
                         channel.removeUser(kicked);
                     } else {
                         ERRSender.ERR_NOTONCHANNEL(socket.client, chan);
@@ -61,6 +62,7 @@ module.exports = function (socket, command) {
 
 
     } catch (e) {
+        console.log(e);
         ERRSender.ERR_NEEDMOREPARAMS(socket.client, 'KICK');
     }
 
