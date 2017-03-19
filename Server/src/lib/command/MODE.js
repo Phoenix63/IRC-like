@@ -153,13 +153,22 @@ module.exports = function (socket, command) {
             }
         } else if (user != socket.client) {
             /*Possibility of change*/
-            if (!user.isRegisteredWithPass()) {
+            if (!user.isRegisteredWithPass() && flags.indexOf('o') >= 1) {
                 ERRSender.ERR_NOTREGISTERED(socket.client, "MODE");
                 return;
             }
             if (socket.client.isSuperAdmin()) {
                 if (flags.indexOf('o') > -1) {
                     user.changeFlag(sign, 'o');
+                }
+                if(flags.indexOf('b')>-1){
+                    if(operator=='+'){
+                        //server.ban(id)
+                        //user.disconnect
+                    }else{
+                        //server.unban(id)
+                    }
+
                 }
             } else if (socket.client.isAdmin() && !user.isAdmin() && !user.isSuperAdmin()) {
                 if (flags.indexOf('o') > -1) {

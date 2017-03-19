@@ -20,6 +20,10 @@ class Redis {
         });
     }
 
+    static setBannedIP(bannedIP) {
+        //client.hmset("bans",);
+    }
+
     static setChannel(channel) {
         client.hmset(
             "channels",
