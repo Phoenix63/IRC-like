@@ -57,29 +57,33 @@ private:
 	bool out_isModeMsg(QString string);
 	bool out_isTopicMsg(QString string);
 	bool out_isKickMsg(QString string);
+    bool out_isServKickMsg(QString string);
 	bool out_isWhoMsg(QString string);
 	bool out_isWhoisMsg(QString string);
 	bool out_isMsgMsg(QString string);
 	bool out_isPrivMsg(QString string);
 	bool out_isAwayMsg(QString string);
 	bool out_isInvMsg(QString string);
-	bool out_isListFile(QString string);
-	bool out_isRmFile(QString string);
+    bool out_isListFileMsg(QString string);
+    bool out_isRmFileMsg(QString string);
+	bool out_isBeloteMsg(QString string);
+    bool out_isRmChanMsg(QString string);
 
 	// In functions
-	bool in_isInitMesg(QString string);
+    bool in_isInitMsg(QString string);
 	bool in_isChanList(QString string);
 	bool in_isNameList(QString string);
 	bool in_isJoinNote(QString string);
 	bool in_isPartNote(QString string);
 	bool in_isQuitNote(QString string);
-	bool in_isPrivMesg(QString string);
-	bool in_isWhisMesg(QString string);
+    bool in_isPrivMsg(QString string);
+    bool in_isWhisMsg(QString string);
 	bool in_isNickEdit(QString string);
-	bool in_isKickMesg(QString string);
+    bool in_isKickMsg(QString string);
+    bool in_isEndKickMsg(QString string);
 	bool in_isSetTopic(QString string);
 	bool in_isPing(QString string);
-	bool in_isListMesg(QString string);
+    bool in_isListMsg(QString string);
     bool in_isNoNick(QString string);
     bool in_isNoChan(QString string);
     bool in_isUserMode(QString string);
@@ -87,9 +91,11 @@ private:
 	bool in_isAwayStatus(QString string);
 	bool in_isAwayPrivMsg(QString string);
 	bool in_isInvMsg(QString string);
+	bool in_isInvBelMsg(QString string);
+	bool in_isBeloteMsg(QString string);
 	bool in_isConfirmInv(QString string);
-	bool in_isListFile(QString string);
-	bool in_isRmFile(QString string);
+    bool in_isListFileMsg(QString string);
+    bool in_isRmFileMsg(QString string);
 private:
 	// Pointer to the channel and socket created in mainframe
 	User self;

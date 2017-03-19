@@ -24,7 +24,7 @@ head:
 compile:
 	make head
 	echo -e "> executing qmake ..."
-	qmake chatIRC.pro
+	qmake ChatIRC.pro
 	echo -e "> compiling ..."
 	make -f chatIRC.make
 	echo -e "> done"

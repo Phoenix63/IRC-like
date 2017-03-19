@@ -1,5 +1,6 @@
 #include "parser.h"
 
+#include <QMediaPlayer>
 #include <QMessageBox>
 #include <QRegularExpression>
 #include <QString>
@@ -62,18 +63,21 @@ bool Parser::out(QString string)
     if (!out_isPassMsg(string))
     if (!out_isPartMsg(string))
     if (!out_isListMsg(string))
-    if (!out_isListFile(string))
-	if (!out_isRmFile(string))
+    if (!out_isListFileMsg(string))
+    if (!out_isRmFileMsg(string))
     if (!out_isCleanMsg(string))
     if (!out_isDebugMsg(string))
     if (!out_isModeMsg(string))
     if (!out_isTopicMsg(string))
     if (!out_isKickMsg(string))
+    if (!out_isServKickMsg(string))
     if (!out_isWhoisMsg(string))
     if (!out_isWhoMsg(string))
     if (!out_isMsgMsg(string))
-	if (!out_isAwayMsg(string))
+    if (!out_isAwayMsg(string))
     if (!out_isInvMsg(string))
+    if (!out_isBeloteMsg(string))
+    if (!out_isRmChanMsg(string))
     if (!out_isPrivMsg(string))
         return false;
     return true;
@@ -89,27 +93,30 @@ void Parser::in(QString string)
     string = string.left(string.length() - 1);
     string = string.right(string.length() - 2);
     //Parse the message starting from error code to detect server name
-    if (!in_isInitMesg(string))
+    if (!in_isInitMsg(string))
     if (!in_isChanList(string))
     if (!in_isNameList(string))
     if (!in_isJoinNote(string))
     if (!in_isPartNote(string))
-	if (!in_isQuitNote(string))
-    if (!in_isPrivMesg(string))
-    if (!in_isWhisMesg(string))
+    if (!in_isQuitNote(string))
+    if (!in_isPrivMsg(string))
+    if (!in_isWhisMsg(string))
     if (!in_isNickEdit(string))
-    if (!in_isListMesg(string))
-    if (!in_isListFile(string))
-	if (!in_isRmFile(string))
+    if (!in_isListMsg(string))
+    if (!in_isListFileMsg(string))
+    if (!in_isRmFileMsg(string))
     if (!in_isSetTopic(string))
-    if (!in_isKickMesg(string))
+    if (!in_isKickMsg(string))
+    if (!in_isEndKickMsg(string))
     if (!in_isNoNick(string))
     if (!in_isNoChan(string))
     if (!in_isUserMode(string))
     if (!in_isChanMode(string))
-	if (!in_isAwayStatus(string))
-	if (!in_isAwayPrivMsg(string))
+    if (!in_isAwayStatus(string))
+    if (!in_isAwayPrivMsg(string))
     if (!in_isInvMsg(string))
+    if (!in_isInvBelMsg(string))
+    if (!in_isBeloteMsg(string))
     if (!in_isConfirmInv(string))
     if (!in_isPing(string)) {
         channel->appendChannel(string, "\"Debug\"", nullptr);
@@ -159,8 +166,10 @@ bool Parser::out_isJoinMsg(QString string)
 {
     if (!string.startsWith("/join"))
         return false;
-    string = string.right(string.length() - 5);
-    string.prepend("JOIN");
+    string = string.right(string.length() - 6);
+    if (!string.startsWith('#'))
+        string.prepend('#');
+    string.prepend("JOIN ");
     sendToServer(socket, string);
     return true;
 }
@@ -211,7 +220,7 @@ bool Parser::out_isListMsg(QString string)
     return true;
 }
 
-bool Parser::out_isListFile(QString string)
+bool Parser::out_isListFileMsg(QString string)
 {
     if(!string.startsWith("/files"))
         return false;
@@ -223,7 +232,7 @@ bool Parser::out_isListFile(QString string)
     return true;
 }
 
-bool Parser::out_isRmFile(QString string)
+bool Parser::out_isRmFileMsg(QString string)
 {
     if(!string.startsWith("/rmfile"))
         return false;
@@ -241,10 +250,12 @@ bool Parser::out_isTopicMsg(QString string)
 {
     if(!string.startsWith("/topic"))
         return false;
-    string = string.right(string.length() - 6);
-    string.prepend("TOPIC");
-    if (string.contains(QRegularExpression("^TOPIC\\s*$")))
+    if (string.contains(QRegularExpression("^/topic\\s*$")))
         string="TOPIC " + channel->channelName() + '\n';
+    else {
+        string = string.right(string.length() - 7);
+        string.prepend("TOPIC " + channel->channelName() + " :");
+    }
     sendToServer(socket, string);
     return true;
 }
@@ -254,6 +265,16 @@ bool Parser::out_isKickMsg(QString string)
     if (!string.startsWith("/kick"))
         return false;
     string = string.right(string.length() - 5);
+    string.prepend("KICK " + channel->channelName());
+    sendToServer(socket, string);
+    return true;
+}
+
+bool Parser::out_isServKickMsg(QString string)
+{
+    if (!string.startsWith("/serverkick"))
+        return false;
+    string = string.right(string.length() - 11);
     string.prepend("KICK");
     sendToServer(socket, string);
     return true;
@@ -261,12 +282,14 @@ bool Parser::out_isKickMsg(QString string)
 
 bool Parser::out_isWhoMsg(QString string)
 {
-    if(!string.startsWith("/who"))
+    if (!string.startsWith("/who"))
         return false;
-    string = string.right(string.length() - 4);
-    string.prepend("WHO");
-    if (channel->channelName() != "\"Debug\"")
-        string = QString("WHO " + (channel->channelName()) + '\n');
+    if (string.contains(QRegularExpression("^/who\\s*$")))
+        string = "WHO " + channel->channelName() + '\n';
+    else {
+        string = string.right(string.length() - 4);
+        string.prepend("WHO");
+    }
     sendToServer(socket, string);
     channel->change("\"Debug\"");
     emit changeChannelSignal();
@@ -300,15 +323,17 @@ bool Parser::out_isMsgMsg(QString string)
     if (!string.startsWith("/msg"))
         return false;
     string.replace(QString("/msg"), QString("PRIVMSG"));
-    channel->joinWhisper(string.split(' ').at(1));
-    channel->change(string.split(' ').at(1));
+    if (!string.split(' ').at(1).startsWith('#')) {
+        channel->joinWhisper(string.split(' ').at(1));
+        channel->change(string.split(' ').at(1));
+        int j = string.indexOf(QRegularExpression(":.+$"));
+        QString message = string.right(string.length() - j - 1);
+        message.remove(message.length() - 1, 1);
+        channel->appendCurrent(message, &self);
+        emit changeChannelSignal();
+        emit channelModifiedSignal();
+    }
     sendToServer(socket, string);
-    int j = string.indexOf(QRegularExpression(":.+$"));
-    QString message = string.right(string.length() - j - 1);
-    message.remove(message.length() - 1, 1);
-    channel->appendCurrent(message, &self);
-    emit changeChannelSignal();
-    emit channelModifiedSignal();
     return true;
 }
 
@@ -353,10 +378,34 @@ bool Parser::out_isQuitMsg(QString string)
     return true;
 }
 
+bool Parser::out_isRmChanMsg(QString string)
+{
+    if (!string.startsWith("/rmchan"))
+        return false;
+    string.trimmed();
+    if (string.split(' ').size() == 1)
+        string = "RMCHAN " + channel->channelName();
+    else
+        string = "RMCHAN " + string.split(' ').at(1);
+    string.append('\n');
+    sendToServer(socket, string);
+    channel->change("\"Debug\"");
+    emit changeChannelSignal();
+    return true;
+}
+
+bool Parser::out_isBeloteMsg(QString string)
+{
+    if (!string.startsWith("/belote"))
+        return false;
+    string.replace(QString("/belote"), QString("BELOTE JOIN"));
+    sendToServer(socket, string);
+    return true;
+}
 /*
  * Parseur: In private function's
  */
-bool Parser::in_isInitMesg(QString string)
+bool Parser::in_isInitMsg(QString string)
 {
     if (!string.contains(IRC::RPL::NOTICE))
         return false;
@@ -374,8 +423,12 @@ bool Parser::in_isChanList(QString string)
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString chan = string.split(' ').at(3);
     QString topic = string.right(string.length() - j - 1);
-    channel->join(chan, topic);
-    emit channelModifiedSignal();
+    if (chan.startsWith('&')) {
+        channel->joinBelote(chan, socket, self.name());
+    } else {
+        channel->join(chan, topic);
+        emit channelModifiedSignal();
+    }
     return true;
 }
 
@@ -383,10 +436,10 @@ bool Parser::in_isNameList(QString string)
 {
     if (!string.contains(IRC::RPL::NAMEREPLY))
         return false;
-    channel->change("\"Debug\"");
     channel->appendChannel(string, "\"Debug\"", nullptr);
     QString tmp = string.split(':').last();
     QString chan = string.split(' ').at(4);
+    channel->change(chan);
     QStringList users = tmp.split(' ');
     for (auto i:users){
         channel->addUser(i,chan);
@@ -427,7 +480,7 @@ bool Parser::in_isPartNote(QString string)
     if (user.compare(self.name())) {
         channel->appendChannel(user + " left " + chan + ' ' + message, chan, nullptr);
         channel->removeUser(user, chan);
-    } else {
+    } else if (!chan.startsWith('&')){
         channel->leave(chan);
         emit channelModifiedSignal();
     }
@@ -437,12 +490,12 @@ bool Parser::in_isPartNote(QString string)
 
 bool Parser::in_isQuitNote(QString string)
 {
-	if (!string.contains(IRC::RPL::QUIT))
-		return false;
+    if (!string.contains(IRC::RPL::QUIT))
+        return false;
     QString user = string.split(' ').at(0);
     for (auto i:channel->channelNames()) {
         if (i == user) {
-			channel->appendChannel(user + " disconnected from server.", i, nullptr);
+            channel->appendChannel(user + " disconnected from server.", i, nullptr);
             emit lineAddedSignal();
         }
     }
@@ -450,10 +503,17 @@ bool Parser::in_isQuitNote(QString string)
     return true;
 }
 
-bool Parser::in_isPrivMesg(QString string)
+bool Parser::in_isPrivMsg(QString string)
 {
     if (!string.contains(IRC::RPL::PRIVMSG))
         return false;
+    QString mention = '@' + self.name();
+    if (string.contains(mention)) {
+        QMediaPlayer *player = new QMediaPlayer;
+        player->setMedia(QUrl::fromLocalFile("ressources/AH.mp3"));
+        player->setVolume(30);
+        player->play();
+    }
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString message = string.right(string.length() - j - 1);
     QString chan = string.split(' ').at(2);
@@ -466,10 +526,17 @@ bool Parser::in_isPrivMesg(QString string)
     return true;
 }
 
-bool Parser::in_isWhisMesg(QString string)
+bool Parser::in_isWhisMsg(QString string)
 {
     if (!string.contains(IRC::RPL::WHISPER))
         return false;
+    QString mention = '@' + self.name();
+    if (string.contains(mention)) {
+        QMediaPlayer *player = new QMediaPlayer;
+        player->setMedia(QUrl::fromLocalFile("ressources/AH.mp3"));
+        player->setVolume(30);
+        player->play();
+    }
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString sender = string.split(' ').at(0);
     QString message = string.right(string.length() - j - 1);
@@ -491,7 +558,7 @@ bool Parser::in_isNickEdit(QString string)
     QString newNick = string.split(' ').at(2);
     for (auto i:channel->channelNames()) {
         if (channel->contains(nick, i))
-    		channel->appendChannel(nick + " changed his nickname to " + newNick, i, "");
+            channel->appendChannel(nick + " changed his nickname to " + newNick, i, "");
         if (i == nick) {
             channel->changeName(nick, newNick);
             emit channelModifiedSignal();
@@ -499,33 +566,43 @@ bool Parser::in_isNickEdit(QString string)
     }
     if (!nick.compare(self.name()))
         nickname(newNick);
-	channel->changeNick(nick, newNick);
-	emit userModifiedSignal();
+    channel->changeNick(nick, newNick);
+    emit userModifiedSignal();
     emit chatModifiedSignal();
     return true;
 }
 
-bool Parser::in_isKickMesg(QString string)
+bool Parser::in_isKickMsg(QString string)
 {
-    if(!string.contains(IRC::RPL::KICK))
+    if (!string.contains(IRC::RPL::KICK))
         return false;
     QString admin = string.split(' ').at(0);
     QString chan = string.split(' ').at(2);
     QString kicked = string.split(' ').at(3);
     if(!kicked.compare(self.name())) {
-        channel->appendChannel("You were kicked from " + chan + " by " + admin, "\"Debug\"", "");
+        channel->appendChannel("You were kicked from " + chan + " by " + admin, "\"Debug\"", nullptr);
         channel->leave(chan);
     } else {
-    	channel->appendChannel(kicked + " was kicked by " + admin, chan, "");
-	}
+        channel->appendChannel(kicked + " was kicked by " + admin, chan, "");
+    }
     emit channelModifiedSignal();
     emit changeChannelSignal();
     return true;
 }
 
+bool Parser::in_isEndKickMsg(QString string)
+{
+    if (!string.contains(IRC::RPL::ENDOFKICK))
+        return false;
+    QString chan = string.split(' ').at(2);
+    channel->appendChannel("Your mode in " + chan + " has been updated", "\"Debug\"", "");
+    emit channelModifiedSignal();
+    return true;
+}
+
 bool Parser::in_isPing(QString string)
 {
-    if(!string.contains(IRC::RPL::PING))
+    if (!string.contains(IRC::RPL::PING))
         return false;
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString pong = string.right(string.length() - j) + '\n';
@@ -534,7 +611,7 @@ bool Parser::in_isPing(QString string)
     return true;
 }
 
-bool Parser::in_isListMesg(QString string)
+bool Parser::in_isListMsg(QString string)
 {
     if(!string.contains(IRC::RPL::LIST))
         return false;
@@ -545,7 +622,7 @@ bool Parser::in_isListMesg(QString string)
     return true;
 }
 
-bool Parser::in_isListFile(QString string)
+bool Parser::in_isListFileMsg(QString string)
 {
     if (!string.contains(IRC::RPL::FILELIST))
         return false;
@@ -557,7 +634,7 @@ bool Parser::in_isListFile(QString string)
     return true;
 }
 
-bool Parser::in_isRmFile(QString string)
+bool Parser::in_isRmFileMsg(QString string)
 {
     if (!string.contains(IRC::RPL::RMFILE))
         return false;
@@ -586,11 +663,35 @@ bool Parser::in_isInvMsg(QString string)
     if (!string.contains(QRegularExpression(IRC::RPL::INVITED)))
         return false;
     QString chan = string.split(' ').at(3);
-	QString tmp = "Do you want to join : " + chan + '?';
+    QString tmp = "Do you want to join : " + chan + '?';
     if (QMessageBox::Yes == QMessageBox(QMessageBox::Information, "Invitation", "Do you want to join : " + chan + '?', QMessageBox::Yes|QMessageBox::No).exec())
     {
         sendToServer(socket, "JOIN " + chan + '\n');
     }
+    return true;
+}
+
+bool Parser::in_isInvBelMsg(QString string)
+{
+    if (!string.contains(QRegularExpression(IRC::RPL::INVBELOTE)))
+        return false;
+    QString chan = string.split(' ').at(3);
+    QString tmp = "Do you want to play belote in : " + chan + '?';
+    if (QMessageBox::Yes == QMessageBox(QMessageBox::Information, "Invitation", "Do you want to join : " + chan + '?', QMessageBox::Yes|QMessageBox::No).exec())
+    {
+        sendToServer(socket, "BELOTE JOIN " + chan + '\n');
+    }
+    return true;
+}
+
+bool Parser::in_isBeloteMsg(QString string)
+{
+    QString chan = string.split(' ').at(2);
+    if (!string.contains(QRegularExpression(IRC::RPL::BELOTE)))
+        return false;
+    int j = string.indexOf(QRegularExpression("BELOTE"));
+    QString message = string.right(string.length() - j);
+    channel->beloteParse(chan, message);
     return true;
 }
 
@@ -664,6 +765,7 @@ bool Parser::in_isChanMode(QString string)
         return false;
     modeParser->parseChan(string);
     emit channelModifiedSignal();
+    emit chatModifiedSignal();
     return true;
 }
 
@@ -673,6 +775,6 @@ bool Parser::in_isUserMode(QString string)
         return false;
     modeParser->parseUser(string);
     emit changeChannelSignal();
-    emit channelModifiedSignal();
+    emit userModifiedSignal();
     return true;
 }

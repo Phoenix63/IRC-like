@@ -3,6 +3,7 @@
 
 #include <QHash>
 #include <QList>
+#include <QStringList>
 
 #include "message.h"
 #include "mode.h"
@@ -13,6 +14,7 @@ class QString;
 class ChannelContent
 {
 public:
+    virtual void parse(QString command);
     //User functions
     void addUser(User *newUser);
     void removeUser(QString userName);
@@ -21,6 +23,7 @@ public:
     QStringList userList();
     User* findUser(QString nick);
     bool contains(QString nick);
+
     //Chat functions
     void appendChat(QString heure, User *pseudo, QString message);
     void clearContent();
@@ -45,7 +48,7 @@ public:
     void voice(QString user, bool val);
     void oper(QString user, bool val);
 
-private:
+protected:
     QString aTopic;
     QHash<User *, Mode> aUsers;
     QList<Message> aChatContent;

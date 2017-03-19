@@ -1,8 +1,10 @@
 #include "mainframe.h"
 
+#include <QCloseEvent>
 #include <QCompleter>
 #include <QFileDialog>
 #include <QHBoxLayout>
+#include <QKeyEvent>
 #include <QLabel>
 #include <QMessageBox>
 #include <QScrollBar>
@@ -126,9 +128,11 @@ void MainFrame::channelModified()
 
     ui->channelList->clear();
     for (auto i:channel.channelNames()) {
-        ui->channelList->addItem(i);
-        if (channel.notif(i))
-            ui->channelList->findItems(i,Qt::MatchExactly)[0]->setForeground(QColor("red"));
+        if (!i.startsWith('&')) {
+            ui->channelList->addItem(i);
+            if (channel.notif(i))
+                ui->channelList->findItems(i,Qt::MatchExactly)[0]->setForeground(QColor("red"));
+        }
     }
 }
 
@@ -291,17 +295,18 @@ void MainFrame::on_pushButton_upload_clicked()
 {
     QTcpSocket *tmp = new QTcpSocket();
     tmp->connectToHost(host, 8090);
-    if (!socket->waitForConnected(5000))
+    if (!tmp->waitForConnected(5000))
         QMessageBox::information(this, "Error", "Host not found");
     QStringList homePath = QStandardPaths::standardLocations(QStandardPaths::HomeLocation);
     QStringList files = QFileDialog::getOpenFileNames(this, "Select one or more files to open", homePath.first());
     if (files.size() != 0) {
-        Upload *up = new Upload(this, host, files, tmp);
         UploadWindow *progress = new UploadWindow(this, tmp);
-        connect(up, &Upload::finished, up, &QObject::deleteLater);
+        Upload *up = new Upload(this, host, files, tmp);
         connect(progress, &UploadWindow::resultReady, this, &MainFrame::handleResults);
+        connect(up, &Upload::finished, up, &QObject::deleteLater);
         up->start();
         progress->show();
+        ui->messageSender->setFocus();
     }
 }
 
@@ -397,7 +402,7 @@ void MainFrame::initCompletion()
     completionList << "/clean" << "/debug" << "/nick" << "/user" << "/join" << "/names"
                    << "/pass" << "/part" << "/list" << "/topic" << "/kick" << "/who"
                    << "/whois" << "/mode" << "/msg" << "/quit" << "/away" << "/back"
-				   << "/invite" << "/files" << "/rmfile";
+                   << "/invite" << "/files" << "/rmfile" << "/belote" << "/serverkick" <<"/rmchan";
     stringCompleter = new QCompleter(completionList,this);
     stringCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     stringCompleter->popup()->setTabKeyNavigation(true);
