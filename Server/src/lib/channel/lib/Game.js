@@ -169,6 +169,7 @@ class Game {
             player._hand = [];
         });
         this._teams = [new Team(this, 0), new Team(this, 1)];
+        this._points = [0,0];
 
     }
 

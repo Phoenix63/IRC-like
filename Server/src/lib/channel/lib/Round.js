@@ -20,6 +20,7 @@ class Round {
         this._deck.reset();
 
         this._trump = null;
+        this._trumpColor = -1;
         this._takeTurn = -1;
         this._play = 0;
 
@@ -64,6 +65,7 @@ class Round {
 
     _showTrump() {
         this._trump = this._deck.getCards(1)[0];
+        this._trumpColor = this._trump.color;
         this._takeTurn = 0;
         this._play = 0;
         this.game.rpl.trumpIs(this._trump);
@@ -96,16 +98,14 @@ class Round {
                 }
                 this._notifyPlayerToTake();
             } else if(index >= 0 && this._trump) {
-                if(this._takeTurn === 0 && colors === this._trump.color || this._takeTurn === 1 && colors !== this._trump.color) {
+                if(this._takeTurn === 0 && colors === this._trumpColor || this._takeTurn === 1 && colors !== this._trumpColor) {
                     this._players[index].addCardToHand([this._trump]);
 
                     player.team.take();
 
-                    this._trump = {
-                        color: colors
-                    };
+                    this._trumpColor = colors;
 
-                    this.game.rpl.playerTake(this._play, this._trump);
+                    this.game.rpl.playerTake(this._play, this._trump, this._trumpColor);
 
                     for(let i = 0 ; i<4; i++) {
                         this._players[i].addCardToHand(this._deck.getCards((i === index ? 2 : 3)));
@@ -130,7 +130,7 @@ class Round {
         this._players.forEach((player) => {
             debug('--------- '+player.client.name+' ----------');
             debug(player._hand.map((c) => {
-                return c.toString(true, this._trump.color);
+                return c.toString(true, this._trumpColor);
             }).join('\t| '));
         });
 
@@ -158,7 +158,7 @@ class Round {
 
                     if(play.indexOf(card) >= 0) {
 
-                        if(!masterCard || card.compare(masterCard, this._folds[this._currentFold][0][1].color, this._trump.color)>0) {
+                        if(!masterCard || card.compare(masterCard, this._folds[this._currentFold][0][1].color, this._trumpColor)>0) {
                             masterCard = card;
                             masterCardOwner = player;
                         }
@@ -176,11 +176,11 @@ class Round {
                             this._play = 0;
                         }
 
-                        debug('----------------- pli ('+this._trump.color+') ------------');
+                        debug('----------------- pli ('+this._trumpColor+') ------------');
                         debug(this._folds[this._currentFold].map((c) => {
                             if(c[1] === masterCard)
-                                return '*'+c[1].toString(true, this._trump.color);
-                            return c[1].toString(true, this._trump.color);
+                                return '*'+c[1].toString(true, this._trumpColor);
+                            return c[1].toString(true, this._trumpColor);
                         }).join('\t| '));
                         console.log();
 
@@ -188,7 +188,7 @@ class Round {
                             this._players.forEach((player) => {
                                 debug('--------- '+player.client.name+' ----------');
                                 debug(player._hand.map((c) => {
-                                    return c.toString(true, this._trump.color);
+                                    return c.toString(true, this._trumpColor);
                                 }).join('\t| '));
                             });
 
@@ -202,7 +202,7 @@ class Round {
                                 return f[1];
                             }).join(','));
                             this._folds[this._currentFold-1].forEach((pc) => {
-                                masterCardOwner.team.addPoints(pc[1].getPoints(this._trump.color));
+                                masterCardOwner.team.addPoints(pc[1].getPoints(this._trumpColor));
                             });
                             if(this._currentFold === this._folds.length-1) {
                                 masterCardOwner.team.addPoints(10);

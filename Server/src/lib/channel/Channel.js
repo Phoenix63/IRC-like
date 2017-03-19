@@ -223,7 +223,7 @@ class Channel {
      * @private
      */
     _mergeToRedis() {
-        if (this._persistent) {
+        if (this._persistent && this.name[0] === '#') {
             Redis.setChannel(this);
         }
     }
@@ -288,11 +288,10 @@ class Channel {
     remove() {
 
         this._persistent = false;
-
         if(this._users.length > 0) {
-            this._users.map((u) => {
-                this.removeUser(u);
-            });
+            while(this._users.length > 0) {
+                this.removeUser(this._users[0]);
+            }
         } else {
             channels.splice(channels.indexOf(this), 1);
         }
