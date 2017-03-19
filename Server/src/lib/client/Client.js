@@ -83,6 +83,9 @@ class Client {
                 this._identity = identity;
                 this._registeredWithPass = true;
                 this._realname = realname;
+                if(!this._name) {
+                    this.name = this._identity;
+                }
                 this._mergeToRedis();
                 RPLSender.RPL_MOTDSTART(this.socket);
                 RPLSender.RPL_MOTD(this.socket);
