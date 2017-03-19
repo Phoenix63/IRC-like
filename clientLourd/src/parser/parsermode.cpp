@@ -43,9 +43,9 @@ bool ParserMode::isIUserMode(QString mode, QString user)
     if (mode[1] != 'i')
         return false;
     if (mode[0] == '+') {
-        userList.modeI(true, user);
+        channel->modeI(true, user);
     } else {
-        userList.modeI(false, user);
+        channel->modeI(false, user);
     }
     return true;
 }
@@ -55,9 +55,11 @@ bool ParserMode::isOUserMode(QString mode, QString user)
     if (mode[1] != 'o')
         return false;
     if (mode[0] == '+') {
-        userList.modeO(true, user);
+        channel->modeO(true, user);
+        channel->appendChannel(user + " is now IRC operator", "\"Debug\"", nullptr);
     } else {
-        userList.modeO(false, user);
+        channel->modeO(false, user);
+        channel->appendChannel(user + " is no longer IRC operator", "\"Debug\"", nullptr);
     }
     return true;
 }
@@ -67,9 +69,9 @@ bool ParserMode::isWMode(QString mode, QString user)
     if (mode[1] != 'w')
         return false;
     if (mode[0] == '+') {
-        userList.modeW(true, user);
+        channel->modeW(true, user);
     } else {
-        userList.modeW(false, user);
+        channel->modeW(false, user);
     }
     return true;
 }

@@ -74,6 +74,9 @@ public:
     void voice(QString user, QString chan, bool val);
     void oper(QString user, QString chan, bool val);
 
+    void modeI(bool mode, QString user);
+    void modeO(bool mode, QString user);
+    void modeW(bool mode, QString user);
 
     // Topic
     void topic(QString topic, QString channel);

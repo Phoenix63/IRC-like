@@ -77,18 +77,26 @@ void Channel::leave(QString chan){
  * Channel: Text adding functions
  */
 
- void Channel::appendCurrent(QString string, QString pseudo)
+ void Channel::appendCurrent(QString string, QString send)
  {
      QString time = '[' + QTime::currentTime().toString() + ']';
-     if (channels.contains(currentChannel))
-         channels[currentChannel]->appendChat(time + "    ", channels[currentChannel]->findUser(pseudo) , " : " + emoji->parse(string));
+     if (channels.contains(currentChannel)) {
+         User *sender = channels[currentChannel]->findUser(send);
+         if (!sender)
+             sender = aUserList.addUser(send);
+         channels[currentChannel]->appendChat(time + "    ", sender , " : " + emoji->parse(string));
+     }
  }
 
  void Channel::appendChannel(QString string, QString channel, QString send)
  {
      QString time = '[' + QTime::currentTime().toString() + ']';
-     if (channels.contains(channel))
-         channels[channel]->appendChat(time + "    ", channels[channel]->findUser(send)," : " + emoji->parse(string));
+     if (channels.contains(channel)) {
+         User *sender = channels[channel]->findUser(send);
+         if (!sender)
+             sender = aUserList.addUser(send);
+         channels[channel]->appendChat(time + "    ", sender," : " + emoji->parse(string));
+     }
  }
 
  void Channel::appendCurrent(QString string, User *pseudo)
@@ -290,4 +298,23 @@ bool Channel::voice(User *user)
 bool Channel::voice(QString user)
 {
     return channels[currentChannel]->voice(user);
+}
+
+/*
+ * Server mode
+ */
+
+void Channel::modeI(bool mode, QString user)
+{
+    aUserList.modeI(mode,user);
+}
+
+void Channel::modeO(bool mode, QString user)
+{
+    aUserList.modeO(mode,user);
+}
+
+void Channel::modeW(bool mode, QString user)
+{
+    aUserList.modeW(mode,user);
 }
