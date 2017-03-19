@@ -5,10 +5,14 @@ import sio from './sio';
 import shortid from 'shortid';
 import config from './../../config.json';
 import Redis from './../data/RedisInterface';
+import ERRSender from './../responses/ERRSender';
+
+
 let debug = require('debug')('pandirc:socket');
 
 let sockets = [];
 let bannedIP = {};
+let ipConnected = {};
 
 const interval = config.timeout*1000;
 
@@ -39,7 +43,6 @@ class Socket {
                 }
             }, interval);
         }
-
     }
 
     /**
@@ -103,13 +106,18 @@ class Socket {
      * @param {string} data
      */
     send(data) {
-        if (this._logger)
-            this._logger._SEND_TO_CLIENT(data);
-        if (this.isTcp) {
-            this._socket.write(data + '\n\r');
-        } else {
-            this._socket.emit('message', data);
+        try {
+            if (this._logger)
+                this._logger._SEND_TO_CLIENT(data);
+            if (this.isTcp) {
+                this._socket.write(data + '\n\r');
+            } else {
+                this._socket.emit('message', data);
+            }
+        } catch (e) {
+            debug('Socket is closed');
         }
+
     }
 
     /**
@@ -157,6 +165,7 @@ class Socket {
             this._logger._CLIENT_DISCONNECTED();
         }
         sockets.splice(sockets.indexOf(this), 1);
+        ipConnected[this.ip]--;
         delete this;
     }
 
@@ -221,6 +230,10 @@ class Socket {
 
     static getBannedIP() {
         return bannedIP;
+    }
+
+    static get ipConnected() {
+        return ipConnected;
     }
 }
 

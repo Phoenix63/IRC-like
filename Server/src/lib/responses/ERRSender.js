@@ -1,6 +1,7 @@
 "use strict";
 
 import config from './../../config.json';
+const debug = require('debug')('pandirc:rpl:error');
 
 let ERRSender = {
     /**
@@ -220,6 +221,58 @@ let ERRSender = {
      */
     ERR_FILESIZE: (client) => {
         client.socket.send(':' + config.ip + ' 601 :your file size must be 0 < filesize < ' + config.fileSizeLimit + ' Ko');
+    },
+
+    /**
+     *
+     * @param {Socket} socket
+     * @constructor
+     */
+    ERR_SERVERSIZELIMIT: (socket) => {
+        try {
+            debug('Server is full');
+            if (socket._connectionType === 'tcp') {
+                socket.write(':'+config.ip+' 2001 :Server cannot receive more users\n\r');
+            } else {
+                socket.emit('message', ':'+config.ip+' 2001 :Server cannot receive more users');
+            }
+        } catch (e) {
+            debug('Socket is closed');
+        }
+    },
+    /**
+     *
+     * @param {Socket} socket
+     * @constructor
+     */
+    ERR_MAXCONNECTIONPERIP: (socket) => {
+        try {
+            debug('Client max ip per connection is fired');
+            if (socket._connectionType === 'tcp') {
+                socket.write(':'+config.ip+' 2002 :Your IP is too much used in this server\n\r');
+            } else {
+                socket.emit('message', ':'+config.ip+' 2002 :Your IP is too much used in this server');
+            }
+        } catch (e) {
+            debug('Socket is closed');
+        }
+    },
+    /**
+     *
+     * @param socket
+     * @constructor
+     */
+    ERR_YOUAREBANNED: (socket) => {
+        try {
+            debug('Banned user tried to join');
+            if (socket._connectionType === 'tcp') {
+                socket.write(':'+config.ip+' 2003 :You have been banned\n\r');
+            } else {
+                socket.emit('message', ':'+config.ip+' 2003 :You have been banned');
+            }
+        } catch (e) {
+            debug('Socket is closed');
+        }
     }
 
 };
