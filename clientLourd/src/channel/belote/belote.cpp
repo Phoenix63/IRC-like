@@ -13,9 +13,7 @@ Belote::Belote(QWidget *parent, QTcpSocket *sock, QString chan, QString nick) :
     username(nick)
 {
     ui->setupUi(this);
-    fold = new QDialog(this);
-    QHBoxLayout *test = new QHBoxLayout();
-    fold->setLayout(test);
+    setUpInfos();
     this->show();
     this->setWindowTitle(nick + " - " + "Belote room : " + chan);
     this->setObjectName("Belote");
@@ -23,12 +21,20 @@ Belote::Belote(QWidget *parent, QTcpSocket *sock, QString chan, QString nick) :
                         "border-image: url(\"ressources/img/tapis.jpg\") 0 0 0 0 stretch stretch;"
                         "}"
                         );
-    ui->scoreboard->setColumnCount(2);
-    ui->scoreboard->setColumnWidth(0, 50);
-    ui->scoreboard->setColumnWidth(1, 50);
-    ui->scoreboard->verticalHeader()->setVisible(false);
     ui->scoreboard->setHorizontalHeaderLabels(QString("Kotei;Jbzz").split(';'));
     lobbyWait();
+}
+
+void Belote::setUpInfos()
+{
+    //Last fold dialog
+    fold = new QDialog(this);
+    QHBoxLayout *test = new QHBoxLayout();
+    fold->setLayout(test);
+
+    //Scoretable dialog
+    score = new ScoreBoard(this);
+    score->hide();
 }
 
 Belote::~Belote()
@@ -86,6 +92,7 @@ void Belote::parse(QString string)
     if (!in_isEndFold(string))
     if (!in_isCardDeal(string))
     if (!in_isRoundEnd(string))
+    if (!in_isTeamPoints(string))
     if (!in_isYourTurn(string))
         qDebug() << "cant find this";
 }
@@ -128,7 +135,6 @@ void Belote::setActive(QString string)
 
 void Belote::displayCard(Card *card)
 {
-    qDebug() << card->rank() << card->suit() << card->value();
     QPixmap cards("ressources/img/cards.jpg");
     QRect rect(73*card->rank(), 97*card->suit(), 73, 97);
     QPixmap cropped = cards.copy(rect);
@@ -253,7 +259,20 @@ bool Belote::in_isPlayerTake(QString string)
 {
     if (!string.contains(BELOTE::RPL::PLAYERTAKE))
         return false;
+    QString take = string.split(' ').at(4);
+    int taker = take.toInt();
+    int trump = string.split(' ').last().toInt();
+    if (taker == position())
+        ui->taker->setText("Taker :" + username);
+    else if (taker == (position() + 1) % 4)
+        ui->taker->setText("Taker :" + ui->eastName->text());
+    else if (taker == (position() + 2) % 4)
+        ui->taker->setText("Taker :" + ui->northName->text());
+    else
+        ui->taker->setText("Taker :" + ui->westName->text());
     clearLayout(ui->board);
+    QString tmp = ui->taker->text().right(ui->taker->text().length() - 7);
+    score->addRound(tmp, trump);
     return true;
 }
 
@@ -315,16 +334,16 @@ bool Belote::in_isGameStart(QString string)
         return false;
     QString players = string.split(' ').last();
     QStringList playerList = players.split(',');
+    qDebug() << playerList;
     position(playerList.indexOf(username));
+    qDebug() << position();
     QString eastPlayer = playerList.at((position() + 1) % 4);
     QString northPlayer = playerList.at((position() + 2) % 4);
     QString westPlayer = playerList.at((position() + 3) % 4);
-    QLabel *east = new QLabel(eastPlayer);
-    ui->east->addWidget(east);
-    QLabel *north = new QLabel(northPlayer);
-    ui->north->addWidget(north);
-    QLabel *west = new QLabel(westPlayer);
-    ui->west->addWidget(west);
+    qDebug() << eastPlayer << northPlayer << westPlayer;
+    ui->eastName->setText(eastPlayer);
+    ui->northName->setText(northPlayer);
+    ui->westName->setText(westPlayer);
     return true;
 }
 
@@ -334,7 +353,6 @@ bool Belote::in_isYourTurn(QString string)
         return false;
     clearLayout(ui->buttons);
     QString cardList = string.split(' ').last();
-    qDebug() << "set active : " << cardList;
     setActive(cardList);
     return true;
 }
@@ -351,12 +369,11 @@ bool Belote::in_isTeamPoints(QString string)
 {
     if (!string.contains(BELOTE::RPL::TEAMPOINTS))
         return false;
-    ui->scoreboard->insertRow(ui->scoreboard->rowCount());
     QString points = string.split(' ').last();
-    score0 += string.split(',').at(0).toInt();
-    score1 += string.split(',').at(1).toInt();
-    ui->scoreboard->setItem(ui->scoreboard->rowCount() - 1, 0, new QTableWidgetItem(score0));
-    ui->scoreboard->setItem(ui->scoreboard->rowCount() - 1, 1, new QTableWidgetItem(score1));
+    score->addScore(points);
+    ui->scoreboard->setItem(0, 0, new QTableWidgetItem(points.split(',').at(0)));
+    ui->scoreboard->setItem(0, 1, new QTableWidgetItem(points.split(',').at(1)));
+    return true;
 }
 
 bool Belote::in_isFullTeam(QString string)
@@ -382,6 +399,13 @@ void Belote::on_actionLast_Fold_triggered()
         tmp->addWidget(lCard);
     }
     fold->show();
+}
+
+
+
+void Belote::on_actionStats_triggered()
+{
+    score->show();
 }
 
 void Belote::closeEvent(QCloseEvent *event)

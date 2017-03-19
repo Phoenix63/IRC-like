@@ -1,5 +1,6 @@
 #include "parser.h"
 
+#include <QMediaPlayer>
 #include <QMessageBox>
 #include <QRegularExpression>
 #include <QString>
@@ -479,7 +480,7 @@ bool Parser::in_isPartNote(QString string)
     if (user.compare(self.name())) {
         channel->appendChannel(user + " left " + chan + ' ' + message, chan, nullptr);
         channel->removeUser(user, chan);
-    } else {
+    } else if (!chan.startsWith('&')){
         channel->leave(chan);
         emit channelModifiedSignal();
     }
@@ -506,6 +507,13 @@ bool Parser::in_isPrivMsg(QString string)
 {
     if (!string.contains(IRC::RPL::PRIVMSG))
         return false;
+    QString mention = '@' + self.name();
+    if (string.contains(mention)) {
+        QMediaPlayer *player = new QMediaPlayer;
+        player->setMedia(QUrl::fromLocalFile("ressources/AH.mp3"));
+        player->setVolume(30);
+        player->play();
+    }
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString message = string.right(string.length() - j - 1);
     QString chan = string.split(' ').at(2);
@@ -522,6 +530,13 @@ bool Parser::in_isWhisMsg(QString string)
 {
     if (!string.contains(IRC::RPL::WHISPER))
         return false;
+    QString mention = '@' + self.name();
+    if (string.contains(mention)) {
+        QMediaPlayer *player = new QMediaPlayer;
+        player->setMedia(QUrl::fromLocalFile("ressources/AH.mp3"));
+        player->setVolume(30);
+        player->play();
+    }
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString sender = string.split(' ').at(0);
     QString message = string.right(string.length() - j - 1);

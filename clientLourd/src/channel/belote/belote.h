@@ -7,6 +7,7 @@
 
 #include "card.h"
 #include "customlayout.h"
+#include "scoreboard.h"
 #include "../channelcontent.h"
 
 namespace Ui {
@@ -20,6 +21,7 @@ class Belote : public QMainWindow, public ChannelContent
 public:
     explicit Belote(QWidget *parent = 0, QTcpSocket *socket = NULL, QString channelName = "", QString username = "");
     ~Belote();
+    void setUpInfos();
     void closeEvent(QCloseEvent *event);
     void lobbyWait();
 
@@ -30,6 +32,8 @@ public slots:
     void take(int trump, CustomLayout *layout);
 private slots:
     void on_actionLast_Fold_triggered();
+
+    void on_actionStats_triggered();
 
 private:
     //Hand functions
@@ -67,14 +71,13 @@ private:
     bool in_isRoundEnd(QString string);
     bool in_isTeamPoints(QString string);
 private:
-    int score0;
-    int score1;
     QString username;
     QString channelName;
     int aPosition;
     Ui::Belote *ui;
     QTcpSocket *socket;
     QList<Card *> lastFold;
+    ScoreBoard  *score;
     QHash<Card *, QPushButton *> hand;
     QDialog *fold;
 };

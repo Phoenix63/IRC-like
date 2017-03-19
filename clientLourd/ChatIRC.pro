@@ -11,6 +11,7 @@ OBJECTS_DIR += objects
 UI_DIR += uis
 QT       += core gui
 QT       += network
+QT       += multimedia
 RC_ICONS = ressources/img/pandab.ico
 
 
@@ -44,7 +45,8 @@ SOURCES += \
     src/user/userlist.cpp \
     src/gui/uploadwindow.cpp \
     src/channel/belote/card.cpp \
-    src/channel/belote/customlayout.cpp
+    src/channel/belote/customlayout.cpp \
+    src/channel/belote/scoreboard.cpp
 
 
 HEADERS  += \
@@ -75,11 +77,13 @@ HEADERS  += \
     src/gui/uploadwindow.h \ 
     src/channel/belote/card.h \
     src/channel/belote/rpl_response.h \
-    src/channel/belote/customlayout.h
+    src/channel/belote/customlayout.h \
+    src/channel/belote/scoreboard.h
 
 FORMS    += \
     src/channel/belote/belote.ui \
     src/gui/login.ui \
     src/gui/mainframe.ui \
     src/gui/channellist.ui \
-    src/gui/uploadwindow.ui
+    src/gui/uploadwindow.ui \
+    src/channel/belote/scoreboard.ui
