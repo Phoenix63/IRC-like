@@ -151,7 +151,14 @@ class Client {
      * @param {string} pass
      */
     set pass(pass) {
-        this._pass = crypto.createHash('sha256').update(pass).digest('base64');
+        if(this.isRegisteredWithPass()) {
+            this._pass = crypto.createHash('sha256').update(pass).digest('base64');
+            this._mergeToRedis();
+            RPLSender.RPL_PASSCHANGED(this.socket);
+        } else {
+            this._pass = crypto.createHash('sha256').update(pass).digest('base64');
+        }
+
     }
 
     /**
@@ -294,6 +301,7 @@ class Client {
                         this._channels.forEach((channel) => {
                             channel.changeClientFlag('+', 'o', this);
                         });
+                        RPLSender.RPL_YOUREOPER(this.socket);
                     }
                     RPLSender.RPL_UMODEIS_BROADCAST_ALL(this.name + ' +' + flag);
                 } else {

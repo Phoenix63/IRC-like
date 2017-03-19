@@ -164,6 +164,9 @@ let RPLSender = {
 
     RPL_ENDOFMOTD: (socket) => {
         socket.send(':' + config.ip + ' 376 :End of /MOTD command');
+        if(socket.client.isAdmin()) {
+            RPLSender.RPL_YOUREOPER(socket);
+        }
     },
 
     /**
@@ -311,7 +314,16 @@ let RPLSender = {
      */
     RMFILE: (socket, chan, file) => {
         chan.broadcast(':' + socket.client.name + ' RMFILE :' + file, null);
+    },
+
+    RPL_YOUREOPER: (socket) => {
+        socket.send(':'+config.ip+' 381 :You are now an IRC operator');
+    },
+
+    RPL_PASSCHANGED: (socket) => {
+        socket.send(':'+config.ip+' 399 :Your password has been updated');
     }
+
 
 };
 export default RPLSender
