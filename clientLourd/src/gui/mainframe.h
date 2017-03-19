@@ -65,17 +65,27 @@ signals:
 
 private slots:
 	void on_channelList_itemSelectionChanged();
+    void on_userList_doubleClicked(const QModelIndex &index);
 	void on_messageSender_returnPressed();
 	void on_pushButton_upload_clicked();
 
 	//QMenus
+    //PandIRC
 	void on_actionConnect_triggered();
 	void on_actionDisconnect_triggered();
-
+    void on_actionSet_Away_toggled(bool arg1);
+    //Channel
+    void on_actionClean_triggered();
+    void on_actionNames_triggered();
+    void on_actionwho_triggered();
+    void on_actionClose_triggered();
+    //Settings
 	void on_actionDark_toggled(bool arg1);
 	void on_actionLight_toggled(bool arg1);
 
-    void on_userList_doubleClicked(const QModelIndex &index);
+    void on_actionBip_on_messages_toggled(bool arg1);
+
+    void on_actionHide_join_part_messages_toggled(bool arg1);
 
 private:
 	// Initialisation functions

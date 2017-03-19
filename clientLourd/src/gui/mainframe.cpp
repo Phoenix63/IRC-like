@@ -73,6 +73,7 @@ void MainFrame::printMsgLine(Message chatMsgLine)
     pseudoBox->addWidget(lPseudo);
     ui->nickBox->addLayout(pseudoBox);
     QLabel *lMessage = new QLabel(chatMsgLine.message());
+    lMessage->setTextInteractionFlags(Qt::TextSelectableByMouse);
     lMessage->setFixedHeight(20);
     chatLine->addWidget(lMessage);
     chatLine->addStretch(0);
@@ -177,6 +178,7 @@ void MainFrame::changeChannel()
     userModified();
     topicModified();
     ui->messageSender->setPlaceholderText("Message " + channel.channelName());
+    ui->actionBip_on_messages->setChecked(channel.soundNotif(channel.channelName()));
 }
 
 void MainFrame::lineAdded()
@@ -356,6 +358,9 @@ void MainFrame::initUiConf()
     ui->setupUi(this);
     ui->actionDark->setCheckable(true);
     ui->actionLight->setCheckable(true);
+    ui->actionSet_Away->setCheckable(true);
+    ui->actionBip_on_messages->setCheckable(true);
+    ui->actionHide_join_part_messages->setCheckable(true);
     ui->messageSender->installEventFilter(this);
     ui->pushButton_emojis->setIcon(QPixmap("ressources/img/smile.png"));
     ui->pushButton_upload->setIcon(QPixmap("ressources/img/upload.png"));
@@ -420,4 +425,56 @@ void MainFrame::on_userList_doubleClicked(const QModelIndex &index)
     channelModified();
     channel.change(user);
     changeChannel();
+}
+
+void MainFrame::on_actionClean_triggered()
+{
+    clean();
+}
+
+void MainFrame::on_actionSet_Away_toggled(bool arg1)
+{
+    ui->actionSet_Away->setChecked(arg1);
+    if (arg1){
+        parser.sendToServer(socket, "AWAY :Gone\n");
+        channel.change("\"Debug\"");
+    }
+    else
+        parser.sendToServer(socket, "AWAY\n");
+}
+
+void MainFrame::on_actionNames_triggered()
+{
+    parser.sendToServer(socket, "NAMES " + channel.channelName() + '\n');
+    channel.change("\"Debug\"");
+}
+
+void MainFrame::on_actionwho_triggered()
+{
+    parser.sendToServer(socket, "WHO " + channel.channelName() + '\n');
+    channel.change("\"Debug\"");
+}
+
+void MainFrame::on_actionClose_triggered()
+{
+    if (channel.channelName().startsWith('#'))
+        parser.sendToServer(socket, "PART " + channel.channelName() + '\n');
+    else {
+        for (int i = 0; i < ui->channelList->count(); i++) {
+            if (ui->channelList->item(i)->text() == channel.channelName())
+                ui->channelList->takeItem(i);
+        }
+    }
+}
+
+void MainFrame::on_actionBip_on_messages_toggled(bool arg1)
+{
+    ui->actionBip_on_messages->setChecked(arg1);
+    channel.soundNotif(channel.channelName(), arg1);
+}
+
+void MainFrame::on_actionHide_join_part_messages_toggled(bool arg1)
+{
+    ui->actionHide_join_part_messages->setChecked(arg1);
+    channel.hideNotif(channel.channelName(), arg1);
 }

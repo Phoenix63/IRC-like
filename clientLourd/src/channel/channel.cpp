@@ -42,7 +42,7 @@ void Channel::join(QString chan, QString topic)
     }
 }
 
-void Channel::joinWhisper(QString dest){
+void Channel::joinWhisper(QString dest) {
     if (!channels.contains(dest))
         channels[dest] = new ChannelContent();
 }
@@ -258,6 +258,10 @@ QString Channel::topic()
     return channels[currentChannel]->topic();
 }
 
+/*
+ * Notifications
+ */
+
 bool Channel::notif(QString chan)
 {
     if (channels.contains(chan))
@@ -274,6 +278,26 @@ void Channel::togleNotif(QString chan, bool newValue)
 Message Channel::getLast()
 {
     return channels[currentChannel]->getLast();
+}
+
+void Channel::soundNotif(QString chan, bool value)
+{
+    channels[chan]->soundNotif(value);
+}
+
+void Channel::hideNotif(QString chan, bool value)
+{
+    channels[chan]->hideNotif(value);
+}
+
+bool Channel::soundNotif(QString chan)
+{
+    return channels[chan]->soundNotif();
+}
+
+bool Channel::hideNotif(QString chan)
+{
+    return channels[chan]->hideNotif();
 }
 
 /*

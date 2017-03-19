@@ -1,5 +1,11 @@
 #include "channelcontent.h"
 
+ChannelContent::ChannelContent():
+    aHidenotif(false),
+    aSoundNotif(false)
+{
+
+}
 
 void ChannelContent::parse(QString command)
 {
@@ -119,6 +125,27 @@ void ChannelContent::togleNotif(bool newValue)
 Message ChannelContent::getLast()
 {
     return aChatContent.back();
+}
+
+
+void ChannelContent::soundNotif(bool value)
+{
+    aSoundNotif = value;
+}
+
+void ChannelContent::hideNotif(bool value)
+{
+    aHidenotif = value;
+}
+
+bool ChannelContent::soundNotif()
+{
+    return aSoundNotif;
+}
+
+bool ChannelContent::hideNotif()
+{
+    return aHidenotif;
 }
 
 /*

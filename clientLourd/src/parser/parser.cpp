@@ -462,7 +462,8 @@ bool Parser::in_isJoinNote(QString string)
     QString chan = string.split(' ').at(2);
     if(nick.compare(self.name())) {
         channel->addUser(tmp, chan);
-        channel->appendChannel(nick + " joined " + chan, chan, nullptr);
+        if (!channel->hideNotif(chan))
+            channel->appendChannel(nick + " joined " + chan, chan, nullptr);
     }
     emit userModifiedSignal();
     emit chatModifiedSignal();
@@ -477,14 +478,15 @@ bool Parser::in_isPartNote(QString string)
     QString chan = string.split(' ').at(2);
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString message = string.right(string.length() - j);
+    qDebug() << "channel is "<< chan;
     if (user.compare(self.name())) {
-        channel->appendChannel(user + " left " + chan + ' ' + message, chan, nullptr);
         channel->removeUser(user, chan);
+        if (!channel->hideNotif(chan))
+            channel->appendChannel(user + " left " + chan + ' ' + message, chan, nullptr);
     } else if (!chan.startsWith('&')){
         channel->leave(chan);
-        emit channelModifiedSignal();
     }
-    emit changeChannelSignal();
+    emit channelModifiedSignal();
     return true;
 }
 
@@ -521,6 +523,12 @@ bool Parser::in_isPrivMsg(QString string)
     channel->appendChannel(message, chan, sender);
     if (chan != channel->channelName())
         channel->togleNotif(chan, true);
+    if (channel->soundNotif(chan)) {
+        QMediaPlayer *bip = new QMediaPlayer;
+        bip->setMedia(QUrl::fromLocalFile("ressources/bip.mp3"));
+        bip->setVolume(20);
+        bip->play();
+    }
     emit chatModifiedSignal();
     emit channelModifiedSignal();
     return true;
@@ -545,6 +553,12 @@ bool Parser::in_isWhisMsg(QString string)
     channel->appendChannel(message, sender, sender);
     if (sender != channel->channelName())
             channel->togleNotif(sender, true);
+    if (channel->soundNotif(sender)) {
+        QMediaPlayer *bip = new QMediaPlayer;
+        bip->setMedia(QUrl::fromLocalFile("ressources/bip.mp3"));
+        bip->setVolume(20);
+        bip->play();
+    }
     emit channelModifiedSignal();
     emit chatModifiedSignal();
     return true;

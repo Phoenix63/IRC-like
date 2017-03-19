@@ -260,19 +260,32 @@
    </property>
    <widget class="QMenu" name="menuFichier">
     <property name="title">
-     <string>Fichier</string>
+     <string>Pand'IRC</string>
     </property>
     <addaction name="actionConnect"/>
     <addaction name="actionDisconnect"/>
+    <addaction name="actionSet_Away"/>
    </widget>
    <widget class="QMenu" name="menuEdition">
     <property name="title">
-     <string>Edition</string>
+     <string>Channel</string>
     </property>
+    <widget class="QMenu" name="menuAlerts">
+     <property name="title">
+      <string>Alerts</string>
+     </property>
+     <addaction name="actionBip_on_messages"/>
+     <addaction name="actionHide_join_part_messages"/>
+    </widget>
+    <addaction name="menuAlerts"/>
+    <addaction name="actionwho"/>
+    <addaction name="actionNames"/>
+    <addaction name="actionClean"/>
+    <addaction name="actionClose"/>
    </widget>
    <widget class="QMenu" name="menuFenetre">
     <property name="title">
-     <string>Fenetre</string>
+     <string>Settings</string>
     </property>
     <widget class="QMenu" name="menuTheme">
      <property name="title">
@@ -286,7 +299,7 @@
    </widget>
    <widget class="QMenu" name="menuAide">
     <property name="title">
-     <string>Aide</string>
+     <string>Help</string>
     </property>
    </widget>
    <addaction name="menuFichier"/>
@@ -303,10 +316,16 @@
    <property name="text">
     <string>Connect</string>
    </property>
+   <property name="shortcut">
+    <string>Ctrl+N</string>
+   </property>
   </action>
   <action name="actionDisconnect">
    <property name="text">
     <string>Disconnect</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
    </property>
   </action>
   <action name="actionLight">
@@ -317,6 +336,47 @@
   <action name="actionDark">
    <property name="text">
     <string>Dark</string>
+   </property>
+  </action>
+  <action name="actionBip_on_messages">
+   <property name="text">
+    <string>Bip on messages</string>
+   </property>
+  </action>
+  <action name="actionHide_join_part_messages">
+   <property name="text">
+    <string>Hide join/part messages</string>
+   </property>
+  </action>
+  <action name="actionNames">
+   <property name="text">
+    <string>Users List</string>
+   </property>
+  </action>
+  <action name="actionwho">
+   <property name="text">
+    <string>Users Infos</string>
+   </property>
+  </action>
+  <action name="actionSet_Away">
+   <property name="text">
+    <string>Away Mode</string>
+   </property>
+   <property name="shortcut">
+    <string>Alt+A</string>
+   </property>
+  </action>
+  <action name="actionClean">
+   <property name="text">
+    <string>Clean</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+W</string>
    </property>
   </action>
  </widget>

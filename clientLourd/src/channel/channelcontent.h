@@ -14,6 +14,7 @@ class QString;
 class ChannelContent
 {
 public:
+    ChannelContent();
     virtual void parse(QString command);
     //User functions
     void addUser(User *newUser);
@@ -36,7 +37,11 @@ public:
     //Notifications functions
     bool notif();
     void togleNotif(bool newValue);
-    Message getLast();
+    Message getLast();  
+    void hideNotif(bool value);
+    void soundNotif(bool value);
+    bool hideNotif();
+    bool soundNotif();
 
 	// Mode access
     bool oper(User *user);
@@ -49,6 +54,9 @@ public:
     void oper(QString user, bool val);
 
 protected:
+protected:
+    bool aHidenotif;
+    bool aSoundNotif;
     QString aTopic;
     QHash<User *, Mode> aUsers;
     QList<Message> aChatContent;

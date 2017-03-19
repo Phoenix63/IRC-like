@@ -86,6 +86,11 @@ public:
     bool notif(QString chan);
     void togleNotif(QString chan, bool newValue);
     Message getLast();
+    void soundNotif(QString chan, bool value);
+    void hideNotif(QString chan, bool value);
+    bool soundNotif(QString chan);
+    bool hideNotif(QString chan);
+
 private:
     ParserEmoji * emoji;
     // Current channel name
