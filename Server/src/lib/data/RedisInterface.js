@@ -21,7 +21,13 @@ class Redis {
     }
 
     static setBannedIP(bannedIP) {
-        //client.hmset("bans",);
+        client.set("bannedIP", JSON.stringify(bannedIP));
+    }
+
+    static getBannedIP(callback) {
+        client.get("bannedIP", function (err, reply) {
+            callback(reply);
+        });
     }
 
     static setChannel(channel) {

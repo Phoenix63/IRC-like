@@ -1,12 +1,14 @@
-"use strict"
+"use strict";
 
 import tcp from './tcp';
 import sio from './sio';
 import shortid from 'shortid';
 import config from './../../config.json';
-import FileReceiver from '../file/socket/FileReceiver';
+import Redis from './../data/RedisInterface';
+let debug = require('debug')('pandirc:socket');
 
 let sockets = [];
+let bannedIP = {};
 
 const interval = config.timeout;
 
@@ -145,11 +147,8 @@ class Socket {
         }
     }
 
-    /**
-     * delete socket
-     */
-    //onClose not close ...
-    close() {
+
+    onClose() {
         clearInterval(this._interval);
         if (this._client) {
             this._client.remove();
@@ -161,32 +160,64 @@ class Socket {
         delete this;
     }
 
-    closeTheSockets() {/*
-     if (this.isTcp) {
-     this._socket.
-     } else {
-     this._socket.emit('message', data);
-     }*/
+    close() {
+        if (this.isTcp){
+            this.socket.destroy();
+        }else{
+            this.socket.disconnect(true);
+        }
     }
 
     get ip() {
         return this.isTcp ? this._socket.remoteAddress : this._socket.handshake.address;
     }
 
+    static create(callback) {
+        sio.create(function (socket) {
+            let soc = new Socket('sio', socket);
+            socket.manager = soc;
+            callback(soc);
+        });
+        tcp.create(function (socket) {
+            let soc = new Socket('tcp', socket);
+            socket.manager = soc;
+            callback(soc);
+        });
+    }
+    static isBan(ip){
+        for (let key in bannedIP){
+            debug(key+' '+bannedIP[key]);
+        }
+        debug(bannedIP[ip]);
+        debug(typeof bannedIP[ip]);
+        debug(Date.now());
+        if (bannedIP[ip] && bannedIP[ip] > Date.now()) {
+            return true;
+        } else {
+            delete bannedIP[ip];
+            Redis.setBannedIP(bannedIP);
+            return false;
+        }
+    }
+    static unBan(ip){
+        if(bannedIP[ip]){
+            delete bannedIP[ip];
+            Redis.setBannedIP(bannedIP);
+        }
+    }
+    static ban(userBanned, banishmentTime){
+        let banDuration = parseInt(banishmentTime) * 1000;//millisecond
+        let endTimeOfBan = Date.now() + banDuration;
+        bannedIP[userBanned.ip] = endTimeOfBan;
+        userBanned.socket.close();
+        Redis.setBannedIP(bannedIP);
+    }
 
+    static setBan(ipban){
+        bannedIP = ipban;
+        Redis.setBannedIP(bannedIP);
+    }
 }
 
-function create(callback) {
-    sio.create(function (socket) {
-        let soc = new Socket('sio', socket);
-        socket.manager = soc;
-        callback(soc);
-    });
-    tcp.create(function (socket) {
-        let soc = new Socket('tcp', socket);
-        socket.manager = soc;
-        callback(soc);
-    });
-}
 
-export default {create: create};
+export default Socket;

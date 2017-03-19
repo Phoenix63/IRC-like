@@ -1,10 +1,16 @@
 "use strict";
 import config from './../../config.json';
 import sio from 'socket.io';
+import Socket from './socket';
 
 function createServer(callback) {
     let io = sio.listen(config.sio_server.port);
     io.on('connection', (socket) => {
+
+        if(Socket.isBan(socket.handshake.address)){
+            socket.disconnect(true);
+            return;
+        }
         socket.remoteAddress = socket.request.connection.remoteAddress;
         callback(socket);
         socket.manager.emit('connect', socket);
@@ -22,10 +28,10 @@ function createServer(callback) {
 
         });
         socket.on('error', () => {
-            socket.manager.close();
+            socket.manager.onClose();
         });
         socket.on('disconnect', () => {
-            socket.manager.close();
+            socket.manager.onClose();
         });
     });
 }

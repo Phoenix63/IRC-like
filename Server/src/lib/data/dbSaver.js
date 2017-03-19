@@ -15,7 +15,14 @@ module.exports = function (callback) {
         let trigger = new Trigger(() => {
             db.close();
             callback();
-        }, 2);
+        }, 4);
+        // drop mongo channel collection
+        db.collection('channels', {}, (err, chans) => {
+            if(!err) {
+                db.dropCollection('channels');
+            }
+            trigger.perform();
+        });
         Redis.getUsers(function (users) {
             if (users) {
                 trigger.addAsyncTask(Object.keys(users).length);
@@ -49,6 +56,19 @@ module.exports = function (callback) {
             } else {
                 trigger.removeAsyncTask(1);
             }
+        });
+        Redis.getBannedIP((bans)=>{
+            if(bans){
+                db.collection('bannedIP').findOneAndUpdate({name: "bannedIP"}, {
+                    name: "bannedIP",
+                    data: bans
+                }, {upsert: true}, function () {
+                    trigger.perform();
+                });
+            }else{
+                trigger.removeAsyncTask(1);
+            }
+
         });
     });
 };

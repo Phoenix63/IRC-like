@@ -46,6 +46,14 @@ module.exports = function (socket, command) {
                 debug("\n");
             }
         });
+        Redis.getBannedIP((ban)=>{
+            debug("BannedIP Users");
+            let tmp = JSON.parse(ban);
+            for(let key in tmp) {
+                debug(key+":"+tmp[key]);
+            }
+
+        });
     }
     //view mongo
     if (command[1].indexOf("--vm") > -1) {
@@ -80,6 +88,15 @@ module.exports = function (socket, command) {
                     }
                     debug("\n");
                 });
+            });
+            db.collection('bannedIP').find().toArray((err, bannedIP) => {
+                debug("BannedIP Users");
+                bannedIP.forEach((ipban)=>{
+                    let obj = JSON.parse(ipban.data);
+                    for(let key in obj){
+                        debug(key+":"+obj[key]);
+                    }
+                })
             });
         });
 

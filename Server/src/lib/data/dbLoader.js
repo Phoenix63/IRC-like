@@ -2,6 +2,7 @@ import config from './../../ENV.json';
 import Redis from './RedisInterface';
 import Channel from './../channel/Channel';
 import Trigger from './Trigger';
+import Socket from './../socket/socket';
 let MongoClient = require('mongodb').MongoClient;
 let url;
 //For unitTest we use an other DB and we drop it before starting
@@ -14,7 +15,7 @@ if (process.env.RUNNING === 'TEST') {
 module.exports = function (callback) {
     MongoClient.connect(url, (err, db) => {
 
-        let trigger = new Trigger(callback, 2);
+        let trigger = new Trigger(callback, 3);
 
         if (process.env.RUNNING === 'TEST') {
             db.dropDatabase();
@@ -48,5 +49,19 @@ module.exports = function (callback) {
                 trigger.removeAsyncTask(1)
             }
         });
+        db.collection('bannedIP').find().toArray(function (err, ib) {
+            if (ib.length > 0){
+                trigger.addAsyncTask(ib.length);
+                trigger.removeAsyncTask(1);
+                ib.forEach(function (ipban){
+                    let obj = JSON.parse(ipban.data);
+                    Socket.setBan(obj);
+                    trigger.perform();
+                });
+            }else{
+                trigger.removeAsyncTask(1);
+            }
+
+        })
     });
 };

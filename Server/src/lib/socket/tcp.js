@@ -3,9 +3,14 @@
 import net from 'net';
 import config from './../../config.json';
 let debug = require('debug')('pandirc:tcp');
+import Socket from './socket';
 
 function createServer(callback) {
     let server = net.createServer((socket) => {
+        if(Socket.isBan(socket.remoteAddress)){
+            socket.destroy();
+            return;
+        }
         callback(socket);
         socket.buffer = '';
         socket.manager.emit('connect');
@@ -44,10 +49,10 @@ function createServer(callback) {
         });
 
         socket.on('close', () => {
-            socket.manager.close();
+            socket.manager.onClose();
         });
         socket.on('end', () => {
-            socket.manager.close();
+            socket.manager.onClose();
         });
 
 
