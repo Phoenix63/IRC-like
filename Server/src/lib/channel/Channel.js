@@ -278,9 +278,14 @@ class Channel {
 
         this._persistent = false;
 
-        this._users.map((u) => {
-            this.removeUser(u);
-        });
+        if(this._users.length > 0) {
+            this._users.map((u) => {
+                this.removeUser(u);
+            });
+        } else {
+            channels.splice(channels.indexOf(this), 1);
+        }
+
 
         Redis.deleteChannel(this);
     }
@@ -476,6 +481,9 @@ class Channel {
             ERRSender.ERR_NOTONCHANNEL(user, this);
         } else {
             this._users.splice(index, 1);
+            if(this._usersFlags[user.identity] && !user.isRegisteredWithPass()) {
+                delete this._usersFlags[user.identity];
+            }
             RPLSender.PART(user, this, message);
 
             if (!bool) {
@@ -622,6 +630,26 @@ class Channel {
      */
     static list() {
         return channels;
+    }
+
+    /**
+     *
+     * @param {Array<Channel>} chans
+     */
+    static updateList(chans) {
+        chans.map((c) => {
+            let chan =
+                new Channel(
+                    {identity: c._creator},
+                    c._name,
+                    c._pass,
+                    c._size,
+                    c._topic
+                );
+            chan.flags = c._flags;
+            chan._usersFlags = c._usersFlags;
+            chan._files = c._files;
+        });
     }
 }
 

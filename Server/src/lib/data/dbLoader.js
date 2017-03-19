@@ -29,6 +29,7 @@ module.exports = function (callback) {
             db.collection('channels').find().toArray(function(err, cs) {
                 caller.toSave = (us.length?us.length:0) + (cs.length?cs.length:0);
                 cs.forEach(function(channel) {
+
                     let obj = JSON.parse(channel.data);
                     let chan = new Channel({identity: obj.creator}, obj.name, obj.pass, parseInt(obj.size), obj.topic);
                     chan.usersFlags = obj.usersFlags;

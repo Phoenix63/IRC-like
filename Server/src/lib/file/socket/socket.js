@@ -19,7 +19,7 @@ class SocketKicker {
         }
         this.timeout = setTimeout(() => {
              this.socket.destroy();
-        }, 5000);
+        }, (config.timeout>0?config.timeout*1000:5000));
     }
 }
 

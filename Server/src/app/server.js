@@ -1,6 +1,7 @@
 import RedisInterface from './../lib/data/RedisInterface';
 import socketManager from './../lib/socket/socket';
 import Client from './../lib/client/Client';
+import Channel from './../lib/channel/Channel';
 import Logger from './../lib/Logger';
 import MessageManager from './../lib/CommandManager';
 import RPLSender from './../lib/responses/RPLSender';
@@ -22,6 +23,14 @@ function run(cluster) {
     let test = require('debug')('pandirc:test');
 
     process.env.RUNNING = process.env.RUNNING || 'PROD';
+
+    cluster.worker.send({getChannels: true});
+    cluster.worker.on('message', (message) => {
+        if(message.type && message.type === 'channels') {
+            Channel.updateList(message.channels);
+        }
+    });
+
 
     debug(colors.green('Server running...'));
     socketManager.create((socket) => {

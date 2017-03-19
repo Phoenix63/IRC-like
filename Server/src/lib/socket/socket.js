@@ -4,11 +4,10 @@ import tcp from './tcp';
 import sio from './sio';
 import shortid from 'shortid';
 import config from './../../config.json';
-import FileReceiver from '../file/socket/FileReceiver';
 
 let sockets = [];
 
-const interval = config.timeout;
+const interval = config.timeout*1000;
 
 class Socket {
     /**
@@ -35,7 +34,7 @@ class Socket {
                     this._life--;
                     this.send(':' + config.ip + ' PING :' + shortid.generate());
                 }
-            }, interval / 2);
+            }, interval);
         }
 
     }

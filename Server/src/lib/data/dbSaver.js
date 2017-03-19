@@ -13,6 +13,14 @@ if (process.env.RUNNING === 'TEST') {
 module.exports = function (callback) {
     let caller = new Caller(callback);
     MongoClient.connect(url, function(err, db) {
+
+        // drop mongo channel collection
+        db.collection('channels', {}, (err, chans) => {
+            if(!err) {
+                db.dropCollection('channels');
+            }
+        });
+
         Redis.getUsers(function(users) {
             if (users) {
                 for (let key in users) {
