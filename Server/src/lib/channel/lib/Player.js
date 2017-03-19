@@ -80,7 +80,7 @@ class Player {
         return this.client.name;
     }
 
-    getPlayableCard(trump, fold) {
+    getPlayableCard(trump, trumpColor, fold) {
         let pcards = [];
 
         let masterCardOwner = null;

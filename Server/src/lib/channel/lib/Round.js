@@ -64,6 +64,7 @@ class Round {
     }
 
     _showTrump() {
+        this._trumpColor = -1;
         this._trump = this._deck.getCards(1)[0];
         this._trumpColor = this._trump.color;
         this._takeTurn = 0;
@@ -138,7 +139,7 @@ class Round {
     }
 
     _notifyToPlay() {
-        this.game.rpl.playerTurn(this._players[this._play], this._players[this._play].getPlayableCard(this._trump, this._folds[this._currentFold]).playable.join(','));
+        this.game.rpl.playerTurn(this._players[this._play], this._players[this._play].getPlayableCard(this._trump, this._trumpColor, this._folds[this._currentFold]).playable.join(','));
     }
 
     playerPlayCard(player, card) {
@@ -151,7 +152,7 @@ class Round {
                 });
 
                 if(player._hand.indexOf(card) >= 0) {
-                    let cds = player.getPlayableCard(this._trump, this._folds[this._currentFold]);
+                    let cds = player.getPlayableCard(this._trump, this._trumpColor, this._folds[this._currentFold]);
                     let play = cds.playable;
                     let masterCardOwner = cds.master.player;
                     let masterCard = cds.master.card;

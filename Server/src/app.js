@@ -25,12 +25,14 @@ function _start() {
             data.toString().split('\n').map((data) => {
                 if(data.toString().trim() !== '') {
                     let d = data.toString()
-                        .replace(/[A-Za-z,]{4} [1-9]{1,2} [A-Za-z]{3} [0-9]{4} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2} GMT /g, '');
-                    let head = d.slice(0,d.indexOf(' '));
-                    let message = d.replace(head, '');
+                        .replace(/[A-Za-z,]{4} [1-9]{1,2} [A-Za-z]{3} [0-9]{4} /g, '').replace(' GMT','');
+                    let date = d.slice(0,d.indexOf(' '));
+                    let head = d.replace(date+' ', '');
+                    head = head.slice(0, head.indexOf(' '));
+                    let message = d.replace(date+' ', '').replace(head+' ', '');
 
                     process.stdout.write(
-                        colors.yellow(head)+'\t\t'+message+'\n'
+                        colors.green(date)+':'+colors.yellow(head)+'\t\t'+message+'\n'
                     );
                 }
             })
@@ -41,12 +43,14 @@ function _start() {
             data.toString().split('\n').map((data) => {
                 if(data.toString().trim() !== '') {
                     let d = data.toString()
-                        .replace(/[A-Za-z,]{4} [1-9]{1,2} [A-Za-z]{3} [0-9]{4} [0-9]{1,2}:[0-9]{1,2}:[0-9]{1,2} GMT /g, '');
-                    let head = d.slice(0,d.indexOf(' '));
-                    let message = d.replace(head, '');
+                        .replace(/[A-Za-z,]{4} [1-9]{1,2} [A-Za-z]{3} [0-9]{4} /g, '').replace(' GMT','');
+                    let date = d.slice(0,d.indexOf(' '));
+                    let head = d.replace(date+' ', '');
+                    head = head.slice(0, head.indexOf(' '));
+                    let message = d.replace(date+' ', '').replace(head+' ', '');
 
                     process.stdout.write(
-                        colors.yellow(head)+'\t\t'+message+'\n'
+                        colors.green(date)+':'+colors.yellow(head)+'\t\t'+message+'\n'
                     );
                 }
             })
