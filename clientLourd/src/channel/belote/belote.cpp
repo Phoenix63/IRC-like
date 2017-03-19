@@ -33,7 +33,7 @@ void Belote::setUpInfos()
     fold->setLayout(test);
 
     //Scoretable dialog
-    score = new ScoreBoard(this);
+    score = new ScoreBoard(NULL);
     score->hide();
 }
 
@@ -55,14 +55,6 @@ void Belote::position(int val)
 /*
  * User interface functions
  */
-
-void Belote::clean()
-{
-    clearLayout(ui->south);
-    clearLayout(ui->north);
-    clearLayout(ui->east);
-    clearLayout(ui->west);
-}
 
 void Belote::clearLayout(QLayout *layout)
 {
@@ -91,7 +83,6 @@ void Belote::parse(QString string)
     if (!in_isPlayerPlay(string))
     if (!in_isEndFold(string))
     if (!in_isCardDeal(string))
-    if (!in_isRoundEnd(string))
     if (!in_isTeamPoints(string))
     if (!in_isYourTurn(string))
         qDebug() << "cant find this";
@@ -172,7 +163,6 @@ void Belote::receiveCard(int val)
 
 void Belote::emptyHand()
 {
-    clean();
     for(auto i:hand.keys()) {
         hand.remove(i);
     }
@@ -340,7 +330,6 @@ bool Belote::in_isGameStart(QString string)
     QString eastPlayer = playerList.at((position() + 1) % 4);
     QString northPlayer = playerList.at((position() + 2) % 4);
     QString westPlayer = playerList.at((position() + 3) % 4);
-    qDebug() << eastPlayer << northPlayer << westPlayer;
     ui->eastName->setText(eastPlayer);
     ui->northName->setText(northPlayer);
     ui->westName->setText(westPlayer);
@@ -354,14 +343,6 @@ bool Belote::in_isYourTurn(QString string)
     clearLayout(ui->buttons);
     QString cardList = string.split(' ').last();
     setActive(cardList);
-    return true;
-}
-
-bool Belote::in_isRoundEnd(QString string)
-{
-    if (!string.contains(BELOTE::RPL::ROUNDEND))
-        return false;
-    clean();
     return true;
 }
 

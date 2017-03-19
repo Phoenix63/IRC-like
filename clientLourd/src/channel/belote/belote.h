@@ -46,7 +46,6 @@ private:
     void setActive(QString string);
 
     //UI
-    void clean();
     void clearLayout(QLayout *layout);
     void chooseTeam();
     void displayCard(Card *card);
@@ -68,7 +67,6 @@ private:
     bool in_isPlayerPlay(QString string);
     bool in_isEndFold(QString string);
     bool in_isTakeTurn(QString string);
-    bool in_isRoundEnd(QString string);
     bool in_isTeamPoints(QString string);
 private:
     QString username;

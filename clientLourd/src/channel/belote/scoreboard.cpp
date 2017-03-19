@@ -13,6 +13,8 @@ ScoreBoard::ScoreBoard(QWidget *parent) :
     this->setStyleSheet("background-color : " + theme->background() + ';' + " color : " + theme->text() + ';');
     ui->scores->setHorizontalHeaderLabels(QString("Kotei;Jbzz;Taker;Trump").split(';'));
     ui->scores->setColumnWidth(2, 70);
+    ui->scores->horizontalHeader()->setStyleSheet("QHeaderView::section{background-color : " + theme->background() +
+                                                  "; color : " + theme->text() + ";}");
 }
 
 ScoreBoard::~ScoreBoard()
