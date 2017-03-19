@@ -3,6 +3,8 @@ import dbSaver from './../lib/data/dbSaver';
 import dbLoader from './../lib/data/dbLoader';
 import colors from './../lib/util/Color';
 import Channel from './../lib/channel/Channel';
+import Socket from './../lib/socket/socket';
+
 process.title = 'pandirc:master';
 
 module.exports = {
@@ -72,6 +74,11 @@ function run(cluster) {
                 server.send({
                     type: 'channels',
                     channels: Channel.list()
+                });
+            } else if (message.getBannedIP) {
+                server.send({
+                    type: 'banip',
+                    ban: Socket.getBannedIP()
                 });
             }
         });

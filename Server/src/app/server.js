@@ -25,9 +25,13 @@ function run(cluster) {
     process.env.RUNNING = process.env.RUNNING || 'PROD';
 
     cluster.worker.send({getChannels: true});
+    cluster.worker.send({getBannedIP: true});
     cluster.worker.on('message', (message) => {
         if(message.type && message.type === 'channels') {
             Channel.updateList(message.channels);
+        }
+        if(message.type && message.type === 'banip') {
+            socketManager.updateList(message.ban);
         }
     });
 

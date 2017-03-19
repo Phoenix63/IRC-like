@@ -185,12 +185,6 @@ class Socket {
         });
     }
     static isBan(ip){
-        for (let key in bannedIP){
-            debug(key+' '+bannedIP[key]);
-        }
-        debug(bannedIP[ip]);
-        debug(typeof bannedIP[ip]);
-        debug(Date.now());
         if (bannedIP[ip] && bannedIP[ip] > Date.now()) {
             return true;
         } else {
@@ -219,6 +213,14 @@ class Socket {
     }
     static list(){
         return sockets;
+    }
+
+    static updateList(obj) {
+        bannedIP = obj;
+    }
+
+    static getBannedIP() {
+        return bannedIP;
     }
 }
 
