@@ -43,6 +43,7 @@ class Channel {
         this._persistent = false;
         this._topic = topic;
         this._files = {};
+        this._savedMessages = [];
 
         if (this._pass.length > 0) {
             this._addChannelFlag('p');
@@ -64,6 +65,16 @@ class Channel {
             channels.push(this);
         }
 
+    }
+
+    addMessage(user, message) {
+        if(this._savedMessages.length > 10) {
+            this._savedMessages.shift();
+        }
+        this._savedMessages.push({
+            user: user,
+            message: message
+        });
     }
 
 
@@ -450,6 +461,7 @@ class Channel {
 
 
             user.addChannel(this);
+
             RPLSender.JOIN(user, this);
             RPLSender.RPL_TOPIC('JOIN', user, this);
             RPLSender.RPL_NAMREPLY(user, this);
@@ -467,6 +479,9 @@ class Channel {
             });
 
             this._mergeToRedis();
+            this._savedMessages.forEach((arr) => {
+                RPLSender.PRIVMSG(arr.user.socket, this, arr.message, user);
+            });
         }
     }
 

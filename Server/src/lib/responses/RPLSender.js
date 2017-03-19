@@ -1,6 +1,7 @@
 import Channel from './../channel/Channel';
 import config from './../../config.json';
 import Client from './../client/Client';
+import ERRSender from './ERRSender';
 
 let RPLSender = {
 
@@ -322,6 +323,28 @@ let RPLSender = {
 
     RPL_PASSCHANGED: (socket) => {
         socket.send(':'+config.ip+' 399 :Your password has been updated');
+    },
+
+    /**
+     *
+     * @param {Socket} socket
+     * @param {Client|Channel} receiver
+     * @param {string} message
+     * @param {Client|null} to
+     * @constructor
+     */
+    PRIVMSG: (socket, receiver, message, to=null) => {
+        if(receiver instanceof Channel) {
+            if(!to) {
+                receiver.broadcast(':' + socket.client.name + ' PRIVMSG '+receiver.name+' :'+message, socket.client);
+            } else {
+                to.socket.send(':' + socket.client.name + ' PRIVMSG '+receiver.name+' :'+message);
+            }
+        } else if (receiver instanceof Client) {
+            receiver.socket.send(':' + socket.client.name + ' PRIVMSG '+receiver.name+' :'+message);
+        } else {
+            ERRSender.ERR_NOSUCHNICK(socket.client, (receiver || {name:'none'}).name);
+        }
     }
 
 
