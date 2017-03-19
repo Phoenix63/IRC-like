@@ -6,7 +6,7 @@ services:
     command: npm run build
     entrypoint: node ./dist/app.js
     environment:
-      - DEBUG=*,-babel,-socket.io:*
+      - DEBUG=pandirc*
       - RUNNING=DEV
     hostname: node
     stop_signal: SIGINT
@@ -24,9 +24,10 @@ services:
     image: pandirc/dev
     command: npm run build
     entrypoint: node ./dist/lib/file/server.js
+    stop_signal: SIGINT
     environment:
     - RUNNING=DEV
-    - DEBUG=fileserver:*
+    - DEBUG=pandirc*
     hostname: fileserver
     volumes:
      - ./..:/app

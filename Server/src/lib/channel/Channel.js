@@ -44,19 +44,26 @@ class Channel {
         this._topic = topic;
         this._files = {};
 
+        if (this._pass.length > 0) {
+            this._addChannelFlag('p');
+        }
+
         // not loaded from mongo
         if (creator instanceof Client) {
             if (creator.isAdmin() || creator.isSuperAdmin()) {
                 this.setPersistent(true);
             }
-            this.addUser(creator, pass);
+            //this.addUser(creator, pass);
             this._addChannelFlag('tn');
         }
         //load from mongo
         else {
             this.setPersistent(true);
         }
-        channels.push(this);
+        if(this.name[0] === '#') {
+            channels.push(this);
+        }
+
     }
 
 
@@ -201,6 +208,16 @@ class Channel {
     }
 
     /**
+     *if the channel is persistent, ie if it is created by an administrator, we save in redis
+     * @private
+     */
+    _mergeToRedis() {
+        if (this._persistent) {
+            Redis.setChannel(this);
+        }
+    }
+
+    /**
      * set channel persistent or not
      * @param {Boolean} bool
      */
@@ -217,11 +234,7 @@ class Channel {
      *if the channel is persistent, ie if it is created by an administrator, we save in redis
      * @private
      */
-    _mergeToRedis() {
-        if (this._persistent) {
-            Redis.setChannel(this);
-        }
-    }
+
 
     /**
      *
@@ -398,7 +411,7 @@ class Channel {
             ERRSender.ERR_BANNEDFROMCHAN(user, this);
             return;
         }
-        if (this.isInvitation && this._invitations.indexOf(user.identity) === -1) {
+        if (this.isInvitation && this._invitations.indexOf(user.identity) === -1 && user.identity !== this.creator) {
             ERRSender.ERR_INVITEONLYCHAN(user, this);
             return;
         }
@@ -420,16 +433,17 @@ class Channel {
             RPLSender.RPL_TOPIC('JOIN', user, this);
             RPLSender.RPL_NAMREPLY(user, this);
             if (this._users.length === 1) {
-                this._addClientFlag(user, 'o')
-            }
-
-            if (this._pass.length > 0) {
-                this._addChannelFlag('p');
+                this._addClientFlag(user, 'o');
             }
 
             if (user.isAdmin() || user.isSuperAdmin() || user.identity === this._creator) {
-                this._addClientFlag(user, 'o')
+                this._addClientFlag(user, 'o');
             }
+
+            this._flags.split('').forEach((flag) => {
+                RPLSender.RPL_CHANNELMODEIS(this, this._name + ' +' + flag, user);
+            });
+
             this._mergeToRedis();
 
         }
@@ -452,6 +466,9 @@ class Channel {
                 user.removeChannel(this);
             }
 
+            if(!this._persistent && this._creator === user.identity) {
+                this._creator = '##### NONE ####';
+            }
 
             if (!this._persistent && this._users.length <= 0) {
                 channels.splice(channels.indexOf(this), 1);
@@ -578,6 +595,10 @@ class Channel {
             }
         }
         return null;
+    }
+
+    toString() {
+        return this.name;
     }
 
     /**

@@ -1,4 +1,4 @@
-let debug = require('debug')('server:colors');
+let debug = require('debug')('pandirc:colors');
 
 const colors = {
     Color_Off:"\x1b[0m",

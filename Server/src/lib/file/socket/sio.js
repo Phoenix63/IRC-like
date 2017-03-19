@@ -1,6 +1,6 @@
 import sio from 'socket.io';
 import config from './../../../config.json';
-let debug = require('debug')('fileserver:sio');
+let debug = require('debug')('pandirc:fileserver:sio');
 
 class Sio {
     static bind(callback) {
@@ -14,6 +14,9 @@ class Sio {
             socket.write = function(data) {
                 socket.emit('file', data);
             };
+            socket.destroy = function() {
+                socket.disconnect();
+            }
             socket.pause = function(){};
             socket.resume = function(){};
             socket.setTimeout = function(){};

@@ -1,18 +1,12 @@
 version: "2"
 
 services:
-  preload:
-    image: pandirc/dev
-    entrypoint: npm run build
-    volumes:
-     - ./..:/app
-
   node:
     image: pandirc/dev
     command: npm run build
     entrypoint: node ./dist/app.js
     environment:
-      - DEBUG=*,-babel,-socket.io:*
+      - DEBUG=pandirc:runner,pandirc:app:master,pandirc:app:server
       - RUNNING=PROD
     hostname: node
     stop_signal: SIGINT
@@ -25,15 +19,15 @@ services:
      - mongo:mongo
      - redis:redis
      - fileserver:fileserver
-     - preload
 
   fileserver:
     image: pandirc/dev
     command: npm run build
     entrypoint: node ./dist/lib/file/server.js
+    stop_signal: SIGINT
     environment:
     - RUNNING=PROD
-    - DEBUG=fileserver:*
+    - DEBUG=pandirc:fileserver:app,pandirc:fileserver:sio,pandirc:fileserver:tcp
     hostname: fileserver
     volumes:
      - ./..:/app

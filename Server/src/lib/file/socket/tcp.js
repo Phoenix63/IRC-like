@@ -1,6 +1,6 @@
 import config from './../../../config.json';
 import net from 'net';
-let debug = require('debug')('fileserver:tcp');
+let debug = require('debug')('pandirc:fileserver:tcp');
 
 class TcpCreator {
 

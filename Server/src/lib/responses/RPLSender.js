@@ -190,10 +190,16 @@ let RPLSender = {
      *
      * @param {Channel} chan
      * @param {string} cmd
+     * @param {Client|null} user
      * @static
      */
-    RPL_CHANNELMODEIS: (chan, cmd) => {
-        chan.broadcast(':' + config.ip + ' 324 MODE ' + cmd, null);
+    RPL_CHANNELMODEIS: (chan, cmd, user=null) => {
+        if(!user) {
+            chan.broadcast(':' + config.ip + ' 324 MODE ' + cmd, null);
+        } else {
+            user.socket.send(':' + config.ip + ' 324 MODE ' + cmd);
+        }
+
     },
     /**
      *
@@ -216,13 +222,23 @@ let RPLSender = {
     },
     /**
      *
-     * @param client
-     * @param kicked
-     * @param channel
+     * @param {Client} client
+     * @param {Client} kicked
+     * @param {Channel} channel
      * @constructor
      */
     KICK: (client, kicked, channel) => {
-        channel.broadcast(':' + client.name + ' KICK ' + channel.name + ' ' + kicked);
+        channel.broadcast(':' + client.name + ' KICK ' + channel.name + ' ' + kicked, null);
+    },
+
+    /**
+     *
+     * @param {Client} client
+     * @param {Client} kicked
+     * @constructor
+     */
+    SKICK: (client, kicked) => {
+        client.socket.broadcast(':'+client.name+' SKICK '+kicked, null);
     },
     /**
      *

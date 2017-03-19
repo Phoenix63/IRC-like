@@ -2,19 +2,17 @@ import RedisInterface from './../lib/data/RedisInterface';
 import dbSaver from './../lib/data/dbSaver';
 import dbLoader from './../lib/data/dbLoader';
 import colors from './../lib/util/Color';
-
 process.title = 'pandirc:master';
 
 module.exports = {
     run: run
 };
 
-
 function run(cluster) {
     "use strict";
     let _quiting = false;
 
-    let debug = require('debug')('server:app:master');
+    let debug = require('debug')('pandirc:app:master');
 
     RedisInterface.init();
 
