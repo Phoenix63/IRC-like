@@ -15,7 +15,10 @@ if (process.env.RUNNING === 'TEST') {
 module.exports = function (callback) {
     MongoClient.connect(url, (err, db) => {
 
-        let trigger = new Trigger(callback, 3);
+        let trigger = new Trigger(() => {
+            db.close();
+            callback();
+        }, 3);
 
         if (process.env.RUNNING === 'TEST') {
             db.dropDatabase();

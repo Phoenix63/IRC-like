@@ -55,7 +55,7 @@ function run(cluster) {
             }
         });
     }
-
+    debug(colors.green('Running pandirc:master'));
     dbLoader(() => {
         debug(colors.green('Database loaded'));
         let server = cluster.fork();

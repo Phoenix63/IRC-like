@@ -314,7 +314,7 @@ let RPLSender = {
      * @constructor
      */
     RMFILE: (socket, chan, file) => {
-        chan.broadcast(':' + socket.client.name + ' RMFILE :' + file, null);
+        chan.broadcast(':' + socket.client.name + ' RMFILE '+chan.name+' :' + file, null);
     },
 
     RPL_YOUREOPER: (socket) => {
