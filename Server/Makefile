@@ -1,5 +1,5 @@
 .SILENT:
-
+NODE := $(shell which node 2> /dev/null)
 all:
 	echo ""
 
@@ -39,6 +39,7 @@ help:
 	echo -e "            \033[0;32mdev\e[0m  - Run the server in  dev environment"
 	echo -e "            \033[0;32mprod\e[0m - Run the server in prod environment"
 	echo -e "            \033[0;32mprod-deamon\e[0m - Run the server in prod environment is deamon mode"
+	echo -e "            \033[0;32mstats\e[0m - See server CPU and RAM usage (NodeJS required)"
 	echo
 	echo -e "            ------- Testing commands -------"
 	echo -e "            \033[0;32munit\e[0m - Run the server in test environment"
@@ -79,6 +80,17 @@ dev:
 	docker-compose -f docker/build.yml up --abort-on-container-exit
 	docker-compose -f docker/dev.yml up
 
+stats:
+	make head
+ifeq ($(NODE),)
+	exit 0
+	echo "This command require NodeJS"
+	exit 1
+else
+	LIVE=true node src/usage
+endif
+
+
 unit:
 	make head
 	docker-compose -f docker/build.yml up --abort-on-container-exit
@@ -86,7 +98,6 @@ unit:
 
 clean:
 	docker-compose -f docker/deps.yml rm -f
-	docker-compose -f docker/test.yml rm -f
 	docker-compose -f docker/prod.yml rm -f
 	docker-compose -f docker/dev.yml rm -f
-	docker-compose -f docker/fileserver.yml rm -f
+	docker-compose -f docker/build.yml rm -f
