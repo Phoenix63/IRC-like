@@ -1997,6 +1997,9 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			boolNames = false;
 			userInfo.socket.emit("message", "NAMES");
 		}
+		else if(msg.match(/^[\S]+[ ]399[ ][\w\W]+$/)) {
+			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Your password have been update"]);
+		}
 		else if(msg.match(/^[\S]+[ ]403[ ][\w\W]+$/)) {
 			$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "This channel doesnt exist"]);
 		}
@@ -2016,6 +2019,9 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 		}
 		else if(msg.match(/^[\S]+[ ]461[ ]RMFILE[ ][\w\W]+$/)) {
 			$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Not enough parameters RMFILE"]);	
+		}
+		else if(msg.match(/^[\S]+[ ]462[ ][\w\W]+$/)) {
+			$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You are not authorized to do this command (Guest)"]);	
 		}
 		else if(msg.match(/^[\S]+[ ]464[ ][\w\W]+$/)) {
 			bootbox.prompt("Password incorrect", function(ev){
