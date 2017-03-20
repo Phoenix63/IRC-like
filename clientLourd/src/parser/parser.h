@@ -21,7 +21,7 @@ class Parser : public QObject{
 public:
 	Parser();
 	// Initialisation functions
-    void initialize(Channel *channel, QTcpSocket *socket, User user);
+    void initialize(Channel *channel, QTcpSocket *socket, User user, Channellist *list);
     void nickname(QString nick);
     QString nickname();
 	User * userNick();

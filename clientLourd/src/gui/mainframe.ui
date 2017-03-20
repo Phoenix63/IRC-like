@@ -264,6 +264,7 @@
     </property>
     <addaction name="actionConnect"/>
     <addaction name="actionDisconnect"/>
+    <addaction name="actionchannelList"/>
     <addaction name="actionSet_Away"/>
    </widget>
    <widget class="QMenu" name="menuEdition">
@@ -377,6 +378,22 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+W</string>
+   </property>
+  </action>
+  <action name="actionchannelList">
+   <property name="text">
+    <string>List of Channels</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+L</string>
+   </property>
+  </action>
+  <action name="actionJoin">
+   <property name="text">
+    <string>Join</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+J</string>
    </property>
   </action>
  </widget>

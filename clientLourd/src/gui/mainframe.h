@@ -72,9 +72,12 @@ private slots:
 	//QMenus
     //PandIRC
 	void on_actionConnect_triggered();
-	void on_actionDisconnect_triggered();
+    void on_actionDisconnect_triggered();
+    void on_actionchannelList_triggered();
     void on_actionSet_Away_toggled(bool arg1);
     //Channel
+    void on_actionBip_on_messages_toggled(bool arg1);
+    void on_actionHide_join_part_messages_toggled(bool arg1);
     void on_actionClean_triggered();
     void on_actionNames_triggered();
     void on_actionwho_triggered();
@@ -82,10 +85,6 @@ private slots:
     //Settings
 	void on_actionDark_toggled(bool arg1);
 	void on_actionLight_toggled(bool arg1);
-
-    void on_actionBip_on_messages_toggled(bool arg1);
-
-    void on_actionHide_join_part_messages_toggled(bool arg1);
 
 private:
 	// Initialisation functions
@@ -109,6 +108,7 @@ private:
 	MsgList msgList;
     QCompleter *stringCompleter;
     QCompleter *emoteCompleter;
+    Channellist *listOfChannels;
 };
 
 #endif // MAINFRAME_H

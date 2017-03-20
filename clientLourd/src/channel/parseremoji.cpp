@@ -24,7 +24,7 @@ ParserEmoji::ParserEmoji()
 
 QString ParserEmoji::parse(QString string)
 {
-    string.toHtmlEscaped().replace("&amp;","&").replace("&quot;","\"\"");
+    string.toHtmlEscaped().replace("&amp;","&").replace("&quot;","\"\"").replace("&gt;",">");
     for(auto  i : emotes.keys()) {
         QByteArray* byteArray = new QByteArray();
         QBuffer buffer(byteArray);

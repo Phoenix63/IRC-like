@@ -18,13 +18,13 @@ Parser::Parser()
  * Parseur: Initialisation functions
  */
 
-void Parser::initialize(Channel *chan, QTcpSocket *sock, User nick)
+void Parser::initialize(Channel *chan, QTcpSocket *sock, User nick, Channellist *list)
 {
     channel = chan;
     socket = sock;
     self = nick;
-    listOfChannels = new Channellist(NULL, sock);
-    modeParser = new ParserMode(chan);
+    listOfChannels = list;
+    modeParser = new ParserMode(chan); 
 }
 
 void Parser::nickname(QString nick)

@@ -35,7 +35,8 @@ MainFrame::MainFrame(QWidget *parent, QTcpSocket *socket, QString host) :
     initConnect();
     initUIStyle();
     initCompletion();
-    parser.initialize(&channel, socket, User("Guest"));
+    listOfChannels = new Channellist(NULL, socket);
+    parser.initialize(&channel, socket, User("Guest"), listOfChannels);
     msgList.msgSender(ui->messageSender);
     channelModified();
 }
@@ -477,4 +478,12 @@ void MainFrame::on_actionHide_join_part_messages_toggled(bool arg1)
 {
     ui->actionHide_join_part_messages->setChecked(arg1);
     channel.hideNotif(channel.channelName(), arg1);
+}
+
+void MainFrame::on_actionchannelList_triggered()
+{
+    socket->write("LIST\n");
+    listOfChannels->show();
+    listOfChannels->initUIStyle();
+    listOfChannels->clear();
 }
