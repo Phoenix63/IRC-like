@@ -293,7 +293,8 @@ class Channel {
                 this.removeUser(this._users[0]);
             }
         } else {
-            channels.splice(channels.indexOf(this), 1);
+            if(channels.indexOf(this) >= 0)
+                channels.splice(channels.indexOf(this), 1);
         }
 
 
@@ -491,7 +492,8 @@ class Channel {
         if (index < 0) {
             ERRSender.ERR_NOTONCHANNEL(user, this);
         } else {
-            this._users.splice(index, 1);
+            if(index >= 0)
+                this._users.splice(index, 1);
             if(this._usersFlags[user.identity] && !user.isRegisteredWithPass()) {
                 delete this._usersFlags[user.identity];
             }
@@ -506,7 +508,8 @@ class Channel {
             }
 
             if (!this._persistent && this._users.length <= 0) {
-                channels.splice(channels.indexOf(this), 1);
+                if(channels.indexOf(this) >= 0)
+                    channels.splice(channels.indexOf(this), 1);
                 Redis.deleteChannel(this);
             }
         }

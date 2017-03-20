@@ -158,7 +158,8 @@ class Game {
         this._players.forEach((player) => {
             player._team = null;
             if(player.client === client) {
-                this._players.splice(this._players.indexOf(player), 1);
+                if(this._players.indexOf(player) >= 0)
+                    this._players.splice(this._players.indexOf(player), 1);
                 this.state = -1;
                 if(this._players.length === 3) {
                     this.rpl.gameReset();

@@ -165,9 +165,11 @@ class Socket {
         if (this._logger) {
             this._logger._CLIENT_DISCONNECTED();
         }
-        sockets.splice(sockets.indexOf(this), 1);
-        ipConnected[this.ip]--;
-        delete this;
+        if(sockets.indexOf(this) >= 0) {
+            sockets.splice(sockets.indexOf(this), 1);
+            ipConnected[this.ip]--;
+            delete this;
+        }
     }
 
     close() {

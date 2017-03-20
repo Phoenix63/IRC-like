@@ -4,6 +4,8 @@ import colors from './lib/util/Color';
 
 process.env.RUNNING = process.env.RUNNING || 'PROD';
 
+process.title = 'pandirc:main';
+
 let child = null;
 
 function _start() {

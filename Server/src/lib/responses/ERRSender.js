@@ -214,14 +214,6 @@ let ERRSender = {
     ERR_USERONCHANNEL: (socket, nameGuest, nameChannel) => {
         socket.send(':' + config.ip + ' 443 ' + nameGuest + ' ' + nameChannel + ' :is already on channel');
     },
-    /**
-     *
-     * @param client
-     * @constructor
-     */
-    ERR_FILESIZE: (client) => {
-        client.socket.send(':' + config.ip + ' 601 :your file size must be 0 < filesize < ' + config.fileSizeLimit + ' Ko');
-    },
 
     /**
      *

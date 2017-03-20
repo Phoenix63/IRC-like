@@ -73,7 +73,7 @@ prod:
 prod-daemon:
 	make head
 	docker-compose -f docker/build.yml up --abort-on-container-exit
-	docker-compose -f docker/prod.yml up
+	docker-compose -f docker/prod.yml up -d
 
 dev:
 	make head
