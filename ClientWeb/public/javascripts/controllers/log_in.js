@@ -1,10 +1,10 @@
 myApp.controller('log_in_controller', function ($scope, $location, userInfo) {
 	$scope.logIn = function() {
 		if($scope.isSetServer() && $scope.isSetPort()) {
-			userInfo.setServer($scope.server);
+			userInfo.setServer("http://" + $scope.server);
 			userInfo.setPort($scope.port);
 		} else if($scope.isSetServer() && !($scope.isSetPort())) {
-			userInfo.setServer($scope.server);
+			userInfo.setServer("http://" + $scope.server);
 		}
 		userInfo.connect();
 
@@ -73,9 +73,9 @@ myApp.controller('log_in_controller', function ($scope, $location, userInfo) {
 		}
 	}
 	$scope.valid = function() {
-		if($scope.isSetPassword() && $scope.isSetId() && ($scope.port === undefined || $scope.port === "" || typeof($scope.port) === 'number')) {
+		if($scope.isSetPassword() && $scope.isSetId() && ($scope.port === undefined || $scope.port === "" || typeof($scope.port) === 'string')) {
 			return true;
-		} else if(!($scope.isSetPassword()) && !($scope.isSetId()) && ($scope.port === undefined || $scope.port === "" || typeof($scope.port) === 'number')) {
+		} else if(!($scope.isSetPassword()) && !($scope.isSetId()) && ($scope.port === undefined || $scope.port === "" || typeof($scope.port) === 'string')) {
 			return true;
 		} else {
 			return false;

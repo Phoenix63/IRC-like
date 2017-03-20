@@ -39,7 +39,7 @@ myApp.factory("userInfo", function() {
         this.right = newRight;
       },
       "server": "http://crismos.fr",
-      "port": 8089,
+      "port": "8089",
       "socket": "",
 	  "filePort": "",
       "setNick": function(newUserNick) {
