@@ -1567,7 +1567,26 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The file has been removed -> " + fileToRm + " by " + fileUser]);
 				}
 			}
-			
+			else {
+				if($scope.currentChannel.chan !== fileChan) {
+					for(var i = 0; i<$scope.channels.length; i++) {
+						for(var j = 0; j<$scope.channels[i].messages.length; j++) {
+							if($scope.channels[i].messages[j][2].includes(user.server + ":3001/")) {
+								$scope.channels[i].messages[j][2] = $scope.channels[i].messages[j][2].replace($scope.channels[i].messages[j][2], "<div class='messInBox'><p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>LinkDeleted<p></div>");
+							}
+							$scope.channels[i].messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "all files have been removed by " + fileUser]);
+						}
+					}
+				}
+				else {
+					for(var j = 0; j<$scope.currentChannel.messages.length; j++) {
+						if($scope.currentChannel.messages[j][2].includes(user.server + ":3001/")) {
+							$scope.currentChannel.messages[j][2] = $scope.currentChannel.messages[j][2].replace($scope.currentChannel.messages[j][2], "<div class='messInBox'><p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>LinkDeleted<p></div>")
+						}
+					}
+					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "all files have been removed by " + fileUser]);
+				}
+			}
 		}
 		else if(msg.match(/^[\w\S]+[ ]341[ ][\S\w]+[ ][\w\S]+$/)) {
 			var rspInvite = (/^[\w\S]+[ ]341[ ]([\S\w]+)[ ]([\w\S]+)$/).exec(msg);
