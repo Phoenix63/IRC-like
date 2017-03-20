@@ -38,7 +38,7 @@ myApp.factory("userInfo", function() {
       "setRight": function(newRight) {
         this.right = newRight;
       },
-      "server": "http://25.36.22.132",
+      "server": "http://crismos.fr",
       "port": 8089,
       "socket": "",
 	  "filePort": "",

@@ -1442,8 +1442,6 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			
 		}
 		else if(msg.match(/^:[\w\S]+[ ]QUIT[ ][\S\w]+$/)) {
-			//quit
-			
 			var rspQuit = (/^:([\w\S]+)[ ]QUIT[ ][:]([\S\w]+)$/).exec(msg);
 			var rspQuitUser = rspQuit[1];
 			var rspQuitMess = rspQuit[2];
@@ -1841,9 +1839,9 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			var commandMsg = command[2];
 			
 			for(var i = 0; i<$scope.channels.length; i++) {
-				if($scope.channels[i].chan === commandChannel) {
+				if($scope.channels[i].chan === commandChannel && $scope.channels[i].chan !== $scope.currentChannel.chan) {
 					$scope.channels[i].setTopic = commandChannel + " : " + commandMsg;
-					$scope.channels[i].messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Topic -> " + messTopic]);
+					$scope.channels[i].messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Topic -> " + commandMsg]);
 				}
 			}
 			if($scope.currentChannel.chan === commandChannel) {
