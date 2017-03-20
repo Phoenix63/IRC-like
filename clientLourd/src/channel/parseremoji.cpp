@@ -6,6 +6,7 @@
 #include <QRegularExpression>
 #include <QStringList>
 
+#include <QDebug>
 #include "../config/theme.h"
 
 ParserEmoji::ParserEmoji()
@@ -24,7 +25,12 @@ ParserEmoji::ParserEmoji()
 
 QString ParserEmoji::parse(QString string)
 {
-    string.toHtmlEscaped().replace("&amp;","&").replace("&quot;","\"\"").replace("&gt;",">");
+    if (string.startsWith("http://") || string.startsWith("https://")) {
+        QString url = string;
+        string.prepend("<a href=\"");
+        string.append("\">" + url + "</a>\n");
+    } else
+        string.toHtmlEscaped().replace("&amp;","&").replace("&quot;","\"\"").replace("&gt;",">");
     for(auto  i : emotes.keys()) {
         QByteArray* byteArray = new QByteArray();
         QBuffer buffer(byteArray);

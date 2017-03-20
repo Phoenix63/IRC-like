@@ -75,6 +75,8 @@ void MainFrame::printMsgLine(Message chatMsgLine)
     ui->nickBox->addLayout(pseudoBox);
     QLabel *lMessage = new QLabel(chatMsgLine.message());
     lMessage->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    lMessage->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+    lMessage->setOpenExternalLinks(true);
     lMessage->setFixedHeight(20);
     chatLine->addWidget(lMessage);
     chatLine->addStretch(0);

@@ -101,6 +101,7 @@ void Belote::playCard()
             hand.remove(i);
         }
     }
+    setInactive();
 }
 
 void Belote::setInactive()
