@@ -37,6 +37,7 @@ class Socket {
             this._interval = setInterval(() => {
                 if (this._life <= 0) {
                     this._socket.destroy();
+                    clearInterval(this._interval);
                 } else {
                     this._life--;
                     this.send(':' + config.ip + ' PING :' + shortid.generate());

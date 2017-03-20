@@ -50,7 +50,7 @@ module.exports = function (socket, command) {
                         RPLSender.KICK(socket.client, kicked, channel);
                         channel.removeUser(kicked);
                     } else {
-                        ERRSender.ERR_NOTONCHANNEL(socket.client, chan);
+                        ERRSender.ERR_NOSUCHNICK(socket.client, cmd[1]);
                     }
                 } else {
                     ERRSender.ERR_CHANOPRIVSNEEDED(socket.client, chan);

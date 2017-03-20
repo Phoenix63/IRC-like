@@ -50,18 +50,18 @@ class Channel {
         }
 
         // not loaded from mongo
-        if (creator instanceof Client) {
-            if (creator.isAdmin() || creator.isSuperAdmin()) {
+        if(this.name[0] === '#') {
+            if (creator instanceof Client) {
+                if (creator.isAdmin() || creator.isSuperAdmin()) {
+                    this.setPersistent(true);
+                }
+                //this.addUser(creator, pass);
+                this._addChannelFlag('tn');
+            }
+            //load from mongo
+            else {
                 this.setPersistent(true);
             }
-            //this.addUser(creator, pass);
-            this._addChannelFlag('tn');
-        }
-        //load from mongo
-        else {
-            this.setPersistent(true);
-        }
-        if(this.name[0] === '#') {
             channels.push(this);
         }
 
