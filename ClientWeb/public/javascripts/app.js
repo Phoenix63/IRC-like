@@ -48,8 +48,8 @@ myApp.factory("userInfo", function() {
       "setReal": function(newUserRealName) {
         this.realName = newUserRealName;
       },
-      "setUser": function(newUserNick, newUserRealName) {
-        this.nick = newUserNick;
+      "setUser": function(newUserUserN, newUserRealName) {
+        this.userN = newUserUserN;
         this.realName = newUserRealName;
       },
       "setServer": function(newServer) {

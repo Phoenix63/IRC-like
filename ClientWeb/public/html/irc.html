@@ -9,7 +9,7 @@
 	<div id="users">
         <h3>Users list</h3>
         <div ng-repeat="user in currentChannel.listU track by $index">
-            <button class="buttonChUs" ng-context-menu="menuOptionsUser(user)" ng-class="user.right === 3 ? 'admin-color' : ( user.right === 1 ? 'operator-color' : 'default-color')">{{user.nick}}</button>
+            <button class="buttonChUs" ng-context-menu="menuOptionsUser(user)" ng-class="user.right === 1 ? 'operator-color' : (user.right === 2 ? 'user-color' : 'default-color')">{{user.nick}}</button>
         </div>
     </div>
     <div id="messages" scroll-bottom="currentChannel.messages">

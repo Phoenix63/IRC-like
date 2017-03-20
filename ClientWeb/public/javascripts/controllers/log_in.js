@@ -7,7 +7,6 @@ myApp.controller('log_in_controller', function ($scope, $location, userInfo) {
 			userInfo.setServer($scope.server);
 		}
 		userInfo.connect();
-		userInfo.connectFile();
 
 		if(!($scope.isSetNick()) && !($scope.isSetId())) {
 			userInfo.socket.emit("message", "USER " + userInfo.userN + " 0 * : " + userInfo.realName);
@@ -25,7 +24,7 @@ myApp.controller('log_in_controller', function ($scope, $location, userInfo) {
 				userInfo.setReal($scope.id);
 				userInfo.socket.emit("message", "PASS " + $scope.password);
 			}  else if($scope.isSetNick() && $scope.isSetId()) {
-				userInfo.setUser($scope.nickname, $scope.id);
+				userInfo.setUser($scope.id, $scope.id);
 				userInfo.socket.emit("message", "PASS " + $scope.password);
 			} else {
 				console.log("Une erreur s'est produite ///Identification");
