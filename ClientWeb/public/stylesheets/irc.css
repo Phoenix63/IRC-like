@@ -28,8 +28,8 @@ h3::after {
     margin-left: 271px;
     padding: 99px 50px 0px 70px;
     height:85%;
-    #min-height: 100%;
-    overflow: scroll;
+    overflow-y: auto;
+	word-wrap:break-word;
 }
 
 #test {
@@ -70,7 +70,7 @@ h3::after {
     left: 0px;
     top: 0px;
     z-index: 900;
-    overflow: scroll;
+    overflow: auto;
 
 }
 
@@ -92,7 +92,7 @@ h3::after {
     left: 0px;
     top: 50%;
     z-index:500;
-    overflow: scroll;
+    overflow: auto;
 }
 
 #users::-webkit-scrollbar {
