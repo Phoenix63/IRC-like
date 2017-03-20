@@ -101,18 +101,18 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 					fileReceive[0] = fileReceive[0].replace(fileToReplace[1], user.server + ":3001");
 					if(isImage(msgFile[1])) {
 						if(msgToSend === "") {
-							$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + fileReceive[0] + "' target='_blank'>" + fileReceive[1] + "</a></p><p><a href='" + fileReceive[0] + "' target='_blank'><img class = 'previewImage' src='" + fileReceive[0] + "'/></a></p></div>"]);
+							$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + fileReceive[0] + "' target='_blank'>" + fileReceive[0] + "</a></p><p><a href='" + fileReceive[0] + "' target='_blank'><img class = 'previewImage' src='" + fileReceive[0] + "'/></a></p></div>"]);
 						}
 						else {
-							$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + msgToSend + "</p><p><a href='" + fileReceive[0] + "' target='_blank'><img class = 'previewImage' src='" + fileReceive[0] + "'/></a></p></div>"]);
+							$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + fileReceive[0] + "' target='_blank'>" + fileReceive[0] + "</a></p><p>" + msgToSend + "</p><p><a href='" + fileReceive[0] + "' target='_blank'><img class = 'previewImage' src='" + fileReceive[0] + "'/></a></p></div>"]);
 						}
 					}
 					else {
 						if(msgToSend === "") {
-							$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + fileReceive[0] + "' target='_blank'>" + fileReceive[1] + "</a></p></div>"]);
+							$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + fileReceive[0] + "' target='_blank'>" + fileReceive[0] + "</a></p></div>"]);
 						}
 						else {
-							$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + msgToSend + "</p><p><a href='" + fileReceive[0] + "' target='_blank'>" + fileReceive[1] + "</a></p></div>"]);
+							$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + fileReceive[0] + "' target='_blank'>" + fileReceive[0] + "</a></p><p>" + msgToSend + "</p><p><a href='" + fileReceive[0] + "' target='_blank'>" + fileReceive[0] + "</a></p></div>"]);
 						}
 					}
 					if($scope.currentChannel.chan !== "@accueil") {
@@ -295,7 +295,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 		var cmdPart = $scope.newMessage.match(/^\/part[ ][\w\W]+$/);
 		var cmdTopic = $scope.newMessage.match(/^\/topic[ ][#][\S]+[ ][\w\W]+$/);
 		var cmdRmChan = $scope.newMessage.match(/^\/rmchan[ ][#][\S]+$/);
-		var cmdRmFile = $scope.newMessage.match(/^\/rmfile[ ][\S]+$/);
+		var cmdRmFile = $scope.newMessage.match(/^\/rmfile[ ][#][\S]+[ ][\S]+$/);
 		var cmdTopic1 = $scope.newMessage.match(/^\/topic[ ][#][\S]+$/);
 		var cmdKick = $scope.newMessage.match(/^\/kick[ ][#][\S]+[ ][\w\S]+$/);
 		var cmdUser = $scope.newMessage.match(/^\/[a-z]+[ ][\w\S]+$/);
@@ -334,9 +334,10 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				userInfo.socket.emit("message", "RMCHAN " + rmChan);
 			}
 			else if(cmdRmFile !== null) {
-				var commandRmFile = (/^\/rmfile[ ]([\S]+)$/).exec($scope.newMessage);
-				var rmFile = commandRmFile[1];
-				userInfo.socket.emit("message", "RMFILE " + rmFile);
+				var commandRmFile = (/^\/rmfile[ ]([#][\S]+)[ ]([\S\w]+)$/).exec($scope.newMessage);
+				var rmFileCh = commandRmFile[1];
+				var rmFile = commandRmFile[2];
+				userInfo.socket.emit("message", "RMFILE " + rmFileCh + " " + rmFile);
 			}
 			else if(cmdTopic != null) {
 				var command = (/^\/[a-z]+[ ]([#][a-zA-Z0-9]+)[ ]([\w\W ]+)$/).exec($scope.newMessage);
@@ -1059,18 +1060,18 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 								}
 								if(regxUser.right === 1) {//operator or creator of channel
 									if(isImage(urlFile)) {
-										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'><img class = 'previewImage' src='" + urlFile + "'/></a></p></div>"]);
+										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + urlFile + "' target='_blank'>" + urlFile + "</a></p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'><img class = 'previewImage' src='" + urlFile + "'/></a></p></div>"]);
 									}
 									else {
-										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'>" + nameOfFile + "</a></p></div>"]);
+										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + urlFile + "' target='_blank'>" + urlFile + "</a></p><p>" + mess + "</p></div>"]);
 									}
 								}
 								else {//simpleuser
 									if(isImage(urlFile)) {
-										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'><img class = 'previewImage' src='" + urlFile + "'/></a></p></div>"]);
+										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + urlFile + "' target='_blank'>" + urlFile + "</a></p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'><img class = 'previewImage' src='" + urlFile + "'/></a></p></div>"]);
 									}
 									else {
-										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'>" + nameOfFile + "</a></p></div>"]);
+										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + urlFile + "' target='_blank'>" + urlFile + "</a></p><p>" + mess + "</p></div>"]);
 									}
 								}
 							}
@@ -1078,18 +1079,18 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 								var nameOfFile = in_isFile(regxMsg)[1];
 								if(regxUser.right === 1) {//operator or creator of channel
 									if(isImage(regxMsg)) {
-										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p><p><a href='" + regxMsg + "' target='_blank'><img class = 'previewImage' src='" + regxMsg + "'/></a></p></div>"]);
+										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + regxMsg + "</a></p><p><a href='" + regxMsg + "' target='_blank'><img class = 'previewImage' src='" + regxMsg + "'/></a></p></div>"]);
 									}
 									else {
-										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p></div>"]);
+										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + regxMsg + "</a></p></div>"]);
 									}
 								}
 								else {//simpleuser
 									if(isImage(regxMsg)) {
-										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p><p><a href='" + regxMsg + "' target='_blank'><img class = 'previewImage' src='" + regxMsg + "'/></a></p></div>"])
+										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + regxMsg + "</a></p><p><a href='" + regxMsg + "' target='_blank'><img class = 'previewImage' src='" + regxMsg + "'/></a></p></div>"])
 									}
 									else {
-										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p></div>"]);
+										$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + regxMsg + "</a></p></div>"]);
 									}
 								}
 							}
@@ -1116,18 +1117,18 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						}
 						if(regxUser.right === 1) {//operator or creator of channel
 							if(isImage(urlFile)) {
-								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'><img class = 'previewImage' src='" + urlFile + "'/></a></p></div>"]);
+								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + urlFile + "' target='_blank'>" + urlFile + "</a></p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'><img class = 'previewImage' src='" + urlFile + "'/></a></p></div>"]);
 							}
 							else {
-								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'>" + nameOfFile + "</a></p></div>"]);
+								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + urlFile + "' target='_blank'>" + urlFile + "</a></p><p>" + mess + "</p></div>"]);
 							}
 						}
 						else {//simpleuser
 							if(isImage(urlFile)) {
-								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'><img class = 'previewImage' src='" + urlFile + "'/></a></p></div>"]);
+								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + urlFile + "' target='_blank'>" + urlFile + "</a></p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'><img class = 'previewImage' src='" + urlFile + "'/></a></p></div>"]);
 							}
 							else {
-								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'>" + nameOfFile + "</a></p></div>"]);
+								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + urlFile + "' target='_blank'>" + urlFile + "</a></p><p>" + mess + "</p></div>"]);
 							}
 						}
 					}
@@ -1135,18 +1136,18 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						var nameOfFile = in_isFile(regxMsg)[1];
 						if(regxUser.right === 1) {//operator or creator of channel
 							if(isImage(regxMsg)) {
-								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p><p><a href='" + regxMsg + "' target='_blank'><img class = 'previewImage' src='" + regxMsg + "'/></a></p></div>"]);
+								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + regxMsg + "</a></p><p><a href='" + regxMsg + "' target='_blank'><img class = 'previewImage' src='" + regxMsg + "'/></a></p></div>"]);
 							}
 							else {
-								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p></div>"]);
+								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + regxMsg + "</a></p></div>"]);
 							}
 						}
 						else {//simpleuser
 							if(isImage(regxMsg)) {
-								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p><p><a href='" + regxMsg + "' target='_blank'><img class = 'previewImage' src='" + regxMsg + "'/></a></p></div>"])
+								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + regxMsg + "</a></p><p><a href='" + regxMsg + "' target='_blank'><img class = 'previewImage' src='" + regxMsg + "'/></a></p></div>"])
 							}
 							else {
-								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p></div>"]);
+								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + regxMsg + "</a></p></div>"]);
 							}
 						}
 					}
@@ -1201,20 +1202,20 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 								mess = mess + " " + tabFile[j];
 							}
 							if(isImage(urlFile)) {
-								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'><img class = 'previewImage' src='" + urlFile + "'/></a></p></div>"]);
+								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + urlFile + "' target='_blank'>" + urlFile + "</a></p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'><img class = 'previewImage' src='" + urlFile + "'/></a></p></div>"]);
 							}
 							else {
-								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'>" + nameOfFile + "</a></p></div>"]);
+								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + urlFile + "' target='_blank'>" + urlFile + "</a></p><p>" + mess + "</p></div>"]);
 							}
 							
 						}
 						else if(regxMsg.match(regFileWithoutMess) !== null) {
 							var nameOfFile = in_isFile(regxMsg)[1];
 							if(isImage(regxMsg)) {
-								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p><p><a href='" + regxMsg + "' target='_blank'><img class = 'previewImage' src='" + regxMsg + "'/></a></p></div>"]);
+								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + regxMsg + "</a></p><p><a href='" + regxMsg + "' target='_blank'><img class = 'previewImage' src='" + regxMsg + "'/></a></p></div>"]);
 							}
 							else {
-								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p></div>"]);
+								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + regxMsg + "</a></p></div>"]);
 							}
 						}
 						else {
@@ -1233,20 +1234,20 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 								mess = mess + " " + tabFile[j];
 							}
 							if(isImage(urlFile)) {
-								$scope.channels[count].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'><img class = 'previewImage' src='" + urlFile + "'/></a></p></div>"]);
+								$scope.channels[count].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + urlFile + "' target='_blank'>" + urlFile + "</a></p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'><img class = 'previewImage' src='" + urlFile + "'/></a></p></div>"]);
 							}
 							else {
-								$scope.channels[count].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + mess + "</p><p><a href='" + urlFile + "' target='_blank'>" + nameOfFile + "</a></p></div>"]);
+								$scope.channels[count].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + urlFile + "' target='_blank'>" + urlFile + "</a></p><p>" + mess + "</p></div>"]);
 							}
 							
 						}
 						else if(regxMsg.match(regFileWithoutMess)) {
 							var nameOfFile = in_isFile(regxMsg)[1];
 							if(isImage(regxMsg)) {
-								$scope.channels[count].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p><p><a href='" + regxMsg + "' target='_blank'><img class = 'previewImage' src='" + regxMsg + "'/></a></p></div>"]);
+								$scope.channels[count].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + regxMsg + "</a></p><p><a href='" + regxMsg + "' target='_blank'><img class = 'previewImage' src='" + regxMsg + "'/></a></p></div>"]);
 							}
 							else {
-								$scope.channels[count].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + nameOfFile + "</a></p></div>"]);
+								$scope.channels[count].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + regxMsg + "</a></p></div>"]);
 							}
 						}
 						else {
@@ -1442,14 +1443,12 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			else if($scope.currentChannel.chan === chann[1]) {
 				boolNames = false;
 				userInfo.socket.emit("message","NAMES " + $scope.currentChannel.chan);
-				//$scope.currentChannel.removeUser(chann[0]);
 				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), chann[0] + " leave the channel " + chann[1]]);
 			}
 			else {
 				for(var i = 0; i<$scope.channels.length; i++) {
 					if($scope.channels[i].chan === chann[1]) {
 						boolNames = false;
-						//$scope.channels[i].removeUser(chann[0]);
 						userInfo.socket.emit("message","NAMES " + $scope.channels[i].chan);
 						$scope.channels[i].messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), chann[0] + " leave the channel"]);
 						if($scope.channels[i].notif !== 2) {
@@ -1481,17 +1480,29 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				}
 			}
 		}
-		else if(msg.match(/^:[\S]+[ ]RMFILE[ ][:][\S\w]+$/)) {
-			var rmfile = (/^:[\S]+[ ]RMFILE[ ][:]([\S\w]+)$/).exec(msg);
-			var fileToRm = rmfile[1];
+		else if(msg.match(/^:[\S]+[ ]RMFILE[ ][#][\S]+[ ][:][\S\w]+$/)) {
+			var rmFile = (/^:([\S]+)[ ]RMFILE[ ]([#][\S]+)[ ][:]([\S\w]+)$/).exec(msg);
+			var fileUser = rmFile[1];
+			var fileChan = rmFile[2];
+			var fileToRm = rmFile[3];
 			if(fileToRm !== "*"){
-				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The file has been removed -> " + fileToRm]);
-				for(var i = 0; i<$scope.channels.length; i++) {
-					for(var j = 0; j<$scope.channels[i].messages.length; j++) {
-						if($scope.channels[i].messages[j][2].includes(fileToRm) {
-							$scope.channels[i].messages[j][2] = $scope.channels[i].messages[j][2].replace(fileToRm, "deleted");
-						} 
+				if($scope.currentChannel.chan !== fileChan) {
+					for(var i = 0; i<$scope.channels.length; i++) {
+						for(var j = 0; j<$scope.channels[i].messages.length; j++) {
+							if($scope.channels[i].messages[j][2].includes(fileToRm)) {
+								$scope.channels[i].messages[j][2] = $scope.channels[i].messages[j][2].replace($scope.channels[i].messages[j][2], "<div class='messInBox'><p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>LinkDeleted<p></div>");
+							}
+							$scope.channels[i].messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The file has been removed -> " + fileToRm + " by " + fileUser]);
+						}
 					}
+				}
+				else {
+					for(var j = 0; j<$scope.currentChannel.messages.length; j++) {
+						if($scope.currentChannel.messages[j][2].includes(fileToRm)) {
+							$scope.currentChannel.messages[j][2] = $scope.currentChannel.messages[j][2].replace($scope.currentChannel.messages[j][2], "<div class='messInBox'><p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>LinkDeleted<p></div>")
+						}
+					}
+					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The file has been removed -> " + fileToRm + " by " + fileUser]);
 				}
 			}
 			
@@ -1940,6 +1951,9 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 		}
 		else if(msg.match(/^[\S]+[ ]433[ ][\w\W]+$/)) {
 			$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "This nickname is already used"]);		
+		}
+		else if(msg.match(/^[\S]+[ ]461[ ]RMFILE[ ][\w\W]+$/)) {
+			$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Not enough parameters RMFILE"]);	
 		}
 		else if(msg.match(/^[\S]+[ ]464[ ][\w\W]+$/)) {
 			bootbox.prompt("Password incorrect", function(ev){
