@@ -21,6 +21,7 @@ class ParserEmoji
 public:
     ParserEmoji();
     QString parse(QString string);
+    QString parseURL(QString string);
     QHash<QString, QPixmap> * getHashMap();
     QList<QString> keys();
     QPixmap value(QString key);

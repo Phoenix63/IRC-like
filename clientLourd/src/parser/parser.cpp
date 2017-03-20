@@ -512,7 +512,7 @@ bool Parser::in_isPrivMsg(QString string)
     QString mention = '@' + self.name();
     if (string.contains(mention)) {
         QMediaPlayer *player = new QMediaPlayer;
-        player->setMedia(QUrl::fromLocalFile("ressources/AH.mp3"));
+        player->setMedia(QUrl::fromLocalFile(QString(getenv("PWD"))+"ressources/AH.mp3"));
         player->setVolume(30);
         player->play();
     }

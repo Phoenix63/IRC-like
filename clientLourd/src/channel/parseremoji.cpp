@@ -25,11 +25,9 @@ ParserEmoji::ParserEmoji()
 
 QString ParserEmoji::parse(QString string)
 {
-    if (string.startsWith("http://") || string.startsWith("https://")) {
-        QString url = string;
-        string.prepend("<a href=\"");
-        string.append("\">" + url + "</a>\n");
-    } else
+    if (string.contains(QRegularExpression("[http|https]://")))
+        string = parseURL(string);
+    else
         string.toHtmlEscaped().replace("&amp;","&").replace("&quot;","\"\"").replace("&gt;",">");
     for(auto  i : emotes.keys()) {
         QByteArray* byteArray = new QByteArray();
@@ -38,6 +36,21 @@ QString ParserEmoji::parse(QString string)
         string.replace(i, "<img src=\"data:ressources/image/png;base64," + byteArray->toBase64() + ".png\" height=\"20\" />");
     }
     return string;
+}
+
+QString ParserEmoji::parseURL(QString string)
+{
+    int j = string.indexOf(QRegularExpression("[http://|https://]"));
+    QString left = string.left(j);
+    QString rest = string.right(string.length() - j);
+    QStringList tmp = rest.split(' ');
+    QString url = tmp.at(0);
+    tmp.removeFirst();
+    QString right = tmp.join(' ');
+    QString link = url;
+    url.prepend("<a href=\"");
+    url.append("\"style=\"text-decoration: none;\">" + link + "</a>");
+    return left + ' ' + url + ' ' + right;
 }
 
 QList<QString> ParserEmoji::keys()
