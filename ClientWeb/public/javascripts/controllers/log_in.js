@@ -24,6 +24,7 @@ myApp.controller('log_in_controller', function ($scope, $location, userInfo) {
 				userInfo.setReal($scope.id);
 				userInfo.socket.emit("message", "PASS " + $scope.password);
 			}  else if($scope.isSetNick() && $scope.isSetId()) {
+				userInfo.setNick($scope.nickname);
 				userInfo.setUser($scope.id, $scope.id);
 				userInfo.socket.emit("message", "PASS " + $scope.password);
 			} else {
