@@ -22,7 +22,7 @@ void ParserMode::parseUser(QString string)
 void ParserMode::parseChan(QString string)
 {
     QString chan = string.split(' ').at(3);
-	QString mode = string.split(' ').at(4);
+    QString mode = string.split(' ').at(4);
     QString arg = string.split(' ').last();
     if(!isIChanMode(mode, chan))
     if(!isOChanMode(mode, chan, arg))
@@ -32,7 +32,7 @@ void ParserMode::parseChan(QString string)
     if(!isNMode(mode, chan))
     if(!isMMode(mode, chan))
     if(!isLMode(mode, chan, arg))
-    if(!isBMode(mode, chan, arg))
+    if(!isBMode(mode, chan, string.split(' ').at(5)))
     if(!isVMode(mode, chan, arg))
     if(!isKMode(mode, chan, arg))
         return;
@@ -172,7 +172,7 @@ bool ParserMode::isLMode(QString mode, QString chan, QString arg)
 
 bool ParserMode::isBMode(QString mode, QString chan, QString user)
 {
-    if(!mode.contains('m'))
+    if(!mode.contains('b'))
         return false;
     if (mode[0] == '+')
         channel->appendChannel(user + " is now banned from this channel.", chan, nullptr);

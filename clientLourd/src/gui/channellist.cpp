@@ -65,7 +65,7 @@ void Channellist::addRow(QString channel)
 
 void Channellist::on_tableWidget_doubleClicked(const QModelIndex &index)
 {
-    QString channel = ui->tableWidget->item(index.row(), 1)->text();
+    QString channel = ui->tableWidget->item(index.row(), 0)->text();
     channel.prepend("JOIN ");
     channel.append('\n');
     socket->write(channel.toUtf8());
