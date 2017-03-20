@@ -2,10 +2,33 @@
 
 import net from 'net';
 import config from './../../config.json';
-let debug = require('debug')('server:tcp');
+let debug = require('debug')('pandirc:tcp');
+import Socket from './socket';
+import ERRSender from './../responses/ERRSender';
 
 function createServer(callback) {
     let server = net.createServer((socket) => {
+        socket._connectionType = 'tcp';
+        if(Socket.isBan(socket.remoteAddress)){
+            ERRSender.ERR_YOUAREBANNED(socket);
+            socket.destroy();
+            return;
+        }
+        if(!Socket.ipConnected[socket.remoteAddress]) {
+            Socket.ipConnected[socket.remoteAddress] = 0;
+        }
+        Socket.ipConnected[socket.remoteAddress]++;
+
+        if(Socket.list().length > config.maxConnections) {
+            ERRSender.ERR_SERVERSIZELIMIT(socket);
+            socket.destroy();
+            return;
+        }
+        if(Socket.ipConnected[socket.remoteAddress] > config.maxClientByIP) {
+            ERRSender.ERR_MAXCONNECTIONPERIP(socket);
+            socket.destroy();
+            return;
+        }
         callback(socket);
         socket.buffer = '';
         socket.manager.emit('connect');
@@ -44,10 +67,10 @@ function createServer(callback) {
         });
 
         socket.on('close', () => {
-            socket.manager.close();
+            socket.manager.onClose();
         });
         socket.on('end', () => {
-            socket.manager.close();
+            socket.manager.onClose();
         });
 
 

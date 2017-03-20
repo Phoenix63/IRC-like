@@ -28,27 +28,35 @@ class Card {
      * @return {number}
      */
     compare(card, firstColor, trump) {
-        if(this.color === trump && card.color !== trump) {
-            return 1;
+        let val = 0;
+        if(card === this)
+            val = 0;
+        else if(this.color === trump && card.color !== trump) {
+            val = 1;
         }
-        if(this.color !== trump && card.color === trump) {
-            return -1;
+        else if(this.color !== trump && card.color === trump) {
+            val = -1;
         }
-        if(this.color === trump && card.color === trump) {
-            let order = [4,2,7,6,5,3,1,0];
-            return (order.indexOf(this.high)>order.indexOf(card.high)?1:-1);
+        else if(this.color === trump && card.color === trump) {
+            let order = [4,2,7,3,6,5,1,0];
+            val = (order.indexOf(this.high)>order.indexOf(card.high)?-1:1);
         }
-        if(this.color === firstColor && card.color === firstColor) {
+        else if(this.color === firstColor && card.color === firstColor) {
             let order = [7,3,6,5,4,2,1,0];
-            return (order.indexOf(this.high)>order.indexOf(card.high)?1:-1);
+            val = (order.indexOf(this.high)>order.indexOf(card.high)?-1:1);
         }
-        if(this.color === firstColor && card.color !== firstColor) {
-            return 1;
+        else if(this.color === firstColor && card.color !== firstColor) {
+            val = 1;
         }
-        if(this.color !== firstColor && card.color === firstColor) {
-            return -1;
+        else if(this.color !== firstColor && card.color === firstColor) {
+            val = -1;
         }
-        return 0;
+        else {
+            val = 0;
+        }
+        /*console.log(this.toString(true, trump), card.toString(true, trump), firstColor, trump);
+        console.log(val);*/
+        return val;
     }
 
     getPoints(trump) {

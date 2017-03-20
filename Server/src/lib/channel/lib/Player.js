@@ -1,5 +1,5 @@
 
-const debug = require('debug')('delote:player');
+const debug = require('debug')('pandirc:belote:player');
 
 class Player {
     constructor(game, client) {
@@ -80,7 +80,7 @@ class Player {
         return this.client.name;
     }
 
-    getPlayableCard(trump, fold) {
+    getPlayableCard(trump, trumpColor, fold) {
         let pcards = [];
 
         let masterCardOwner = null;
@@ -95,7 +95,7 @@ class Player {
             masterCardOwner = firstCardOwner;
 
             fold.forEach((arr) => {
-                if (arr[1].compare(masterCard, masterCard.color, trump.color) > 0) {
+                if (arr[1].compare(masterCard, firstCard.color, trump.color) > 0) {
                     masterCard = arr[1];
                     masterCardOwner = arr[0];
                 }
@@ -103,17 +103,20 @@ class Player {
             });
 
             if (masterCard.color !== trump.color && masterCard.color === firstCard.color) {
-                playertrumps.map((trump) => {
-                    pcards.push(trump);
-                });
                 playercards.map((c) => {
                     pcards.push(c);
-                })
-                if (pcards.length === 0) {
-                    this._hand.map((c) => {
-                        pcards.push(c);
-                    })
+                });
+                if(pcards.length === 0) {
+                    playertrumps.map((trump) => {
+                        pcards.push(trump);
+                    });
+                    if (pcards.length === 0) {
+                        this._hand.map((c) => {
+                            pcards.push(c);
+                        });
+                    }
                 }
+
             } else {
                 if (masterCard.color !== firstCard.color) {
 
@@ -133,7 +136,7 @@ class Player {
                         })
                         if (pcards.length === 0) {
                             playertrumps.map((trump) => {
-                                if (trump.compare(masterCard, masterCard.color, trump.color) > 0)
+                                if (trump.compare(masterCard, firstCard.color, trump.color) > 0)
                                     pcards.push(trump);
                             });
                             if (pcards.length === 0) {
@@ -152,7 +155,7 @@ class Player {
 
                 } else {
                     playertrumps.map((trump) => {
-                        if (trump.compare(masterCard, masterCard.color, trump.color) > 0)
+                        if (trump.compare(masterCard, firstCard.color, trump.color) > 0)
                             pcards.push(trump);
                     });
                     if (pcards.length === 0) {
@@ -162,7 +165,7 @@ class Player {
                         if (pcards.length === 0) {
                             this._hand.map((c) => {
                                 pcards.push(c);
-                            })
+                            });
                         }
                     }
                 }

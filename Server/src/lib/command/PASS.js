@@ -4,7 +4,7 @@ import ERRSender from './../responses/ERRSender';
 
 module.exports = function (socket, command) {
 
-    if (socket.client.isRegistered) {
+    if (socket.client.isRegistered && !socket.client.isRegisteredWithPass()) {
         ERRSender.ERR_ALREADYREGISTRED(socket.client);
         return;
     }

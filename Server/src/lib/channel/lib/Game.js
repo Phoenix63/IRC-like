@@ -4,6 +4,9 @@ import Deck from './Deck';
 import Player from './Player';
 import Round from './Round';
 import RPLManger from './RPLManager';
+import colors from './../../util/Color';
+
+const debug = require('debug')('pandirc:belote:rpl');
 
 class Game {
     /**
@@ -44,6 +47,7 @@ class Game {
     }
 
     broadcast(message) {
+        debug(colors.magenta('[to] ')+colors.green('all')+'\t'+message);
         this._belote.broadcast(message, null);
     }
 
@@ -81,6 +85,7 @@ class Game {
     }
 
     _roundParser() {
+        this._round++;
         let t1 = this.teams[0];
         let t2 = this.teams[1];
         let t1p = 0;
@@ -115,6 +120,19 @@ class Game {
 
         if(this._points[0] !== this._points[1] && (this._points[0] >= 1000 || this._points[1] >= 1000)) {
             this.rpl.teamWin(this._points[0]>=this._points[1]?0:1);
+            this._points = [0,0];
+
+            this._round = null;
+            this._deck = new Deck();
+
+            this._players.forEach((player) => {
+                player._hand = [];
+            });
+
+            this._teams = [new Team(this, 0), new Team(this, 1)];
+            this._round = 0;
+            this.state = 0;
+
         } else {
             this._roundFactory.call(this);
         }
@@ -153,7 +171,8 @@ class Game {
             player._hand = [];
         });
         this._teams = [new Team(this, 0), new Team(this, 1)];
-
+        this._points = [0,0];
+        this._round = 0;
     }
 
     userSelectTeam(client, teamId) {

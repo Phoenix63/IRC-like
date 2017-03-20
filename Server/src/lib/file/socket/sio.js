@@ -1,6 +1,6 @@
 import sio from 'socket.io';
 import config from './../../../config.json';
-let debug = require('debug')('fileserver:sio');
+let debug = require('debug')('pandirc:fileserver:sio');
 
 class Sio {
     static bind(callback) {

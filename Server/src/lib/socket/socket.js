@@ -1,14 +1,20 @@
-"use strict"
+"use strict";
 
 import tcp from './tcp';
 import sio from './sio';
 import shortid from 'shortid';
 import config from './../../config.json';
-import FileReceiver from '../file/socket/FileReceiver';
+import Redis from './../data/RedisInterface';
+import ERRSender from './../responses/ERRSender';
+
+
+let debug = require('debug')('pandirc:socket');
 
 let sockets = [];
+let bannedIP = {};
+let ipConnected = {};
 
-const interval = config.timeout;
+const interval = config.timeout*1000;
 
 class Socket {
     /**
@@ -35,9 +41,8 @@ class Socket {
                     this._life--;
                     this.send(':' + config.ip + ' PING :' + shortid.generate());
                 }
-            }, interval / 2);
+            }, interval);
         }
-
     }
 
     /**
@@ -101,13 +106,18 @@ class Socket {
      * @param {string} data
      */
     send(data) {
-        if (this._logger)
-            this._logger._SEND_TO_CLIENT(data);
-        if (this.isTcp) {
-            this._socket.write(data + '\n\r');
-        } else {
-            this._socket.emit('message', data);
+        try {
+            if (this._logger)
+                this._logger._SEND_TO_CLIENT(data);
+            if (this.isTcp) {
+                this._socket.write(data + '\n\r');
+            } else {
+                this._socket.emit('message', data);
+            }
+        } catch (e) {
+            debug('Socket is closed');
         }
+
     }
 
     /**
@@ -145,11 +155,8 @@ class Socket {
         }
     }
 
-    /**
-     * delete socket
-     */
-    //onClose not close ...
-    close() {
+
+    onClose() {
         clearInterval(this._interval);
         if (this._client) {
             this._client.remove();
@@ -158,35 +165,77 @@ class Socket {
             this._logger._CLIENT_DISCONNECTED();
         }
         sockets.splice(sockets.indexOf(this), 1);
+        ipConnected[this.ip]--;
         delete this;
     }
 
-    closeTheSockets() {/*
-     if (this.isTcp) {
-     this._socket.
-     } else {
-     this._socket.emit('message', data);
-     }*/
+    close() {
+        if (this.isTcp){
+            this.socket.destroy();
+        }else{
+            this.socket.disconnect(true);
+        }
     }
 
     get ip() {
         return this.isTcp ? this._socket.remoteAddress : this._socket.handshake.address;
     }
 
+    static create(callback) {
+        sio.create(function (socket) {
+            let soc = new Socket('sio', socket);
+            socket.manager = soc;
+            callback(soc);
+        });
+        tcp.create(function (socket) {
+            let soc = new Socket('tcp', socket);
+            socket.manager = soc;
+            callback(soc);
+        });
+    }
+    static isBan(ip){
+        if (bannedIP[ip] && bannedIP[ip] > Date.now()) {
+            return true;
+        } else {
+            delete bannedIP[ip];
+            Redis.setBannedIP(bannedIP);
+            return false;
+        }
+    }
+    static unBan(ip){
+        if(bannedIP[ip]){
+            delete bannedIP[ip];
+            Redis.setBannedIP(bannedIP);
+        }
+    }
+    static ban(userBanned, banishmentTime){
+        let banDuration = parseInt(banishmentTime) * 1000;//millisecond
+        let endTimeOfBan = Date.now() + banDuration;
+        bannedIP[userBanned.ip] = endTimeOfBan;
+        userBanned.socket.close();
+        Redis.setBannedIP(bannedIP);
+    }
 
+    static setBan(ipban){
+        bannedIP = ipban;
+        Redis.setBannedIP(bannedIP);
+    }
+    static list(){
+        return sockets;
+    }
+
+    static updateList(obj) {
+        bannedIP = obj;
+    }
+
+    static getBannedIP() {
+        return bannedIP;
+    }
+
+    static get ipConnected() {
+        return ipConnected;
+    }
 }
 
-function create(callback) {
-    sio.create(function (socket) {
-        let soc = new Socket('sio', socket);
-        socket.manager = soc;
-        callback(soc);
-    });
-    tcp.create(function (socket) {
-        let soc = new Socket('tcp', socket);
-        socket.manager = soc;
-        callback(soc);
-    });
-}
 
-export default {create: create};
+export default Socket;

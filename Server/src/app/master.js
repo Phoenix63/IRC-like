@@ -2,6 +2,9 @@ import RedisInterface from './../lib/data/RedisInterface';
 import dbSaver from './../lib/data/dbSaver';
 import dbLoader from './../lib/data/dbLoader';
 import colors from './../lib/util/Color';
+import Channel from './../lib/channel/Channel';
+import Socket from './../lib/socket/socket';
+
 process.title = 'pandirc:master';
 
 module.exports = {
@@ -12,7 +15,7 @@ function run(cluster) {
     "use strict";
     let _quiting = false;
 
-    let debug = require('debug')('server:app:master');
+    let debug = require('debug')('pandirc:app:master');
 
     RedisInterface.init();
 
@@ -67,9 +70,17 @@ function run(cluster) {
                     server.disconnect();
                     server.kill();
                 }
+            } else if (message.getChannels) {
+                server.send({
+                    type: 'channels',
+                    channels: Channel.list()
+                });
+            } else if (message.getBannedIP) {
+                server.send({
+                    type: 'banip',
+                    ban: Socket.getBannedIP()
+                });
             }
-
-
         });
         server.on('exit', () => {
             if(server._quitSignal && server._quitSignal === 'quit') {

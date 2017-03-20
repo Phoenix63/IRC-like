@@ -3,7 +3,7 @@ import bufferManager from './../modules/bufferSpliter';
 import Tcp from './tcp';
 import Sio from './sio';
 import config from './../../../config.json';
-let debug = require('debug')('fileserver:socket');
+let debug = require('debug')('pandirc:fileserver:socket');
 
 import fs from 'fs';
 
@@ -19,7 +19,7 @@ class SocketKicker {
         }
         this.timeout = setTimeout(() => {
              this.socket.destroy();
-        }, 5000);
+        }, (config.timeout>0?config.timeout*1000:5000));
     }
 }
 

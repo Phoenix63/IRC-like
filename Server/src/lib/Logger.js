@@ -2,7 +2,11 @@
 
 import Client from './client/Client';
 import colors from './util/Color';
-let debug = require('debug')('server:logger');
+
+let debug = require('debug')('pandirc:logger');
+let receive = require('debug')('pandirc:receive');
+let send = require('debug')('pandirc:send');
+
 
 
 function throwError(client, message) {
@@ -44,14 +48,14 @@ class Logger {
     };
 
     _SEND_TO_CLIENT(message) {
-        debug(colors.magenta('[to] ') + colors.green(this.client.name) + '<< ' + message);
+        send(colors.magenta('[to] ') + colors.green(this.client.name) + '<< ' + message);
     };
 
     _USER_SEND_CMD(message) {
         if(message.indexOf('PASS ')===0) {
             message = 'PASS ********';
         }
-        debug(colors.magenta('[from] ') + colors.red(this.client.name) + '>> ' + message);
+        receive(colors.magenta('[from] ') + colors.red(this.client.name) + '>> ' + message);
     };
 
     _CLIENT_LOGGED() {

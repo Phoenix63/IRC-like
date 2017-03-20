@@ -1,6 +1,6 @@
 let redis = require('redis');
 let config = require('./../../ENV.json');
-let debug = require('debug')('server:redis');
+let debug = require('debug')('pandirc:redis');
 let client;
 
 class Redis {
@@ -17,6 +17,16 @@ class Redis {
             if (err) {
                 throw err;
             }
+        });
+    }
+
+    static setBannedIP(bannedIP) {
+        client.set("bannedIP", JSON.stringify(bannedIP));
+    }
+
+    static getBannedIP(callback) {
+        client.get("bannedIP", function (err, reply) {
+            callback(reply);
         });
     }
 

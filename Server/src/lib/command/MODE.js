@@ -4,14 +4,15 @@ import Channel from './../channel/Channel';
 import Client from './../client/Client';
 import ERRSender from './../responses/ERRSender';
 import RPLSender from './../responses/RPLSender';
+import Socket from './../../lib/socket/socket';
 
 module.exports = function (socket, command) {
     if (!socket.client.isRegistered) {
         ERRSender.ERR_NOTREGISTERED(socket.client, 'MODE');
         return;
     }
-    let channelModeRegex = /^(#[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15}) ([+|-])([opsitnmlbvk]{1,11})(?: ([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15})(?: ([0-9]{1,9})$|$)|$)/.exec(command[1]);
-    let userModeRegex = /^([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15}) ([+|-])([iswo]{1,11})$/.exec(command[1]);
+    let channelModeRegex = /^(#[a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15}) ([+|-])([opsitnmlbvk]{1,11})(?: ([a-zA-Z0-9_-é"'ëäïöüâêîôûç`è]{1,15})(?: ([0-9]{1,15})$|$)|$)/.exec(command[1]);
+    let userModeRegex = /^([a-zA-Z0-9_-é"'ëäï.öüâêîôûç`è]{1,15}) ([+|-])([iswbo]{1,5})(?: ([0-9]{1,15})$|$)/.exec(command[1]);
 
     if (channelModeRegex) {
         let nameChannel = channelModeRegex[1];
@@ -129,11 +130,17 @@ module.exports = function (socket, command) {
             channel.changeChannelFlag(sign, 'm');
         }
     } else if (userModeRegex) {
+        //name user can be ip
         let nameUser = userModeRegex[1];
         let sign = userModeRegex[2];
         let flags = userModeRegex[3];
-
+        let banDuration = userModeRegex[4];
         let user = Client.getClient(nameUser);
+
+        if (flags.indexOf('b') > -1 && sign === '-') {
+            Socket.unBan(nameUser);
+            return;
+        }
         if (!user) {
             ERRSender.ERR_NOSUCHNICK(socket.client, nameUser);
             return;
@@ -154,16 +161,26 @@ module.exports = function (socket, command) {
         } else if (user != socket.client) {
             /*Possibility of change*/
             if (!user.isRegisteredWithPass()) {
-                ERRSender.ERR_NOTREGISTERED(socket.client, "MODE");
+                ERRSender.ERR_USERSDONTMATCH(socket.client);
                 return;
             }
             if (socket.client.isSuperAdmin()) {
                 if (flags.indexOf('o') > -1) {
                     user.changeFlag(sign, 'o');
                 }
+                if (flags.indexOf('b') > -1 ) {
+                    if (sign === '+' && banDuration) {
+                        Socket.ban(user, banDuration);
+                    }
+                }
             } else if (socket.client.isAdmin() && !user.isAdmin() && !user.isSuperAdmin()) {
                 if (flags.indexOf('o') > -1) {
                     user.changeFlag(sign, 'o');
+                }
+                if (flags.indexOf('b') > -1) {
+                    if (sign === '+' && banDuration) {
+                        Socket.ban(user, banDuration);
+                    }
                 }
             }
             else {

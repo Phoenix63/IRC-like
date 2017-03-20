@@ -1,4 +1,4 @@
-const debug = require('debug')('belote:Round');
+const debug = require('debug')('pandirc:belote:Round');
 
 class Round {
     /**
@@ -20,6 +20,7 @@ class Round {
         this._deck.reset();
 
         this._trump = null;
+        this._trumpColor = -1;
         this._takeTurn = -1;
         this._play = 0;
 
@@ -63,7 +64,9 @@ class Round {
     }
 
     _showTrump() {
+        this._trumpColor = -1;
         this._trump = this._deck.getCards(1)[0];
+        this._trumpColor = this._trump.color;
         this._takeTurn = 0;
         this._play = 0;
         this.game.rpl.trumpIs(this._trump);
@@ -81,7 +84,7 @@ class Round {
                 let isNext = true;
 
                 this._play++;
-                if(this._play > 4) {
+                if(this._play >= 4) {
                     this._play = 0;
                     this._takeTurn++;
                     if(this._takeTurn > 1) {
@@ -96,11 +99,14 @@ class Round {
                 }
                 this._notifyPlayerToTake();
             } else if(index >= 0 && this._trump) {
-                if(this._takeTurn === 0 && colors === this._trump.color || this._takeTurn === 1 && colors !== this._trump.color) {
+                if(this._takeTurn === 0 && colors === this._trumpColor || this._takeTurn === 1 && colors !== this._trumpColor) {
                     this._players[index].addCardToHand([this._trump]);
 
                     player.team.take();
-                    this.game.rpl.playerTake(this._play, this._trump);
+
+                    this._trumpColor = colors;
+
+                    this.game.rpl.playerTake(this._play, this._trump, this._trumpColor);
 
                     for(let i = 0 ; i<4; i++) {
                         this._players[i].addCardToHand(this._deck.getCards((i === index ? 2 : 3)));
@@ -125,7 +131,7 @@ class Round {
         this._players.forEach((player) => {
             debug('--------- '+player.client.name+' ----------');
             debug(player._hand.map((c) => {
-                return c.toString(true, this._trump.color);
+                return c.toString(true, this._trumpColor);
             }).join('\t| '));
         });
 
@@ -133,7 +139,7 @@ class Round {
     }
 
     _notifyToPlay() {
-        this.game.rpl.playerTurn(this._players[this._play], this._players[this._play].getPlayableCard(this._trump, this._folds[this._currentFold]).playable.join(','));
+        this.game.rpl.playerTurn(this._players[this._play], this._players[this._play].getPlayableCard(this._trump, this._trumpColor, this._folds[this._currentFold]).playable.join(','));
     }
 
     playerPlayCard(player, card) {
@@ -146,33 +152,44 @@ class Round {
                 });
 
                 if(player._hand.indexOf(card) >= 0) {
-                    let cds = player.getPlayableCard(this._trump, this._folds[this._currentFold]);
+                    let cds = player.getPlayableCard(this._trump, this._trumpColor, this._folds[this._currentFold]);
                     let play = cds.playable;
                     let masterCardOwner = cds.master.player;
                     let masterCard = cds.master.card;
 
                     if(play.indexOf(card) >= 0) {
+
+                        if(!masterCard || card.compare(masterCard, this._folds[this._currentFold][0][1].color, this._trumpColor)>0) {
+                            masterCard = card;
+                            masterCardOwner = player;
+                        }
+
+
                         let end = false;
                         this._folds[this._currentFold].push([player, card]);
 
                         this._deck._played.push(card);
 
-                        debug('----------------- pli ('+this._trump.color+') ------------');
-                        let better = false;
-                        debug(this._folds[this._currentFold].map((c) => {
-                            return c[1].toString(true, this._trump.color);
-                        }).join('\t| '));
                         this.game.rpl.playerPlay(this._play, card);
                         player.play(card.value);
                         this._play++;
                         if(this._play >= 4) {
                             this._play = 0;
                         }
+
+                        debug('----------------- pli ('+this._trumpColor+') ------------');
+                        debug(this._folds[this._currentFold].map((c) => {
+                            if(c[1] === masterCard)
+                                return '*'+c[1].toString(true, this._trumpColor);
+                            return c[1].toString(true, this._trumpColor);
+                        }).join('\t| '));
+                        console.log();
+
                         if(this._folds[this._currentFold].length >= 4) {
                             this._players.forEach((player) => {
                                 debug('--------- '+player.client.name+' ----------');
                                 debug(player._hand.map((c) => {
-                                    return c.toString(true, this._trump.color);
+                                    return c.toString(true, this._trumpColor);
                                 }).join('\t| '));
                             });
 
@@ -182,8 +199,11 @@ class Round {
                             } else {
                                 this._play = this._players.indexOf(masterCardOwner);
                             }
+                            this.game.rpl.endOfFold(this._folds[this._currentFold-1].map((f) => {
+                                return f[1];
+                            }).join(','));
                             this._folds[this._currentFold-1].forEach((pc) => {
-                                masterCardOwner.team.addPoints(pc[1].getPoints(this._trump.color));
+                                masterCardOwner.team.addPoints(pc[1].getPoints(this._trumpColor));
                             });
                             if(this._currentFold === this._folds.length-1) {
                                 masterCardOwner.team.addPoints(10);

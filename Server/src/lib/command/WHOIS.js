@@ -18,10 +18,10 @@ module.exports = function (socket, command) {
             RPLSender.RPL_WHOISUSER(socket.client, user);
         } else {
             ERRSender.ERR_NONICKNAMEGIVEN(socket.client);
-            return;
+            return null;
         }
     } else {
         ERRSender.ERR_NONICKNAMEGIVEN(socket.client);
-        return;
+        return null;
     }
 };
