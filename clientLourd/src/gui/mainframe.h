@@ -27,7 +27,7 @@ class MainFrame : public QMainWindow
 
 public:
 	//Constructor and Destructor
-    explicit MainFrame(QWidget *parent = 0, QTcpSocket *socket=NULL, QString host = "localhost");
+    explicit MainFrame(QWidget *parent = 0, QTcpSocket *socket=NULL, QString host = "localhost", int port = 8088);
 	~MainFrame();
 
 	void connectSocket();
@@ -49,6 +49,7 @@ public slots:
 	void topicModified();
 	void lineAdded();
     void refreshMentionList();
+    void nickModified(QString nick);
 
 	//Socket slots
 	void readyRead();
@@ -100,6 +101,7 @@ private:
 
 	//Tcp pointer from login
 	QTcpSocket *socket;
+    int port;
     QString host;
 
 	//Parser and channel for message handling

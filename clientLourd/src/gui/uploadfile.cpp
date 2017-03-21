@@ -24,6 +24,7 @@ void Upload::run()
         QFile inputFile(i);
         int size = inputFile.size();
         QString fileName = i.split('/').last();
+        fileName = fileName.split(' ').join('_');
         QString toSend = "FILE " + QString::number(size, 10) + " " + fileName + '\n';
         socket->write(toSend.toLatin1());
         inputFile.open(QIODevice::ReadOnly);

@@ -22,11 +22,12 @@
  * Mainframe: constructor and destructor
  */
 
-MainFrame::MainFrame(QWidget *parent, QTcpSocket *socket, QString host) :
+MainFrame::MainFrame(QWidget *parent, QTcpSocket *socket, QString host, int port) :
     QMainWindow(parent),
     ui(new Ui::MainFrame),
     socket(socket),
     host(host),
+    port(port),
     channel(&parserEmoji),
     stringCompleter(nullptr),
     emoteCompleter(nullptr)
@@ -108,7 +109,6 @@ void MainFrame::clearLayout(QLayout *layout)
         if (item->widget()) {
             delete item->widget();
         }
-        delete item;
     }
 }
 
@@ -192,6 +192,11 @@ void MainFrame::lineAdded()
 void MainFrame::topicModified()
 {
     ui->topicDisplay->setText(channel.topic());
+}
+
+void MainFrame::nickModified(QString nick)
+{
+    this->setWindowTitle(nick + '@' + host + ":" + QString::number(port));
 }
 
 /*
@@ -401,6 +406,7 @@ void MainFrame::initConnect()
     connect(&parser, &Parser::changeChannelSignal, this, &MainFrame::changeChannel);
     connect(&parser, &Parser::topicModifiedSignal, this, &MainFrame::topicModified);
     connect(&parser, &Parser::lineAddedSignal, this, &MainFrame::lineAdded);
+    connect(&parser, &Parser::nickModifiedSignal, this, &MainFrame::nickModified);
 }
 
 void MainFrame::initCompletion()

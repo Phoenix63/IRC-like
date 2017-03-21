@@ -438,11 +438,11 @@ bool Parser::in_isNameList(QString string)
         return false;
     channel->appendChannel(string, "\"Debug\"", nullptr);
     QString tmp = string.split(':').last();
-    QString chan = string.split(' ').at(4);
+    QString chan = string.split(' ').at(3);
     channel->change(chan);
     QStringList users = tmp.split(' ');
     for (auto i:users){
-        channel->addUser(i,chan);
+        channel->addUser(i, chan);
     }
     emit changeChannelSignal();
     emit chatModifiedSignal();
@@ -478,7 +478,6 @@ bool Parser::in_isPartNote(QString string)
     QString chan = string.split(' ').at(2);
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString message = string.right(string.length() - j);
-    qDebug() << "channel is "<< chan;
     if (user.compare(self.name())) {
         channel->removeUser(user, chan);
         if (!channel->hideNotif(chan))
@@ -578,8 +577,10 @@ bool Parser::in_isNickEdit(QString string)
             emit channelModifiedSignal();
         }
     }
-    if (!nick.compare(self.name()))
+    if (!nick.compare(self.name())) {
         nickname(newNick);
+        emit nickModifiedSignal(newNick);
+    }
     channel->changeNick(nick, newNick);
     emit userModifiedSignal();
     emit chatModifiedSignal();

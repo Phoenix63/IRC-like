@@ -41,6 +41,7 @@ signals:
 	void cleanSignal();
 	void changeChannelSignal();
     void lineAddedSignal();
+    void nickModifiedSignal(QString nick);
 
 private:
 	// Out functions

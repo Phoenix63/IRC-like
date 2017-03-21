@@ -43,8 +43,6 @@ void UploadWindow::parse(QString string)
         ui->progressBar->setValue(progress.split('/').at(0).toInt());
     } else {
         QString url = string.right(string.length() - j - 1);
-        QLabel *result = new QLabel(url);
-        ui->urlLayout->addWidget(result);
         emit resultReady(url);
     }
 }

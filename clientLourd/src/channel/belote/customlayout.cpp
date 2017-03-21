@@ -29,7 +29,6 @@ void CustomLayout::clicked()
     for (auto i:buttons.keys()) {
         if (i) {
             if (i->isDown()) {
-                qDebug() << "button : " << i->text();
                 emit isClicked(buttons[i], this);
             }
         }

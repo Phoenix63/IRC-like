@@ -59,7 +59,7 @@ bool Login::doConnect()
         QMessageBox::information(this, "Error", "Host not found");
         return false;
     } else {
-        main = new MainFrame(NULL, socket, host);
+        main = new MainFrame(NULL, socket, host, port);
         connect(main, &MainFrame::showLogin, this, &Login::show);
         main->show();
         main->setWindowTitle("Guest@" + host + ":" + QString::number(port));
