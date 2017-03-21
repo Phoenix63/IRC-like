@@ -1558,8 +1558,6 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 							}
 						}
 					}
-						
-					
 				}
 				else {
 					var newNick = msgToPush[1];
@@ -1743,6 +1741,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				var fileUser = rmFile[1];
 				var fileChan = rmFile[2];
 				var fileToRm = rmFile[3];
+				var fileName = in_isFile(fileToRm)[1];
 				if(fileToRm !== "*"){
 					if($scope.currentChannel.chan !== fileChan) {
 						for(var i = 0; i<$scope.channels.length; i++) {
@@ -1750,7 +1749,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 								if($scope.channels[i].messages[j][2].includes(fileToRm)) {
 									$scope.channels[i].messages[j][2] = $scope.channels[i].messages[j][2].replace($scope.channels[i].messages[j][2], "<div class='messInBox'><p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>LinkDeleted<p></div>");
 								}
-								$scope.channels[i].messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The file has been removed -> " + fileToRm + " by " + fileUser]);
+								$scope.channels[i].messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The file has been removed -> " + fileName + " by " + fileUser]);
 							}
 						}
 					}
@@ -1760,7 +1759,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 								$scope.currentChannel.messages[j][2] = $scope.currentChannel.messages[j][2].replace($scope.currentChannel.messages[j][2], "<div class='messInBox'><p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>LinkDeleted<p></div>")
 							}
 						}
-						$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The file has been removed -> " + fileToRm + " by " + fileUser]);
+						$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "The file has been removed -> " + fileName + " by " + fileUser]);
 					}
 				}
 				else {
@@ -2120,10 +2119,12 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				}
 				else if(rspModeFlag === "+i") {
 					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), rspModeUser + " is now invisible"]);
-					boolOnlyOneUser = true;
-					userInvisible = rspModeUser;
-					boolNames = false;
-					userInfo.socket.emit("message", "NAMES");
+					for(var i = 0; i<$scope.channels.length; i++) {
+						boolOnlyOneUser = true;
+						userInvisible = rspModeUser;
+						boolNames = false;
+						userInfo.socket.emit("message", "NAMES " + $scope.channels[i].chan);
+					}
 				}
 				else if(rspModeFlag === "-i") {
 					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), rspModeUser + " is not invisible"]);
@@ -2312,6 +2313,4 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 		$scope.currentChannel.messages.push([new User("debug"), new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), msg]);
 		$scope.$apply();
     });
-
-
 });

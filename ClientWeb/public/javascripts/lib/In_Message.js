@@ -10,9 +10,9 @@
 	function in_isNames(msg) {
 		var msSplit = msg.split(' ');
 		var listUsers = [];
-		var channSet = msSplit[3];
-		var chann = msSplit[4];
-		for(var i = 5; i<msSplit.length; i++) {
+		var channSet = msSplit[2];
+		var chann = msSplit[3];
+		for(var i = 4; i<msSplit.length; i++) {
 			msSplit[i] = msSplit[i].replace(":","");
 			if(msSplit[i].includes("@")) {
 				msSplit[i] = msSplit[i].replace("@","");
