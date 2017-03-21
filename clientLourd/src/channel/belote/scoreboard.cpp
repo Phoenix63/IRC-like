@@ -22,6 +22,11 @@ ScoreBoard::~ScoreBoard()
     delete ui;
 }
 
+void ScoreBoard::reset()
+{
+    ui->scores->clear();
+}
+
 void ScoreBoard::addRound(QString taker, int trump)
 {
     ui->scores->insertRow(ui->scores->rowCount());

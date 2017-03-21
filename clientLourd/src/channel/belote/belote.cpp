@@ -85,6 +85,7 @@ void Belote::parse(QString string)
     if (!in_isCardDeal(string))
     if (!in_isTeamPoints(string))
     if (!in_isYourTurn(string))
+    if (!in_isTeamWon(string))
         qDebug() << "cant find this";
 }
 
@@ -97,8 +98,16 @@ void Belote::playCard()
             socket->write(message.toUtf8());
             hand[i]->setIcon(QIcon());
             hand[i]->clearMask();
-            ui->south->removeWidget(hand[i]);
+            for (int j = 0; j < ui->south->count(); j++) {
+                if (ui->south->itemAt(j)->widget() == hand[i]) {
+                    hand[i]->hide();
+                    QLayoutItem *card = ui->south->takeAt(j);
+                    delete card;
+                    break;
+                }
+            }
             hand.remove(i);
+            qDebug() << ui->south->count();
         }
     }
     setInactive();
@@ -155,7 +164,7 @@ void Belote::receiveCard(int val)
     cropped.scaledToHeight(70,Qt::SmoothTransformation);
     QPushButton *newCard = new QPushButton();
     newCard->setIcon(cropped);
-    newCard->setStyleSheet("background-color: rgba( 255, 255, 255, 0%);");
+    newCard->setStyleSheet("background-color: rgba( 255, 255, 255, 0%); border: 1px solid black;");
     newCard->setIconSize(QSize(70, 90));
     ui->south->addWidget(newCard);
     hand[card] = newCard;
@@ -164,6 +173,7 @@ void Belote::receiveCard(int val)
 
 void Belote::emptyHand()
 {
+    clearLayout(ui->south);
     for(auto i:hand.keys()) {
         hand.remove(i);
     }
@@ -171,6 +181,7 @@ void Belote::emptyHand()
 
 void Belote::chooseTeam()
 {
+    ui->order->hide();
     clearLayout(ui->buttons);
     QMessageBox teamSelec;
     teamSelec.setText("Which team do you want to join ?");
@@ -323,11 +334,11 @@ bool Belote::in_isGameStart(QString string)
 {
     if (!string.contains(BELOTE::RPL::ROUNDSTART))
         return false;
-    QString players = string.split(' ').last();
-    QStringList playerList = players.split(',');
-    qDebug() << playerList;
+    turnOrder = string.split(' ').last();
+    ui->order->setText("Turn Order :" + turnOrder);
+    ui->order->show();
+    QStringList playerList = turnOrder.split(',');
     position(playerList.indexOf(username));
-    qDebug() << position();
     QString eastPlayer = playerList.at((position() + 1) % 4);
     QString northPlayer = playerList.at((position() + 2) % 4);
     QString westPlayer = playerList.at((position() + 3) % 4);
@@ -350,11 +361,25 @@ bool Belote::in_isYourTurn(QString string)
 bool Belote::in_isTeamPoints(QString string)
 {
     if (!string.contains(BELOTE::RPL::TEAMPOINTS))
-        return false;
+        return false; 
+    emptyHand();
+    ui->order->hide();
     QString points = string.split(' ').last();
     score->addScore(points);
     ui->scoreboard->setItem(0, 0, new QTableWidgetItem(points.split(',').at(0)));
     ui->scoreboard->setItem(0, 1, new QTableWidgetItem(points.split(',').at(1)));
+    return true;
+}
+
+bool Belote::in_isTeamWon(QString string)
+{
+    if (!string.contains(BELOTE::RPL::TEAMWIN))
+        return false;
+    emptyHand();
+    score->reset();
+    qDebug() << "winner :" << string.split(' ').at(4);
+    QString winner = (string.split(' ').at(4) == '0') ? "Kotei" : "Jbzz";
+    QMessageBox::information(this, "End of game", "Team " + winner + " won !");
     return true;
 }
 

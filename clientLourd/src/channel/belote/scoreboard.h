@@ -15,6 +15,7 @@ class ScoreBoard : public QDialog
 public:
     explicit ScoreBoard(QWidget *parent = 0);
     ~ScoreBoard();
+    void reset();
 
     void addRound(QString taker, int trump);
     void addScore(QString scores);

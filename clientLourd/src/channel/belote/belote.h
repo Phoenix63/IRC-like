@@ -68,9 +68,11 @@ private:
     bool in_isEndFold(QString string);
     bool in_isTakeTurn(QString string);
     bool in_isTeamPoints(QString string);
+    bool in_isTeamWon(QString string);
 private:
     QString username;
     QString channelName;
+    QString turnOrder;
     int aPosition;
     Ui::Belote *ui;
     QTcpSocket *socket;
