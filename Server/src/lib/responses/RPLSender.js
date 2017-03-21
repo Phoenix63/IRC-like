@@ -12,31 +12,15 @@ let RPLSender = {
      * @static
      */
     RPL_NAMREPLY: (client, channel) => {
-        let sep = '=';
-        if (channel.isSecret)
-            sep = '@';
-        if (channel.isPrivate)
-            sep = '*';
-
-        let ret = ':' + config.ip + ' 353 ' + client.name + ' ' + sep + ' ' + channel.name;
-        let us = '';
-        channel.users.forEach((user) => {
-            if (user.isInvisible()) {
-                return;
-            }
-            let delimiter = '';
-            if (channel.isUserOperator(user)) {
-                delimiter = '@';
-            } else if (channel.isUserVoice(user)) {
-                delimiter = '+';
-            }
-            us += ' ' + delimiter + user.name;
+        let channelMode = (channel.isSecret?'@':'')+(channel.isPrivate?'*':'');
+        channelMode = (channelMode.length>0?channelMode+' ':'= ');
+        let users = channel.users.filter((user)=>(!user.isInvisible())).map((user) => {
+            return (channel.isUserOperator(user)?'@':channel.isUserVoice(user)?'+':'')+user.name;
         });
-
-        if (us) {
-            client.socket.send(ret + (us ? ' :' + us.slice(1, us.length) : ''));
+        if (users.length>0) {
+            client.socket.send(':' + config.ip + ' 353 ' + channelMode+channel.name+' :'+users.join(' '));
         }
-        client.socket.send(':' + config.ip + ' 366 ' + client.name + ' :End of /NAMES list');
+        client.socket.send(':' + config.ip + ' 366 ' + channel.name + ' :End of /NAMES list');
     },
 
     /**
@@ -314,7 +298,7 @@ let RPLSender = {
      * @constructor
      */
     RMFILE: (socket, chan, file) => {
-        chan.broadcast(':' + socket.client.name + ' RMFILE :' + file, null);
+        chan.broadcast(':' + socket.client.name + ' RMFILE '+chan.name+' :' + file, null);
     },
 
     RPL_YOUREOPER: (socket) => {

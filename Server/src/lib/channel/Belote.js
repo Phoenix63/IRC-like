@@ -53,7 +53,8 @@ class Belote extends Channel {
         if (index < 0) {
             ERRSender.ERR_NOTONCHANNEL(user, this);
         } else {
-            this._users.splice(index, 1);
+            if(index >= 0)
+                this._users.splice(index, 1);
             RPLSender.PART(user, this, message);
 
             if (!bool) {
@@ -63,7 +64,8 @@ class Belote extends Channel {
 
 
             if (!this._persistent && this._users.length <= 0) {
-                belotes.splice(belotes.indexOf(this), 1);
+                if(belotes.indexOf(this) >= 0)
+                    belotes.splice(belotes.indexOf(this), 1);
             }
         }
     }

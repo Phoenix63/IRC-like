@@ -268,7 +268,8 @@ class Client {
             this._channels[i].removeUser(this, 'Quit', true);
         }
         RPLSender.QUIT(this, 'Gone');
-        clients.splice(clients.indexOf(this), 1);
+        if(clients.indexOf(this) >= 0)
+            clients.splice(clients.indexOf(this), 1);
     };
 
 
@@ -277,7 +278,8 @@ class Client {
      * @param {Channel} channel
      */
     removeChannel(channel) {
-        this._channels.splice(this._channels.indexOf(channel), 1);
+        if(this._channels.indexOf(channel) >= 0)
+            this._channels.splice(this._channels.indexOf(channel), 1);
     }
 
     /**

@@ -14,7 +14,7 @@
     "sioport": 8091
   },
   "fileSizeLimit": 2097152,
-  "timeout": 30,
+  "timeout": 60,
   "maxConnections": 100,
   "maxClientByIP": 10
 }

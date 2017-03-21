@@ -16,6 +16,7 @@ let allowedCommand = {
     'PASS': require('./command/PASS'),
     'PONG': function () {
     },
+    'PING': require('./command/PING'),
     'WHOIS': require('./command/WHOIS'),
     'MODE': require('./command/MODE'),
     'TOPIC': require('./command/TOPIC'),
