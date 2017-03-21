@@ -184,7 +184,9 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 		}],
 		['SetTopic', function ($itemScope) {
 			bootbox.prompt("Set the topic", function(setTopic){
-				userInfo.socket.emit("message", "TOPIC " +$scope.currentChannel.chan + " " + setTopic);
+				if(setTopic !== null) {
+					userInfo.socket.emit("message", "TOPIC " +$scope.currentChannel.chan + " " + setTopic);
+				}
 			});
 		}],
 		['Mute', function ($itemScope) {
