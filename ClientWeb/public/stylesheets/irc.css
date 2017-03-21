@@ -1,72 +1,243 @@
-#channels {
-    position: absolute;
-    top:0;
-    bottom: 0;
-    left: 0;
-    width : 200px;
-    background-color: #8b564b;
+body, html {
+    height: 100%;
+    margin: 0px;
+    padding: 0px;
+    overflow: auto;
+}
+
+h1,h2,h3 {
+    margin: 0px;
+    padding: 0px;
     text-align: center;
+    display: block;
+    padding: 15px 15px 0px 15px;
+    color: rgba(255,255,255,0.9);
+}
+
+h3::after {
+    content: '';
+    display: block;
+    margin: 10px 30px 0px 30px;
+    height: 2px;
+    background-color: rgba(255,255,255,0.3);
 }
 
 #messages {
-	overflow-y: auto;
-	overflow-x: hidden;
-	word-wrap:break-word;
-    position: absolute;
-    top:100px;
-    left: 200px;
-    right:200px;
-    bottom:50px;
-    background-color: #25608b;
+    background-color: #ffffff;
+    display: block;
+    margin-left: 271px;
+    padding: 99px 50px 0px 70px;
+    height:85%;
+    #min-height: 100%;
+    overflow: scroll;
+}
+
+#test {
+    background-color: #ffffff;
+    display: block;
+    margin-left: 271px;
+    height:60px;
+}
+
+#messages h3 {
+    position: fixed;
+    top: 0px;
+    left: 270px;
+    color: rgba(255,255,255,0.8);
+    background-color: #2f343f;
+    padding-bottom: 10px;
+    margin: 0px;
+    width: 100%;
+}
+
+
+#messages h3::after {
+    display: none;
+}
+.view.ng-scope, .view.ng-scope div:nth-child(1) {
+    height: 100%;
+}
+
+#channels {
+    background-color: #6ba4e7;
+    display: block;
+    text-align:center;
+    width: 270px;
+    height: 50%;
+    -webkit-box-shadow: 0 0 7px 0 rgba(0,0,0,0.5);
+    box-shadow: 0 0 7px 0 rgba(0,0,0,0.5);
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    z-index: 900;
+    overflow: scroll;
+
+}
+
+
+#channels::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
 }
 
 #users {
+    background-color: #2e343e;
+    display: block;
+    width: 270px;
+    height: 50%;
+    text-align:center;
+    -webkit-box-shadow: 0 0 7px 0 rgba(0,0,0,0.5);
+    box-shadow: 0 0 7px 0 rgba(0,0,0,0.5);
+    position: fixed;
+    left: 0px;
+    top: 50%;
+    z-index:500;
+    overflow: scroll;
+}
+
+
+
+
+#users::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+}
+
+
+#div_emoji, #divSendMessage{
+
+    display: inline-block;
+    float: left;
+    
+}
+
+
+#div_emoji{
+    height: 50px;
+    margin-left: 15px;
+    width: 10%;
+}
+
+.bouton_emoji{
+    width: 30px;
+    height: 30px;
+    margin-top: 13px;
+    background-color: #FFFFFF;
+    cursor: pointer;
+}
+
+
+
+#inputSendMessage{
+    width: 95%;
+    height: 50px;
+    float: left;
+    border-radius: 10px;
+    padding-left: 10px;
+}
+
+
+#divSendMessage{
+    width: 75%;
+    height: 95%;
+    margin-left: 15px;
+    margin-top: 5px;
+
+}
+
+#submitSendMessage{
+    display: inline-block;
+    background-color: grey;
+    height: 100%;
+    border-radius: 10px;
+    margin-top: 10px;
+    padding-left: 0.5px;
+    padding-right: 0.5px;
+}
+
+#divSubmit{
+    height: 50%;
+    width: 9%;
+    float: right;
+    
+}
+
+#fileToSend{
+    background-color: grey;
+    display: block;
+    margin-left: 271px;
+}
+
+
+
+
+
+
+
+
+#messages::-webkit-scrollbar {
+    width: 9px;
+    height: 9px;
+}
+#messages::-webkit-scrollbar-button {
+    width: 0px;
+    height: 0px;
+}
+#messages::-webkit-scrollbar-thumb {
+    background: #6ba4e7;
+    border: 0px none #ffffff;
+    border-radius: 50px;
+}
+#messages::-webkit-scrollbar-thumb:hover {
+    background: #6ba4e7;
+}
+#messages::-webkit-scrollbar-thumb:active {
+    background: #6ba4e7;
+}
+#messages::-webkit-scrollbar-track {
+    background: transparent;
+    border: 0px none #ffffff;
+    border-radius: 27px;
+}
+#messages::-webkit-scrollbar-track:hover {
+    background: transparent;
+}
+#messages::-webkit-scrollbar-track:active {
+    background: transparent;
+}
+::-webkit-scrollbar-corner {
+    background: transparent;
+}
+
+
+
+#masque {
     position: absolute;
+    left: 0;
     top: 0;
-    bottom: 0;
-    right: 0;
-    width: 200px;
-    background-color: #8b564b;
-    text-align: center;
-}
-#topic {
-    position: absolute;
-    top:0;
-    right:200px;
-    left:200px;
-    height:100px;
-    background-color: chocolate;
-}
-#divSendMessage {
-     position: absolute;
-     bottom: 0;
-     right: 300px;
-     left: 200px;
-     height:50px;
-     background-color: #3e348b;
- }
-#divSubmit {
-    position: absolute;
-    bottom: 0;
-    right: 200px;
-    width: 100px;
-    height:50px;
-    background-color: #718b3e;
+    z-index: 9000;
+    background-color: #000;
+    display: none;
 }
 
-
-#inputSendMessage {
+#dialog {
+    display: none;
     position: absolute;
-    bottom:0;
-    height:44px;
-    width:100%;
+    left: 0;
+    top: 0;
+    z-index: 9999;
+    padding: 20px;
+    color: #00008B;
+    border: 3px solid #fff;
+    border-radius: 15px;
+    background-color: #C0C0C0;
+    max-width: 100%; 
 }
 
-#submitSendMessage {
-    position: absolute;
-    bottom:0;
-    height:50px;
-    width:100%;
+.previewImage {
+	width:50px;
+	height:40px;
+	border-radius:5px;
 }
 
 .notif-messageOn {
@@ -77,6 +248,49 @@
 	color:black;
 }
 
+.admin-color {
+	color:#A52A2A;
+	font-weight:bold;
+}
+
+.operator-color {
+	color:#9932CC;
+	font-weight:bold;
+}
+.user-color {
+	font-weight:bold;
+}
+.default-color {
+	color:blue;
+}
+
+
+.messInBox {
+	border-bottom:0.1px grey groove;
+	margin-left:10px;
+	margin-right:10px;
+}
+.date {
+	display:inline-block;
+	font-size:80%;
+}
+.users {
+	display:inline-block;
+	font-size:120%;
+}
+
+.common-channel {
+	color:grey;
+}
+
+.secret-channel {
+	color:red;
+}
+
+.private-channel {
+	color:green;
+}
+
 .contextM {
 	background:white;
 	border:1px black groove;
@@ -84,8 +298,332 @@
 	margin:5px;
 	padding:5px;
 	text-align:center;
+	border-radius:5px;
 }
 
+.contextM > li > a {
+	color:black;
+}
+
+.buttonChUs {
+	border:none;
+	padding:6px 0 6px 0;
+	border-radius:2px;
+	margin-top:5px;
+	box-shadow:1px 1px 3px #aaa;
+	background:#fff;
+	font:bold 13px Arial;
+}
+
+#menu_emoji {
+    width: 620px;
+    height: 225px; z-index: 999;
+    position: absolute;
+    bottom: 53px;
+    left: 271px;
+    background-color: #FFFFFF;
+    display: none;
+    padding: 5px;
+    border-style: 0.5 grey solid;
+    box-shadow:1px 1px 1px #aaa;
+
+
+}
+
+#clique {
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    background-color: #ffffff;
+    margin: 2px;
+}
+
+#menu_emoji img:hover{
+    background-color: #6BF;
+}
+
+
+#fleche{
+        position: fixed;
+        left: 0px;
+        width: 0px;
+        height: 0px;
+    }
+
+
+
+@media screen and (max-width: 533px){
+
+
+    #div_emoji{
+    height: 50px;
+    margin-left: 1px;
+    width: 5%;
+    }
+
+
+
+    #inputSendMessage{
+        width: 90%;
+        height: 50px;
+        float: left;
+        border-radius: 10px;
+    }
+
+
+    #divSendMessage{
+        width: 70%;
+        height: 95%;
+        margin-left: 15px;
+    }
+
+    #submitSendMessage{
+        display: inline-block;
+        background-color: grey;
+        height: 100%;
+        border-radius: 10px;
+        margin-top: 10px;
+    }
+
+    #divSubmit{
+        height: 50%;
+        width: 30%;
+        float: right;
+
+    }
+
+
+}
+
+
+
+
+@media only screen and (max-width: 1000px){
+
+    #div_emoji{
+    background-color: #FFFFFF;
+    height: 50px;
+    margin-left: 0px;
+    width: 35px;
+    }
+
+
+    #divSendMessage{
+        width: 70%;
+        height: 95%;
+        margin-left: 28px;
+    }
+
+    #divSubmit{
+        height: 50%;
+        width: 12%;
+        float: right;
+    }
+
+
+    #messages {
+    margin-left: 135px;
+    }
+
+
+    #messages h3 {
+    left: 135px;
+    width: 100%;
+    }
+
+#test {
+    margin-left: 135px;
+    }
+
+
+
+#channels {
+    width: 135px;
+    display: block;
+    
+    }
+
+#users {
+    width: 135px;
+    display: block;
+    
+    }
+
+
+    #menu_emoji {
+        width: 340px;
+        height: 300px; z-index: 999;
+        left: 135px;
+    }
+
+    #clique {
+        width: 25px;
+        height: 25px;
+        cursor: pointer;
+        background-color: #ffffff;
+        margin: 2px;
+    }
+
+    #fileToSend{
+    margin-left: 135px;
+}
+
+
+}
+
+@media screen and (max-width: 700px){
+
+    #div_emoji{
+    height: 50px;
+    margin-left: 0px;
+    width: 35px;
+    }
+
+
+    #divSendMessage{
+        width: 65%;
+        height: 95%;
+        margin-left: 0px;
+    }
+
+    #divSubmit{
+        height: 50%;
+        width: 18%;
+        float: right;
+     }
+}
+
+
+
+@media screen and (max-width: 600px){
+
+    #div_emoji{
+    height: 50px;
+    margin-left: 0px;
+    width: 35px;
+    }
+
+
+    #divSendMessage{
+        width: 57%;
+        height: 95%;
+        margin-left: 0px;
+    }
+
+    #divSubmit{
+        height: 50%;
+        width: 20%;
+        float: right;
+    }
+}
+
+@media screen and (max-width: 550px){
+
+    #div_emoji{
+    height: 50px;
+    margin-left: 0px;
+    width: 30px;
+    }
+
+
+    .bouton_emoji{
+        width: 28px;
+        height: 28px;
+        margin-top: 13px;
+        background-color: #FFFFFF;
+    }
+
+
+    #inputSendMessage{
+    padding-left: 1px;
+    }
+
+
+    #divSendMessage{
+        width: 60%;
+        height: 95%;
+        margin-left: 5px;
+    }
+
+    #divSubmit{
+        height: 50%;
+        width: 22%;
+        float: right;
+    }
+
+
+
+    #messages {
+    margin-left: 0px;
+    }
+
+
+    #messages h3 {
+        left: 0px;
+        width: 100%;
+    }
+
+    #test {
+        margin-left: 0px;
+    }
+
+
+
+    #channels {
+        width: 135px;
+        display: none;
+        top: 50px;
+        height: 210px;
+    }
+
+    #channels h3, #users h3 {
+        font-size: 15px;
+    }
+
+
+
+
+    #users {
+        width: 135px;
+        display: none;
+        top: 260px;
+        height: 210px;
+
+    }
+
+
+    #menu_emoji {
+    width: 210px;
+    height: 340px; z-index: 999;
+    left: 0px;
+    overflow: scroll;
+    }
+
+    #clique {
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    background-color: #ffffff;
+    margin: 2px;
+    }
+
+    #fileToSend{
+    margin-left: 0px;
+    width: 180px;
+    }
+
+    #fleche{
+        position: fixed;
+        left: 10px;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+    }
+
+    span img:hover{
+    background-color: #6ba4e7;
+    }
+}
 
 
 

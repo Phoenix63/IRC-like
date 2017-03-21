@@ -24,3 +24,57 @@ myApp.config(function ($locationProvider, $routeProvider) {
             redirectTo: '/'
         });
 });
+
+myApp.factory("userInfo", function() {
+    return {
+      "userN": uniqid(),
+      "nick": uniqid(),
+      "realName": uniqid(),
+      "right": 0,
+	  "mute": [],
+	  "removeUserMute": function(user) {
+		  this.mute.splice(this.mute.indexOf(user), 1);
+	  },
+      "setRight": function(newRight) {
+        this.right = newRight;
+      },
+      "server": "http://tehroux.fr",
+      "port": 8089,
+      "socket": "",
+      "setNick": function(newUserNick) {
+        this.nick = newUserNick;
+      },
+      "setReal": function(newUserRealName) {
+        this.realName = newUserRealName;
+      },
+      "setUser": function(newUserNick, newUserRealName) {
+        this.nick = newUserNick;
+        this.realName = newUserRealName;
+      },
+      "setServer": function(newServer) {
+        this.server = newServer;
+      },
+      "setPort": function(newPort) {
+        this.port = newPort;
+      },
+      "connect": function() {
+        this.socket = io(this.server+":"+this.port);
+		this.filePort = io(this.server+":8091", {'forceNew': true });
+      },
+      "afterConnection": function() {
+        this.userN = "Guest_"+this.userN;
+      }
+    }
+});
+
+
+
+var uniqid = function() {
+    var text = "";
+    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+    for( var i=0; i < 6; i++ )
+        text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+    return text;
+}

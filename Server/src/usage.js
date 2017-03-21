@@ -61,7 +61,6 @@ function addSpaces(key) {
         spaces += ' ';
     return spaces;
 }
-
 function getBar(val) {
     let bar = '';
     if(parseFloat(val) < 50) {
