@@ -35,8 +35,11 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 	$scope.uploadImage = function(fich) {
 		userInfo.connectFile();
 		boolFile = true;
-		var msgToSend = "";
-		if(fich[0].size >= 250000) {
+		var nameF = fich[0].name;
+		while (nameF.indexOf(' ') !== -1) {
+			nameF = nameF.replace(' ', '_');
+		}
+		if(fich[0].size >= 2097152) {
 			bootbox.alert("File too big");
 		}
 		else if($scope.currentChannel.chan === "@home") {
@@ -46,7 +49,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			if(isImage(fich[0].name)) {
 				var readerPreview = new FileReader();
 				readerPreview.onload = function (e) {
-					bootbox.prompt("<a href='" + e.target.result + "' target='_blank'><img src='"+ e.target.result +"' class = 'previewImage'></img></a> Do you want to send <strong>" + fich[0].name + "</strong> ?<center><p>Add a message</p></center>", function(ev){
+					bootbox.prompt("<a href='" + e.target.result + "' target='_blank'><img src='"+ e.target.result +"' class = 'previewImage'></img></a> Do you want to send <strong>" + nameF + "</strong> ?<center><p>Add a message</p></center>", function(ev){
 						if(ev !== null) {
 							msgToSend = ev;
 							var readerSend = new FileReader();
@@ -54,7 +57,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 								var arrayBuffer = readerSend.result;
 								array1 = new Uint8Array(arrayBuffer);
 								binaryString = String.fromCharCode.apply(null, array1);
-								userInfo.filePort.emit("data", "FILE " + binaryString.length + " " + fich[0].name);
+								userInfo.filePort.emit("data", "FILE " + binaryString.length + " " + nameF);
 								userInfo.filePort.emit("data", array1);
 							}
 							readerSend.readAsArrayBuffer(fich[0]);
@@ -65,7 +68,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				readerPreview.readAsDataURL(fich[0]);
 			}
 			else {
-				bootbox.prompt("<img src='../images/fichier.jpg' class = 'previewImage'></img> Do you want to send <strong>" + fich[0].name + "</strong> ?<center><p>Add a message</p></center>", function(ev){
+				bootbox.prompt("<img src='../images/fichier.jpg' class = 'previewImage'></img> Do you want to send <strong>" + nameF + "</strong> ?<center><p>Add a message</p></center>", function(ev){
 					if(ev !== null) {
 						var readerSend = new FileReader();
 						msgToSend = ev;
@@ -73,7 +76,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 							var arrayBuffer = readerSend.result;
 							array1 = new Uint8Array(arrayBuffer);
 							binaryString = String.fromCharCode.apply(null, array1);
-							userInfo.filePort.emit("data", "FILE " + binaryString.length + " " + fich[0].name);
+							userInfo.filePort.emit("data", "FILE " + binaryString.length + " " + nameF);
 							userInfo.filePort.emit("data", array1);
 						}
 						readerSend.readAsArrayBuffer(fich[0]);
