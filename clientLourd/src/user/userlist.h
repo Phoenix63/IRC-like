@@ -15,7 +15,9 @@ public:
     void modeI(bool mode, QString user);
     void modeO(bool mode, QString user);
     void modeW(bool mode, QString user);
+    void modeM(bool mode, QString user);
 
+    bool modeM(QString user);
     //User functions
     User * addUser(QString nick);
     void addUser(User *user);

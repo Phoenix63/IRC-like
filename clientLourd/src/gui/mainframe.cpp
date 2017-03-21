@@ -75,8 +75,7 @@ void MainFrame::printMsgLine(Message chatMsgLine)
     pseudoBox->addWidget(lPseudo);
     ui->nickBox->addLayout(pseudoBox);
     QLabel *lMessage = new QLabel(chatMsgLine.message());
-    lMessage->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    lMessage->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
+    lMessage->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::LinksAccessibleByMouse);
     lMessage->setOpenExternalLinks(true);
     lMessage->setFixedHeight(20);
     chatLine->addWidget(lMessage);
@@ -144,8 +143,14 @@ void MainFrame::userModified()
 {
     ui->userList->clear();
     for (auto i:channel.users()) {
-        if (!i->modeI())
-            ui->userList->addItem((i->modeO() || channel.oper(i)) ? '@' + i->name() : i->name());
+        if (!i->modeI()){
+            QString name = i->name();
+            if (i->modeO() || channel.oper(i))
+                name.prepend('@');
+            if (i->modeM())
+                name.prepend('-');
+            ui->userList->addItem(name);
+        }
     }
     refreshMentionList();
 }
@@ -416,7 +421,8 @@ void MainFrame::initCompletion()
     completionList << "/clean" << "/debug" << "/nick" << "/user" << "/join" << "/names"
                    << "/pass" << "/part" << "/list" << "/topic" << "/kick" << "/who"
                    << "/whois" << "/mode" << "/msg" << "/quit" << "/away" << "/back"
-                   << "/invite" << "/files" << "/rmfile" << "/belote" << "/serverkick" <<"/rmchan";
+                   << "/invite" << "/files" << "/rmfile" << "/belote" << "/serverkick"
+                   <<"/rmchan" << "/mute" << "/unmute";
     stringCompleter = new QCompleter(completionList,this);
     stringCompleter->setCaseSensitivity(Qt::CaseInsensitive);
     stringCompleter->popup()->setTabKeyNavigation(true);
@@ -438,7 +444,7 @@ void MainFrame::on_userList_doubleClicked(const QModelIndex &index)
 
 void MainFrame::on_actionClean_triggered()
 {
-    clean();
+    channel.clean();
 }
 
 void MainFrame::on_actionSet_Away_toggled(bool arg1)

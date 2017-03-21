@@ -1,11 +1,12 @@
 #include "user.h"
 
-
+#include <QDebug>
 User::User():
 aName("notdefined"),
 aModeI(false),
 aModeO(false),
-aModeW(false)
+aModeW(false),
+aModeM(false)
 {
 
 }
@@ -14,7 +15,8 @@ User::User(QString nick):
     aName(nick),
     aModeI(false),
     aModeO(false),
-    aModeW(false)
+    aModeW(false),
+    aModeM(false)
 {
 
 }
@@ -43,6 +45,10 @@ void User::modeW(bool mode)
     aModeW = mode;
 }
 
+void User::modeM(bool mode)
+{
+    aModeM = mode;
+}
 /*
  * Getters
  */
@@ -65,4 +71,9 @@ bool User::modeO()
 bool User::modeW()
 {
     return aModeW;
+}
+
+bool User::modeM()
+{
+    return aModeM;
 }

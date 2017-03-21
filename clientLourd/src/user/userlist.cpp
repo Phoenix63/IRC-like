@@ -2,6 +2,7 @@
 
 #include "user.h"
 
+#include <QDebug>
 UserList::UserList()
 {
 }
@@ -38,6 +39,23 @@ void UserList::modeW(bool mode, QString user)
         if (i->name() == user)
             i->modeW(mode);
     }
+}
+
+void UserList::modeM(bool mode, QString user)
+{
+    for(auto i:users) {
+        if (i->name() == user)
+            i->modeM(mode);
+    }
+}
+
+bool UserList::modeM(QString user)
+{
+    for (auto i:users) {
+        if (i->name() == user)
+            return i->modeM();
+    }
+    return false;
 }
 
 User * UserList::addUser(QString nick)

@@ -63,6 +63,8 @@ private:
 	bool out_isWhoisMsg(QString string);
 	bool out_isMsgMsg(QString string);
 	bool out_isPrivMsg(QString string);
+    bool out_isMuteMsg(QString string);
+    bool out_isUnMuteMsg(QString string);
 	bool out_isAwayMsg(QString string);
 	bool out_isInvMsg(QString string);
     bool out_isListFileMsg(QString string);

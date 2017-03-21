@@ -339,9 +339,9 @@ bool Belote::in_isGameStart(QString string)
     ui->order->show();
     QStringList playerList = turnOrder.split(',');
     position(playerList.indexOf(username));
-    QString eastPlayer = playerList.at((position() + 1) % 4);
+    QString eastPlayer = playerList.at((position() - 1) % 4);
     QString northPlayer = playerList.at((position() + 2) % 4);
-    QString westPlayer = playerList.at((position() + 3) % 4);
+    QString westPlayer = playerList.at((position() + 1) % 4);
     ui->eastName->setText(eastPlayer);
     ui->northName->setText(northPlayer);
     ui->westName->setText(westPlayer);
