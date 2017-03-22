@@ -11,9 +11,6 @@ myApp.config(function ($locationProvider, $routeProvider) {
         .when('/', {
             templateUrl: 'html/log_in.html'
         })
-        .when('/sign_in', {
-            templateUrl: 'html/sign_in.html'
-        })
         .when('/irc', {
             templateUrl: 'html/irc.html'
         })
