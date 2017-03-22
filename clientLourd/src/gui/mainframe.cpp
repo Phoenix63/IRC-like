@@ -259,7 +259,9 @@ void MainFrame::moveScrollBarToBottom(int min, int max)
 
 void MainFrame::on_channelList_itemSelectionChanged()
 {
-    channel.change(ui->channelList->currentItem()->text());
+    QList<QListWidgetItem *> selected = ui->channelList->selectedItems();
+    if (!selected.isEmpty())
+        channel.change(selected.first()->text());
     if (channel.notif(channel.channelName())) {
         channel.togleNotif(channel.channelName(), false);
         channelModified();
