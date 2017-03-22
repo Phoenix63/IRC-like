@@ -10,9 +10,9 @@
 	function in_isNames(msg) {
 		var msSplit = msg.split(' ');
 		var listUsers = [];
-		var channSet = msSplit[3];
-		var chann = msSplit[4];
-		for(var i = 5; i<msSplit.length; i++) {
+		var channSet = msSplit[2];
+		var chann = msSplit[3];
+		for(var i = 4; i<msSplit.length; i++) {
 			msSplit[i] = msSplit[i].replace(":","");
 			if(msSplit[i].includes("@")) {
 				msSplit[i] = msSplit[i].replace("@","");
@@ -56,5 +56,12 @@
 			topic = topic + " " + msSplit[i];
 		}
 		return [channel, numberOfUser, topic];
+	}
+	
+	function in_isFile(msg) {
+		var newLink = msg.replace(":","");
+		var tabNames = msg.split(".");
+		var nameOfFile = tabNames[tabNames.length-2] + "." + tabNames[tabNames.length-1];
+		return [newLink, nameOfFile];
 	}
 	

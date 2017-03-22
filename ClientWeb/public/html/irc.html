@@ -9,14 +9,14 @@
 	<div id="users">
         <h3>Users list</h3>
         <div ng-repeat="user in currentChannel.listU track by $index">
-            <button class="buttonChUs" ng-context-menu="menuOptionsUser(user)" ng-class="user.right === 3 ? 'admin-color' : ( user.right === 1 ? 'operator-color' : 'default-color')">{{user.nick}}</button>
+            <button class="buttonChUs" ng-context-menu="menuOptionsUser(user)" ng-class="user.right === 1 ? 'operator-color' : (user.right === 2 ? 'user-color' : 'default-color')">{{user.nick}}</button>
         </div>
     </div>
     <div id="messages" scroll-bottom="currentChannel.messages">
-        <h3><span><img id="fleche" src="images/fleche.png"></span> {{topicChannel}}</h3>
+        <h3><span><img id="fleche" src="images/fleche.png"></span> <div id="topic">{{topicChannel}}</div> <div ng-context-menu="menuOptionsAway()" ng-class="$connected === true ? 'connectedUser' : 'notConnectedUser'"></div></h3>
         <div ng-repeat="message in currentChannel.messages track by $index" ng-bind-html="message[0].right === 5 ? (message[2] | insertHtml) : message">
             <div class="messInBox">
-				<p class="users" ng-class="message[0].right === 3 ? 'admin-color' : (message[0].right === 1 ? 'operator-color' : ( message[0].right === 2 ? 'user-color' : 'default-color'))">{{message[0].nick}}</p>
+				<p class="users" ng-class="message[0].right === 1 ? 'operator-color' : ( message[0].right === 2 ? 'user-color' : 'default-color')">{{message[0].nick}}</p>
 				<p class="date">{{message[1]}}</p>
 				<p>{{message[2]}}</p>
 			</div>
@@ -25,9 +25,7 @@
 	
     <input type="file" id="fileToSend" ng-model="image" onchange="angular.element(this).scope().uploadImage(this.files)"></input>
 	<form id="test" ng-submit="sendMessage()">
-		<div id="div_emoji">
-                <img class="bouton_emoji" src="img/joie.png">
-        </div>
+		<a id="helpWindows" ng-click="helpPandirc()" href="">help</a>
 		<div id="divSendMessage">
 			<input id="inputSendMessage" ng-model="newMessage" placeholder="Entrez votre message"></input>
         </div>
@@ -53,5 +51,4 @@
 	
     
     <div id="masque"></div>
-	
 </div>

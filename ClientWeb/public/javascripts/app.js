@@ -11,9 +11,6 @@ myApp.config(function ($locationProvider, $routeProvider) {
         .when('/', {
             templateUrl: 'html/log_in.html'
         })
-        .when('/sign_in', {
-            templateUrl: 'html/sign_in.html'
-        })
         .when('/irc', {
             templateUrl: 'html/irc.html'
         })
@@ -38,17 +35,18 @@ myApp.factory("userInfo", function() {
       "setRight": function(newRight) {
         this.right = newRight;
       },
-      "server": "http://tehroux.fr",
-      "port": 8089,
+      "server": "http://crismos.fr",
+      "port": "8089",
       "socket": "",
+	  "filePort": "",
       "setNick": function(newUserNick) {
         this.nick = newUserNick;
       },
       "setReal": function(newUserRealName) {
         this.realName = newUserRealName;
       },
-      "setUser": function(newUserNick, newUserRealName) {
-        this.nick = newUserNick;
+      "setUser": function(newUserUserN, newUserRealName) {
+        this.userN = newUserUserN;
         this.realName = newUserRealName;
       },
       "setServer": function(newServer) {
@@ -59,7 +57,9 @@ myApp.factory("userInfo", function() {
       },
       "connect": function() {
         this.socket = io(this.server+":"+this.port);
-		this.filePort = io(this.server+":8091", {'forceNew': true });
+      },
+	  "connectFile": function() {
+        this.filePort = io(this.server+":8091");
       },
       "afterConnection": function() {
         this.userN = "Guest_"+this.userN;
