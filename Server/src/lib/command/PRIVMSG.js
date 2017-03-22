@@ -33,19 +33,16 @@ module.exports = function (socket, command) {
         message = message.replace(regcatch[0], val);
         regcatch = /{[ ]?([-]?[0-9]+)[ ]?([+\-/*])[ ]?([\-]?[0-9]+)[ ]?}/g.exec(message);
     }
-    message = message.replace(/faut y faire/gi, 'faut le faire');
-    message = message.replace(/j'y fai([st])/gi, 'je le fai$1');
-    message = message.replace(/j'y fass([a-z]+)/gi, 'je le fass$1');
-    message = message.replace(/(^[^a-z]?)pcq([^a-z]?)/gi, '$1pq$2');
-    message = message.replace(/si j'?y?'? ?aur/gi, 'si j\'av');
-    message = message.replace(/(^[^a-z]?)ntm([^a-z]?)/gi, '$1nique ta mère, cordialement, la Direction$2');
-    message = message.replace(/(^[^a-z]?)ah|ha([^a-z]?)/gi, '$1:AH:$2');
-    message = message.replace(/nodejs c[oô]t[eé] client/gi, 'electron');
-    message = message.replace(/o[uù] [cs](e)?'? ?(que|ke)/gi, 'où');
-    message = message.replace(/(m[éeè]re?|fr[éeè]re?|p[éeè]re?|fils?|fille|pote|amie?s?) à|a ([a-z]+)/gi, '$1 de $2');
-    message = message.replace(/je peu[ts]([^a-z]?)/gi, 'je peux$1');
-    message = message.replace(/(^[^a-z]?)jui([^a-z]?)/gi, '$1je suis$2');
+    message = message.replace(/(.*)faut y faire(.*)/gi, '$1faut le faire$2');
+    message = message.replace(/(.*)j'y fai[st](.*)/gi, '$1je le fai$2');
+    message = message.replace(/(.*)j'? ?y fass([a-z]+)(.*)/gi, '$1je le fass$2$3');
+    message = message.replace(/(.*)si j'?y?'? ?aur(.*)/gi, '$1si j\'av$2');
+    message = message.replace(/(.*)(nodejs|js|javascript) c[oô]t[eé] client(.*)/gi, '$1electron$3');
+    message = message.replace(/(.*)o[uù] [cs]e?'? ?(que|ke)(.*)/gi, '$1où$3');
+    message = message.replace(/(je|tu) peu[ts] (.*)/gi, '$1 peux $2');
     message = message.replace(/[ck]om?me? m[eê]m[e]?/gi, 'quand même');
+    message = message.replace(/^ah$|^ha$|^a$/gi, ':AH:');
+
 
     let files = [];
     message.replace(/\[FILE=[^\]]/g, '');
