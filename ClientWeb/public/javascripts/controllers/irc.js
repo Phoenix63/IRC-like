@@ -1204,18 +1204,33 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 					var adminGlobalM = new User(globalMessage[1]);
 					adminGlobalM.setRight(1);
 					var adMsg = globalMessage[2];
-					var isEmote = changeToEmoji(adMsg);
-					if(isEmote !== false) {
+					
+					if(adMsg.match(/^http:\/\/[\S]+(.fr|.com)$/)) {
 						for(var i = 0; i<$scope.channels.length; i++) {
-							$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + adminGlobalM.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + isEmote + "</p></div>"]);
+							$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + adminGlobalM.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + adMsg + "' target='_blank'>" + adMsg + "</a></p></div>"]);
 						}
-						$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + adminGlobalM.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + isEmote + "</p></div>"]);
+						$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + adminGlobalM.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + adMsg + "' target='_blank'>" + adMsg + "</a></p></div>"]);
+					}
+					else if(adMsg.match(/^https:\/\/[\S]+(.fr|.com)$/)) {
+						for(var i = 0; i<$scope.channels.length; i++) {
+							$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + adminGlobalM.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + adMsg + "' target='_blank'>" + adMsg + "</a></p></div>"]);
+						}
+						$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + adminGlobalM.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + adMsg + "' target='_blank'>" + adMsg + "</a></p></div>"]);
 					}
 					else {
-						for(var i = 0; i<$scope.channels.length; i++) {
-							$scope.channels[i].messages.push([adminGlobalM, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), adMsg]);
+						var isEmote = changeToEmoji(adMsg);
+						if(isEmote !== false) {
+							for(var i = 0; i<$scope.channels.length; i++) {
+								$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + adminGlobalM.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + isEmote + "</p></div>"]);
+							}
+							$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + adminGlobalM.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + isEmote + "</p></div>"]);
 						}
-						$scope.currentChannel.messages.push([adminGlobalM, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), adMsg]);
+						else {
+							for(var i = 0; i<$scope.channels.length; i++) {
+								$scope.channels[i].messages.push([adminGlobalM, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), adMsg]);
+							}
+							$scope.currentChannel.messages.push([adminGlobalM, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), adMsg]);
+						}
 					}
 				}
 				else if(msg.match(/^[:][\w\S]+[ ]PRIVMSG[ ][#][\w\S]+[ ][:][\S\W]+$/)) {
@@ -1337,7 +1352,6 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 							regxUser = isAdmin(regxUser, $scope.currentChannel);			
 							var regFileWithMess = new RegExp("^" + user.server + ":3001[\\S]+[ ][\\S]+", "g");
 							var regFileWithoutMess = new RegExp("^" + user.server + ":3001[\\S]+$");
-							var regClick = new RegExp("^http://[\\S]+$");
 							if(regxMsg.match(regFileWithMess)) {
 								var tabFile = regxMsg.split(" ");
 								var urlFile = tabFile[0];

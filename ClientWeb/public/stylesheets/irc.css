@@ -42,7 +42,7 @@ h3::after {
 #messages h3 {
     position: fixed;
     top: 0px;
-    left: 270px;
+    left: 240px;
     color: rgba(255,255,255,0.8);
     background-color: #2f343f;
     padding-bottom: 10px;
@@ -233,6 +233,8 @@ h3::after {
 
 .connectedUser {
 	display:inline-block;
+	margin-top:5px;
+	margin-bottom:5px;
 	background:green;
 	border-radius:50%;
 	width:20px;
@@ -363,20 +365,6 @@ h3::after {
 	color:blue;
 }
 
-#menu_emoji {
-    width: 620px;
-    height: 225px; z-index: 999;
-    position: absolute;
-    bottom: 53px;
-    left: 271px;
-    background-color: #FFFFFF;
-    display: none;
-    padding: 5px;
-    border-style: 0.5 grey solid;
-    box-shadow:1px 1px 1px #aaa;
-
-
-}
 
 #clique {
     width: 30px;
@@ -384,10 +372,6 @@ h3::after {
     cursor: pointer;
     background-color: #ffffff;
     margin: 2px;
-}
-
-#menu_emoji img:hover{
-    background-color: #6BF;
 }
 
 
@@ -536,11 +520,6 @@ h3::after {
     }
 
 
-    #menu_emoji {
-        width: 340px;
-        height: 300px; z-index: 999;
-        left: 135px;
-    }
 
     #clique {
         width: 25px;
@@ -678,12 +657,6 @@ h3::after {
     }
 
 
-    #menu_emoji {
-    width: 210px;
-    height: 340px; z-index: 999;
-    left: 0px;
-    overflow: scroll;
-    }
 
     #clique {
     width: 22px;
