@@ -17,11 +17,11 @@ const colors = {
     lBlue: "\x1b[94m",
     lMagenta: "\x1b[95m",
     lCyan: "\x1b[96m",
-    clean: '\033[2J'
+    clean: "\x1Bc"
 };
 
 function getPercent(val) {
-    val = val.toString();
+    val = isNaN(val)?'0':val.toString();
     if(val.split('.')===1) {
         val += '.0';
     }
@@ -38,6 +38,28 @@ function getPercent(val) {
         val = colors.Red+val+colors.Default;
     }
     return val+'%';
+}
+
+function getRam(process, arr) {
+    return arr.map((item) => {
+        if(process[item] && process[item].ram)
+            return process[item].ram
+    }).filter((item) => (typeof item === 'number'))
+        .reduce((a,b) => (a+b),0);
+}
+function getCpu(process, arr) {
+    return arr.map((item) => {
+        if(process[item] && process[item].cpu)
+            return process[item].cpu
+    }).filter((item) => (typeof item === 'number'))
+        .reduce((a,b) => (a+b),0);
+}
+
+function addSpaces(key) {
+    let spaces = '';
+    while(spaces.length < 38-key.length)
+        spaces += ' ';
+    return spaces;
 }
 
 function getBar(val) {
@@ -65,7 +87,7 @@ function getBar(val) {
 function execStats() {
 
     try {
-        exec("ps -ef|grep 'pandirc:'|grep -v grep|awk {'print $2'}|head -2", (err, stdout, stderr) => {
+        exec("ps -ef|grep 'pandirc:'|grep -v grep|awk {'print $2'}|head -4", (err, stdout, stderr) => {
             let lines = stdout.toString().split('\n');
             let pids = [];
             lines.forEach((line) => {
@@ -94,22 +116,20 @@ function execStats() {
                     }
                 });
                 let out = '';
+                let keys = ['pandirc:main','pandirc:master','pandirc:server','pandirc:fileserver'];
                 out += '\t-----------------------------------------------\n';
                 out += '\t|             '+colors.lCyan+'Pand\'IRC Server'+colors.Default+'                 |\n';
                 out += '\t|                                             |\n';
-                out += '\t|  CPU usage: ['+getBar((process['pandirc:server']||{cpu:0}).cpu+(process['pandirc:master']||{cpu:0}).cpu)+']  '+getPercent((process['pandirc:server']||{cpu:0}).cpu+(process['pandirc:master']||{cpu:0}).cpu)+'            |\n';
-                out += '\t|  MEM usage: ['+getBar((process['pandirc:server']||{ram:0}).ram+(process['pandirc:master']||{ram:0}).ram)+']  '+getPercent((process['pandirc:server']||{ram:0}).ram+(process['pandirc:master']||{ram:0}).ram)+'            |\n';
+                out += '\t|  CPU usage: ['+getBar(getCpu(process, keys))+']  '+getPercent(getCpu(process, keys))+'            |\n';
+                out += '\t|  MEM usage: ['+getBar(getRam(process, keys))+']  '+getPercent(getRam(process, keys))+'            |\n';
                 out += '\t|                                             |\n';
                 out += '\t-----------------------------------------------\n';
                 out += '\t|                  Details                    |\n';
-                out += '\t|  '+(process['pandirc:master']?colors.lCyan:colors.Red)+'---- pandirc:master'+colors.Default+'                        |\n';
-                out += '\t|  CPU usage: ['+getBar((process['pandirc:master']||{cpu:0}).cpu)+']  '+getPercent((process['pandirc:master']||{cpu:0}).cpu)+'            |\n';
-                out += '\t|  MEM usage: ['+getBar((process['pandirc:master']||{ram:0}).ram)+']  '+getPercent((process['pandirc:master']||{ram:0}).ram)+'            |\n';
-                out += '\t|                                             |\n';
-                out += '\t|  '+(process['pandirc:server']?colors.lCyan:colors.Red)+'---- pandirc:server'+colors.Default+'                        |\n';
-                out += '\t|  CPU usage: ['+getBar((process['pandirc:server']||{cpu:0}).cpu)+']  '+getPercent((process['pandirc:server']||{cpu:0}).cpu)+'            |\n';
-                out += '\t|  MEM usage: ['+getBar((process['pandirc:server']||{ram:0}).ram)+']  '+getPercent((process['pandirc:server']||{ram:0}).ram)+'            |\n';
-                out += '\t|                                             |\n';
+                keys.map((key) => {
+                    out += '\t|  '+(process[key]?colors.lCyan:colors.Red)+'---- '+key+colors.Default+addSpaces(key)+'|\n';
+                    out += '\t|  MEM usage: ['+getBar(getCpu(process, [key]))+']  '+getPercent(getCpu(process, [key]))+'            |\n';
+                    out += '\t|  MEM usage: ['+getBar(getRam(process, [key]))+']  '+getPercent(getRam(process, [key]))+'            |\n';
+                });
                 out += '\t-----------------------------------------------\n';
                 console.log(colors.clean);
                 console.log(out);

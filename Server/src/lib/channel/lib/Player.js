@@ -80,7 +80,7 @@ class Player {
         return this.client.name;
     }
 
-    getPlayableCard(trump, trumpColor, fold) {
+    getPlayableCard(trumpColor, fold) {
         let pcards = [];
 
         let masterCardOwner = null;
@@ -90,19 +90,19 @@ class Player {
             let firstCard = fold[0][1];
             let firstCardOwner = fold[0][0];
             let playercards = this.getCardByColors([firstCard.color]);
-            let playertrumps = this.getCardByColors([trump.color]);
+            let playertrumps = this.getCardByColors([trumpColor]);
             masterCard = firstCard;
             masterCardOwner = firstCardOwner;
 
             fold.forEach((arr) => {
-                if (arr[1].compare(masterCard, firstCard.color, trump.color) > 0) {
+                if (arr[1].compare(masterCard, firstCard.color, trumpColor) > 0) {
                     masterCard = arr[1];
                     masterCardOwner = arr[0];
                 }
 
             });
 
-            if (masterCard.color !== trump.color && masterCard.color === firstCard.color) {
+            if (masterCard.color !== trumpColor && masterCard.color === firstCard.color) {
                 playercards.map((c) => {
                     pcards.push(c);
                 });
@@ -136,7 +136,7 @@ class Player {
                         })
                         if (pcards.length === 0) {
                             playertrumps.map((trump) => {
-                                if (trump.compare(masterCard, firstCard.color, trump.color) > 0)
+                                if (trump.compare(masterCard, firstCard.color, trumpColor) > 0)
                                     pcards.push(trump);
                             });
                             if (pcards.length === 0) {
@@ -155,7 +155,7 @@ class Player {
 
                 } else {
                     playertrumps.map((trump) => {
-                        if (trump.compare(masterCard, firstCard.color, trump.color) > 0)
+                        if (trump.compare(masterCard, firstCard.color, trumpColor) > 0)
                             pcards.push(trump);
                     });
                     if (pcards.length === 0) {

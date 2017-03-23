@@ -4,6 +4,8 @@ import colors from './lib/util/Color';
 
 process.env.RUNNING = process.env.RUNNING || 'PROD';
 
+process.title = 'pandirc:main';
+
 let child = null;
 
 function _start() {
@@ -25,7 +27,7 @@ function _start() {
             data.toString().split('\n').map((data) => {
                 if(data.toString().trim() !== '') {
                     let d = data.toString()
-                        .replace(/[A-Za-z,]{4} [1-9]{1,2} [A-Za-z]{3} [0-9]{4} /g, '').replace(' GMT','');
+                        .replace(/[A-Za-z]+, [0-9]+ [A-Za-z]+ [0-9]+ /g, '').replace(' GMT','');
                     let date = d.slice(0,d.indexOf(' '));
                     let head = d.replace(date+' ', '');
                     head = head.slice(0, head.indexOf(' '));
@@ -43,7 +45,7 @@ function _start() {
             data.toString().split('\n').map((data) => {
                 if(data.toString().trim() !== '') {
                     let d = data.toString()
-                        .replace(/[A-Za-z,]{4} [1-9]{1,2} [A-Za-z]{3} [0-9]{4} /g, '').replace(' GMT','');
+                        .replace(/[A-Za-z]+, [0-9]+ [A-Za-z]+ [0-9]+ /g, '').replace(' GMT','');
                     let date = d.slice(0,d.indexOf(' '));
                     let head = d.replace(date+' ', '');
                     head = head.slice(0, head.indexOf(' '));

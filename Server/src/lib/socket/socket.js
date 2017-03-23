@@ -37,6 +37,7 @@ class Socket {
             this._interval = setInterval(() => {
                 if (this._life <= 0) {
                     this._socket.destroy();
+                    clearInterval(this._interval);
                 } else {
                     this._life--;
                     this.send(':' + config.ip + ' PING :' + shortid.generate());
@@ -164,9 +165,11 @@ class Socket {
         if (this._logger) {
             this._logger._CLIENT_DISCONNECTED();
         }
-        sockets.splice(sockets.indexOf(this), 1);
-        ipConnected[this.ip]--;
-        delete this;
+        if(sockets.indexOf(this) >= 0) {
+            sockets.splice(sockets.indexOf(this), 1);
+            ipConnected[this.ip]--;
+            delete this;
+        }
     }
 
     close() {
