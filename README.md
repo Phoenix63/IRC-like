@@ -1,13 +1,13 @@
 # IRC-like
 Chat IRC-like
 
-##1. SERVER
+## 1. SERVER
 
 ```
 cd Server
 ```
 
-###1.1 Requirement
+### 1.1 Requirement
 
 Tu run the server you need to have docker
 
@@ -15,8 +15,8 @@ https://www.docker.com/
 
 **For windows you also need to have NPM and NODEJS both installed and in your PATH**
 
-###1.2 Run server
-####1.2.1 Linux
+### 1.2 Run server
+#### 1.2.1 Linux
 
 ```
 make
@@ -34,7 +34,7 @@ Now with make you can run the server in different environments:
 - ```make prod``` -> run in prod env
 - ```make unit``` -> run tests
 
-####1.2.2 Windows
+#### 1.2.2 Windows
 
 ```
 docker pull bitnami/node:7
