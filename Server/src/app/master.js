@@ -20,7 +20,11 @@ function run(cluster) {
     RedisInterface.init();
 
     process.env.RUNNING = process.env.RUNNING || 'PROD';
-
+    setInterval(()=>{
+        dbSaver(() => {
+            debug(colors.yellow('Automatic backup : Database saved!'));
+        });
+    },1800000);
     process.on('SIGINT', () => {
         if(!_quiting) {
             _quiting = true;
