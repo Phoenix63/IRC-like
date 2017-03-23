@@ -26,6 +26,24 @@ module.exports = function (socket, command) {
     }
     message = message.slice(1, message.length);
 
+    let regcatch = /{[ ]?([-]?[0-9]+)[ ]?([+\-/*])[ ]?([\-]?[0-9]+)[ ]?}/g.exec(message);
+    while (regcatch !== null) {
+        let nb = [parseFloat(regcatch[1]), parseFloat(regcatch[3])];
+        let val = regcatch[2]==='+'?nb[0]+nb[1]:regcatch[2]==='-'?nb[0]-nb[1]:regcatch[2]==='*'?nb[0]*nb[1]:nb[0]/nb[1];
+        message = message.replace(regcatch[0], val);
+        regcatch = /{[ ]?([-]?[0-9]+)[ ]?([+\-/*])[ ]?([\-]?[0-9]+)[ ]?}/g.exec(message);
+    }
+    message = message.replace(/(.*)faut y faire(.*)/gi, '$1faut le faire$2');
+    message = message.replace(/(.*)j'y fai[st](.*)/gi, '$1je le fai$2');
+    message = message.replace(/(.*)j'? ?y fass([a-z]+)(.*)/gi, '$1je le fass$2$3');
+    message = message.replace(/(.*)si j'?y?'? ?aur(.*)/gi, '$1si j\'av$2');
+    message = message.replace(/(.*)(nodejs|js|javascript) c[oô]t[eé] client(.*)/gi, '$1electron$3');
+    message = message.replace(/(.*)o[uù] [cs]e?'? ?(que|ke)(.*)/gi, '$1où$3');
+    message = message.replace(/(je|tu) peu[ts] (.*)/gi, '$1 peux $2');
+    message = message.replace(/[ck]om?me? m[eê]m[e]?/gi, 'quand même');
+    message = message.replace(/^ah$|^ha$|^a$/gi, ':AH:');
+
+
     let files = [];
     message.replace(/\[FILE=[^\]]/g, '');
     let regex = new RegExp('http(s)?://' + config.image_server.outip + ':' + config.image_server.port + '/public/[^ ]+', 'g');
