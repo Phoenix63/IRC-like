@@ -224,6 +224,12 @@ h3::after {
     max-width: 100%; 
 }
 
+.emote {
+	width:20px;
+	height:20px;
+	display:inline-block;
+}
+
 .connectedUser {
 	display:inline-block;
 	background:green;
@@ -270,7 +276,7 @@ h3::after {
 	font-weight:bold;
 }
 .default-color {
-	color:blue;
+	color:black;
 }
 .class-user-file {
 	font-weight:bold;
@@ -287,7 +293,7 @@ h3::after {
 .class-default-file {
 	display:inline-block;
 	font-size:120%;
-	color:blue;
+	color:black;
 }
 
 .messInBox {
