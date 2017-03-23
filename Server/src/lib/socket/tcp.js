@@ -32,7 +32,7 @@ function createServer(callback) {
         callback(socket);
         socket.buffer = '';
         socket.manager.emit('connect');
-        socket.setTimeout(config.timeout*1000);
+        socket.setTimeout(0);
 
         socket.on('timeout', () => {
             socket.destroy();

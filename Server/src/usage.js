@@ -126,7 +126,7 @@ function execStats() {
                 out += '\t|                  Details                    |\n';
                 keys.map((key) => {
                     out += '\t|  '+(process[key]?colors.lCyan:colors.Red)+'---- '+key+colors.Default+addSpaces(key)+'|\n';
-                    out += '\t|  MEM usage: ['+getBar(getCpu(process, [key]))+']  '+getPercent(getCpu(process, [key]))+'            |\n';
+                    out += '\t|  CPU usage: ['+getBar(getCpu(process, [key]))+']  '+getPercent(getCpu(process, [key]))+'            |\n';
                     out += '\t|  MEM usage: ['+getBar(getRam(process, [key]))+']  '+getPercent(getRam(process, [key]))+'            |\n';
                 });
                 out += '\t-----------------------------------------------\n';

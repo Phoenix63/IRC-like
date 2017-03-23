@@ -16,13 +16,15 @@ module.exports = function (callback) {
             db.close();
             callback();
         }, 4);
-        // drop mongo channel collection
-        db.collection('channels', {}, (err, chans) => {
-            if(!err) {
-                db.dropCollection('channels');
+
+        db.collection('channels').find().toArray((err, channels) => {
+            if(channels.length > 0) {
+                db.dropCollection('channels', trigger.perform);
+            } else {
+                trigger.perform();
             }
-            trigger.perform();
         });
+
         Redis.getUsers(function (users) {
             if (users) {
                 trigger.addAsyncTask(Object.keys(users).length);
