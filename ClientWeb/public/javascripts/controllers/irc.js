@@ -312,7 +312,17 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 					"<p>user b -> Bann or debann a user in the server <div class = 'commandHelp'>/mode NickOfUser +b</div> <div class = 'commandHelp'>/mode NickOfUser -b</div></p>" +
 					"<p>user o -> Upgrade a user to admin <div class = 'commandHelp'>/mode NickOfUser +o</div></p>" +
 					"<p>user w -> The user could receive WALLOPS <div class = 'commandHelp'>/mode NickOfUser +w</div></p>" +
-					"<p>user s -> Mark an user as receiving notification from server <div class = 'commandHelp'>/mode NickOfUser +s</div></p>");
+					"<p>user s -> Mark an user as receiving notification from server <div class = 'commandHelp'>/mode NickOfUser +s</div></p>" +
+					"<strong>Quelques exemples de smiley</strong>" + 
+					"<p>:ok_hand: <img class='emote' src = '../../images/ok_hand.png' /></p>" + 
+					"<p>:pandab: <img class='emote' src = '../../images/pandab.png' /></p>" + 
+					"<p>:surprised: <img class='emote' src = '../../images/surprised.png' /></p>" +
+					"<p>:tong_close: <img class='emote' src = '../../images/tong_close.png' /></p>" +
+					"<p>:tong_wink: <img class='emote' src = '../../images/tong_wink.png' /></p>" +
+					"<p>:heart_eyes: <img class='emote' src = '../../images/heart_eyes.png' /></p>" +
+					"<p>:sunglasses: <img class='emote' src = '../../images/sunglasses.png' /></p>" +
+					"<p>:no_exp: <img class='emote' src = '../../images/no_exp.png' /></p>"
+					);
 	};
 	
     $scope.sendMessage = function() {
