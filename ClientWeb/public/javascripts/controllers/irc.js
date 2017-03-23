@@ -35,17 +35,20 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 	$scope.uploadImage = function(fich) {
 		userInfo.connectFile();
 		boolFile = true;
-		var nameF = fich[0].name;
-		while (nameF.indexOf(' ') !== -1) {
-			nameF = nameF.replace(' ', '_');
+		if(fich.length > 1) {
+			bootbox.alert("You must put one file");
 		}
-		if(fich[0].size >= 2097152) {
+		else if(fich[0].size >= 2097152) {
 			bootbox.alert("File too big");
 		}
 		else if($scope.currentChannel.chan === "@home") {
 			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(),  "You should be in a channel"]);
 		}
 		else {
+			var nameF = fich[0].name;
+			while (nameF.indexOf(' ') !== -1) {
+				nameF = nameF.replace(' ', '_');
+			}
 			if(isImage(fich[0].name)) {
 				var readerPreview = new FileReader();
 				readerPreview.onload = function (e) {
@@ -100,8 +103,6 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 					$("#fileUpload").hide();
 					var msgFile = (/^:[\S]+[ ]FILE[ ]([\S]+)/g).exec(msg);
 					var fileReceive = in_isFile(msgFile[1]);
-					var fileToReplace = (/^(http:\/\/[\w.:]+)\/[\S]+$/).exec(fileReceive[0]); // a envoyer avant d'envoyer
-					fileReceive[0] = fileReceive[0].replace(fileToReplace[1], user.server + ":3001"); //a enlever avant d'envoyer
 					if(isImage(msgFile[1])) {
 						var img = new Image();
 						img.onload = function() {
@@ -2251,7 +2252,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 					var cmdTopic = (/^:[0-9.a-z:]+[ ]331[ ]JOIN[ ]([#][\w\S]+)[ ][:]([\w\S ]+)$/).exec(msg);
 					var channelTopic = cmdTopic[1];
 					var messTopic = cmdTopic[2];
-					$scope.currentChannel.setTopic(channelTopic + " :" + messTopic);
+					$scope.currentChannel.setTopic(channelTopic + " : " + messTopic);
 					$scope.topicChannel = $scope.currentChannel.topic;
 				}
 				if(msg.match(/^:[0-9.a-z:]+[ ]331[ ]TOPIC[ ][#][\w\S]+[ ][:][\w\S ]+$/)) {
@@ -2289,7 +2290,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				boolList = false;
 				break;
 			case "311":
-				var regXpTab = (/^:[\S]+[ ]311[ ]([\S\w]+)[ ]([\w\S]+)[ ][\S]+[ ][*][ ][:][ ]([\w\S]+)$/).exec(msg);
+				var regXpTab = (/^:[\S]+[ ]311[ ]([\S\w]+)[ ]([\w\S]+)[ ][\S]+[ ][*][ ][:]([\w\S]+)$/).exec(msg);
 				if(isCmdMute === true) {
 					user.mute.push(regXpTab[1]);
 					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You have mute " + regXpTab[1]]);
@@ -2341,7 +2342,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				bootbox.prompt("Password incorrect", function(ev){
 					if(ev !== null) {
 						userInfo.socket.emit("message", "PASS " + ev);
-						userInfo.socket.emit("message", "USER " + user.userN + " 0 * : " + user.realName);
+						userInfo.socket.emit("message", "USER " + user.userN + " 0 * :" + user.realName);
 					}
 					else {
 						$window.location.href = landingUrl;
@@ -2400,6 +2401,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 		if(msg.includes("PING")===true) {
 			userInfo.socket.emit("message", "PONG");
 		}
+		$scope.currentChannel.messages.push([new User("debug"), new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), msg]);
 		$scope.$apply();
     });
 });
