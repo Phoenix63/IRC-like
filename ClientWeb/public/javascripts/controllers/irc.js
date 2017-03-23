@@ -2195,18 +2195,6 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 					boolNames = false;
 					userInfo.socket.emit("message", "NAMES");
 				}
-				else if(rspModeFlag === "+w") {
-					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), rspModeUser + " received the WALLOPS"]);
-				}
-				else if(rspModeFlag === "-w") {
-					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), rspModeUser + " doesn't received WALLOPS"]);
-				}
-				else if(rspModeFlag === "+s") {
-					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), rspModeUser + " received the notification from server"]);
-				}
-				else if(rspModeFlag === "-s") {
-					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), rspModeUser + "doesnt received notification from server"]);
-				}
 				else if(rspModeFlag === "+i") {
 					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), rspModeUser + " is now invisible"]);
 					for(var i = 0; i<$scope.channels.length; i++) {
