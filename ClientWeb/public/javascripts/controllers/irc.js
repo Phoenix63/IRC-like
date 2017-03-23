@@ -2400,7 +2400,6 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 		if(msg.includes("PING")===true) {
 			userInfo.socket.emit("message", "PONG");
 		}
-		$scope.currentChannel.messages.push([new User("debug"), new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), msg]);
 		$scope.$apply();
     });
 });
