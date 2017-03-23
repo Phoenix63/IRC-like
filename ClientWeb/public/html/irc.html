@@ -3,13 +3,13 @@
     <div id="channels">
         <h3>Channels list</h3>
         <div ng-repeat="channel in channels">
-            <button class="buttonChUs" ng-click="joinChannel(channel)" ng-class="channel.notif === 1 ? 'notif-messageOn' : 'notif-messageOff'" ng-context-menu="menuOptions(channel)">{{channel.chan}}</button>
+            <button class="buttonCh" ng-click="joinChannel(channel)" ng-class="channel.notif === 1 ? 'notif-messageOn' : 'notif-messageOff'" ng-context-menu="menuOptions(channel)">{{channel.chan}}</button>
         </div>
     </div>
 	<div id="users">
         <h3>Users list</h3>
         <div ng-repeat="user in currentChannel.listU track by $index">
-            <button class="buttonChUs" ng-context-menu="menuOptionsUser(user)" ng-class="user.right === 1 ? 'operator-color' : (user.right === 2 ? 'user-color' : 'default-color')">{{user.nick}}</button>
+            <button class="buttonUs" ng-context-menu="menuOptionsUser(user)" ng-class="user.right === 1 ? 'operator-color' : (user.right === 2 ? 'user-color' : 'default-color')">{{user.nick}}</button>
         </div>
     </div>
     <div id="messages" scroll-bottom="currentChannel.messages">
