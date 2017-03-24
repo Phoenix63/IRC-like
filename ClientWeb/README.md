@@ -9,7 +9,7 @@ cd ClientWeb
 
 ### Requirement
 
-Tu run the server you need to have npm
+Tu run the client you need to have npm
 
 https://nodejs.org/en/download/
 
