@@ -253,7 +253,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			userInfo.socket.emit("message", "KICK " + $scope.currentChannel.chan + " " + userL.nick);
 		}],
 		["Bann", function ($itemScope) {
-			userInfo.socket.emit("message", "MODE " + $scope.currentChannel.chan + " +b " + userL.nick);
+			userInfo.socket.emit("message", "MODE " + $scope.currentChannel.chan + " +b " + userL.nick + " 999999999");
 		}]
 	];};
 	
