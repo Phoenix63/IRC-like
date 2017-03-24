@@ -523,7 +523,7 @@ void MainFrame::onPongSignal()
 void MainFrame::ping()
 {
     if (!pongResponse) {
-        socket->connectToHost(host, 8080);
+        socket->connectToHost(host, 8088);
         if (!socket->waitForConnected(5000))
             close();
     }
@@ -534,6 +534,6 @@ void MainFrame::ping()
 void MainFrame::help(bool arg1)
 {
     (void)arg1;
-    HelpDialog *helpDialog = new HelpDialog(NULL);
+    HelpDialog *helpDialog = new HelpDialog(this);
     helpDialog->show();
 }

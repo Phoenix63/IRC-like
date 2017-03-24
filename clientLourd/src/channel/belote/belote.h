@@ -49,7 +49,7 @@ private:
     void clearLayout(QLayout *layout);
     void chooseTeam();
     void displayCard(Card *card);
-    void refreshHand();
+    void setActivePlayer(int lastPlayer);
     //Game functions
     void firstRound(int trump);
     void secondRound(int trump);

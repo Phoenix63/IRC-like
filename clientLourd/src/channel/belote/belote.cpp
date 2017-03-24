@@ -118,6 +118,19 @@ void Belote::playCard()
     setInactive();
 }
 
+void Belote::setActivePlayer(int lastPlayer)
+{
+    ui->westName->setStyleSheet("color : black;");
+    ui->northName->setStyleSheet("color : black;");
+    ui->eastName->setStyleSheet("color : black;");
+    if (lastPlayer == position())
+        ui->westName->setStyleSheet("color : red;");
+    else if (lastPlayer == (position() + 1) % 4)
+        ui->northName->setStyleSheet("color : red;");
+    else if (lastPlayer == (position() + 2) % 4)
+        ui->eastName->setStyleSheet("color : red;");
+}
+
 void Belote::setInactive()
 {
     for (auto i:hand.keys()) {
@@ -169,7 +182,7 @@ void Belote::receiveCard(int val)
     cropped.scaledToHeight(70,Qt::SmoothTransformation);
     QPushButton *newCard = new QPushButton();
     newCard->setIcon(cropped);
-    newCard->setStyleSheet("background-color: rgba( 255, 255, 255, 0%); border: 1px solid black;");
+    newCard->setStyleSheet("background-color: rgba( 255, 255, 255, 0%);");
     newCard->setIconSize(QSize(70, 90));
     ui->south->addWidget(newCard);
     hand[card] = newCard;
@@ -263,6 +276,7 @@ bool Belote::in_isCardDeal(QString string)
 
 bool Belote::in_isPlayerTake(QString string)
 {
+    ui->order->setText("");
     if (!string.contains(BELOTE::RPL::PLAYERTAKE))
         return false;
     QString take = string.split(' ').at(4);
@@ -271,11 +285,11 @@ bool Belote::in_isPlayerTake(QString string)
     if (taker == position())
         ui->taker->setText("Taker :" + username + " - ");
     else if (taker == (position() + 1) % 4)
-        ui->taker->setText("Taker :" + ui->eastName->text() + " - ");
+        ui->taker->setText("Taker :" + ui->westName->text() + " - ");
     else if (taker == (position() + 2) % 4)
         ui->taker->setText("Taker :" + ui->northName->text() + " - ");
     else
-        ui->taker->setText("Taker :" + ui->westName->text() + " - ");
+        ui->taker->setText("Taker :" + ui->eastName->text() + " - ");
     clearLayout(ui->board);
     if (trump == 0)
         ui->taker->setText(ui->taker->text() + "♠");
@@ -294,6 +308,7 @@ bool Belote::in_isPlayerPlay(QString string)
 {
     if (!string.contains(BELOTE::RPL::PLAYED))
         return false;
+    setActivePlayer(string.split(' ').at(4).toInt());
     int card = string.split(' ').last().toInt();
     Card *played = new Card(card);
     if (ui->board->count() == 4)
