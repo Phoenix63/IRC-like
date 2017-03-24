@@ -1,16 +1,24 @@
-Server/
+bin
+.idea
+
+#.idea/workspace.xml - remove # and delete .idea if it better suit your needs.
+.gradle
+build/
+
+#NDK
+obj/
+
+# IntelliJ project files
+*.iml
+.idea/
+idea/*.xml
+
 out/
 node_modules/
 
 *.pro.user
 *.pro.user.*
 
-build-ChatIRC*
-.qmake.*
-Make*
-clientLourd/debug/*
-clientLourd/release/*
-clientLourd/config.cfg
-clientLourd/theme.cfg
-clientLourd/ui_*
-*.obj
+build-ChatIRC-Desktop_Qt_5_8_0_MinGW_32bit-Debug/
+/Server/perso/
+/Server/__uploaded_files__/*
