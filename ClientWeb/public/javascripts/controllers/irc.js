@@ -24,7 +24,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 	$scope.$connected = true;
 	var userFile = new User("");
 	userFile.setRight(5);
-	
+	userInfo.socket.emit("message", "LIST");
 	$scope.newLogInNick = function() {
 		userInfo.setNick($scope.newNick);
 		userInfo.socket.emit("message", "NICK " + userInfo.nick);
@@ -35,17 +35,20 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 	$scope.uploadImage = function(fich) {
 		userInfo.connectFile();
 		boolFile = true;
-		var nameF = fich[0].name;
-		while (nameF.indexOf(' ') !== -1) {
-			nameF = nameF.replace(' ', '_');
+		if(fich.length > 1) {
+			bootbox.alert("You must put one file");
 		}
-		if(fich[0].size >= 2097152) {
+		else if(fich[0].size >= 2097152) {
 			bootbox.alert("File too big");
 		}
 		else if($scope.currentChannel.chan === "@home") {
 			$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(),  "You should be in a channel"]);
 		}
 		else {
+			var nameF = fich[0].name;
+			while (nameF.indexOf(' ') !== -1) {
+				nameF = nameF.replace(' ', '_');
+			}
 			if(isImage(fich[0].name)) {
 				var readerPreview = new FileReader();
 				readerPreview.onload = function (e) {
@@ -100,8 +103,6 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 					$("#fileUpload").hide();
 					var msgFile = (/^:[\S]+[ ]FILE[ ]([\S]+)/g).exec(msg);
 					var fileReceive = in_isFile(msgFile[1]);
-					var fileToReplace = (/^(http:\/\/[\w.:]+)\/[\S]+$/).exec(fileReceive[0]);
-					fileReceive[0] = fileReceive[0].replace(fileToReplace[1], user.server + ":3001");
 					if(isImage(msgFile[1])) {
 						var img = new Image();
 						img.onload = function() {
@@ -112,6 +113,10 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 							else {
 								$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + fileReceive[0] + "' target='_blank'>" + fileReceive[0] + "</a></p><p>" + msgToSend + "</p><p><a href='" + fileReceive[0] + "' target='_blank'><img style='width:" + tabMiniature[0] + "px;height:" + tabMiniature[1] + "px' src='" + fileReceive[0] + "'/></a></p></div>"]);
 							}
+							$scope.$apply();
+						}
+						img.onerror = function() {
+							$scope.currentChannel.messages.push([userFile, "",  "<div class='messInBox'><p class='class-user-file' class='user-color'>" + defaultMess.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>Can't load image link : <a href'" + fileReceive[0] + "'>" + fileReceive[0] + "</a></p></div>"]);
 							$scope.$apply();
 						}
 						img.src = fileReceive[0];
@@ -228,6 +233,14 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 		["WhoIs", function ($itemScope) {
 			userInfo.socket.emit("message", "WHOIS " + userL.nick);
 		}],
+		["Invite", function ($itemScope) {
+			bootbox.prompt("In which channel ?", function(ev){
+				if(ev !== null) {
+					userInfo.socket.emit("message", "INVITE " + userL.nick + " " + ev);
+				}
+				$scope.$apply();
+			});
+		}],
 		["Mute", function ($itemScope) {
 			isCmdMute = true;
 			userInfo.socket.emit("message", "WHOIS " + userL.nick);
@@ -240,7 +253,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 			userInfo.socket.emit("message", "KICK " + $scope.currentChannel.chan + " " + userL.nick);
 		}],
 		["Bann", function ($itemScope) {
-			userInfo.socket.emit("message", "MODE " + $scope.currentChannel.chan + " +b " + userL.nick);
+			userInfo.socket.emit("message", "MODE " + $scope.currentChannel.chan + " +b " + userL.nick + " 999999999");
 		}]
 	];};
 	
@@ -301,7 +314,17 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 					"<p>user b -> Bann or debann a user in the server <div class = 'commandHelp'>/mode NickOfUser +b</div> <div class = 'commandHelp'>/mode NickOfUser -b</div></p>" +
 					"<p>user o -> Upgrade a user to admin <div class = 'commandHelp'>/mode NickOfUser +o</div></p>" +
 					"<p>user w -> The user could receive WALLOPS <div class = 'commandHelp'>/mode NickOfUser +w</div></p>" +
-					"<p>user s -> Mark an user as receiving notification from server <div class = 'commandHelp'>/mode NickOfUser +s</div></p>");
+					"<p>user s -> Mark an user as receiving notification from server <div class = 'commandHelp'>/mode NickOfUser +s</div></p>" +
+					"<strong>Quelques exemples de smiley</strong>" + 
+					"<p>:ok_hand: <img class='emote' src = '../../images/ok_hand.png' /></p>" + 
+					"<p>:pandab: <img class='emote' src = '../../images/pandab.png' /></p>" + 
+					"<p>:surprised: <img class='emote' src = '../../images/surprised.png' /></p>" +
+					"<p>:tong_close: <img class='emote' src = '../../images/tong_close.png' /></p>" +
+					"<p>:tong_wink: <img class='emote' src = '../../images/tong_wink.png' /></p>" +
+					"<p>:heart_eyes: <img class='emote' src = '../../images/heart_eyes.png' /></p>" +
+					"<p>:sunglasses: <img class='emote' src = '../../images/sunglasses.png' /></p>" +
+					"<p>:no_exp: <img class='emote' src = '../../images/no_exp.png' /></p>"
+					);
 	};
 	
     $scope.sendMessage = function() {
@@ -325,7 +348,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						}
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/part":
@@ -403,7 +426,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						}
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/pass":
@@ -414,7 +437,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						userInfo.socket.emit("message", "PASS " + commandPass);
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/rmchan":
@@ -431,7 +454,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						}
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/rmfile":
@@ -443,7 +466,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						userInfo.socket.emit("message", "RMFILE " + rmFileCh + " " + rmFile);
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/files":
@@ -463,7 +486,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						}
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/topic":
@@ -496,7 +519,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						}
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/kick":
@@ -520,7 +543,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						}
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/msg":
@@ -561,7 +584,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						$scope.currentChannel.messages.push([paramUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), paramMess]);
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/invite":
@@ -573,7 +596,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						userInfo.socket.emit("message", "INVITE " + cmdInvitUser + " " + cmdInvitCh);
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/away":
@@ -584,7 +607,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						userInfo.socket.emit("message", "AWAY : " + cmdAwayMess);
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/back":
@@ -593,7 +616,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						userInfo.socket.emit("message", "AWAY");
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/privmsg":
@@ -605,7 +628,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						userInfo.socket.emit("message", "PRIVMSG " + cmdPrivMsgChan + " :" + cmdPrivM);
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/names":
@@ -621,7 +644,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						userInfo.socket.emit("message", "NAMES");
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/restart":
@@ -630,7 +653,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						userInfo.socket.emit("message", "RESTART");
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/quit":
@@ -640,7 +663,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						$window.location.href = landingUrl;
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/whois":
@@ -660,7 +683,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						}
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/who":
@@ -680,7 +703,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						}
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/list":
@@ -689,7 +712,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						userInfo.socket.emit("message", "LIST");
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/nick":
@@ -700,7 +723,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						userInfo.socket.emit("message", "NICK " + nickCommand);
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/mute":
@@ -712,7 +735,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						userInfo.socket.emit("message", "WHOIS " + cmdMUser);
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/demute":
@@ -729,7 +752,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 						}
 					}
 					else {
-						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command Invalid"]);
+						$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 					}
 					break;
 				case "/mode":
@@ -1052,7 +1075,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 										userInfo.socket.emit("message", "MODE " + cmd[1] + " " + flag + " " + cmd[3]);
 									}
 									else {
-										$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Command invalid"]);
+										$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error - check if the argument is good"]);
 									}
 								}
 								else {
@@ -1141,7 +1164,13 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				$scope.currentChannel.messages.push([userFile, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "<div class='messInBox'><p class='class-user-file'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + $scope.newMessage + "' target='_blank'>" + $scope.newMessage + "</a></p></div>"]);
 			}
 			else {
-				$scope.currentChannel.messages.push([user, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), $scope.newMessage]);
+				var isEmote = changeToEmoji($scope.newMessage);
+				if(isEmote !== false) {
+					$scope.currentChannel.messages.push([userFile, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "<div class='messInBox'><p class='class-user-file'>" + user.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + isEmote + "</p></div>"]);
+				}
+				else {
+					$scope.currentChannel.messages.push([user, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), $scope.newMessage]);
+				}
 			}
 			$scope.newMessage = undefined;
         }
@@ -1187,10 +1216,34 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 					var adminGlobalM = new User(globalMessage[1]);
 					adminGlobalM.setRight(1);
 					var adMsg = globalMessage[2];
-					for(var i = 0; i<$scope.channels.length; i++) {
-						$scope.channels[i].messages.push([adminGlobalM, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), adMsg]);
+					
+					if(adMsg.match(/^http:\/\/[\S]+(.fr|.com)$/)) {
+						for(var i = 0; i<$scope.channels.length; i++) {
+							$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + adminGlobalM.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + adMsg + "' target='_blank'>" + adMsg + "</a></p></div>"]);
+						}
+						$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + adminGlobalM.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + adMsg + "' target='_blank'>" + adMsg + "</a></p></div>"]);
 					}
-					$scope.currentChannel.messages.push([adminGlobalM, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), adMsg]);
+					else if(adMsg.match(/^https:\/\/[\S]+(.fr|.com)$/)) {
+						for(var i = 0; i<$scope.channels.length; i++) {
+							$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + adminGlobalM.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + adMsg + "' target='_blank'>" + adMsg + "</a></p></div>"]);
+						}
+						$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + adminGlobalM.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + adMsg + "' target='_blank'>" + adMsg + "</a></p></div>"]);
+					}
+					else {
+						var isEmote = changeToEmoji(adMsg);
+						if(isEmote !== false) {
+							for(var i = 0; i<$scope.channels.length; i++) {
+								$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + adminGlobalM.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + isEmote + "</p></div>"]);
+							}
+							$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + adminGlobalM.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + isEmote + "</p></div>"]);
+						}
+						else {
+							for(var i = 0; i<$scope.channels.length; i++) {
+								$scope.channels[i].messages.push([adminGlobalM, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), adMsg]);
+							}
+							$scope.currentChannel.messages.push([adminGlobalM, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), adMsg]);
+						}
+					}
 				}
 				else if(msg.match(/^[:][\w\S]+[ ]PRIVMSG[ ][#][\w\S]+[ ][:][\S\W]+$/)) {
 					var regxMess = (/^[:]([\w\S]+)[ ]PRIVMSG[ ]([#][\w\S]+)[ ][:]([\S\W]+)$/).exec(msg);
@@ -1288,7 +1341,18 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 										}
 									}
 									else {
-										$scope.channels[i].messages.push([regxUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
+										var isEmote = changeToEmoji(regxMsg);
+										if(isEmote !== false) {
+											if(regxUser.right === 1) {
+												$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + isEmote + "</p></div>"]);
+											}
+											else {
+												$scope.channels[i].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + isEmote + "</p></div>"]);
+											}
+										}
+										else {
+											$scope.channels[i].messages.push([regxUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
+										}
 									}
 									if($scope.channels[i].notif !== 2) {
 										$scope.channels[i].setNotifOn();
@@ -1300,7 +1364,6 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 							regxUser = isAdmin(regxUser, $scope.currentChannel);			
 							var regFileWithMess = new RegExp("^" + user.server + ":3001[\\S]+[ ][\\S]+", "g");
 							var regFileWithoutMess = new RegExp("^" + user.server + ":3001[\\S]+$");
-							var regClick = new RegExp("^http://[\\S]+$");
 							if(regxMsg.match(regFileWithMess)) {
 								var tabFile = regxMsg.split(" ");
 								var urlFile = tabFile[0];
@@ -1384,7 +1447,18 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 								}
 							}
 							else {
-								$scope.currentChannel.messages.push([regxUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
+								var isEmote = changeToEmoji(regxMsg);
+								if(isEmote !== false) {
+									if(regxUser.right === 1) {
+										$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-operator-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + isEmote + "</p></div>"]);
+									}
+									else {
+										$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + isEmote + "</p></div>"]);
+									}
+								}
+								else {
+									$scope.currentChannel.messages.push([regxUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
+								}
 							}
 						}
 					}
@@ -1461,13 +1535,19 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 									}
 								}
 								else if(regxMsg.match(/^http:\/\/[\S]+(.fr|.com)$/)) {
-									$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + regxMsg + "</a></p></div>"]);
+									$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + regxMsg + "</a></p></div>"]);
 								}
 								else if(regxMsg.match(/^https:\/\/[\S]+(.fr|.com)$/)) {
-									$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + regxMsg + "</a></p></div>"]);
+									$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + regxMsg + "</a></p></div>"]);
 								}
 								else {
-									$scope.currentChannel.messages.push([userToAdd, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
+									var isEmote = changeToEmoji(regxMsg);
+									if(isEmote !== false) {
+										$scope.currentChannel.messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + isEmote + "</p></div>"]);
+									}
+									else {
+										$scope.currentChannel.messages.push([regxUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
+									}
 								}
 							}
 							else {
@@ -1515,7 +1595,13 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 									$scope.channels[count].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p><a href='" + regxMsg + "' target='_blank'>" + regxMsg + "</a></p></div>"]);
 								}
 								else {
-									$scope.channels[count].messages.push([userToAdd, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
+									var isEmote = changeToEmoji(regxMsg);
+									if(isEmote !== false) {
+										$scope.channels[count].messages.push([userFile, "", "<div class='messInBox'><p class='class-default-file'>" + regxUser + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>" + isEmote + "</p></div>"]);
+									}
+									else {
+										$scope.channels[count].messages.push([regxUser, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), regxMsg]);
+									}
 								}
 								if($scope.channels[count].notif !== 2) {
 									$scope.channels[count].setNotifOn();
@@ -1794,7 +1880,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				var listFilesURL = rspListFiles[2];
 				var nameFiles = rspListFiles[3];
 				var userFiles = rspListFiles[4];
-				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Channel :" + listFilesCh + " - user : " + userFiles + " - file : " + nameFiles + " " + listFilesURL]);
+				$scope.currentChannel.messages.push([userFile,"", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + defaultMess.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>Channel :" + listFilesCh + " name :" + userFiles + " file :" + nameFiles + " <a href'" + listFilesURL + "'>" + listFilesURL + "</a></p></div>"]);
 				break;
 			case "341":
 				var rspInvite = (/^[\w\S]+[ ]341[ ]([\S\w]+)[ ]([\w\S]+)$/).exec(msg);
@@ -2110,18 +2196,6 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 					boolNames = false;
 					userInfo.socket.emit("message", "NAMES");
 				}
-				else if(rspModeFlag === "+w") {
-					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), rspModeUser + " received the WALLOPS"]);
-				}
-				else if(rspModeFlag === "-w") {
-					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), rspModeUser + " doesn't received WALLOPS"]);
-				}
-				else if(rspModeFlag === "+s") {
-					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), rspModeUser + " received the notification from server"]);
-				}
-				else if(rspModeFlag === "-s") {
-					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), rspModeUser + "doesnt received notification from server"]);
-				}
 				else if(rspModeFlag === "+i") {
 					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), rspModeUser + " is now invisible"]);
 					for(var i = 0; i<$scope.channels.length; i++) {
@@ -2164,12 +2238,13 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				break;
 			case "331":
 				if(msg.match(/^:[0-9.a-z:]+[ ]331[ ]JOIN[ ][#][\w\S]+[ ][:][\w\S ]+$/)) {
-					var topic = in_isTopic(msg);
-					$scope.currentChannel.setTopic(topic[0] + " :" + topic[1]);
-					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Topic -> " + topic[1]]);
+					var cmdTopic = (/^:[0-9.a-z:]+[ ]331[ ]JOIN[ ]([#][\w\S]+)[ ][:]([\w\S ]+)$/).exec(msg);
+					var channelTopic = cmdTopic[1];
+					var messTopic = cmdTopic[2];
+					$scope.currentChannel.setTopic(channelTopic + " : " + messTopic);
 					$scope.topicChannel = $scope.currentChannel.topic;
 				}
-				else if(msg.match(/^:[0-9.a-z:]+[ ]331[ ]TOPIC[ ][#][\w\S]+[ ][:][\w\S ]+$/)) {
+				if(msg.match(/^:[0-9.a-z:]+[ ]331[ ]TOPIC[ ][#][\w\S]+[ ][:][\w\S ]+$/)) {
 					var cmdTopic = (/^:[0-9.a-z:]+[ ]331[ ]TOPIC[ ]([#][\w\S]+)[ ][:]([\w\S ]+)$/).exec(msg);
 					var channelTopic = cmdTopic[1];
 					var messTopic = cmdTopic[2];
@@ -2204,7 +2279,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				boolList = false;
 				break;
 			case "311":
-				var regXpTab = (/^:[\S]+[ ]311[ ]([\S\w]+)[ ]([\w\S]+)[ ][\S]+[ ][*][ ][:][ ]([\w\S]+)$/).exec(msg);
+				var regXpTab = (/^:[\S]+[ ]311[ ]([\S\w]+)[ ]([\w\S]+)[ ][\S]+[ ][*][ ][:]([\w\S]+)$/).exec(msg);
 				if(isCmdMute === true) {
 					user.mute.push(regXpTab[1]);
 					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You have mute " + regXpTab[1]]);
@@ -2230,7 +2305,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Your password have been update"]);
 				break;
 			case "403":
-				$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "This channel doesnt exist"]);
+				$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "check if the channel is in invite mode or if the channel is valid"]);
 				break;
 			case "404":
 				var rspMsg = (/^[\S]+[ ]404[ ]([#][\S\w]+)[ ][\w\W]+$/).exec(msg);
@@ -2256,7 +2331,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				bootbox.prompt("Password incorrect", function(ev){
 					if(ev !== null) {
 						userInfo.socket.emit("message", "PASS " + ev);
-						userInfo.socket.emit("message", "USER " + user.userN + " 0 * : " + user.realName);
+						userInfo.socket.emit("message", "USER " + user.userN + " 0 * :" + user.realName);
 					}
 					else {
 						$window.location.href = landingUrl;

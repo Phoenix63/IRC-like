@@ -42,12 +42,13 @@ h3::after {
 #messages h3 {
     position: fixed;
     top: 0px;
-    left: 270px;
+    left: 240px;
     color: rgba(255,255,255,0.8);
     background-color: #2f343f;
     padding-bottom: 10px;
     margin: 0px;
     width: 100%;
+	overflow:auto;
 }
 
 
@@ -224,8 +225,16 @@ h3::after {
     max-width: 100%; 
 }
 
+.emote {
+	width:20px;
+	height:20px;
+	display:inline-block;
+}
+
 .connectedUser {
 	display:inline-block;
+	margin-top:5px;
+	margin-bottom:5px;
 	background:green;
 	border-radius:50%;
 	width:20px;
@@ -244,6 +253,7 @@ h3::after {
 
 #topic {
 	display:inline-block;
+	overflow:auto;
 }
 
 
@@ -270,7 +280,7 @@ h3::after {
 	font-weight:bold;
 }
 .default-color {
-	color:blue;
+	color:black;
 }
 .class-user-file {
 	font-weight:bold;
@@ -287,7 +297,7 @@ h3::after {
 .class-default-file {
 	display:inline-block;
 	font-size:120%;
-	color:blue;
+	color:black;
 }
 
 .messInBox {
@@ -330,9 +340,20 @@ h3::after {
 	color:black;
 }
 
-.buttonChUs {
+.buttonCh {
 	border:none;
-	padding:6px 0 6px 0;
+	padding:6px 6px 6px 6px;
+	border-radius:2px;
+	margin-top:5px;
+	box-shadow:1px 1px 3px #aaa;
+	background:#fff;
+	font:bold 13px Arial;
+}
+
+.buttonUs {
+	border:none;
+	padding:6px 6px 6px 6px;
+	width:125px;
 	border-radius:2px;
 	margin-top:5px;
 	box-shadow:1px 1px 3px #aaa;
@@ -344,20 +365,6 @@ h3::after {
 	color:blue;
 }
 
-#menu_emoji {
-    width: 620px;
-    height: 225px; z-index: 999;
-    position: absolute;
-    bottom: 53px;
-    left: 271px;
-    background-color: #FFFFFF;
-    display: none;
-    padding: 5px;
-    border-style: 0.5 grey solid;
-    box-shadow:1px 1px 1px #aaa;
-
-
-}
 
 #clique {
     width: 30px;
@@ -365,10 +372,6 @@ h3::after {
     cursor: pointer;
     background-color: #ffffff;
     margin: 2px;
-}
-
-#menu_emoji img:hover{
-    background-color: #6BF;
 }
 
 
@@ -517,11 +520,6 @@ h3::after {
     }
 
 
-    #menu_emoji {
-        width: 340px;
-        height: 300px; z-index: 999;
-        left: 135px;
-    }
 
     #clique {
         width: 25px;
@@ -659,12 +657,6 @@ h3::after {
     }
 
 
-    #menu_emoji {
-    width: 210px;
-    height: 340px; z-index: 999;
-    left: 0px;
-    overflow: scroll;
-    }
 
     #clique {
     width: 22px;
