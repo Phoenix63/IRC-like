@@ -1,16 +1,4 @@
 
-	function in_isMsg(msg) {
-		var msSplit = msg.split(' ');
-		msSplit[0] = msSplit[0].replace(":","");
-		var channel = msSplit[2];
-		msSplit[3] = msSplit[3].replace(":","");
-		var mess = "";
-		for(var i = 3; i<msSplit.length; i++) {
-			mess = mess + " " + msSplit[i];
-		}
-		var msgBox = [msSplit[0], channel, mess];
-		return msgBox;
-	}
 	function in_isNickname(msg) {
 		var msSplit = msg.split(' ');
 		msSplit[0] = msSplit[0].replace(":","");
@@ -22,15 +10,22 @@
 	function in_isNames(msg) {
 		var msSplit = msg.split(' ');
 		var listUsers = [];
-		var chann = msSplit[4];
-		msSplit[5] = msSplit[5].replace(":","");
-		msSplit[5] = msSplit[5].replace("@","");
-		listUsers.push(msSplit[5]);
-		for(var i = 6; i<msSplit.length; i++) {
-			msSplit[i] = msSplit[i].replace("@","");
-			listUsers.push(msSplit[i]);
+		var channSet = msSplit[2];
+		var chann = msSplit[3];
+		for(var i = 4; i<msSplit.length; i++) {
+			msSplit[i] = msSplit[i].replace(":","");
+			if(msSplit[i].includes("@")) {
+				msSplit[i] = msSplit[i].replace("@","");
+				var newUser = new User(msSplit[i]);
+				newUser.setRight(1);
+				listUsers.push(newUser);
+			}
+			else {
+				var newUser = new User(msSplit[i]);
+				listUsers.push(newUser);
+			}
 		}
-		return [chann, listUsers];
+		return [chann, listUsers, channSet];
 	}
 	
 	function in_isChannel(msg) {
@@ -40,17 +35,7 @@
 		var lChan = [msSplit[0], channel];
 		return lChan;
 	}
-	
-	function in_isTopic(msg) {
-		var msSplit = msg.split(' ');
-		var channel = msSplit[3];
-		var topic = "";
-		msSplit[4] = msSplit[4].replace(":","");
-		for(var i = 4; i<msSplit.length; i++) {
-			topic = topic + " " + msSplit[i];
-		}
-		return [channel, topic];
-	}
+
 	function in_isList(msg) {
 		var msSplit = msg.split(' ');
 		var channel = msSplit[3];
@@ -61,5 +46,12 @@
 			topic = topic + " " + msSplit[i];
 		}
 		return [channel, numberOfUser, topic];
+	}
+	
+	function in_isFile(msg) {
+		var newLink = msg.replace(":","");
+		var tabNames = msg.split(".");
+		var nameOfFile = tabNames[tabNames.length-2] + "." + tabNames[tabNames.length-1];
+		return [newLink, nameOfFile];
 	}
 	
