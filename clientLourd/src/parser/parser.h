@@ -42,6 +42,7 @@ signals:
 	void changeChannelSignal();
     void lineAddedSignal();
     void nickModifiedSignal(QString nick);
+	void pongSignal();
 
 private:
 	// Out functions
@@ -99,6 +100,7 @@ private:
 	bool in_isConfirmInv(QString string);
     bool in_isListFileMsg(QString string);
     bool in_isRmFileMsg(QString string);
+	bool in_isPong(QString string);
 private:
 	// Pointer to the channel and socket created in mainframe
 	User self;

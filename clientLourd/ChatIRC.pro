@@ -24,6 +24,9 @@ TEMPLATE = app
 SOURCES += \
     src/main.cpp \
     src/channel/belote/belote.cpp \
+    src/channel/belote/card.cpp \
+    src/channel/belote/customlayout.cpp \
+    src/channel/belote/scoreboard.cpp \
     src/channel/channel.cpp \
     src/channel/channelcontent.cpp \
     src/channel/message.cpp \
@@ -34,6 +37,7 @@ SOURCES += \
     src/config/theme.cpp \
     src/config/themelist.cpp \
     src/gui/channellist.cpp \
+    src/gui/helpdialog.cpp \
     src/gui/login.cpp \
     src/gui/mainframe.cpp \
     src/gui/mclineedit.cpp \
@@ -44,13 +48,13 @@ SOURCES += \
     src/user/user.cpp \
     src/user/userlist.cpp \
     src/gui/uploadwindow.cpp \
-    src/channel/belote/card.cpp \
-    src/channel/belote/customlayout.cpp \
-    src/channel/belote/scoreboard.cpp
-
 
 HEADERS  += \
     src/channel/belote/belote.h \
+    src/channel/belote/card.h \
+    src/channel/belote/customlayout.h \
+    src/channel/belote/rpl_response.h \
+    src/channel/belote/scoreboard.h \
     src/channel/channel.h \
     src/channel/channelcontent.h \
     src/channel/message.h \
@@ -63,6 +67,7 @@ HEADERS  += \
     src/config/theme.h \
     src/config/themelist.h \
     src/gui/channellist.h \
+    src/gui/helpdialog.h \
     src/gui/login.h \
     src/gui/mainframe.h \
     src/gui/mclineedit.h \
@@ -74,16 +79,13 @@ HEADERS  += \
     src/parser/rpl_response.h \
     src/user/user.h \
     src/user/userlist.h \
-    src/gui/uploadwindow.h \ 
-    src/channel/belote/card.h \
-    src/channel/belote/rpl_response.h \
-    src/channel/belote/customlayout.h \
-    src/channel/belote/scoreboard.h
+    src/gui/uploadwindow.h
 
 FORMS    += \
     src/channel/belote/belote.ui \
+    src/channel/belote/scoreboard.ui \
+    src/gui/channellist.ui \
+    src/gui/helpdialog.ui \
     src/gui/login.ui \
     src/gui/mainframe.ui \
-    src/gui/channellist.ui \
-    src/gui/uploadwindow.ui \
-    src/channel/belote/scoreboard.ui
+    src/gui/uploadwindow.ui

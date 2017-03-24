@@ -51,6 +51,8 @@ public slots:
     void refreshMentionList();
     void nickModified(QString nick);
 
+    void help(bool arg1);
+
 	//Socket slots
 	void readyRead();
 	void closeEvent (QCloseEvent *event);
@@ -60,6 +62,9 @@ public slots:
 	void moveScrollBarToBottom(int min, int max);
 	void handleResults(QString url);
 
+	// ping pong slots
+	void onPongSignal();
+	void ping();
 signals:
 	void showLogin();
 	void deleteMainFrame(MainFrame *mainFrame);
@@ -111,6 +116,7 @@ private:
     QCompleter *stringCompleter;
     QCompleter *emoteCompleter;
     Channellist *listOfChannels;
+	bool pongResponse;
 };
 
 #endif // MAINFRAME_H

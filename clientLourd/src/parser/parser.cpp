@@ -24,7 +24,7 @@ void Parser::initialize(Channel *chan, QTcpSocket *sock, User nick, Channellist 
     socket = sock;
     self = nick;
     listOfChannels = list;
-    modeParser = new ParserMode(chan); 
+    modeParser = new ParserMode(chan);
 }
 
 void Parser::nickname(QString nick)
@@ -120,6 +120,7 @@ void Parser::in(QString string)
     if (!in_isInvBelMsg(string))
     if (!in_isBeloteMsg(string))
     if (!in_isConfirmInv(string))
+    if (!in_isPong(string))
     if (!in_isPing(string)) {
         channel->appendChannel(string, "\"Debug\"", nullptr);
         emit chatModifiedSignal();
@@ -842,5 +843,13 @@ bool Parser::in_isUserMode(QString string)
     modeParser->parseUser(string);
     emit changeChannelSignal();
     emit userModifiedSignal();
+    return true;
+}
+
+bool Parser::in_isPong(QString string)
+{
+    if (!string.contains(IRC::RPL::PONG))
+        return false;
+    emit pongSignal();
     return true;
 }

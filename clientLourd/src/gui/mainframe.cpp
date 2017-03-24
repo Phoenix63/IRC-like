@@ -10,11 +10,13 @@
 #include <QScrollBar>
 #include <QStandardPaths>
 #include <QTcpSocket>
+#include <QTimer>
 
 #include "channellist.h"
 #include "uploadfile.h"
 #include "uploadwindow.h"
 #include "ui_mainframe.h"
+#include "helpdialog.h"
 #include "../channel/message.h"
 #include "../config/theme.h"
 
@@ -30,7 +32,8 @@ MainFrame::MainFrame(QWidget *parent, QTcpSocket *socket, QString host, int port
     port(port),
     channel(&parserEmoji),
     stringCompleter(nullptr),
-    emoteCompleter(nullptr)
+    emoteCompleter(nullptr),
+    pongResponse(true)
 {
     initUiConf();
     initConnect();
@@ -40,6 +43,9 @@ MainFrame::MainFrame(QWidget *parent, QTcpSocket *socket, QString host, int port
     parser.initialize(&channel, socket, User("Guest"), listOfChannels);
     msgList.msgSender(ui->messageSender);
     channelModified();
+    QTimer *timer = new QTimer(this);
+    connect(timer, &QTimer::timeout, this, &MainFrame::ping);
+    timer->start(15000);
 }
 
 MainFrame::~MainFrame()
@@ -414,6 +420,11 @@ void MainFrame::initConnect()
     connect(&parser, &Parser::topicModifiedSignal, this, &MainFrame::topicModified);
     connect(&parser, &Parser::lineAddedSignal, this, &MainFrame::lineAdded);
     connect(&parser, &Parser::nickModifiedSignal, this, &MainFrame::nickModified);
+
+    connect(ui->actionhelp, &QAction::triggered, this, &MainFrame::help);
+
+    // PingPong related connects
+    connect(&parser, &Parser::pongSignal, this, &MainFrame::onPongSignal);
 }
 
 void MainFrame::initCompletion()
@@ -502,4 +513,27 @@ void MainFrame::on_actionchannelList_triggered()
     listOfChannels->show();
     listOfChannels->initUIStyle();
     listOfChannels->clear();
+}
+
+void MainFrame::onPongSignal()
+{
+    pongResponse = true;
+}
+
+void MainFrame::ping()
+{
+    if (!pongResponse) {
+        socket->connectToHost(host, 8080);
+        if (!socket->waitForConnected(5000))
+            close();
+    }
+    pongResponse = false;
+    socket->write(QString("PING\n").toUtf8());
+}
+
+void MainFrame::help(bool arg1)
+{
+    (void)arg1;
+    HelpDialog *helpDialog = new HelpDialog(NULL);
+    helpDialog->show();
 }
