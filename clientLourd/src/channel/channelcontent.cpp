@@ -7,6 +7,11 @@ ChannelContent::ChannelContent():
 
 }
 
+ChannelContent::~ChannelContent()
+{
+
+}
+
 void ChannelContent::parse(QString command)
 {
     (void)command;

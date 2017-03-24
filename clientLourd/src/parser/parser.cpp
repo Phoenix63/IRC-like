@@ -24,7 +24,7 @@ void Parser::initialize(Channel *chan, QTcpSocket *sock, User nick, Channellist 
     socket = sock;
     self = nick;
     listOfChannels = list;
-    modeParser = new ParserMode(chan); 
+    modeParser = new ParserMode(chan);
 }
 
 void Parser::nickname(QString nick)
@@ -68,6 +68,8 @@ bool Parser::out(QString string)
     if (!out_isCleanMsg(string))
     if (!out_isDebugMsg(string))
     if (!out_isModeMsg(string))
+    if (!out_isMuteMsg(string))
+    if (!out_isUnMuteMsg(string))
     if (!out_isTopicMsg(string))
     if (!out_isKickMsg(string))
     if (!out_isServKickMsg(string))
@@ -118,6 +120,7 @@ void Parser::in(QString string)
     if (!in_isInvBelMsg(string))
     if (!in_isBeloteMsg(string))
     if (!in_isConfirmInv(string))
+    if (!in_isPong(string))
     if (!in_isPing(string)) {
         channel->appendChannel(string, "\"Debug\"", nullptr);
         emit chatModifiedSignal();
@@ -166,11 +169,12 @@ bool Parser::out_isJoinMsg(QString string)
 {
     if (!string.startsWith("/join"))
         return false;
-    string = string.right(string.length() - 6);
-    if (!string.startsWith('#'))
-        string.prepend('#');
-    string.prepend("JOIN ");
-    sendToServer(socket, string);
+    if (!string.contains(QRegularExpression("^/join\\s*$"))) {
+        string = string.right(string.length() - 6);
+        if (!string.startsWith('#'))
+            string.prepend('#');
+        sendToServer(socket, "JOIN " + string);
+    }
     return true;
 }
 
@@ -350,19 +354,58 @@ bool Parser::out_isInvMsg(QString string)
 bool Parser::out_isPrivMsg(QString string)
 {
     QString message = string.left(string.length() - 1);
-    channel->appendCurrent(message, &self);
-    string.prepend("PRIVMSG " + channel->channelName() + " :");
+    if (channel->channelName() != "\"Debug\"") {
+        channel->appendCurrent(message, &self);
+        string.prepend("PRIVMSG " + channel->channelName() + " :");
+    }
     sendToServer(socket, string);
     emit lineAddedSignal();
         return true;
+}
+
+bool Parser::out_isMuteMsg(QString string)
+{
+    if (!string.startsWith("/mute"))
+        return false;
+    if (string.contains(QRegularExpression("^/mute\\s*$"))) {
+        string = channel->channelName();
+    }
+    else {
+        string = string.split(' ').at(1);
+        string.remove(string.length() - 1, 1);
+    }
+    channel->modeM(true, string);
+    emit userModifiedSignal();
+    return true;
+}
+
+bool Parser::out_isUnMuteMsg(QString string)
+{
+    if (!string.startsWith("/unmute"))
+        return false;
+    if (string.contains(QRegularExpression("^/unmute\\s*$"))) {
+        string = channel->channelName();
+    }
+    else {
+        string = string.split(' ').at(1);
+        string.remove(string.length() - 1, 1);
+    }
+    channel->modeM(false, string);
+    emit userModifiedSignal();
+    return true;
 }
 
 bool Parser::out_isAwayMsg(QString string)
 {
     if (!(string.startsWith("/away") || string.startsWith("/back")))
         return false;
-    string = string.right(string.length() - 5);
-    string.prepend("AWAY");
+    if (string == "/back\n")
+        string = "AWAY\n";
+    else {
+        QStringList message = string.split(' ');
+        message.removeFirst();
+        string = "AWAY :" + message.join(' ');
+    }
     sendToServer(socket, string);
     channel->change("\"Debug\"");
     emit changeChannelSignal();
@@ -396,9 +439,12 @@ bool Parser::out_isRmChanMsg(QString string)
 
 bool Parser::out_isBeloteMsg(QString string)
 {
-    if (!string.startsWith("/belote"))
+    if (!string.contains(QRegularExpression("^/belote\\s.+$")))
         return false;
-    string.replace(QString("/belote"), QString("BELOTE JOIN"));
+    QString channel = string.split(' ').at(1);
+    if (!channel.startsWith('&'))
+        channel.prepend('&');
+    string = "BELOTE JOIN " + channel;
     sendToServer(socket, string);
     return true;
 }
@@ -508,28 +554,38 @@ bool Parser::in_isPrivMsg(QString string)
 {
     if (!string.contains(IRC::RPL::PRIVMSG))
         return false;
-    QString mention = '@' + self.name();
-    if (string.contains(mention)) {
-        QMediaPlayer *player = new QMediaPlayer;
-        player->setMedia(QUrl::fromLocalFile(QString(getenv("PWD"))+"ressources/AH.mp3"));
-        player->setVolume(30);
-        player->play();
-    }
-    int j = string.indexOf(QRegularExpression(":.+$"));
-    QString message = string.right(string.length() - j - 1);
-    QString chan = string.split(' ').at(2);
     QString sender = string.split(' ').at(0);
-    channel->appendChannel(message, chan, sender);
-    if (chan != channel->channelName())
-        channel->togleNotif(chan, true);
-    if (channel->soundNotif(chan)) {
-        QMediaPlayer *bip = new QMediaPlayer;
-        bip->setMedia(QUrl::fromLocalFile("ressources/bip.mp3"));
-        bip->setVolume(20);
-        bip->play();
+    if (!channel->modeM(sender)) {
+        QString mention = '@' + self.name();
+        if (string.contains(mention)) {
+            QMediaPlayer *player = new QMediaPlayer;
+#ifdef WIN32
+            player->setMedia(QUrl::fromLocalFile("ressources/AH.mp3"));
+#elif __linux__
+            player->setMedia(QUrl::fromLocalFile(QString(getenv("PWD"))+"/ressources/AH.mp3"));
+#endif
+            player->setVolume(30);
+            player->play();
+        }
+        int j = string.indexOf(QRegularExpression(":.+$"));
+        QString message = string.right(string.length() - j - 1);
+        QString chan = string.split(' ').at(2);
+        channel->appendChannel(message, chan, sender);
+        if (chan != channel->channelName())
+            channel->togleNotif(chan, true);
+        if (channel->soundNotif(chan)) {
+            QMediaPlayer *bip = new QMediaPlayer;
+#ifdef WIN32
+            bip->setMedia(QUrl::fromLocalFile("ressources/bip.mp3"));
+#elif __linux__
+            bip->setMedia(QUrl::fromLocalFile(QString(getenv("PWD"))+"/ressources/bip.mp3"));
+#endif
+            bip->setVolume(20);
+            bip->play();
+        }
+        emit chatModifiedSignal();
+        emit channelModifiedSignal();
     }
-    emit chatModifiedSignal();
-    emit channelModifiedSignal();
     return true;
 }
 
@@ -537,29 +593,39 @@ bool Parser::in_isWhisMsg(QString string)
 {
     if (!string.contains(IRC::RPL::WHISPER))
         return false;
-    QString mention = '@' + self.name();
-    if (string.contains(mention)) {
-        QMediaPlayer *player = new QMediaPlayer;
-        player->setMedia(QUrl::fromLocalFile("ressources/AH.mp3"));
-        player->setVolume(30);
-        player->play();
-    }
-    int j = string.indexOf(QRegularExpression(":.+$"));
     QString sender = string.split(' ').at(0);
-    QString message = string.right(string.length() - j - 1);
-    channel->joinWhisper(sender);
-    channel->addUser(sender, sender);
-    channel->appendChannel(message, sender, sender);
-    if (sender != channel->channelName())
+    if (!channel->modeM(sender)){
+        QString mention = '@' + self.name();
+        if (string.contains(mention)) {
+            QMediaPlayer *player = new QMediaPlayer;
+#ifdef WIN32
+            player->setMedia(QUrl::fromLocalFile("ressources/AH.mp3"));
+#elif __linux__
+            player->setMedia(QUrl::fromLocalFile(QString(getenv("PWD"))+"/ressources/AH.mp3"));
+#endif
+            player->setVolume(30);
+            player->play();
+        }
+        int j = string.indexOf(QRegularExpression(":.+$"));
+        QString message = string.right(string.length() - j - 1);
+        channel->joinWhisper(sender);
+        channel->addUser(sender, sender);
+        channel->appendChannel(message, sender, sender);
+        if (sender != channel->channelName())
             channel->togleNotif(sender, true);
-    if (channel->soundNotif(sender)) {
-        QMediaPlayer *bip = new QMediaPlayer;
-        bip->setMedia(QUrl::fromLocalFile("ressources/bip.mp3"));
-        bip->setVolume(20);
-        bip->play();
+        if (channel->soundNotif(sender)) {
+            QMediaPlayer *bip = new QMediaPlayer;
+#ifdef WIN32
+            bip->setMedia(QUrl::fromLocalFile("ressources/bip.mp3"));
+#elif __linux__
+            bip->setMedia(QUrl::fromLocalFile(QString(getenv("PWD"))+"/ressources/bip.mp3"));
+#endif
+            bip->setVolume(20);
+            bip->play();
+        }
+        emit channelModifiedSignal();
+        emit chatModifiedSignal();
     }
-    emit channelModifiedSignal();
-    emit chatModifiedSignal();
     return true;
 }
 
@@ -791,5 +857,13 @@ bool Parser::in_isUserMode(QString string)
     modeParser->parseUser(string);
     emit changeChannelSignal();
     emit userModifiedSignal();
+    return true;
+}
+
+bool Parser::in_isPong(QString string)
+{
+    if (!string.contains(IRC::RPL::PONG))
+        return false;
+    emit pongSignal();
     return true;
 }

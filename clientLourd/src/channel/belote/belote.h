@@ -1,5 +1,5 @@
-#ifndef BELOTE_H
-#define BELOTE_H
+#ifndef CHANNEL_BELOTE_BELOTE_H
+#define CHANNEL_BELOTE_BELOTE_H
 
 #include <QMainWindow>
 #include <QPushButton>
@@ -30,9 +30,9 @@ public:
 public slots:
     void playCard();
     void take(int trump, CustomLayout *layout);
+    void cleanCards();
 private slots:
     void on_actionLast_Fold_triggered();
-
     void on_actionStats_triggered();
 
 private:
@@ -49,7 +49,7 @@ private:
     void clearLayout(QLayout *layout);
     void chooseTeam();
     void displayCard(Card *card);
-    void refreshHand();
+    void setActivePlayer(int lastPlayer);
     //Game functions
     void firstRound(int trump);
     void secondRound(int trump);
@@ -70,12 +70,12 @@ private:
     bool in_isTeamPoints(QString string);
     bool in_isTeamWon(QString string);
 private:
-    QString username;
-    QString channelName;
-    QString turnOrder;
-    int aPosition;
     Ui::Belote *ui;
     QTcpSocket *socket;
+    QString channelName;
+    QString username;
+    QString turnOrder;
+    int aPosition;
     QList<Card *> lastFold;
     ScoreBoard  *score;
     QHash<Card *, QPushButton *> hand;

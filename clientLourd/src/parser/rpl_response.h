@@ -30,6 +30,7 @@ const QRegularExpression PART         ("^\\S+\\sPART\\s");
 const QRegularExpression QUIT		  ("^\\S+\\sQUIT\\s");
 const QRegularExpression NICK         ("^\\S+\\sNICK\\s");
 const QRegularExpression PING         ("^\\S+\\sPING\\s");
+const QRegularExpression PONG         ("^\\S+\\sPONG\\s");
 const QRegularExpression KICK         ("^\\S+\\sKICK\\s");
 const QRegularExpression NOTICE       ("^\\S+\\sNOTICE\\sNICK");
 const QRegularExpression PRIVMSG      ("^\\S+\\sPRIVMSG\\s#");

@@ -40,6 +40,23 @@ void UserList::modeW(bool mode, QString user)
     }
 }
 
+void UserList::modeM(bool mode, QString user)
+{
+    for(auto i:users) {
+        if (i->name() == user)
+            i->modeM(mode);
+    }
+}
+
+bool UserList::modeM(QString user)
+{
+    for (auto i:users) {
+        if (i->name() == user)
+            return i->modeM();
+    }
+    return false;
+}
+
 User * UserList::addUser(QString nick)
 {
     for(auto i:users) {

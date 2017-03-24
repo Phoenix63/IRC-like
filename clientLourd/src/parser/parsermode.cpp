@@ -13,6 +13,7 @@ void ParserMode::parseUser(QString string)
 {
     QString user = string.split(' ').at(3);
     QString mode = string.split(' ').at(4);
+    if (!isBUserMode(mode, user))
     if (!isIUserMode(mode, user))
     if (!isOUserMode(mode, user))
     if (!isWMode(mode, user))
@@ -26,16 +27,34 @@ void ParserMode::parseChan(QString string)
     QString arg = string.split(' ').last();
     if(!isIChanMode(mode, chan))
     if(!isOChanMode(mode, chan, arg))
+    if(!isBChanMode(mode, chan, string))
     if(!isPMode(mode, chan))
     if(!isSMode(mode, chan))
     if(!isTMode(mode, chan))
     if(!isNMode(mode, chan))
     if(!isMMode(mode, chan))
     if(!isLMode(mode, chan, arg))
-    if(!isBMode(mode, chan, string.split(' ').at(5)))
     if(!isVMode(mode, chan, arg))
-    if(!isKMode(mode, chan, arg))
+    if(!isKMode(mode, chan, string))
         return;
+}
+
+bool ParserMode::isBUserMode(QString mode, QString user)
+{
+    if (mode[1] != 'b')
+        return false;
+    if (mode[0] == '+') {
+        for (auto i:channel->channelNames()) {
+            if (channel->contains(user, i))
+                channel->appendChannel(user + " is now banned from the server", channel->channelName(), nullptr);
+        }
+    } else {
+        for (auto i:channel->channelNames()) {
+            if (channel->contains(user, i))
+                channel->appendChannel(user + " is no longer banned from the server", channel->channelName(), nullptr);
+        }
+    }
+    return true;
 }
 
 bool ParserMode::isIUserMode(QString mode, QString user)
@@ -56,10 +75,16 @@ bool ParserMode::isOUserMode(QString mode, QString user)
         return false;
     if (mode[0] == '+') {
         channel->modeO(true, user);
-        channel->appendChannel(user + " is now IRC operator", "\"Debug\"", nullptr);
+        for (auto i:channel->channelNames()) {
+            if (channel->contains(user, i))
+                channel->appendChannel(user + " is now IRC operator", "\"Debug\"", nullptr);
+        }
     } else {
         channel->modeO(false, user);
-        channel->appendChannel(user + " is no longer IRC operator", "\"Debug\"", nullptr);
+        for (auto i:channel->channelNames()) {
+            if (channel->contains(user, i))
+                channel->appendChannel(user + " is no longer IRC operator", "\"Debug\"", nullptr);
+        }
     }
     return true;
 }
@@ -160,20 +185,20 @@ bool ParserMode::isMMode(QString mode, QString chan)
 
 bool ParserMode::isLMode(QString mode, QString chan, QString arg)
 {
-    int maxUsers = arg.toInt();
-    if(!mode.contains('n'))
+    if(!mode.contains('l'))
         return false;
     if (mode[0] == '+')
-        channel->appendChannel("Limit of users in this channel set to : " + maxUsers, chan, nullptr);
+        channel->appendChannel("Limit of users in this channel set to : " + arg, chan, nullptr);
     else
         channel->appendChannel("This channel isn't limited on users anymore.", chan, nullptr);
     return true;
 }
 
-bool ParserMode::isBMode(QString mode, QString chan, QString user)
+bool ParserMode::isBChanMode(QString mode, QString chan, QString user)
 {
     if(!mode.contains('b'))
         return false;
+    user = user.split(' ').at(5);
     if (mode[0] == '+')
         channel->appendChannel(user + " is now banned from this channel.", chan, nullptr);
     else
@@ -197,6 +222,7 @@ bool ParserMode::isVMode(QString mode, QString chan, QString user)
 
 bool ParserMode::isKMode(QString mode, QString chan, QString password)
 {
+    password = password.split(' ').last();
     if(!mode.contains('k'))
         return false;
     if (mode[0] == '+')

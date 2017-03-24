@@ -22,7 +22,6 @@ class Channel
 public:
     // Constructor
     Channel(ParserEmoji *emoji);
-
     // Getters
     QList<Message> chatContent();
 
@@ -77,7 +76,8 @@ public:
     void modeI(bool mode, QString user);
     void modeO(bool mode, QString user);
     void modeW(bool mode, QString user);
-
+    void modeM(bool mode, QString user);
+    bool modeM(QString user);
     // Topic
     void topic(QString topic, QString channel);
     QString topic();

@@ -3,7 +3,6 @@
 
 #include "../../config/themelist.h"
 
-#include <QDebug>
 ScoreBoard::ScoreBoard(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ScoreBoard)

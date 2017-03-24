@@ -2,6 +2,7 @@
 #include "ui_uploadwindow.h"
 
 #include <QLabel>
+#include <QMessageBox>
 
 UploadWindow::UploadWindow(QWidget *parent, QTcpSocket *sock) :
     QDialog(parent),
@@ -36,13 +37,18 @@ void UploadWindow::parse(QString string)
 {
     string.remove(0, 1);
     int j = string.indexOf(QRegularExpression(":.+$"));
-    if(string.contains("TRANSFERT"))
+    if (string.contains("TRANSFERT"))
     {
         QString progress = string.right(string.length() - j - 1);
         ui->progressBar->setMaximum(progress.split('/').at(1).toInt());
         ui->progressBar->setValue(progress.split('/').at(0).toInt());
-    } else {
+    } else if (string.contains(" < size <")) {
+        QMessageBox::information(this, "Error", "File is too large");
+        this->close();
+    }
+    else {
         QString url = string.right(string.length() - j - 1);
         emit resultReady(url);
+        this->close();
     }
 }

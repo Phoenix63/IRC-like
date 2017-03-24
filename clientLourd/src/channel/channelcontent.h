@@ -15,7 +15,9 @@ class ChannelContent
 {
 public:
     ChannelContent();
+    virtual ~ChannelContent();
     virtual void parse(QString command);
+
     //User functions
     void addUser(User *newUser);
     void removeUser(QString userName);
@@ -53,7 +55,6 @@ public:
     void voice(QString user, bool val);
     void oper(QString user, bool val);
 
-protected:
 protected:
     bool aHidenotif;
     bool aSoundNotif;

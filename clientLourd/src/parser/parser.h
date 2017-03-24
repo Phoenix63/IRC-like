@@ -42,6 +42,7 @@ signals:
 	void changeChannelSignal();
     void lineAddedSignal();
     void nickModifiedSignal(QString nick);
+	void pongSignal();
 
 private:
 	// Out functions
@@ -63,6 +64,8 @@ private:
 	bool out_isWhoisMsg(QString string);
 	bool out_isMsgMsg(QString string);
 	bool out_isPrivMsg(QString string);
+    bool out_isMuteMsg(QString string);
+    bool out_isUnMuteMsg(QString string);
 	bool out_isAwayMsg(QString string);
 	bool out_isInvMsg(QString string);
     bool out_isListFileMsg(QString string);
@@ -97,6 +100,7 @@ private:
 	bool in_isConfirmInv(QString string);
     bool in_isListFileMsg(QString string);
     bool in_isRmFileMsg(QString string);
+	bool in_isPong(QString string);
 private:
 	// Pointer to the channel and socket created in mainframe
 	User self;

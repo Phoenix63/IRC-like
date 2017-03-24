@@ -14,17 +14,20 @@ public:
     void modeI(bool mode);
     void modeO(bool mode);
     void modeW(bool mode);
+    void modeM(bool mode);
 
     // Getters
     QString name();
     bool modeI();
     bool modeO();
     bool modeW();
+    bool modeM();
 private:
     QString aName;
     bool aModeI;
     bool aModeO;
     bool aModeW;
+    bool aModeM;
 };
 
 #endif // USER_H

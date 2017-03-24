@@ -1,4 +1,5 @@
 #include "login.h"
+#include "ui_login.h"
 
 #include <QCloseEvent>
 #include <QListWidget>
@@ -8,7 +9,6 @@
 #include <QTcpSocket>
 
 #include "mainframe.h"
-#include "ui_login.h"
 #include "../config/themelist.h"
 /*
  * Constructor and destructor
@@ -57,6 +57,7 @@ bool Login::doConnect()
     if(!socket->waitForConnected(5000))
     {
         QMessageBox::information(this, "Error", "Host not found");
+        this->show();
         return false;
     } else {
         main = new MainFrame(NULL, socket, host, port);
@@ -89,6 +90,7 @@ void Login::sendInfos()
 
 void Login::on_pushButton_connect_clicked()
 {
+    this->hide();
     QString username = ui->lineEdit_username->text();
     QString password = ui->lineEdit_pass->text();
     if(doConnect())
@@ -111,6 +113,7 @@ void Login::on_pushButton_connect_clicked()
 
 void Login::on_pushButton_guest_clicked()
 {
+    this->hide();
     doConnect();
 }
 

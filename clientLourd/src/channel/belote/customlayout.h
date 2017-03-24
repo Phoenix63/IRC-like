@@ -1,10 +1,11 @@
-#ifndef CUSTOMLAYOUT_H
-#define CUSTOMLAYOUT_H
+#ifndef CHANNEL_BELOTE_CUSTOMLAYOUT_H
+#define CHANNEL_BELOTE_CUSTOMLAYOUT_H
 
 #include <QHash>
-#include <QPushButton>
 #include <QHBoxLayout>
+#include <QPushButton>
 #include <QString>
+
 class CustomLayout : public QObject
 {
     Q_OBJECT
@@ -13,6 +14,7 @@ public:
     ~CustomLayout();
     void setLayout(QHBoxLayout *lay, QWidget *parent);
     void addButton(QString name, int value);
+    void clearLayout(QLayout *layout);
 signals:
     void isClicked(int value, CustomLayout *layout);
 public slots:

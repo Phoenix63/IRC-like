@@ -302,6 +302,7 @@
     <property name="title">
      <string>Help</string>
     </property>
+    <addaction name="actionhelp"/>
    </widget>
    <addaction name="menuFichier"/>
    <addaction name="menuEdition"/>
@@ -394,6 +395,11 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+J</string>
+   </property>
+  </action>
+  <action name="actionhelp">
+   <property name="text">
+    <string>Command List</string>
    </property>
   </action>
  </widget>
