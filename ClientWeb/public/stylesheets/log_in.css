@@ -3,34 +3,46 @@ html {
 }
 body {
     background-color: #353945;
+    background-image: url(../images/banniere.png);
+    background-position-x: 0px;
+    background-position-y: 0px;
+    background-repeat: no-repeat;
+    background-size: 100% auto;
 }
 
+/**
+ *
+ * Containers
+ **/
 #connexion {
     width: 100%;
-    height: auto;
-    margin-top: 10%;
-    padding-left: 10%;
-    padding-right: 10%;
+    height: 100%;
+    margin: auto;
+    padding: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    background-image: url(../images/pandab.ico);
+    background-position: bottom right;
+    background-repeat: no-repeat;
 }
 #connexion .container {
-    width: 50%;
-    height: 400px;
-    display: inline-block;
+    width: 600px;
+    height: 300px;
     font-weight: bold;
 	border-radius:5%;
-    
+    display: inline-block;
 }
 #connexion .container label {
     text-align: right;
     width: 20%;
-    height: 40px;
     display: inline-block;
 }
 
 #connexion .container input {
     background: none;
     border: 0px;
-    margin-left: 10px;
     -webkit-transition: all 300ms ease;
     -moz-transition: all 300ms ease;
     -ms-transition: all 300ms ease;
@@ -39,26 +51,25 @@ body {
     line-height: 0;
     outline:none;
     text-align: center;
-}
-#connexion .login-container input {
     margin-left: 10%;
     max-width: 40%;
+}
+
+#connexion .login-container input {
     color: rgba(255,255,255,0.9);
     border-bottom: 2px solid rgba(255,255,255,0.2);
 }
 #connexion .login-container input:hover {
-    border-bottom: 2px solid rgba(255,255,255,0.3);
+    border-bottom: 2px solid rgba(255,255,255,0.5);
 }
 #connexion .login-container input:focus {
-    margin-left: 10px;
-    font-size: 40px;
-    max-width: 70%;
-    border-bottom: 2px solid rgba(255,255,255,0.5);
+    border-bottom: 2px solid rgba(255,255,255,0.8);
+    font-size: 2em;
+    max-width: 65%;
+    margin-left: 0px;
 }
 
 #connexion .server-container input {
-    margin-left: 10%;
-    max-width: 40%;
     color: rgba(0,0,0,0.9);
     border-bottom: 2px solid rgba(0,0,0,0.1);
 }
@@ -66,10 +77,10 @@ body {
     border-bottom: 2px solid rgba(0,0,0,0.2);
 }
 #connexion .server-container input:focus {
-    margin-left: 10px;
-    font-size: 40px;
-    max-width: 70%;
     border-bottom: 2px solid rgba(0,0,0,0.3);
+    font-size: 2.2em;
+    max-width: 65%;
+    margin-left: 0px;
 }
 
 #connexion button {
@@ -79,9 +90,7 @@ body {
     font-weight: 400;
     cursor: pointer;
     color: rgba(3,155,229,0.7);
-    font-size: 1.2em;
-    margin-top: 120px;
-    margin-left: 170px;
+    font-size: 1.6em;   
     -webkit-transition: all 300ms ease;
     -moz-transition: all 300ms ease;
     -ms-transition: all 300ms ease;
@@ -98,6 +107,10 @@ body {
 .container:nth-child(1) span:nth-child(1) {
     padding-top: 85px;
 }
+.container:nth-child(2) span:nth-child(3) {
+    padding-top: 85px;
+    padding-left: 227.5px;
+}
 .container span {
     display: block;
     font-size: 20px;
@@ -105,90 +118,107 @@ body {
 #connexion .login-container {
     background-color: #6ba4e7;
     color: #FAFAFA;
-    margin-right: 0px;
-    float: left;
+    border: 2px blue groove;
 }
 #connexion .server-container {
-    background: #ffffff;
-    margin-left: 0px;
-    float: right;
-    height: 320px;
-    margin-top: 4%;
+    background-color: #ffffff;
+    color: rgba(0,0,0,0.9);
+    border: 2px #A7A37E groove;
 }
 
+/**
+ *
+ * Transition $location.path
+ **/
 .viewContainer {
     width: 100%;
     height: 100%;
 }
 
-.view {
-    padding:10px;
+.view.ng-enter, .view.ng-leave {
+    transition-duration: 0.5s;
 }
 
-@media only screen and (max-width: 1000px){
-
-    #connexion {
-        padding-left: 5%;
-        padding-right: 5%;
-    }
-
+.view.ng-enter {
+    opacity: 0;
+    transform: translateX(-100%);
 }
 
-@media screen and (max-width: 750px){
-
-    #connexion {
-        padding-left: 0%;
-        padding-right: 0%;
-    }
-
-    #connexion .container label {
-        width: 18%;
-    }
-
-
-    #connexion .container input {
-        margin-left: 8px;
-    }
-
-
-    #connexion .login-container input:focus, #connexion .server-container input:focus {
-        max-width: 60%;
-    }
-
-    #connexion button {
-        margin-left: 150px;
-    }
-
+.view.ng-leave {
+    opacity:1;
+    transform: translateX(0);
 }
 
+.view.ng-leave-stagger {
+    transition-delay: 0.2s;
+    transition-duration: .5s;
+}
 
-@media screen and (max-width: 550px){
+.view.ng-enter.ng-enter-active {
+    opacity: 1;
+    transform: translateX(0);
+}
 
-    #connexion {
-        margin-top: 5%;
-        padding-left: 0%;
-        padding-right: 0%;
-    }
+.view.ng-leave.ng-leave-active {
+    opacity: 0;
+    transform: translateX(+100%);
+}
 
+/**
+ *
+ * @media
+ **/
+@media only screen and (max-width: 1220px){
 
     #connexion .container {
-        width: 100%;
-        height: 325px;
-        display: block;
-        font-weight: bold;
-        padding: 0px;
+        width:45%;
     }
 
-
-    #connexion .server-container {
-        height: 280px;
+    #connexion .login-container input:focus {
+        font-size: 1.4em;
+        max-width: 65%;
+    }
+    #connexion .server-container input:focus {
+        font-size: 1.4em;
+        max-width: 65%;
     }
 
-    #connexion button {
-        margin-left: 140px;
-        margin-top: 90px;
+    .container:nth-child(2) span:nth-child(3) {
+        padding-top: 85px;
+        padding-left: 85px;
+    }
+}
+
+
+@media screen and (max-width: 760px){
+
+    #connexion {
+        flex-wrap: wrap;
+        flex-direction: column;
     }
 
+    #connexion .login-container input:focus {
+        font-size: 1.2em;
+        max-width: 65%;
+    }
+    #connexion .server-container input:focus {
+        font-size: 1.2em;
+        max-width: 65%;
+    }
+
+    #connexion .container {
+        width: 500px;
+        height: 200px;
+    }
+
+    .container:nth-child(1) span:nth-child(1) {
+        padding-top: 60px;
+    }
+
+    .container:nth-child(2) span:nth-child(3) {
+        padding-top: 45px;
+        padding-left: 180px;
+    }
 
     
 }

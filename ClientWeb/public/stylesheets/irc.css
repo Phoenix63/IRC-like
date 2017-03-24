@@ -200,31 +200,6 @@ h3::after {
     background: transparent;
 }
 
-
-
-#masque {
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 9000;
-    background-color: #000;
-    display: none;
-}
-
-#dialog {
-    display: none;
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 9999;
-    padding: 20px;
-    color: #00008B;
-    border: 3px solid #fff;
-    border-radius: 15px;
-    background-color: #C0C0C0;
-    max-width: 100%; 
-}
-
 .emote {
 	width:20px;
 	height:20px;
@@ -419,6 +394,22 @@ h3::after {
 }
 #progbar {
 	width:0%;
+}
+
+
+/**
+ *
+ * Transition $location.path
+ **/
+.view.ng-enter {
+    transition-duration: 1s;
+    opacity: 0;
+    transform: translateX(-100%);
+}
+
+.view.ng-enter.ng-enter-active {
+    opacity: 1;
+    transform: translateX(0px);
 }
 
 	
@@ -683,7 +674,3 @@ h3::after {
     background-color: #6ba4e7;
     }
 }
-
-
-
-

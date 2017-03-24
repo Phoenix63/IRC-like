@@ -8,37 +8,39 @@
                     <label>
                         Pseudo
                     </label>
-                    <input id="connexion_pseudo" class="focus" type="text" ng-model="nickname" placeholder="Optionnal"/>
+                    <input id="connexion_pseudo" type="text" ng-model="nickname" placeholder="Optionnal"/>
                 </span>
                 <span>
-                    <label for="connexion_id">
+                    <label>
                         Id
                     </label>
-                    <input id="connexion_pseudo" class="focus" type="text" ng-model="id" placeholder="Optionnal"/>
+                    <input id="connexion_id" type="text" ng-model="id" placeholder="Optionnal"/>
                 </span>
                 <span ng-show="isSetId()">
-                    <label for="connexion_password">
+                    <label>
                         Password
                     </label>
-                    <input id="connexion_password" class="focus" type="password" ng-model="password" placeholder="Required"/>
+                    <input id="connexion_password" type="password" ng-model="password" placeholder="Required"/>
                 </span>
             </div>
             <div class="container server-container">
                 <span>
-                    <label for="connexion_server">
+                    <label>
                         Server
                     </label>
-                    <input id="connexion_server" class="focus" type="text" ng-model="server" placeholder="Optionnal"/>
+                    <input id="connexion_server" type="text" ng-model="server" placeholder="Optionnal"/>
                 </span>
                 <span ng-show="isSetServer()">
-                    <label for="connexion_port">
+                    <label>
                         Port
                     </label>
-                    <input id="connexion_port" class="focus" type="text" ng-model="port" placeholder="Optionnal"/>
+                    <input id="connexion_port" type="text" ng-model="port" placeholder="Optionnal"/>
                 </span>
-                <button type="submit" class="btn-solid btn-connect">Connect</button>
+                <span>
+                    <button type="submit" class="btn-solid btn-connect">Connect</button>
+                </span>
             </div>
         </form>
-
     </section>
+
 </div>
