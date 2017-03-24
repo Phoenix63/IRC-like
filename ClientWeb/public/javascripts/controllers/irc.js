@@ -25,13 +25,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 	var userFile = new User("");
 	userFile.setRight(5);
 	userInfo.socket.emit("message", "LIST");
-	$scope.newLogInNick = function() {
-		userInfo.setNick($scope.newNick);
-		userInfo.socket.emit("message", "NICK " + userInfo.nick);
-		$("#dialog").fadeOut();
-		$("#masque").fadeOut();
-	}
-	
+
 	$scope.uploadImage = function(fich) {
 		userInfo.connectFile();
 		boolFile = true;
@@ -534,7 +528,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 									}
 								}
 								else {
-									$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You're not subscribe on that channel"]);
+									$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "You're not subscribed on that channel"]);
 								}
 							}
 						}
@@ -1193,23 +1187,9 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 	});
 	
     userInfo.socket.on("message", function(msg) {
+		console.log(msg);
 		var rspGeneral = (/^[\S]+[ ]([\S]+)[ ][\w\W]+$/).exec(msg);
 		switch(rspGeneral[1]) {
-			case "433":
-				if(connect !== true) {
-					var xHeight = $(document).height();
-					var xWidth = $(window).width();
-					$("#masque").css({"width":xWidth,"height":xHeight});
-					$("#masque").fadeIn();
-					$("#masque").fadeTo("fast",0.6);
-					$("#dialog").css("top", (xHeight/2) - (70/2));
-					$("#dialog").css("left", (xWidth/2) - (524/2));
-					$("#dialog").fadeIn();
-				}
-				else {
-					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Le pseudo est deja utilisé"]);
-				}
-				break;
 			case "PRIVMSG":
 				if(msg.match(/^[:]@[\w\S]+[ ]PRIVMSG[ ]@global[ ][:][\S\W]+$/)) {
 					var globalMessage = (/^[:][@]([\w\S]+)[ ]PRIVMSG[ ]@global[ ][:]([\S\W]+)$/).exec(msg);
@@ -2285,9 +2265,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Channel : " + list[0] + " with " + list[1] + " user(s) - Topic ->" + list[2]]);
 				break;
 			case "323":
-				if(boolList === false) {
-					$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "There are no channels, create a channel with /join (use the button help is you re need information)"]);
-				}
+				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "There are no channels, create a channel with /join (use the button help is you re need information)"]);
 				boolList = false;
 				break;
 			case "311":
@@ -2317,7 +2295,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Your password have been update"]);
 				break;
 			case "403":
-				$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "check if the channel is in invite mode or if the channel is valid"]);
+				$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Please check if the channel is in invite mode or if the channel is valid. command /join #<channelName>"]);
 				break;
 			case "404":
 				var rspMsg = (/^[\S]+[ ]404[ ]([#][\S\w]+)[ ][\w\W]+$/).exec(msg);
@@ -2331,7 +2309,20 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Error with the nickname"]);
 				break;
 			case "433":
-				$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "This nickname is already used"]);
+				$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "This nickname is already in use"]);
+				if(connect !== true) {
+					bootbox.prompt("Nickname currently in use", function(ev){
+						if(ev !== null && ev !== "") {
+							user.setNick(ev);
+							userInfo.socket.emit("message", "NICK " + user.nick);
+						}
+						else {
+							$window.location.href = landingUrl;
+						}
+						$scope.$apply();
+						$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Nickname changed to "+ ev]);
+					});
+				}
 				break;
 			case "461":
 				$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Not enough parameters RMFILE"]);
@@ -2341,9 +2332,10 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				break;
 			case "464":
 				bootbox.prompt("Password incorrect", function(ev){
-					if(ev !== null) {
+					if(ev !== null && ev !=="") {
 						userInfo.socket.emit("message", "PASS " + ev);
 						userInfo.socket.emit("message", "USER " + user.userN + " 0 * :" + user.realName);
+						userInfo.socket.emit("message", "NICK " + user.nick);
 					}
 					else {
 						$window.location.href = landingUrl;
