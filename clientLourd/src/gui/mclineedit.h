@@ -1,5 +1,5 @@
-#ifndef MCLINEEDIT_H
-#define MCLINEEDIT_H
+#ifndef GUI_MCLINEEDIT_H
+#define GUI_MCLINEEDIT_H
 
 #include <QLineEdit>
 

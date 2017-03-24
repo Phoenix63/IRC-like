@@ -1,5 +1,5 @@
-#ifndef CARD_H
-#define CARD_H
+#ifndef CHANNEL_BELOTE_CARD_H
+#define CHANNEL_BELOTE_CARD_H
 
 #include <QVector>
 

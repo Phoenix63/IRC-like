@@ -1,4 +1,5 @@
 #include "login.h"
+#include "ui_login.h"
 
 #include <QCloseEvent>
 #include <QListWidget>
@@ -8,7 +9,6 @@
 #include <QTcpSocket>
 
 #include "mainframe.h"
-#include "ui_login.h"
 #include "../config/themelist.h"
 /*
  * Constructor and destructor

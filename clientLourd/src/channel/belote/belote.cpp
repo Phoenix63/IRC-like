@@ -5,6 +5,7 @@
 #include <QMediaPlayer>
 #include <QMessageBox>
 #include <QTimer>
+
 #include "rpl_response.h"
 
 Belote::Belote(QWidget *parent, QTcpSocket *sock, QString chan, QString nick) :
@@ -400,7 +401,7 @@ bool Belote::in_isYourTurn(QString string)
 bool Belote::in_isTeamPoints(QString string)
 {
     if (!string.contains(BELOTE::RPL::TEAMPOINTS))
-        return false; 
+        return false;
     emptyHand();
     ui->order->hide();
     QString points = string.split(' ').last();

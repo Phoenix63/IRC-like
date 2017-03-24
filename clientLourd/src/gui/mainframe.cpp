@@ -1,4 +1,5 @@
 #include "mainframe.h"
+#include "ui_mainframe.h"
 
 #include <QCloseEvent>
 #include <QCompleter>
@@ -13,10 +14,9 @@
 #include <QTimer>
 
 #include "channellist.h"
+#include "helpdialog.h"
 #include "uploadfile.h"
 #include "uploadwindow.h"
-#include "ui_mainframe.h"
-#include "helpdialog.h"
 #include "../channel/message.h"
 #include "../config/theme.h"
 

@@ -1,19 +1,19 @@
 #ifndef CHANNEL_PARSEUREMOJI_H
 #define CHANNEL_PARSEUREMOJI_H
 
-#include <QString>
 #include <QHash>
 #include <QPixmap>
+#include <QString>
 
-template <typename> class QList;
-
-class QLabel;
-class QSpacerItem;
-class QRegularExpression;
 template <typename,typename>
 class QHash;
-template <typename> class QList;
+template <typename>
+class QList;
+
 class QDir;
+class QLabel;
+class QRegularExpression;
+class QSpacerItem;
 
 class ParserEmoji
 {

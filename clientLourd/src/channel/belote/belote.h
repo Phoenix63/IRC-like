@@ -1,5 +1,5 @@
-#ifndef BELOTE_H
-#define BELOTE_H
+#ifndef CHANNEL_BELOTE_BELOTE_H
+#define CHANNEL_BELOTE_BELOTE_H
 
 #include <QMainWindow>
 #include <QPushButton>
@@ -70,12 +70,12 @@ private:
     bool in_isTeamPoints(QString string);
     bool in_isTeamWon(QString string);
 private:
+    Ui::Belote *ui;
     QTcpSocket *socket;
     QString channelName;
     QString username;
     QString turnOrder;
     int aPosition;
-    Ui::Belote *ui;
     QList<Card *> lastFold;
     ScoreBoard  *score;
     QHash<Card *, QPushButton *> hand;

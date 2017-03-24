@@ -15,7 +15,9 @@ class ChannelContent
 {
 public:
     ChannelContent();
+    virtual ~ChannelContent();
     virtual void parse(QString command);
+
     //User functions
     void addUser(User *newUser);
     void removeUser(QString userName);

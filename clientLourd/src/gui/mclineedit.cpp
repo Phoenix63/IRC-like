@@ -1,9 +1,10 @@
 #include "mclineedit.h"
-#include <QCompleter>
-#include <QTextCursor>
+
 #include <QAbstractItemView>
-#include <QScrollBar>
+#include <QCompleter>
 #include <QKeyEvent>
+#include <QScrollBar>
+#include <QTextCursor>
 
 MCLineEdit::MCLineEdit(QWidget *parent) :
     QLineEdit(parent)

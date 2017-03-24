@@ -1,10 +1,11 @@
-#ifndef CUSTOMLAYOUT_H
-#define CUSTOMLAYOUT_H
+#ifndef CHANNEL_BELOTE_CUSTOMLAYOUT_H
+#define CHANNEL_BELOTE_CUSTOMLAYOUT_H
 
 #include <QHash>
-#include <QPushButton>
 #include <QHBoxLayout>
+#include <QPushButton>
 #include <QString>
+
 class CustomLayout : public QObject
 {
     Q_OBJECT

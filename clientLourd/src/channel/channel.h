@@ -22,7 +22,6 @@ class Channel
 public:
     // Constructor
     Channel(ParserEmoji *emoji);
-
     // Getters
     QList<Message> chatContent();
 

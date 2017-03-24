@@ -1,5 +1,5 @@
-#ifndef HELPDIALOG_H
-#define HELPDIALOG_H
+#ifndef GUI_HELPDIALOG_H
+#define GUI_HELPDIALOG_H
 
 #include <QDialog>
 #include <QHash>
