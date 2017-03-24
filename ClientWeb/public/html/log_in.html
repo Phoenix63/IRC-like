@@ -5,22 +5,22 @@
         <form ng-submit="valid() && logIn()" class="formType" novalidate>
             <div class="container login-container">
                 <span>
-                    <label for="connexion_pseudo">
+                    <label>
                         Pseudo
                     </label>
-                    <input id="connexion_pseudo" type="text" ng-model="nickname" placeholder="Optionnal"/>
+                    <input id="connexion_pseudo" class="focus" type="text" ng-model="nickname" placeholder="Optionnal"/>
                 </span>
                 <span>
                     <label for="connexion_id">
                         Id
                     </label>
-                    <input id="connexion_pseudo" type="text" ng-model="id" placeholder="Optionnal"/>
+                    <input id="connexion_pseudo" class="focus" type="text" ng-model="id" placeholder="Optionnal"/>
                 </span>
                 <span ng-show="isSetId()">
                     <label for="connexion_password">
                         Password
                     </label>
-                    <input id="connexion_password" type="password" ng-model="password" placeholder="Required"/>
+                    <input id="connexion_password" class="focus" type="password" ng-model="password" placeholder="Required"/>
                 </span>
             </div>
             <div class="container server-container">
@@ -28,13 +28,13 @@
                     <label for="connexion_server">
                         Server
                     </label>
-                    <input id="connexion_server" type="text" ng-model="server" placeholder="Optionnal"/>
+                    <input id="connexion_server" class="focus" type="text" ng-model="server" placeholder="Optionnal"/>
                 </span>
-                <span  ng-show="isSetServer()">
+                <span ng-show="isSetServer()">
                     <label for="connexion_port">
                         Port
                     </label>
-                    <input id="connexion_port" type="text" ng-model="port" placeholder="Optionnal"/>
+                    <input id="connexion_port" class="focus" type="text" ng-model="port" placeholder="Optionnal"/>
                 </span>
                 <button type="submit" class="btn-solid btn-connect">Connect</button>
             </div>

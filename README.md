@@ -1,32 +1,53 @@
 # IRC-like
 Chat IRC-like
 
-##1. SERVER
-###1.1 Install redis
-
-First you need to install Redis :
-https://github.com/rgl/redis/downloads
-Add redis-server to environment variables.
-
-Launch redis with the command
+## 1. SERVER
 
 ```
-    redis-server
+cd Server
 ```
 
-###1.2 Install dependencies
+### 1.1 Requirement
+
+Tu run the server you need to have docker
+
+https://www.docker.com/
+
+**For windows you also need to have NPM and NODEJS both installed and in your PATH**
+
+### 1.2 Run server
+#### 1.2.1 Linux
+
 ```
-    npm install
+make
 ```
 
-###1.3 Run the app
-####1.3.1 As dev env
+**Instalation**
+
 ```
-    npm run dev
+make build
+make deps
 ```
-####1.3.2 As prod env
+
+Now with make you can run the server in different environments:
+- ```make dev``` -> run in dev env
+- ```make prod``` -> run in prod env
+- ```make unit``` -> run tests
+
+#### 1.2.2 Windows
+
 ```
-    npm run start
+docker pull bitnami/node:7
+docker build -f docker/runtest.Dockerfile -t pandirc/runtest .
+docker build -f docker/dev.Dockerfile -t pandirc/dev .
+docker-compose -f ./docker/deps.yml up
 ```
+
+Now with make you can run the server in different environments:
+- ```npm run dev``` -> run in dev env
+- ```npm run prod``` -> run in prod env
+- ```npm run test``` -> run tests
+
+
 
 

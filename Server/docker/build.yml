@@ -1,0 +1,6 @@
+node:
+  image: pandirc/dev
+  command: sh -c 'npm run build'
+  hostname: node
+  volumes:
+   - ./..:/app

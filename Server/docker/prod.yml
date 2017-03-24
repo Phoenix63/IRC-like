@@ -1,0 +1,54 @@
+version: "2"
+
+services:
+  node:
+    image: pandirc/dev
+    command: npm run build
+    entrypoint: node ./dist/app.js
+    environment:
+      - DEBUG=pandirc*
+      - RUNNING=PROD
+    hostname: node
+    stop_signal: SIGINT
+    volumes:
+     - ./..:/app
+    ports:
+     - "8088:8088"
+     - "8089:8089"
+    links:
+     - mongo:mongo
+     - redis:redis
+     - fileserver:fileserver
+
+  fileserver:
+    image: pandirc/dev
+    command: npm run build
+    entrypoint: node ./dist/lib/file/server.js
+    stop_signal: SIGINT
+    environment:
+    - RUNNING=PROD
+    - DEBUG=pandirc*
+    hostname: fileserver
+    volumes:
+     - ./..:/app
+    ports:
+     - "8090:8090"
+     - "8091:8091"
+     - "3001:3001"
+    links:
+     - redis:redis
+
+  mongo:
+    image: mongo:3.4
+    hostname: mongo
+    volumes:
+     - mongoirc:/data/db
+
+  redis:
+    image: redis:3.2
+    hostname: redis
+
+volumes:
+  mongoirc:
+    external:
+      name: mongoirc

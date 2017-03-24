@@ -1,16 +1,9 @@
-let should = require('should');
-let Client = require('./core/Client');
-let config = require('./core/config.json');
+var should = require('should');
+var Client = require('./core/Client');
+var config = require('./core/config.json');
 
 describe('command JOIN:', () => {
-    let client = null;
-    let client1 = null;
-    let client2 = null;
-    beforeEach(() => {
-        client = null;
-        client1 = null;
-        client2 = null;
-    });
+    var client, client1;
     it('should say not registered', (done) => {
         client = new Client(config.port, config.ip);
         client.on('connect', () => {
@@ -30,7 +23,7 @@ describe('command JOIN:', () => {
             client.send('JOIN invalidchannelname');
         });
         client.on('err_nosuchchannel', (message) => {
-            message.should.equal(':' + config.ip + ' 403 invalidchannelname :No such channel');
+            message.should.equal(':' + config.name + ' 403 invalidchannelname :No such channel');
             client.close();
             done();
         });
@@ -63,7 +56,6 @@ describe('command JOIN:', () => {
         });
 
         client1.on('rpl_namreply', (message) => {
-            message.should.containEql('@test');
             if(message.indexOf('@test') > 0) {
                 var client2 = new Client(config.port, config.ip);
 
