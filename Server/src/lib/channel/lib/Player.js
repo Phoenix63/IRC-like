@@ -106,11 +106,12 @@ class Player {
                 playercards.map((c) => {
                     pcards.push(c);
                 });
+
                 if(pcards.length === 0) {
                     playertrumps.map((trump) => {
                         pcards.push(trump);
                     });
-                    if (pcards.length === 0) {
+                    if (pcards.length === 0 || this.team.contains(masterCardOwner)) {
                         this._hand.map((c) => {
                             pcards.push(c);
                         });
