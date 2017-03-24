@@ -63,7 +63,7 @@ class Game {
             this._teams[1]._players[1]
         ];
         this._round = new Round(this,
-            arr.slice(this._rounds,arr.length).concat(arr.slice(0,this._rounds)),
+            arr.slice(this._rounds%4,arr.length).concat(arr.slice(0,this._rounds%4)),
             this.teams[0],
             this.teams[1],
             this._deck,
