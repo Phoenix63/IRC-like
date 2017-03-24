@@ -30,6 +30,7 @@ public:
 public slots:
     void playCard();
     void take(int trump, CustomLayout *layout);
+    void cleanCards();
 private slots:
     void on_actionLast_Fold_triggered();
     void on_actionStats_triggered();

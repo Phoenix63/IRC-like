@@ -3,6 +3,7 @@
 
 #include <QLabel>
 #include <QMessageBox>
+#include <QTimer>
 #include "rpl_response.h"
 
 Belote::Belote(QWidget *parent, QTcpSocket *sock, QString chan, QString nick) :
@@ -62,12 +63,17 @@ void Belote::clearLayout(QLayout *layout)
     while((item = layout->takeAt(0))) {
         if (item->layout()) {
             clearLayout(item->layout());
-            delete item->layout();
         }
         if (item->widget()) {
             delete item->widget();
         }
     }
+}
+
+void Belote::cleanCards()
+{
+    if (ui->board->count() == 4)
+        clearLayout(ui->board);
 }
 
 void Belote::parse(QString string)
@@ -86,7 +92,7 @@ void Belote::parse(QString string)
     if (!in_isTeamPoints(string))
     if (!in_isYourTurn(string))
     if (!in_isTeamWon(string))
-        qDebug() << "cant find this";
+        return;
 }
 
 void Belote::playCard()
@@ -107,7 +113,6 @@ void Belote::playCard()
                 }
             }
             hand.remove(i);
-            qDebug() << ui->south->count();
         }
     }
     setInactive();
@@ -204,6 +209,7 @@ bool Belote::in_isTrumpChoice(QString string)
         return false;
     int iCard = string.split(' ').last().toInt();
     Card *card = new Card(iCard);
+    clearLayout(ui->board);
     displayCard(card);
     return true;
 }
@@ -215,13 +221,11 @@ void Belote::firstRound(int trump)
     tmp->addButton("Take", trump / 8);
     tmp->addButton("No", -1);
     connect(tmp, &CustomLayout::isClicked, this, &Belote::take);
-    clearLayout(ui->buttons);
 }
 
 void Belote::take(int trump, CustomLayout *layout)
 {
     QString message = "BELOTE TAKE " + channelName + " " + QString::number(trump) + '\n';
-    qDebug() << "taking : " << message;
     socket->write(message.toUtf8());
     delete layout;
 }
@@ -242,7 +246,6 @@ void Belote::secondRound(int card)
     if (aPosition != 3)
         tmp->addButton("No", -1);
     connect(tmp, &CustomLayout::isClicked, this, &Belote::take);
-    clearLayout(ui->buttons);
 }
 
 bool Belote::in_isCardDeal(QString string)
@@ -293,6 +296,8 @@ bool Belote::in_isPlayerPlay(QString string)
         return false;
     int card = string.split(' ').last().toInt();
     Card *played = new Card(card);
+    if (ui->board->count() == 4)
+        clearLayout(ui->board);
     displayCard(played);
     return true;
 }
@@ -307,7 +312,10 @@ bool Belote::in_isEndFold(QString string)
     fold->close();
     for (auto i:cardList)
         lastFold.append(new Card(i.toInt()));
-    clearLayout(ui->board);
+    QTimer *wait = new QTimer(this);
+    wait->setSingleShot(true);
+    connect(wait, &QTimer::timeout, this, &Belote::cleanCards);
+    wait->start(3 * 1000);
     return true;
 }
 
@@ -348,7 +356,7 @@ bool Belote::in_isGameStart(QString string)
     ui->order->show();
     QStringList playerList = turnOrder.split(',');
     position(playerList.indexOf(username));
-    QString eastPlayer = playerList.at((position() - 1) % 4);
+    QString eastPlayer = playerList.at((position() + 3) % 4);
     QString northPlayer = playerList.at((position() + 2) % 4);
     QString westPlayer = playerList.at((position() + 1) % 4);
     ui->eastName->setText(eastPlayer);
@@ -386,7 +394,6 @@ bool Belote::in_isTeamWon(QString string)
         return false;
     emptyHand();
     score->reset();
-    qDebug() << "winner :" << string.split(' ').at(4);
     QString winner = (string.split(' ').at(4) == '0') ? "Kotei" : "Jbzz";
     QMessageBox::information(this, "End of game", "Team " + winner + " won !");
     return true;

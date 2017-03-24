@@ -13,6 +13,7 @@ public:
     ~CustomLayout();
     void setLayout(QHBoxLayout *lay, QWidget *parent);
     void addButton(QString name, int value);
+    void clearLayout(QLayout *layout);
 signals:
     void isClicked(int value, CustomLayout *layout);
 public slots:

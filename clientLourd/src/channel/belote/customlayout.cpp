@@ -7,6 +7,20 @@ CustomLayout::CustomLayout()
 
 CustomLayout::~CustomLayout()
 {
+    clearLayout(layout);
+}
+
+void CustomLayout::clearLayout(QLayout *layout)
+{
+    QLayoutItem *item;
+    while((item = layout->takeAt(0))) {
+        if (item->layout()) {
+            clearLayout(item->layout());
+        }
+        if (item->widget()) {
+            delete item->widget();
+        }
+    }
 }
 
 void CustomLayout::setLayout(QHBoxLayout *lay, QWidget *parent)
