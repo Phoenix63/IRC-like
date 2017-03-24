@@ -116,7 +116,8 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 							$scope.$apply();
 						}
 						img.onerror = function() {
-							$scope.currentChannel.messages.push([errorResponse, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(),  "Can't load the image"]);
+							$scope.currentChannel.messages.push([userFile, "",  "<div class='messInBox'><p class='class-user-file' class='user-color'>" + defaultMess.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>Can't load image link : <a href'" + fileReceive[0] + "'>" + fileReceive[0] + "</a></p></div>"]);
+							$scope.$apply();
 						}
 						img.src = fileReceive[0];
 					}
@@ -1879,7 +1880,7 @@ myApp.controller("ircCtrl",function($scope, $location, $sce, $window, userInfo) 
 				var listFilesURL = rspListFiles[2];
 				var nameFiles = rspListFiles[3];
 				var userFiles = rspListFiles[4];
-				$scope.currentChannel.messages.push([defaultMess, new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString(), "Channel :" + listFilesCh + " - user : " + userFiles + " - file : " + nameFiles + " " + listFilesURL]);
+				$scope.currentChannel.messages.push([userFile,"", "<div class='messInBox'><p class='class-user-file' class='user-color'>" + defaultMess.nick + "</p> <p class='date'>" + new Date().toLocaleDateString() + " " + new Date().toLocaleTimeString() + "</p><p>Channel :" + listFilesCh + " name :" + userFiles + " file :" + nameFiles + " <a href'" + listFilesURL + "'>" + listFilesURL + "</a></p></div>"]);
 				break;
 			case "341":
 				var rspInvite = (/^[\w\S]+[ ]341[ ]([\S\w]+)[ ]([\w\S]+)$/).exec(msg);
