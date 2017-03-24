@@ -32,7 +32,7 @@ public:
 
 	void connectSocket();
 	void printMsgLine(Message chatMsgLine);
-	void PrintMsg(QList<Message> chatMsgList);
+    void printMsg(QList<Message> chatMsgList);
 	void clearLayout(QLayout *layout);
 	void clean();
 

@@ -168,11 +168,12 @@ bool Parser::out_isJoinMsg(QString string)
 {
     if (!string.startsWith("/join"))
         return false;
-    string = string.right(string.length() - 6);
-    if (!string.startsWith('#'))
-        string.prepend('#');
-    string.prepend("JOIN ");
-    sendToServer(socket, string);
+    if (!string.contains(QRegularExpression("^/join\\s*$"))) {
+        string = string.right(string.length() - 6);
+        if (!string.startsWith('#'))
+            string.prepend('#');
+        sendToServer(socket, "JOIN " + string);
+    }
     return true;
 }
 
@@ -352,8 +353,10 @@ bool Parser::out_isInvMsg(QString string)
 bool Parser::out_isPrivMsg(QString string)
 {
     QString message = string.left(string.length() - 1);
-    channel->appendCurrent(message, &self);
-    string.prepend("PRIVMSG " + channel->channelName() + " :");
+    if (channel->channelName() != "\"Debug\"") {
+        channel->appendCurrent(message, &self);
+        string.prepend("PRIVMSG " + channel->channelName() + " :");
+    }
     sendToServer(socket, string);
     emit lineAddedSignal();
         return true;
@@ -395,8 +398,13 @@ bool Parser::out_isAwayMsg(QString string)
 {
     if (!(string.startsWith("/away") || string.startsWith("/back")))
         return false;
-    string = string.right(string.length() - 5);
-    string.prepend("AWAY");
+    if (string == "/back\n")
+        string = "AWAY\n";
+    else {
+        QStringList message = string.split(' ');
+        message.removeFirst();
+        string = "AWAY :" + message.join(' ');
+    }
     sendToServer(socket, string);
     channel->change("\"Debug\"");
     emit changeChannelSignal();
@@ -430,9 +438,12 @@ bool Parser::out_isRmChanMsg(QString string)
 
 bool Parser::out_isBeloteMsg(QString string)
 {
-    if (!string.startsWith("/belote"))
+    if (!string.contains(QRegularExpression("^/belote\\s.+$")))
         return false;
-    string.replace(QString("/belote"), QString("BELOTE JOIN"));
+    QString channel = string.split(' ').at(1);
+    if (!channel.startsWith('&'))
+        channel.prepend('&');
+    string = "BELOTE JOIN " + channel;
     sendToServer(socket, string);
     return true;
 }
@@ -661,6 +672,7 @@ bool Parser::in_isPing(QString string)
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString pong = string.right(string.length() - j) + '\n';
     pong.prepend("PONG ");
+    qDebug () << string << pong;
     sendToServer(socket, pong);
     return true;
 }

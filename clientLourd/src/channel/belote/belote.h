@@ -32,7 +32,6 @@ public slots:
     void take(int trump, CustomLayout *layout);
 private slots:
     void on_actionLast_Fold_triggered();
-
     void on_actionStats_triggered();
 
 private:

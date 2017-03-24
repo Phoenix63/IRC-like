@@ -215,6 +215,7 @@ void Belote::firstRound(int trump)
     tmp->addButton("Take", trump / 8);
     tmp->addButton("No", -1);
     connect(tmp, &CustomLayout::isClicked, this, &Belote::take);
+    clearLayout(ui->buttons);
 }
 
 void Belote::take(int trump, CustomLayout *layout)
@@ -228,7 +229,6 @@ void Belote::take(int trump, CustomLayout *layout)
 void Belote::secondRound(int card)
 {
     int trump = card / 8;
-    clearLayout(ui->buttons);
     CustomLayout *tmp = new CustomLayout();
     tmp->setLayout(ui->buttons, this);
     if (trump != 0)
@@ -242,6 +242,7 @@ void Belote::secondRound(int card)
     if (aPosition != 3)
         tmp->addButton("No", -1);
     connect(tmp, &CustomLayout::isClicked, this, &Belote::take);
+    clearLayout(ui->buttons);
 }
 
 bool Belote::in_isCardDeal(QString string)
@@ -265,14 +266,22 @@ bool Belote::in_isPlayerTake(QString string)
     int taker = take.toInt();
     int trump = string.split(' ').last().toInt();
     if (taker == position())
-        ui->taker->setText("Taker :" + username);
+        ui->taker->setText("Taker :" + username + " - ");
     else if (taker == (position() + 1) % 4)
-        ui->taker->setText("Taker :" + ui->eastName->text());
+        ui->taker->setText("Taker :" + ui->eastName->text() + " - ");
     else if (taker == (position() + 2) % 4)
-        ui->taker->setText("Taker :" + ui->northName->text());
+        ui->taker->setText("Taker :" + ui->northName->text() + " - ");
     else
-        ui->taker->setText("Taker :" + ui->westName->text());
+        ui->taker->setText("Taker :" + ui->westName->text() + " - ");
     clearLayout(ui->board);
+    if (trump == 0)
+        ui->taker->setText(ui->taker->text() + "♠");
+    else if (trump == 1)
+        ui->taker->setText(ui->taker->text() + "♥");
+    else if (trump == 2)
+        ui->taker->setText(ui->taker->text() + "♣");
+    else
+        ui->taker->setText(ui->taker->text() + "♦");
     QString tmp = ui->taker->text().right(ui->taker->text().length() - 7);
     score->addRound(tmp, trump);
     return true;
@@ -294,11 +303,11 @@ bool Belote::in_isEndFold(QString string)
         return false;
     QString cards = string.split(' ').last();
     QStringList cardList = cards.split(',');
-    clearLayout(ui->board);
     lastFold.clear();
     fold->close();
     for (auto i:cardList)
         lastFold.append(new Card(i.toInt()));
+    clearLayout(ui->board);
     return true;
 }
 

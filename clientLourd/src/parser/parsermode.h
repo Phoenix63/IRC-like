@@ -13,9 +13,10 @@ public:
     ParserMode(Channel *chan);
     //User Mode
     void parseUser(QString string);
-    bool isIUserMode (QString mode, QString user);
-    bool isOUserMode (QString mode, QString user);
-    bool isWMode (QString mode, QString user);
+    bool isBUserMode(QString mdoe, QString user);
+    bool isIUserMode(QString mode, QString user);
+    bool isOUserMode(QString mode, QString user);
+    bool isWMode(QString mode, QString user);
 
     //Channel Mode
     void parseChan(QString string);
@@ -27,7 +28,7 @@ public:
     bool isNMode(QString mode, QString channel);
     bool isMMode(QString mode, QString channel);
     bool isLMode(QString mode, QString channel, QString arg);
-    bool isBMode(QString mode, QString channel, QString arg);
+    bool isBChanMode(QString mode, QString channel, QString arg);
     bool isVMode(QString mode, QString channel, QString arg);
     bool isKMode(QString mode, QString channel, QString arg);
 private:

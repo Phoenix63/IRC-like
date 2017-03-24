@@ -88,7 +88,7 @@ void MainFrame::connectSocket()
     connect(socket, &QTcpSocket::readyRead, this, &MainFrame::readyRead);
 }
 
-void MainFrame::PrintMsg(QList<Message> chatMsgList)
+void MainFrame::printMsg(QList<Message> chatMsgList)
 {
     clean();
     for (auto i:chatMsgList) {
@@ -171,7 +171,7 @@ void MainFrame::refreshMentionList()
 
 void MainFrame::chatModified()
 {
-    PrintMsg(channel.chatContent());
+    printMsg(channel.chatContent());
 }
 
 void MainFrame::needClean()

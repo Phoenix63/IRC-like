@@ -12,7 +12,7 @@ Upload::Upload(QWidget *parent, QString host, QStringList files, QTcpSocket *soc
     QThread(parent),
     host(host),
     files(files),
-	socket(sock)
+    socket(sock)
 {
 
 }
@@ -26,7 +26,7 @@ void Upload::run()
         QString fileName = i.split('/').last();
         fileName = fileName.split(' ').join('_');
         QString toSend = "FILE " + QString::number(size, 10) + " " + fileName + '\n';
-        socket->write(toSend.toLatin1());
+        socket->write(toSend.toUtf8());
         inputFile.open(QIODevice::ReadOnly);
         read = inputFile.read(100);
         while (read.size() > 0)

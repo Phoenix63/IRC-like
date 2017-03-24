@@ -54,7 +54,6 @@ public:
     void oper(QString user, bool val);
 
 protected:
-protected:
     bool aHidenotif;
     bool aSoundNotif;
     QString aTopic;
