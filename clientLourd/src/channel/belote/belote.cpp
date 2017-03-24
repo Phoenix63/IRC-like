@@ -2,6 +2,7 @@
 #include "ui_belote.h"
 
 #include <QLabel>
+#include <QMediaPlayer>
 #include <QMessageBox>
 #include <QTimer>
 #include "rpl_response.h"
@@ -78,7 +79,6 @@ void Belote::cleanCards()
 
 void Belote::parse(QString string)
 {
-    qDebug() << "belote :" << string;
     if (!in_isTeamSelec(string))
     if (!in_isGameStart(string))
     if (!in_isFullTeam(string))
@@ -266,7 +266,6 @@ bool Belote::in_isCardDeal(QString string)
     if (!string.contains(BELOTE::RPL::RECEIVED))
         return false;
     QStringList cardList = string.split(' ').last().split(',');
-    qDebug() << "cartes recues : " << cardList;
     for (auto i:cardList) {
         receiveCard(i.toInt());
     }
@@ -382,6 +381,14 @@ bool Belote::in_isGameStart(QString string)
 
 bool Belote::in_isYourTurn(QString string)
 {
+    QMediaPlayer *player = new QMediaPlayer;
+#ifdef WIN32
+    player->setMedia(QUrl::fromLocalFile("ressources/belote.mp3"));
+#elif __linux__
+    player->setMedia(QUrl::fromLocalFile(QString(getenv("PWD"))+"/ressources/belote.mp3"));
+#endif
+    player->setVolume(30);
+    player->play();
     if (!string.contains(BELOTE::RPL::YOURTURN))
         return false;
     clearLayout(ui->buttons);

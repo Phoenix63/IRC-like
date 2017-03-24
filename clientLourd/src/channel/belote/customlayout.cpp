@@ -1,5 +1,4 @@
 #include "customlayout.h"
-#include <QDebug>
 CustomLayout::CustomLayout()
 {
 

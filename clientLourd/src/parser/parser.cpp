@@ -559,7 +559,11 @@ bool Parser::in_isPrivMsg(QString string)
         QString mention = '@' + self.name();
         if (string.contains(mention)) {
             QMediaPlayer *player = new QMediaPlayer;
-            player->setMedia(QUrl::fromLocalFile(QString(getenv("PWD"))+"ressources/AH.mp3"));
+#ifdef WIN32
+            player->setMedia(QUrl::fromLocalFile("ressources/AH.mp3"));
+#elif __linux__
+            player->setMedia(QUrl::fromLocalFile(QString(getenv("PWD"))+"/ressources/AH.mp3"));
+#endif
             player->setVolume(30);
             player->play();
         }
@@ -571,7 +575,11 @@ bool Parser::in_isPrivMsg(QString string)
             channel->togleNotif(chan, true);
         if (channel->soundNotif(chan)) {
             QMediaPlayer *bip = new QMediaPlayer;
+#ifdef WIN32
             bip->setMedia(QUrl::fromLocalFile("ressources/bip.mp3"));
+#elif __linux__
+            bip->setMedia(QUrl::fromLocalFile(QString(getenv("PWD"))+"/ressources/bip.mp3"));
+#endif
             bip->setVolume(20);
             bip->play();
         }
@@ -586,12 +594,15 @@ bool Parser::in_isWhisMsg(QString string)
     if (!string.contains(IRC::RPL::WHISPER))
         return false;
     QString sender = string.split(' ').at(0);
-    qDebug() << channel->modeM(sender);
     if (!channel->modeM(sender)){
         QString mention = '@' + self.name();
         if (string.contains(mention)) {
             QMediaPlayer *player = new QMediaPlayer;
+#ifdef WIN32
             player->setMedia(QUrl::fromLocalFile("ressources/AH.mp3"));
+#elif __linux__
+            player->setMedia(QUrl::fromLocalFile(QString(getenv("PWD"))+"/ressources/AH.mp3"));
+#endif
             player->setVolume(30);
             player->play();
         }
@@ -604,7 +615,11 @@ bool Parser::in_isWhisMsg(QString string)
             channel->togleNotif(sender, true);
         if (channel->soundNotif(sender)) {
             QMediaPlayer *bip = new QMediaPlayer;
+#ifdef WIN32
             bip->setMedia(QUrl::fromLocalFile("ressources/bip.mp3"));
+#elif __linux__
+            bip->setMedia(QUrl::fromLocalFile(QString(getenv("PWD"))+"/ressources/bip.mp3"));
+#endif
             bip->setVolume(20);
             bip->play();
         }
@@ -673,7 +688,6 @@ bool Parser::in_isPing(QString string)
     int j = string.indexOf(QRegularExpression(":.+$"));
     QString pong = string.right(string.length() - j) + '\n';
     pong.prepend("PONG ");
-    qDebug () << string << pong;
     sendToServer(socket, pong);
     return true;
 }

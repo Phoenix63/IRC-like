@@ -346,7 +346,6 @@ void Channel::modeW(bool mode, QString user)
 void Channel::modeM(bool mode, QString user)
 {
     aUserList.modeM(mode,user);
-    qDebug() << "channel modem" << aUserList.modeM(user);
 }
 
 bool Channel::modeM(QString user)

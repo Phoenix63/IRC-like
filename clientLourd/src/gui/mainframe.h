@@ -106,12 +106,12 @@ private:
 
 	//Tcp pointer from login
 	QTcpSocket *socket;
-    int port;
     QString host;
+    int port;
 
 	//Parser and channel for message handling
-	Parser parser;
-	Channel channel;
+    Channel channel;
+    Parser parser;
 	MsgList msgList;
     QCompleter *stringCompleter;
     QCompleter *emoteCompleter;

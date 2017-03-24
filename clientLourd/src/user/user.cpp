@@ -1,6 +1,5 @@
 #include "user.h"
 
-#include <QDebug>
 User::User():
 aName("notdefined"),
 aModeI(false),

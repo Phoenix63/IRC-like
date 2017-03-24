@@ -6,7 +6,6 @@
 #include <QRegularExpression>
 #include <QStringList>
 
-#include <QDebug>
 #include "../config/theme.h"
 
 ParserEmoji::ParserEmoji()

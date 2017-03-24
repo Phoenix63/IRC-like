@@ -4,7 +4,6 @@
 #include <QAbstractItemView>
 #include <QScrollBar>
 #include <QKeyEvent>
-#include <QDebug>
 
 MCLineEdit::MCLineEdit(QWidget *parent) :
     QLineEdit(parent)

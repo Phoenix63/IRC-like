@@ -70,12 +70,12 @@ private:
     bool in_isTeamPoints(QString string);
     bool in_isTeamWon(QString string);
 private:
-    QString username;
+    QTcpSocket *socket;
     QString channelName;
+    QString username;
     QString turnOrder;
     int aPosition;
     Ui::Belote *ui;
-    QTcpSocket *socket;
     QList<Card *> lastFold;
     ScoreBoard  *score;
     QHash<Card *, QPushButton *> hand;

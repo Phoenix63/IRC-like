@@ -2,7 +2,6 @@
 
 #include "user.h"
 
-#include <QDebug>
 UserList::UserList()
 {
 }
