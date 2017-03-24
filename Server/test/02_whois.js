@@ -1,16 +1,9 @@
-let should = require('should');
-let Client = require('./core/Client');
-let config = require('./core/config.json');
+var should = require('should');
+var Client = require('./core/Client');
+var config = require('./core/config.json');
 
 describe('command WHOIS:', () => {
-    let client = null;
-    let client1 = null;
-    let client2 = null;
-    beforeEach(() => {
-        client = null;
-        client1 = null;
-        client2 = null;
-    });
+    var client;
     it('should say not registered', (done) => {
         client = new Client(config.port, config.ip);
 
@@ -49,7 +42,7 @@ describe('command WHOIS:', () => {
         });
 
         client.on('rpl_whois', (message) => {
-            message.should.equal(':'+config.ip+' 311 test GUEST_test ' + config.ip + ' * :test');
+            message.should.equal(':'+config.name+' 311 test GUEST_test ' + config.name + ' * :test');
             client.close();
             done();
         });

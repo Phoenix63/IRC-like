@@ -1,60 +1,85 @@
-"use strict";
+let spawn = require('child_process').spawn;
+let debug = require('debug')('pandirc:runner');
+import colors from './lib/util/Color';
 
-process.title = 'server';
+process.env.RUNNING = process.env.RUNNING || 'PROD';
 
-import dbSaver from './modules/data/dbSaver';
+process.title = 'pandirc:main';
 
-let quiting = false;
-function quitHandle(e) {
-    if(e) {
-        console.log(e);
-    }
-    if(!quiting) {
-        quiting = true;
-        console.log('saving database...');
-        dbSaver(false, () => {
-            console.log('database saved!');
-            process.exit(0);
+let child = null;
+
+function _start() {
+
+    debug('rebuilding files...');
+    let build = spawn('npm', ['run', 'build']);
+
+    build.on('close', () => {
+
+        debug('rebuilding success!');
+        child = spawn('node', ['./dist/run.js'], {
+            RUNNING: process.env.RUNNING,
+            DEBUG:process.env.DEBUG
         });
-    }
+
+        debug('running server ('+process.env.RUNNING+')...');
+
+        child.stdout.on('data', function (data) {
+            data.toString().split('\n').map((data) => {
+                if(data.toString().trim() !== '') {
+                    let d = data.toString()
+                        .replace(/[A-Za-z]+, [0-9]+ [A-Za-z]+ [0-9]+ /g, '').replace(' GMT','');
+                    let date = d.slice(0,d.indexOf(' '));
+                    let head = d.replace(date+' ', '');
+                    head = head.slice(0, head.indexOf(' '));
+                    let message = d.replace(date+' ', '').replace(head+' ', '');
+
+                    process.stdout.write(
+                        colors.green(date)+':'+colors.yellow(head)+'\t\t'+message+'\n'
+                    );
+                }
+            })
+
+        });
+
+        child.stderr.on('data', function (data) {
+            data.toString().split('\n').map((data) => {
+                if(data.toString().trim() !== '') {
+                    let d = data.toString()
+                        .replace(/[A-Za-z]+, [0-9]+ [A-Za-z]+ [0-9]+ /g, '').replace(' GMT','');
+                    let date = d.slice(0,d.indexOf(' '));
+                    let head = d.replace(date+' ', '');
+                    head = head.slice(0, head.indexOf(' '));
+                    let message = d.replace(date+' ', '').replace(head+' ', '');
+
+                    process.stdout.write(
+                        colors.green(date)+':'+colors.yellow(head)+'\t\t'+message+'\n'
+                    );
+                }
+            })
+        });
+
+        child.on('close', function (code) {
+            debug("Finished with code " + code);
+            if(!code || code === 15 || code === 1) {
+                if(process.env.RUNNING !== 'TEST') {
+                    _start();
+                } else {
+                    process.exit();
+                }
+            } else {
+                process.exit(0);
+            }
+        });
+    });
+
+
+
 }
 
-process.on('exit', quitHandle);
+_start();
 
-process.on('SIGINT', quitHandle);
-
-if (!(process.argv[2] && (process.argv[2] === 'DEV' || process.argv[2] === 'TEST'))) {
-    process.on('uncaughtException', (err) => {
-        console.log('\t\t' + colors.red(err));
-    });
-} else {
-    process.on('uncaughtException', quitHandle);
-}
-
-
-// globals
-import colors from 'colors';
-
-// socket
-import socketManager from './modules/socket/socket';
-import Client from './modules/client/client';
-import Logger from './modules/Logger';
-import MessageManager from './modules/CommandManager';
-import RPLSender from './modules/responses/RPLSender';
-import dbLoader from './modules/data/dbLoader';
-
-dbLoader(() => {
-    console.log('Database loaded');
-    socketManager.create((socket) => {
-        let client = new Client(socket);
-        let logger = new Logger(client);
-        client.socket.logger = logger;
-        client.socket.messageManager = new MessageManager(client.socket);
-        socket.on('connect', () => {
-            RPLSender.HEADER(socket);
-            logger._CLIENT_CONNECTED();
-        });
-    });
+process.on('SIGINT', function() {
+    if(child) {
+        child.kill('SIGINT');
+    }
 });
-
-

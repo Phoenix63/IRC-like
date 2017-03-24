@@ -1,0 +1,6 @@
+node:
+  image: bitnami/node:7
+  command: sh -c 'npm install'
+  hostname: node
+  volumes:
+   - ./..:/app
