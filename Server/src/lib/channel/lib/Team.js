@@ -58,7 +58,7 @@ class Team {
             // already in team (catched by game)
             return false;
         }
-        if(this.game.otherTeam(this).contains(player)) {
+        if(this.game.otherTeam(this) && this.game.otherTeam(this).contains(player)) {
             this.game.otherTeam(this).removePlayer(player);
         }
         this._players.push(player);

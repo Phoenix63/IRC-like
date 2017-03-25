@@ -19,7 +19,9 @@ module.exports = function (callback) {
 
         db.collection('channels').find().toArray((err, channels) => {
             if(channels.length > 0) {
-                db.dropCollection('channels', trigger.perform);
+                db.dropCollection('channels', () => {
+                    trigger.perform();
+                });
             } else {
                 trigger.perform();
             }
