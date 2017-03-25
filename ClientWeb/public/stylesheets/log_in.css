@@ -1,3 +1,193 @@
-#connexion, #connexionGuest {
-    margin-top:15px;
+html {
+    font-family: Arial, Helvetica, sans-serif;
+}
+body {
+    background-color: #353945;
+}
+
+#connexion {
+    width: 100%;
+    height: auto;
+    margin-top: 10%;
+    padding-left: 10%;
+    padding-right: 10%;
+}
+#connexion .container {
+    width: 50%;
+    height: 400px;
+    display: inline-block;
+    font-weight: bold;
+	border-radius:5%;
+    
+}
+#connexion .container label {
+    text-align: right;
+    width: 20%;
+    height: 40px;
+    display: inline-block;
+}
+
+#connexion .container input {
+    background: none;
+    border: 0px;
+    margin-left: 10px;
+    -webkit-transition: all 300ms ease;
+    -moz-transition: all 300ms ease;
+    -ms-transition: all 300ms ease;
+    -o-transition: all 300ms ease;
+    transition: all 300ms ease;
+    line-height: 0;
+    outline:none;
+    text-align: center;
+}
+#connexion .login-container input {
+    width: 180px;
+    margin-left: 10%;
+
+    max-width: 210px;
+    color: rgba(255,255,255,0.9);
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+}
+#connexion .login-container input:hover {
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+}
+#connexion .login-container input:focus {
+    margin-left: 10px;
+    width: 210px;
+    border-bottom: 2px solid rgba(255,255,255,0.5);
+}
+
+#connexion .server-container input {
+    width: 180px;
+    margin-left: 25px;
+    max-width: 210px;
+    color: rgba(0,0,0,0.9);
+    border-bottom: 2px solid rgba(0,0,0,0.1);
+}
+#connexion .server-container input:hover {
+    border-bottom: 2px solid rgba(0,0,0,0.2);
+}
+#connexion .server-container input:focus {
+    margin-left: 10px;
+    width: 210px;
+    border-bottom: 2px solid rgba(0,0,0,0.3);
+}
+
+#connexion button {
+    background: none;
+    outline: none;
+    border: none;
+    font-weight: 400;
+    cursor: pointer;
+    color: rgba(3,155,229,0.7);
+    font-size: 1.2em;
+    margin-top: 120px;
+    margin-left: 170px;
+    -webkit-transition: all 300ms ease;
+    -moz-transition: all 300ms ease;
+    -ms-transition: all 300ms ease;
+    -o-transition: all 300ms ease;
+    transition: all 300ms ease;
+}
+#connexion button:hover {
+    color: rgba(3,155,229,1);
+}
+
+.container span:nth-child(1) {
+    padding-top:35px;
+}
+.container:nth-child(1) span:nth-child(1) {
+    padding-top: 85px;
+}
+.container span {
+    display: block;
+}
+#connexion .login-container {
+    background-color: #6ba4e7;
+    color: #FAFAFA;
+    margin-right: 0px;
+    float: left;
+}
+#connexion .server-container {
+    background: #ffffff;
+    margin-left: 0px;
+    float: right;
+    height: 320px;
+    margin-top: 4%;
+}
+
+
+@media only screen and (max-width: 1000px){
+
+    #connexion {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
+
+}
+
+@media screen and (max-width: 750px){
+
+    #connexion {
+        padding-left: 0%;
+        padding-right: 0%;
+    }
+
+    #connexion .container label {
+        width: 18%;
+    }
+
+
+    #connexion .container input {
+        margin-left: 8px;
+    }
+
+
+    #connexion .login-container input, #connexion .server-container input {
+        width: 150px;
+        margin-left: 10%;
+        max-width: 170px;
+    }
+
+    #connexion button {
+        margin-left: 150px;
+    }
+
+    #connexion .server-container {
+        height: 320px;
+        margin-top: 4%;
+    }
+
+}
+
+
+@media screen and (max-width: 550px){
+
+    #connexion {
+        margin-top: 5%;
+        padding-left: 0%;
+        padding-right: 0%;
+    }
+
+
+    #connexion .container {
+        width: 100%;
+        height: 325px;
+        display: block;
+        font-weight: bold;
+        padding: 0px;
+    }
+
+
+    #connexion .server-container {
+        height: 280px;
+    }
+
+    #connexion button {
+        margin-left: 140px;
+        margin-top: 90px;
+    }
+
+
+    
 }

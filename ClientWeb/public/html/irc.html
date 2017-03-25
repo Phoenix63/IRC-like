@@ -3,34 +3,52 @@
     <div id="channels">
         <h3>Channels list</h3>
         <div ng-repeat="channel in channels">
-            <button ng-click="joinChannel(channel)" ng-class="channel.notif == 1 ? 'notif-messageOn' : 'notif-messageOff'" ng-context-menu="menuOptions(channel)">{{channel.chan}}</button>
+            <button class="buttonCh" ng-click="joinChannel(channel)" ng-class="channel.notif === 1 ? 'notif-messageOn' : 'notif-messageOff'" ng-context-menu="menuOptions(channel)">{{channel.chan}}</button>
         </div>
     </div>
-
-    <div id="messages" scroll-bottom="currentChannel.messages">
-        <h3>Channel messages</h3>
-        <div ng-repeat="message in currentChannel.messages track by $index">
-            <p>{{message}}</p>
-        </div>
-    </div>
-
-    <div id="users">
+	<div id="users">
         <h3>Users list</h3>
-        <div ng-repeat="user in currentChannel.listU">
-            <button ng-context-menu="menuOptionsUser(user)">{{user}}</button>
+        <div ng-repeat="user in currentChannel.listU track by $index">
+            <button class="buttonUs" ng-context-menu="menuOptionsUser(user)" ng-class="user.right === 1 ? 'operator-color' : (user.right === 2 ? 'user-color' : 'default-color')">{{user.nick}}</button>
         </div>
     </div>
-    <div id="topic">
-        <h1>{{topicChannel}}</h1>
+    <div id="messages" scroll-bottom="currentChannel.messages">
+        <h3><span><img id="fleche" src="images/fleche.png"></span> <div id="topic">{{topicChannel}}</div> <div ng-context-menu="menuOptionsAway()" ng-class="$connected === true ? 'connectedUser' : 'notConnectedUser'"></div></h3>
+        <div ng-repeat="message in currentChannel.messages track by $index" ng-bind-html="message[0].right === 5 ? (message[2] | insertHtml) : message">
+            <div class="messInBox">
+				<p class="users" ng-class="message[0].right === 1 ? 'operator-color' : ( message[0].right === 2 ? 'user-color' : 'default-color')">{{message[0].nick}}</p>
+				<p class="date">{{message[1]}}</p>
+				<p>{{message[2]}}</p>
+			</div>
+        </div>
     </div>
-
-        <form ng-submit="sendMessage()">
-            <div id="divSendMessage">
-                <input id="inputSendMessage" ng-model="newMessage" placeholder="message"></input>
-            </div>
-            <div id="divSubmit">
-                <button type="submit" id="submitSendMessage">Envoyer</button>
+	
+    <input type="file" id="fileToSend" ng-model="image" onchange="angular.element(this).scope().uploadImage(this.files)"></input>
+	<form id="test" ng-submit="sendMessage()">
+		<a id="helpWindows" ng-click="helpPandirc()" href="">help</a>
+		<div id="divSendMessage">
+			<input id="inputSendMessage" ng-model="newMessage" placeholder="Entrez votre message"></input>
+        </div>
+        <div id="divSubmit">
+			<button type="submit" id="submitSendMessage">Envoyer</button>
+		</div>
+	</form>
+	
+	<div id="dialog">
+        <h3>Le nom d'utilisateur que vous avez choisis est déjà pris</h3>
+        <form ng-submit=newLogInNick() class="formType">
+            <div class="login-container">
+                <span>
+                    <label>
+                        Nouveau pseudo :
+                    </label>
+                    <input if="newNick" ng-model="newNick" type="text" autofocus>
+                </span>
+                <button type="submit"  class="btn-solid btn-connect">Se connecter</button>
             </div>
         </form>
-
+    </div>
+	
+    
+    <div id="masque"></div>
 </div>
